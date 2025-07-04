@@ -1,6 +1,6 @@
 [build]
-  command = "cd frontend && pnpm install && pnpm run build"
-  publish = "frontend/dist"
+  command = "pnpm install && pnpm run build"
+  publish = "dist"
   base = "frontend"
 
 [build.environment]
@@ -37,10 +37,10 @@
 
 # Environment-specific settings
 [context.production]
-  command = "cd frontend && pnpm install && pnpm run build"
+  command = "pnpm install && pnpm run build"
 
 [context.deploy-preview]
-  command = "cd frontend && pnpm install && pnpm run build"
+  command = "pnpm install && pnpm run build"
 
 [context.branch-deploy]
-  command = "cd frontend && pnpm install && pnpm run build"
+  command = "pnpm install && pnpm run build"
