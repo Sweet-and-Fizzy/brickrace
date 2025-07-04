@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Display font for headers - Bebas Neue for bold, impactful brick race theme */
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400; /* Bebas Neue only has one weight */
+    letter-spacing: 0.05em; /* tracking for better readability */
+    text-transform: uppercase; /* Bebas Neue works best in all caps */
+  }
+
+  /* Specific styles for different header levels */
+  h1 {
+    letter-spacing: 0.1em;
+    font-size: 2.5rem; /* Larger for maximum impact */
+  }
+
+  h2 {
+    letter-spacing: 0.075em;
+    font-size: 2rem;
+  }
+
+  h3 {
+    letter-spacing: 0.05em;
+    font-size: 1.5rem;
+  }
+
+  h4,
+  h5,
+  h6 {
+    letter-spacing: 0.025em;
+    font-size: 1.25rem;
+  }
+}
