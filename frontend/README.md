@@ -65,7 +65,7 @@ frontend/
 ### Prerequisites
 
 - Node.js 18+
-- npm or pnpm
+- pnpm (recommended) or npm
 - Supabase account
 
 ### Installation
@@ -80,7 +80,7 @@ frontend/
 2. **Install dependencies**
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Environment Setup**
@@ -94,7 +94,7 @@ frontend/
 4. **Start development server**
 
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 
    The application will be available at `http://localhost:3000`
@@ -103,14 +103,14 @@ frontend/
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run generate` - Generate static site
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues automatically
-- `npm run format` - Format code with Prettier
-- `npm run format:check` - Check code formatting
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
+- `pnpm run generate` - Generate static site
+- `pnpm run preview` - Preview production build
+- `pnpm run lint` - Run ESLint
+- `pnpm run lint:fix` - Fix ESLint issues automatically
+- `pnpm run format` - Format code with Prettier
+- `pnpm run format:check` - Check code formatting
 
 ### Code Quality
 
@@ -123,8 +123,8 @@ This project uses:
 Run linting and formatting before committing:
 
 ```bash
-npm run lint:fix
-npm run format
+pnpm run lint:fix
+pnpm run format
 ```
 
 ### Database Schema
@@ -155,8 +155,8 @@ This project is configured for easy deployment on Netlify:
 2. **Configure Build Settings**
    
    Netlify will automatically detect the `netlify.toml` configuration, but verify these settings:
-   - **Build command**: `npm run build`
-   - **Publish directory**: `.output/public`
+   - **Build command**: `pnpm run build`
+   - **Publish directory**: `dist`
    - **Node version**: 18
 
 3. **Environment Variables**
@@ -181,22 +181,22 @@ npm install -g netlify-cli
 netlify login
 
 # Build the project
-npm run build
+pnpm run build
 
 # Deploy to Netlify
-netlify deploy --prod --dir=.output/public
+netlify deploy --prod --dir=dist
 ```
 
 ### Alternative Deployment Options
 
 #### Vercel
 ```bash
-npm run build
+pnpm run build
 ```
 
 #### Static Generation
 ```bash
-npm run generate
+pnpm run generate
 ```
 
 ### Required Environment Variables

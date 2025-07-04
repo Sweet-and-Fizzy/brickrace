@@ -1,21 +1,22 @@
 [build]
-  # Build command
-  command = "npm run build"
+  # Build command using pnpm
+  command = "pnpm run build"
   
-  # Directory to publish (Nuxt 3 outputs to .output/public)
-  publish = ".output/public"
+  # Directory to publish (Netlify preset outputs here)
+  publish = "dist"
   
   # Node.js version
   environment = { NODE_VERSION = "18" }
 
 [build.environment]
   # Build environment variables
-  NPM_FLAGS = "--prefix=/dev/null"
+  NPM_CONFIG_FUND = "false"
+  NPM_CONFIG_AUDIT = "false"
 
 # SPA redirect for client-side routing
 [[redirects]]
   from = "/*"
-  to = "/200.html"
+  to = "/index.html"
   status = 200
 
 # Headers for security and performance

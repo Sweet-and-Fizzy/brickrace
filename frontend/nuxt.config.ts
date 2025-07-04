@@ -5,6 +5,11 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss', '@primevue/nuxt-module', '@pinia/nuxt'],
+  
+  // Netlify deployment configuration
+  nitro: {
+    preset: 'netlify'
+  },
   primevue: {
     options: {
       theme: {
