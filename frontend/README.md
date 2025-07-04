@@ -141,24 +141,77 @@ The application uses Supabase with the following main tables:
 
 ## Deployment
 
-### Production Build
+### Netlify Deployment
 
+This project is configured for easy deployment on Netlify:
+
+#### Quick Deploy
+
+1. **Connect Repository**
+   - Fork or clone this repository to your GitHub account
+   - Connect your GitHub account to Netlify
+   - Create a new site from your repository
+
+2. **Configure Build Settings**
+   
+   Netlify will automatically detect the `netlify.toml` configuration, but verify these settings:
+   - **Build command**: `npm run build`
+   - **Publish directory**: `.output/public`
+   - **Node version**: 18
+
+3. **Environment Variables**
+   
+   In your Netlify dashboard, go to Site Settings > Environment Variables and add:
+   ```
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_ANON_KEY=your-anon-key-here
+   ```
+
+4. **Deploy**
+   - Push changes to your main branch
+   - Netlify will automatically build and deploy
+
+#### Manual Deployment
+
+```bash
+# Install Netlify CLI
+npm install -g netlify-cli
+
+# Login to Netlify
+netlify login
+
+# Build the project
+npm run build
+
+# Deploy to Netlify
+netlify deploy --prod --dir=.output/public
+```
+
+### Alternative Deployment Options
+
+#### Vercel
 ```bash
 npm run build
 ```
 
-### Static Generation
-
+#### Static Generation
 ```bash
 npm run generate
 ```
 
-### Environment Variables
+### Required Environment Variables
 
-Ensure production environment variables are set:
+For all deployment platforms, ensure these environment variables are set:
 
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
+- `SUPABASE_URL` - Your Supabase project URL
+- `SUPABASE_ANON_KEY` - Your Supabase anonymous/public key
+
+### Domain Configuration
+
+After deployment:
+1. Configure your custom domain in Netlify dashboard
+2. Update Supabase authentication settings with your domain
+3. Update any CORS settings in your Supabase project
 
 ## Key Features Explained
 

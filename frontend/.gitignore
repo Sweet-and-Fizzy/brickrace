@@ -11,7 +11,7 @@ node_modules
 
 # Logs
 logs
-*.log
+*.log*
 
 # Misc
 .DS_Store
@@ -22,3 +22,6 @@ logs
 .env
 .env.*
 !.env.example
+
+# Netlify
+.netlify
