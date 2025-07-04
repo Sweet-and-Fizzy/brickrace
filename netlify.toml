@@ -1,15 +1,10 @@
 [build]
-  # Build command using pnpm
-  command = "pnpm run build"
-  
-  # Directory to publish (Netlify preset outputs here)
-  publish = "dist"
-  
-  # Node.js version
-  environment = { NODE_VERSION = "18" }
+  command = "cd frontend && pnpm install && pnpm run build"
+  publish = "frontend/dist"
+  base = "frontend"
 
 [build.environment]
-  # Build environment variables
+  NODE_VERSION = "22"
   NPM_CONFIG_FUND = "false"
   NPM_CONFIG_AUDIT = "false"
 
@@ -42,15 +37,10 @@
 
 # Environment-specific settings
 [context.production]
-  command = "npm run build"
+  command = "cd frontend && pnpm install && pnpm run build"
 
 [context.deploy-preview]
-  command = "npm run build"
+  command = "cd frontend && pnpm install && pnpm run build"
 
 [context.branch-deploy]
-  command = "npm run build"
-
-# Functions configuration (if you need serverless functions later)
-[functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
+  command = "cd frontend && pnpm install && pnpm run build"
