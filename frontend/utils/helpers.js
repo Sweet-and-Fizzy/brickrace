@@ -8,7 +8,7 @@ export const formatFileSize = (bytes) => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
 // Validate email format
@@ -99,7 +99,7 @@ export const isEmpty = (obj) => {
 
 // Format race time for display
 export const formatRaceTime = (timeInSeconds) => {
-  if (!timeInSeconds || isNaN(timeInSeconds)) return 'N/A'
+  if (!timeInSeconds || Number.isNaN(timeInSeconds)) return 'N/A'
 
   const minutes = Math.floor(timeInSeconds / 60)
   const seconds = (timeInSeconds % 60).toFixed(2)
@@ -131,8 +131,8 @@ export const slugify = (text) => {
     .toLowerCase()
     .trim()
     .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/-{2,}/g, '-')
     .replace(/^-+/, '')
     .replace(/-+$/, '')
 }
@@ -144,7 +144,7 @@ export const getFileExtension = (filename) => {
 
 // Check if value is a valid number
 export const isNumber = (value) => {
-  return !isNaN(value) && !isNaN(parseFloat(value))
+  return !Number.isNaN(value) && !Number.isNaN(Number.parseFloat(value))
 }
 
 // Safe JSON parse with fallback

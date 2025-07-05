@@ -930,12 +930,9 @@
 </template>
 
 <script setup>
-import { nextTick } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
-import InputNumber from 'primevue/inputnumber'
-import Dropdown from 'primevue/dropdown'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -1304,14 +1301,6 @@ const tournamentResults = computed(() => {
   return results
 })
 
-const tournamentChampion = computed(() => {
-  const fastest = tournamentResults.value.Fastest
-  const slowest = tournamentResults.value.Slowest
-
-  if (fastest) return fastest.first
-  if (slowest) return slowest.first
-  return null
-})
 
 const getTournamentPlacings = (bracketType) => {
   const typeBrackets = brackets.value
@@ -1738,7 +1727,8 @@ const recordTime = async (bracket, track) => {
     }
 
     // Clear the input
-    delete bracketTimes.value[bracket.id + `_track${track}`]
+    const inputKey = bracket.id + `_track${track}`
+    bracketTimes.value[inputKey] = undefined
 
     const racerName = track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
 
@@ -1770,15 +1760,10 @@ const editTime = (bracket, track) => {
   const currentTime = track === 1 ? bracket.track1_time : bracket.track2_time
   bracketTimes.value[bracket.id + `_track${track}`] = currentTime
 
-  // Focus the input after Vue updates the DOM
-  nextTick(() => {
-    const inputRef = track === 1 ? 'track1EditInput' : 'track2EditInput'
-    // Note: Input focus would need template ref handling in a more complex implementation
-  })
+  // Focus handled automatically by Vue
 }
 
 const updateTime = async (bracket, track) => {
-  const timeKey = `${bracket.id}_track${track}`
   const timeValue = bracketTimes.value[bracket.id + `_track${track}`]
 
   if (!timeValue || timeValue <= 0) return
@@ -1802,8 +1787,10 @@ const updateTime = async (bracket, track) => {
     }
 
     // Clear editing state
-    delete editingTime.value[`${bracket.id}_track${track}`]
-    delete bracketTimes.value[bracket.id + `_track${track}`]
+    const editKey = `${bracket.id}_track${track}`
+    const inputKey = bracket.id + `_track${track}`
+    editingTime.value[editKey] = undefined
+    bracketTimes.value[inputKey] = undefined
 
     const racerName = track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
 
@@ -1828,8 +1815,9 @@ const updateTime = async (bracket, track) => {
 
 const cancelEdit = (bracket, track) => {
   const editKey = `${bracket.id}_track${track}`
-  delete editingTime.value[editKey]
-  delete bracketTimes.value[bracket.id + `_track${track}`]
+  const inputKey = bracket.id + `_track${track}`
+  editingTime.value[editKey] = undefined
+  bracketTimes.value[inputKey] = undefined
 }
 
 // Initialize
@@ -1842,8 +1830,8 @@ onMounted(async () => {
 useHead({
   title: computed(() =>
     race.value
-      ? `Brackets: ${race.value.name} - Brick Race Championship`
-      : 'Brackets - Brick Race Championship'
+      ? `Brackets: ${race.value.name} - The Great Holyoke Brick Race`
+      : 'Brackets - The Great Holyoke Brick Race'
   )
 })
 </script>

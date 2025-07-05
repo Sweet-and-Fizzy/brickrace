@@ -1,5 +1,6 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div class="container mx-auto px-4 py-8">
     <!-- Breadcrumb Navigation -->
     <Breadcrumb :model="breadcrumbItems" class="mb-6" />
 
@@ -35,7 +36,7 @@
 
         <div class="flex gap-2 mt-4 md:mt-0">
           <NuxtLink v-if="canEdit" :to="`/racers/${racer.id}/edit`">
-            <Button severity="primary">
+            <Button class="btn-brick-secondary">
               <i class="pi pi-pencil mr-2" />
               Edit Racer
             </Button>
@@ -78,9 +79,17 @@
                 </div>
               </div>
 
-              <!-- ID Badge -->
+              <!-- Name Tag Badge -->
               <div
-                class="absolute top-4 right-4 bg-blue-600 text-white px-3 py-2 rounded-lg font-mono text-lg font-bold shadow-lg"
+                class="absolute top-4 right-4 bg-white text-gray-800 px-4 py-2 text-lg font-semibold border-2 border-gray-300 shadow-lg"
+                style="
+                  border-radius: 12px 12px 12px 0;
+                  font-family: 'Inter', sans-serif;
+                  letter-spacing: 0.05em;
+                  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+                  min-width: 50px;
+                  text-align: center;
+                "
               >
                 #{{ racer.racer_number }}
               </div>
@@ -351,7 +360,7 @@
                   :alt="item.alt"
                   class="max-w-full max-h-full object-contain"
                   style="max-height: 80vh; max-width: 90vw"
-                />
+                >
               </div>
             </template>
           </Galleria>
@@ -396,7 +405,7 @@
                       :src="award.award_definition.image_url"
                       :alt="award.award_definition.name"
                       class="w-full aspect-square object-cover rounded border border-gray-300 dark:border-gray-600"
-                    />
+                    >
                     <div
                       v-else
                       class="w-full aspect-square bg-gray-100 dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 flex items-center justify-center"
@@ -464,6 +473,7 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
@@ -518,7 +528,7 @@ const fetchRacer = async () => {
       .eq('racer_id', route.params.id)
       .order('created_at', { ascending: false })
 
-    const { data: awardsData, error: awardsError } = await $supabase
+    const { data: awardsData } = await $supabase
       .from('awards')
       .select(
         `
@@ -603,7 +613,7 @@ const fastestTime = computed(() => {
   const qualifiers = racer.value?.qualifiers
   if (!qualifiers || qualifiers.length === 0) return null
 
-  const times = qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
+  const times = qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
   if (times.length === 0) return null
 
   const fastest = Math.min(...times)
@@ -614,7 +624,7 @@ const slowestTime = computed(() => {
   const qualifiers = racer.value?.qualifiers
   if (!qualifiers || qualifiers.length === 0) return null
 
-  const times = qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
+  const times = qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
   if (times.length === 0) return null
 
   const slowest = Math.max(...times)
@@ -698,7 +708,7 @@ const formatTime = (time) => {
 const getBadgeSeverity = (time, allQualifiers) => {
   if (!time || !allQualifiers || allQualifiers.length === 0) return 'secondary'
 
-  const times = allQualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
+  const times = allQualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
   if (times.length === 0) return 'secondary'
 
   const sortedTimes = [...times].sort((a, b) => a - b)
@@ -741,18 +751,6 @@ const getBracketResultSeverity = (bracket, track, racerId) => {
   }
 }
 
-const getBracketWinner = (bracket) => {
-  if (!bracket.track1_time || !bracket.track2_time) return 'TBD'
-
-  const time1 = Number.parseFloat(bracket.track1_time)
-  const time2 = Number.parseFloat(bracket.track2_time)
-
-  if (bracket.bracket_type === 'Fastest') {
-    return time1 < time2 ? bracket.track1_racer?.name : bracket.track2_racer?.name
-  } else {
-    return time1 > time2 ? bracket.track1_racer?.name : bracket.track2_racer?.name
-  }
-}
 
 // Check if track 1 racer is the winner
 const isTrack1Winner = (bracket) => {
@@ -791,8 +789,8 @@ onMounted(async () => {
 useHead({
   title: computed(() =>
     racer.value
-      ? `${racer.value.name} - Brick Race Championship`
-      : 'Racer - Brick Race Championship'
+      ? `${racer.value.name} - The Great Holyoke Brick Race`
+      : 'Racer - The Great Holyoke Brick Race'
   )
 })
 </script>

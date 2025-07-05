@@ -1,9 +1,10 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Awards</h1>
       <NuxtLink v-if="authStore.isRaceAdmin" to="/awards/manage">
-        <Button severity="primary">
+        <Button class="btn-brick">
           <i class="pi pi-cog mr-2" />
           Manage Awards
         </Button>
@@ -201,7 +202,7 @@
                               :src="slotProps.option.image_url"
                               :alt="slotProps.option.name"
                               class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-                            />
+                            >
                             <div
                               v-else
                               class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-mono font-bold"
@@ -234,7 +235,7 @@
                             :src="getSelectedRacer(slotProps.value)?.image_url"
                             :alt="getSelectedRacer(slotProps.value)?.name"
                             class="w-6 h-6 rounded-full object-cover"
-                          />
+                          >
                           <div
                             v-else
                             class="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-mono font-bold"
@@ -494,6 +495,7 @@
       </h3>
       <p class="text-gray-500">Check back later for voting opportunities!</p>
     </div>
+    </div>
   </div>
 </template>
 
@@ -734,11 +736,11 @@ onMounted(async () => {
 })
 
 useHead({
-  title: 'Awards - Brick Race Championship',
+  title: 'Awards - The Great Holyoke Brick Race',
   meta: [
     {
       name: 'description',
-      content: 'Vote for awards and view winners in the Brick Race Championship.'
+      content: 'Vote for awards and view winners in the The Great Holyoke Brick Race.'
     }
   ]
 })

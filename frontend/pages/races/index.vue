@@ -1,9 +1,10 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">All Races</h1>
       <NuxtLink v-if="authStore.isRaceAdmin" to="/races/add">
-        <Button severity="primary">
+        <Button class="btn-brick">
           <i class="pi pi-plus mr-2" />
           Add Race
         </Button>
@@ -149,6 +150,7 @@
         Check back soon for upcoming racing events!
       </p>
     </div>
+    </div>
   </div>
 </template>
 
@@ -225,11 +227,11 @@ onMounted(async () => {
 })
 
 useHead({
-  title: 'All Races - Brick Race Championship',
+  title: 'All Races - The Great Holyoke Brick Race',
   meta: [
     {
       name: 'description',
-      content: 'Browse all LEGO car racing events in the Brick Race Championship.'
+      content: 'Browse all brick car racing events in the The Great Holyoke Brick Race.'
     }
   ]
 })

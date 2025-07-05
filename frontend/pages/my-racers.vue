@@ -1,12 +1,12 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
       <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">My Racers</h1>
-        <p class="text-gray-600 dark:text-gray-300">Manage your custom gravity-powered vehicles</p>
       </div>
       <NuxtLink to="/racers/add">
-        <Button icon="pi pi-plus" label="Add New Racer" severity="primary" class="px-4 py-2" />
+        <Button icon="pi pi-plus" label="Add New Racer" class="btn-brick px-4 py-2" />
       </NuxtLink>
     </div>
 
@@ -16,7 +16,15 @@
     </div>
 
     <!-- My Racers DataView -->
-    <DataView v-else-if="myRacers.length" :value="myRacers" layout="grid">
+    <div v-else-if="myRacers.length" class="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-lg p-6">
+      <DataView 
+        :value="myRacers" 
+        layout="grid"
+        :pt="{
+          root: { class: 'bg-transparent' },
+          content: { class: 'bg-transparent' }
+        }"
+      >
       <template #grid="slotProps">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div
@@ -43,7 +51,7 @@
                           :src="getCurrentImage(racer)"
                           :alt="racer.name"
                           class="w-full h-48 object-cover transition-all duration-300 ease-in-out"
-                        />
+                        >
                       </div>
 
                       <!-- Glass Effect Navigation Arrows -->
@@ -113,23 +121,15 @@
                       </div>
                     </div>
 
-                    <!-- 3D Brick Red Badge -->
+                    <!-- Name Tag Badge -->
                     <div
-                      class="absolute top-3 right-3 text-white px-4 py-2 text-sm font-black transition-all duration-300 transform group-hover:scale-105"
+                      class="absolute top-3 right-3 bg-white text-gray-800 px-3 py-1 text-sm font-semibold transition-all duration-300 transform group-hover:scale-105 border-2 border-gray-300 shadow-lg"
                       style="
-                        background: linear-gradient(135deg, #c53030 0%, #9c1c1c 45%, #742a2a 100%);
-                        border-top: 3px solid #d53f3f;
-                        border-left: 3px solid #d53f3f;
-                        border-right: 3px solid #4a1313;
-                        border-bottom: 3px solid #4a1313;
-                        box-shadow:
-                          0 6px 12px rgba(0, 0, 0, 0.3),
-                          inset 2px 2px 4px rgba(255, 255, 255, 0.3),
-                          inset -2px -2px 4px rgba(0, 0, 0, 0.2);
-                        font-family: 'Courier New', monospace;
-                        letter-spacing: 0.8px;
-                        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-                        min-width: 36px;
+                        border-radius: 12px 12px 12px 0;
+                        font-family: 'Inter', sans-serif;
+                        letter-spacing: 0.05em;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+                        min-width: 40px;
                         text-align: center;
                       "
                     >
@@ -194,6 +194,7 @@
         </div>
       </template>
     </DataView>
+    </div>
 
     <!-- No Racers State -->
     <div v-else class="text-center py-12">
@@ -206,11 +207,11 @@
         <Button
           icon="pi pi-plus"
           label="Create Your First Racer"
-          severity="primary"
+          class="btn-brick"
           size="large"
-          class="px-6 py-3"
         />
       </NuxtLink>
+    </div>
     </div>
   </div>
 </template>
@@ -245,7 +246,6 @@ const sortOptions = ref([
 ])
 
 const voteableAwards = ref([])
-const sortBy = ref('newest')
 
 const fetchVoteableAwards = async () => {
   try {
@@ -352,24 +352,9 @@ const fetchMyRacers = async () => {
   }
 }
 
-// Helper functions for times
-const getFastestTime = (racer) => {
-  if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
-  if (times.length === 0) return null
-  return `${Math.min(...times).toFixed(2)}s`
-}
-
-const getSlowestTime = (racer) => {
-  if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
-  if (times.length === 0) return null
-  return `${Math.max(...times).toFixed(2)}s`
-}
-
 const getTimeRange = (racer) => {
   if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
+  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
   if (times.length === 0) return null
 
   const fastest = Math.min(...times).toFixed(2)
@@ -484,79 +469,6 @@ const previousImage = (racer) => {
   slideshowState.value = new Map(slideshowState.value)
 }
 
-// Computed property for sorted racers
-const sortedRacers = computed(() => {
-  let result = [...myRacers.value]
-
-  switch (sortBy.value) {
-    case 'name':
-      result.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
-      break
-    case 'name-desc':
-      result.sort((a, b) => (b.name || '').localeCompare(a.name || ''))
-      break
-    case 'fastest':
-      result.sort((a, b) => {
-        const aFastest = getFastestTimeValue(a)
-        const bFastest = getFastestTimeValue(b)
-        if (aFastest === null && bFastest === null) return 0
-        if (aFastest === null) return 1
-        if (bFastest === null) return -1
-        return aFastest - bFastest
-      })
-      break
-    case 'slowest':
-      result.sort((a, b) => {
-        const aSlowest = getSlowestTimeValue(a)
-        const bSlowest = getSlowestTimeValue(b)
-        if (aSlowest === null && bSlowest === null) return 0
-        if (aSlowest === null) return 1
-        if (bSlowest === null) return -1
-        return bSlowest - aSlowest
-      })
-      break
-    case 'most-races':
-      result.sort((a, b) => (b.qualifiers?.length || 0) - (a.qualifiers?.length || 0))
-      break
-    case 'most-awards':
-      result.sort((a, b) => (b.awards?.length || 0) - (a.awards?.length || 0))
-      break
-    case 'newest':
-      result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      break
-    case 'oldest':
-      result.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
-      break
-    default:
-      // Handle vote-based sorting
-      if (sortBy.value.startsWith('votes-')) {
-        const awardId = sortBy.value.replace('votes-', '')
-        result.sort((a, b) => {
-          const aVotes = a.votesByAward?.[awardId] || 0
-          const bVotes = b.votesByAward?.[awardId] || 0
-          return bVotes - aVotes // Most votes first
-        })
-      }
-      break
-  }
-
-  return result
-})
-
-// Helper functions for sorting
-const getFastestTimeValue = (racer) => {
-  if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
-  if (times.length === 0) return null
-  return Math.min(...times)
-}
-
-const getSlowestTimeValue = (racer) => {
-  if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
-  if (times.length === 0) return null
-  return Math.max(...times)
-}
 
 // Helper function to get vote counts for display
 const getVoteCounts = (racer) => {
@@ -579,7 +491,7 @@ onMounted(async () => {
 })
 
 useHead({
-  title: 'My Racers - Brick Race Championship',
+  title: 'My Racers - The Great Holyoke Brick Race',
   meta: [{ name: 'description', content: 'Manage your custom brick-powered racing vehicles.' }]
 })
 </script>

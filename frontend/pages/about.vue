@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <div class="bg-gradient-to-r from-red-600 to-red-800 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl font-bold mb-6">🏁 The Great Holyoke Brick Race</h1>
-          <p class="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto">
+          <p class="text-xl md:text-2xl text-red-100 max-w-4xl mx-auto">
             A celebration of creativity, engineering, and friendly competition where custom
             gravity-powered vehicles race for glory
           </p>

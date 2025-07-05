@@ -19,7 +19,7 @@ export default defineNuxtPlugin(() => {
     const errorMessage = `Missing required environment variables: ${missingVars.join(', ')}`
     console.error(errorMessage)
 
-    if (process.dev) {
+    if (import.meta.dev) {
       throw new Error(`${errorMessage}. Please check your .env file.`)
     }
   }

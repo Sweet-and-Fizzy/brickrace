@@ -327,8 +327,8 @@ onMounted(async () => {
 useHead({
   title: computed(() =>
     race.value
-      ? `Check-in: ${race.value.name} - Brick Race Championship`
-      : 'Check-in - Brick Race Championship'
+      ? `Check-in: ${race.value.name} - The Great Holyoke Brick Race`
+      : 'Check-in - The Great Holyoke Brick Race'
   )
 })
 </script>

@@ -50,7 +50,7 @@
                 :src="definition.image_url"
                 :alt="definition.name"
                 class="w-full aspect-square object-cover"
-              />
+              >
               <div
                 v-else
                 class="w-full aspect-square bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
@@ -253,7 +253,7 @@
                 :src="definitionForm.image_url"
                 alt="Award preview"
                 class="w-16 h-16 object-cover rounded border border-gray-300 dark:border-gray-600"
-              />
+              >
               <Button
                 label="Remove Image"
                 icon="pi pi-times"
@@ -332,11 +332,6 @@
 <script setup>
 import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
-import Checkbox from 'primevue/checkbox'
-import Button from 'primevue/button'
-import FileUpload from 'primevue/fileupload'
 
 const authStore = useAuthStore()
 const { $supabase } = useNuxtApp()
@@ -636,7 +631,7 @@ const onAwardImageSelect = async (event) => {
     const fileExt = file.name.split('.').pop()
     const fileName = `award-${Date.now()}.${fileExt}`
 
-    const { data, error } = await $supabase.storage.from('race-images').upload(fileName, file)
+    const { error } = await $supabase.storage.from('race-images').upload(fileName, file)
 
     if (error) throw error
 
@@ -735,7 +730,7 @@ onMounted(async () => {
 })
 
 useHead({
-  title: 'Manage Awards - Brick Race Championship',
+  title: 'Manage Awards - The Great Holyoke Brick Race',
   meta: [{ name: 'description', content: 'Manage award types and assign awards to racers.' }]
 })
 </script>

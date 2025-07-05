@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <div class="bg-gradient-to-r from-red-600 to-red-800 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl font-bold mb-6">📸 Photo Gallery</h1>
-          <p class="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto">
+          <p class="text-xl md:text-2xl text-red-100 max-w-4xl mx-auto">
             Explore the creativity and excitement of The Great Holyoke Brick Race through photos
             from our community
           </p>
@@ -108,7 +108,7 @@
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
       >
         <div
-          v-for="(photo, index) in paginatedPhotos"
+          v-for="photo in paginatedPhotos"
           :key="photo.id"
           class="group cursor-pointer"
           @click="openGallery(filteredPhotos.indexOf(photo))"
@@ -216,7 +216,7 @@
             :alt="item.alt"
             class="max-w-full max-h-full object-contain"
             style="max-height: 85vh"
-          />
+          >
         </div>
       </template>
 
@@ -226,7 +226,7 @@
             :src="item.thumbnailImageSrc"
             :alt="item.alt"
             class="w-16 h-16 object-cover rounded"
-          />
+          >
         </div>
       </template>
 
@@ -505,7 +505,7 @@ const onSearchChange = () => {
   }, 300)
 }
 
-let searchTimeout = null
+let searchTimeout
 
 const removeFilter = (filter) => {
   switch (filter.key) {
@@ -534,14 +534,6 @@ const openGallery = (index) => {
   galleryVisible.value = true
 }
 
-const formatDate = (dateString) => {
-  if (!dateString) return 'Unknown date'
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
-}
 
 // Initialize
 onMounted(() => {

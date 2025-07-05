@@ -7,7 +7,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     // e.g., Sentry, LogRocket, etc.
 
     // Show user-friendly error message
-    if (process.client) {
+    if (import.meta.client) {
       // Only show toast on client side
       const toast = useToast()
       toast.add({
@@ -21,7 +21,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   // Handle unhandled promise rejections
-  if (process.client) {
+  if (import.meta.client) {
     window.addEventListener('unhandledrejection', (event) => {
       console.error('Unhandled promise rejection:', event.reason)
 

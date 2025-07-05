@@ -95,12 +95,12 @@
                 <div class="text-2xl font-bold text-white mb-1">
                   {{ activeRace.checkinCount || 0 }}
                 </div>
-                <div class="text-sm text-blue-100">Racers Checked In</div>
+                <div class="text-sm text-red-100">Racers Checked In</div>
               </div>
             </div>
 
             <div class="text-center">
-              <p class="text-lg text-blue-100 mb-6">
+              <p class="text-lg text-red-100 mb-6">
                 Custom gravity-powered vehicles competing for speed, creativity, and artistry
               </p>
             </div>
@@ -110,7 +110,7 @@
         <div class="flex justify-center">
           <Button
             size="large"
-            class="bg-red-600 text-white hover:bg-red-700 font-bold px-10 py-4 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105 border-2 border-red-500 hover:border-red-400"
+            class="btn-brick px-10 py-4"
             @click="navigateTo(`/races/${activeRace.id}`)"
           >
             <i class="pi pi-flag mr-3 text-lg" />
@@ -121,18 +121,18 @@
     </div>
 
     <!-- Default Hero Section (when no active race) -->
-    <div v-else-if="!pending" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <div v-else-if="!pending" class="bg-gradient-to-r from-red-600 to-red-800 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div class="text-center">
           <h1 class="text-4xl md:text-6xl font-bold mb-6">🏁 The Great Holyoke Brick Race</h1>
-          <p class="text-xl md:text-2xl mb-8 text-blue-100">
+          <p class="text-xl md:text-2xl mb-8 text-red-100">
             Custom gravity-powered vehicles competing for speed, creativity, and artistry
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
               size="large"
               icon="pi pi-flag"
-              class="bg-white text-blue-600 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-200"
+              class="bg-white text-green-700 dark:text-green-400 hover:bg-gray-100 shadow-lg hover:shadow-xl transition-all duration-200"
               @click="navigateTo('/races')"
             >
               View Races
@@ -141,7 +141,7 @@
               size="large"
               icon="pi pi-car"
               outlined
-              class="border-white text-white hover:bg-white hover:text-blue-600 shadow-lg hover:shadow-xl transition-all duration-200"
+              class="border-white text-white hover:bg-white hover:text-green-700 dark:text-green-400 shadow-lg hover:shadow-xl transition-all duration-200"
               @click="navigateTo('/racers')"
             >
               Browse Vehicles
@@ -150,7 +150,7 @@
               size="large"
               icon="pi pi-info-circle"
               outlined
-              class="border-white text-white hover:bg-white hover:text-blue-600 shadow-lg hover:shadow-xl transition-all duration-200"
+              class="border-white text-white hover:bg-white hover:text-green-700 dark:text-green-400 shadow-lg hover:shadow-xl transition-all duration-200"
               @click="navigateTo('/about')"
             >
               Learn More
@@ -170,7 +170,7 @@
               src="~/assets/img/brick_race_logo.jpg"
               alt="The Great Holyoke Brick Race Logo"
               class="h-32 md:h-40 w-auto object-contain rounded-lg"
-            />
+            >
           </div>
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             The Great Holyoke Brick Race
@@ -182,12 +182,12 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Learn About Our History -->
-          <Card class="border-2 border-blue-200 dark:border-blue-800 h-full">
+          <Card class="border-2 border-green-500 dark:border-green-600 h-full">
             <template #content>
               <div class="text-center space-y-6 h-full flex flex-col">
                 <div class="flex justify-center">
                   <div
-                    class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center"
+                    class="bg-gradient-to-r from-red-600 to-red-700 rounded-full w-16 h-16 flex items-center justify-center"
                   >
                     <i class="pi pi-clock text-2xl text-white" />
                   </div>
@@ -210,8 +210,7 @@
 
                 <Button
                   size="large"
-                  severity="primary"
-                  class="font-semibold w-full"
+                  class="btn-brick font-semibold"
                   @click="navigateTo('/about')"
                 >
                   <i class="pi pi-book mr-2" />
@@ -222,12 +221,12 @@
           </Card>
 
           <!-- Build Your Own Racer -->
-          <Card class="border-2 border-green-200 dark:border-green-800 h-full">
+          <Card class="border-2 border-green-500 dark:border-green-600 h-full">
             <template #content>
               <div class="text-center space-y-6 h-full flex flex-col">
                 <div class="flex justify-center">
                   <div
-                    class="bg-gradient-to-r from-green-600 to-blue-600 rounded-full w-16 h-16 flex items-center justify-center"
+                    class="bg-gradient-to-r from-orange-700 to-orange-800 rounded-full w-16 h-16 flex items-center justify-center"
                   >
                     <i class="pi pi-wrench text-2xl text-white" />
                   </div>
@@ -250,8 +249,7 @@
 
                 <Button
                   size="large"
-                  severity="success"
-                  class="font-semibold w-full"
+                  class="btn-brick-secondary font-semibold"
                   @click="navigateTo('/build-racer')"
                 >
                   <i class="pi pi-car mr-2" />
@@ -302,7 +300,7 @@
                     :src="item.itemImageSrc"
                     :alt="item.alt"
                     class="w-full h-96 object-cover rounded-lg shadow-lg"
-                  />
+                  >
 
                   <!-- Click to expand hint -->
                   <div
@@ -323,8 +321,8 @@
                   <img
                     :src="item.thumbnailImageSrc"
                     :alt="item.alt"
-                    class="w-20 h-16 object-cover rounded border-2 border-transparent hover:border-blue-400 transition-colors cursor-pointer"
-                  />
+                    class="w-20 h-16 object-cover rounded border-2 border-transparent hover:border-green-600 dark:hover:border-green-400 transition-colors cursor-pointer"
+                  >
                 </div>
               </template>
             </Galleria>
@@ -335,13 +333,13 @@
         <div class="text-center mt-12 space-y-6">
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <NuxtLink to="/gallery">
-              <Button outlined size="large">
+              <Button outlined size="large" class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900">
                 <i class="pi pi-images mr-2" />
                 View Photo Gallery
               </Button>
             </NuxtLink>
             <NuxtLink to="/my-photos">
-              <Button severity="secondary" outlined size="large">
+              <Button severity="secondary" outlined size="large" class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900">
                 <i class="pi pi-upload mr-2" />
                 Share Your Photos
               </Button>
@@ -349,7 +347,7 @@
           </div>
 
           <div
-            class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 max-w-2xl mx-auto"
+            class="bg-green-100 dark:bg-green-900/20 border border-green-500 dark:border-green-600 rounded-lg p-4 max-w-2xl mx-auto"
           >
             <p class="text-sm text-green-800 dark:text-green-200">
               <i class="pi pi-info-circle mr-2" />
@@ -381,7 +379,7 @@
             :alt="item.alt"
             class="max-w-full max-h-full object-contain"
             style="max-height: 90vh"
-          />
+          >
         </div>
       </template>
     </Galleria>
@@ -431,8 +429,51 @@
 
         <div class="text-center mt-8">
           <NuxtLink to="/races">
-            <Button outlined>View All Races</Button>
+            <Button outlined class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900">View All Races</Button>
           </NuxtLink>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Media Section -->
+    <div class="py-16 bg-gradient-to-r from-red-800 to-orange-800 text-white">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">Stay Connected</h2>
+        <p class="text-xl text-red-100 mb-8 max-w-2xl mx-auto">
+          Follow along for race updates, behind-the-scenes content, and inspiration from our amazing community of builders and racers!
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+          <!-- Facebook -->
+          <a 
+            href="https://www.facebook.com/HolyokeBrickRace"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 px-6 py-3 rounded-lg"
+          >
+            <i class="pi pi-facebook text-2xl" />
+            <span class="font-semibold">Facebook</span>
+          </a>
+
+          <!-- Instagram -->
+          <a 
+            href="https://www.instagram.com/thegreatholyokebrickrace"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 px-6 py-3 rounded-lg"
+          >
+            <i class="pi pi-instagram text-2xl" />
+            <span class="font-semibold">Instagram</span>
+          </a>
+
+          <!-- Email -->
+          <a 
+            href="mailto:thegreatholyokebrickrace@gmail.com"
+            class="flex items-center gap-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 px-6 py-3 rounded-lg"
+          >
+            <i class="pi pi-envelope text-2xl" />
+            <span class="font-semibold">Email</span>
+          </a>
         </div>
       </div>
     </div>
@@ -699,12 +740,12 @@ const openFeaturedGallery = (index) => {
 }
 
 useHead({
-  title: 'Brick Race Championship - LEGO Car Racing Competition',
+  title: 'The Great Holyoke Brick Race - Competing for speed, creativity, and artistry',
   meta: [
     {
       name: 'description',
       content:
-        'The ultimate LEGO car racing competition. Track races, manage racers, and compete for awards.'
+        'The first brick race of its kind in the country. 14 years of creative racing history, memorable designs, and community spirit. Open to all ages worldwide - artists, engineers, tinkerers, and dreamers welcome!'
     }
   ]
 })

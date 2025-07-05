@@ -459,7 +459,7 @@
                 :src="race.image_url"
                 :alt="race.name"
                 class="w-full h-64 md:h-96 object-cover"
-              />
+              >
             </template>
           </Card>
 
@@ -534,7 +534,7 @@
                       :src="checkin.racer_image_url"
                       :alt="checkin.racer_name"
                       class="w-12 h-12 object-cover rounded-full border-2 border-green-300"
-                    />
+                    >
                     <div
                       v-else
                       class="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-full border-2 border-green-300 flex items-center justify-center"
@@ -1079,14 +1079,6 @@ const raceEvents = computed(() => {
   return events.sort((a, b) => new Date(a.date) - new Date(b.date))
 })
 
-const tournamentChampion = computed(() => {
-  const fastest = tournamentResults.value.Fastest
-  const slowest = tournamentResults.value.Slowest
-
-  if (fastest) return fastest.first
-  if (slowest) return slowest.first
-  return null
-})
 
 // Race process steps
 const raceSteps = computed(() => [
@@ -1364,7 +1356,7 @@ onMounted(async () => {
 
 useHead({
   title: computed(() =>
-    race.value ? `${race.value.name} - Brick Race Championship` : 'Race - Brick Race Championship'
+    race.value ? `${race.value.name} - The Great Holyoke Brick Race` : 'Race - The Great Holyoke Brick Race'
   )
 })
 </script>

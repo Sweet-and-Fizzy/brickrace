@@ -60,14 +60,57 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       const { $supabase } = useNuxtApp()
 
-      const { error } = await $supabase.auth.signOut()
+      try {
+        const { error } = await $supabase.auth.signOut()
+        if (error) throw error
+
+        this.user = null
+        this.session = null
+
+        // Redirect to home page
+        await navigateTo('/')
+      } catch (error) {
+        console.error('Logout error:', error)
+        // Clear local state even if remote logout fails
+        this.user = null
+        this.session = null
+        await navigateTo('/')
+        throw error
+      }
+    },
+
+    async resetPassword(email) {
+      const { $supabase } = useNuxtApp()
+
+      const { error } = await $supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      })
+
       if (error) throw error
+    },
 
-      this.user = null
-      this.session = null
+    async updatePassword(newPassword) {
+      const { $supabase } = useNuxtApp()
 
-      // Redirect to home page
-      await navigateTo('/')
+      const { error } = await $supabase.auth.updateUser({
+        password: newPassword
+      })
+
+      if (error) throw error
+    },
+
+    async signInWithProvider(provider) {
+      const { $supabase } = useNuxtApp()
+
+      const { data, error } = await $supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
+
+      if (error) throw error
+      return data
     },
 
     async initAuth() {

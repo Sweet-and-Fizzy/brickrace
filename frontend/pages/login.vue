@@ -1,13 +1,20 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <div class="flex justify-center">
+          <img
+            src="~/assets/img/brick_race_logo.jpg"
+            alt="The The Great Holyoke Brick Race Logo"
+            class="h-20 w-auto object-contain rounded-lg"
+          >
+        </div>
+        <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
           Sign in to your account
         </h2>
-        <p class="mt-2 text-center text-sm text-gray-600">
+        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Or
-          <NuxtLink to="/register" class="font-medium text-blue-600 hover:text-blue-500">
+          <NuxtLink to="/register" class="font-medium text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300">
             create a new account
           </NuxtLink>
         </p>
@@ -15,50 +22,87 @@
 
       <Card class="mt-8">
         <template #content>
-          <form class="space-y-6" @submit.prevent="handleLogin">
-            <div>
-              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                Email address
-              </label>
-              <InputText
-                id="email"
-                v-model="form.email"
-                type="email"
-                autocomplete="email"
-                placeholder="Enter your email"
-                :invalid="!!errors.email"
-                class="w-full"
-              />
-              <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
-            </div>
-
-            <div>
-              <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <Password
-                id="password"
-                v-model="form.password"
-                autocomplete="current-password"
-                placeholder="Enter your password"
-                :invalid="!!errors.password"
-                :feedback="false"
-                toggle-mask
-                class="w-full"
-              />
-              <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
-            </div>
-
-            <div>
+          <div class="space-y-6">
+            <!-- Social Login Buttons -->
+            <div class="space-y-3">
               <Button
-                type="submit"
-                :loading="loading"
-                label="Sign in"
+                :loading="socialLoading === 'google'"
+                severity="secondary"
+                outlined
                 class="w-full"
-                severity="primary"
-              />
+                @click="handleSocialLogin('google')"
+              >
+                <i class="pi pi-google mr-2" />
+                Continue with Google
+              </Button>
             </div>
-          </form>
+
+            <!-- Divider -->
+            <div class="relative">
+              <div class="absolute inset-0 flex items-center">
+                <div class="w-full border-t border-gray-300 dark:border-gray-600" />
+              </div>
+              <div class="relative flex justify-center text-sm">
+                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or use email</span>
+              </div>
+            </div>
+
+            <!-- Email/Password Form -->
+            <form class="space-y-4" @submit.prevent="handleLogin">
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Email address
+                </label>
+                <InputText
+                  id="email"
+                  v-model="form.email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="Enter your email"
+                  :invalid="!!errors.email"
+                  class="w-full"
+                />
+                <p v-if="errors.email" class="mt-1 text-sm text-red-600">{{ errors.email }}</p>
+              </div>
+
+              <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Password
+                </label>
+                <Password
+                  id="password"
+                  v-model="form.password"
+                  autocomplete="current-password"
+                  placeholder="Enter your password"
+                  :invalid="!!errors.password"
+                  :feedback="false"
+                  toggle-mask
+                  input-class="w-full"
+                  class="w-full"
+                />
+                <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
+              </div>
+
+              <div>
+                <Button
+                  type="submit"
+                  :loading="loading"
+                  label="Sign in"
+                  class="w-full btn-brick"
+                  severity="primary"
+                />
+              </div>
+
+              <div class="text-center">
+                <NuxtLink
+                  to="/forgot-password"
+                  class="text-sm text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300"
+                >
+                  Forgot your password?
+                </NuxtLink>
+              </div>
+            </form>
+          </div>
         </template>
       </Card>
     </div>
@@ -67,17 +111,10 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-import InputText from 'primevue/inputtext'
-import Password from 'primevue/password'
-import Button from 'primevue/button'
 
-definePageMeta({
-  layout: false
-})
 
 const authStore = useAuthStore()
 const router = useRouter()
-const $toast = useToast()
 
 const form = reactive({
   email: '',
@@ -91,6 +128,7 @@ const errors = reactive({
 })
 
 const loading = ref(false)
+const socialLoading = ref('')
 
 const clearErrors = () => {
   errors.email = ''
@@ -142,6 +180,21 @@ const handleLogin = async () => {
   }
 }
 
+const handleSocialLogin = async (provider) => {
+  clearErrors()
+  socialLoading.value = provider
+
+  try {
+    await authStore.signInWithProvider(provider)
+    // The redirect will be handled by Supabase
+  } catch (error) {
+    console.error('Social login error:', error)
+    errors.general = error.message || `Failed to sign in with ${provider}. Please try again.`
+  } finally {
+    socialLoading.value = ''
+  }
+}
+
 // Redirect if already authenticated
 onMounted(() => {
   authStore.initAuth()
@@ -151,6 +204,6 @@ onMounted(() => {
 })
 
 useHead({
-  title: 'Login - Brick Race Championship'
+  title: 'Login - The Great Holyoke Brick Race'
 })
 </script>

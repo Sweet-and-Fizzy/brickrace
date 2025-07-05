@@ -3,9 +3,38 @@ import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
 export default createConfigForNuxt({
   features: {
     tooling: true,
-    stylistic: false
+    stylistic: false,
+    typescript: true
   }
 })
+  .prepend({
+    ignores: [
+      // Build output
+      '.nuxt/**',
+      '.output/**',
+      'dist/**',
+      // Dependencies
+      'node_modules/**',
+      // Generated files
+      '**/*.d.ts',
+      // Logs
+      'logs/**',
+      '**/*.log',
+      // Runtime data
+      'pids/**',
+      '**/*.pid',
+      '**/*.seed',
+      // Coverage
+      'coverage/**',
+      // Environment variables
+      '.env',
+      '.env.local',
+      '.env.*.local',
+      // Temporary folders
+      'tmp/**',
+      'temp/**'
+    ]
+  })
   .override('nuxt/vue/rules', {
     rules: {
       'vue/multi-word-component-names': 'off',

@@ -171,7 +171,7 @@
                   </h4>
                   <div class="flex flex-wrap gap-2">
                     <div
-                      v-for="(qualifier, index) in getRacerQualifiers(racer.id)"
+                      v-for="qualifier in getRacerQualifiers(racer.id)"
                       :key="qualifier.id"
                       class="flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-full text-sm text-blue-800 dark:text-blue-200"
                     >
@@ -334,7 +334,6 @@
 import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
-import InputNumber from 'primevue/inputnumber'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -595,8 +594,8 @@ onMounted(async () => {
 useHead({
   title: computed(() =>
     race.value
-      ? `Qualifiers: ${race.value.name} - Brick Race Championship`
-      : 'Qualifiers - Brick Race Championship'
+      ? `Qualifiers: ${race.value.name} - The Great Holyoke Brick Race`
+      : 'Qualifiers - The Great Holyoke Brick Race'
   )
 })
 </script>

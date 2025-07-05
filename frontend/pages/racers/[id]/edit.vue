@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
   >
     <div class="container mx-auto px-4 py-12 max-w-2xl">
       <!-- Breadcrumb Navigation -->
@@ -21,7 +21,7 @@
           You don't have permission to edit this racer or it doesn't exist.
         </p>
         <NuxtLink to="/racers">
-          <Button label="Back to All Racers" icon="pi pi-arrow-left" severity="primary" />
+          <Button label="Back to All Racers" icon="pi pi-arrow-left" class="btn-brick-secondary" />
         </NuxtLink>
       </div>
 
@@ -30,7 +30,7 @@
         <!-- Header -->
         <div class="text-center mb-12">
           <div
-            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-6"
+            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-600 to-green-700 rounded-full mb-6"
           >
             <i class="pi pi-pencil text-2xl text-white" />
           </div>
@@ -130,8 +130,8 @@
                     <!-- Status Header -->
                     <div class="flex items-center justify-center gap-2 mb-4">
                       <template v-if="previewImage">
-                        <i class="pi pi-clock text-blue-600 dark:text-blue-400" />
-                        <span class="text-sm text-blue-600 dark:text-blue-400 font-medium"
+                        <i class="pi pi-clock text-green-700 dark:text-green-400" />
+                        <span class="text-sm text-green-700 dark:text-green-400 font-medium"
                           >Photo ready to save</span
                         >
                       </template>
@@ -157,7 +157,7 @@
                         :src="previewImage || form.image_url"
                         :alt="previewImage ? 'Photo preview' : 'Current main photo'"
                         class="max-w-xs max-h-48 mx-auto rounded-lg shadow-md object-cover"
-                      />
+                      >
                     </div>
 
                     <!-- Preview Action Buttons -->
@@ -246,8 +246,7 @@
                   :loading="loading"
                   label="Update Racer"
                   icon="pi pi-save"
-                  class="flex-1"
-                  severity="primary"
+                  class="btn-brick flex-1"
                 />
               </div>
             </form>
@@ -263,12 +262,6 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-import InputText from 'primevue/inputtext'
-import InputNumber from 'primevue/inputnumber'
-import Textarea from 'primevue/textarea'
-import Button from 'primevue/button'
-import FileUpload from 'primevue/fileupload'
-import Image from 'primevue/image'
 
 definePageMeta({
   middleware: 'auth'
@@ -358,7 +351,7 @@ const validateForm = () => {
     isValid = false
   }
 
-  if (form.weight && (isNaN(form.weight) || Number.parseFloat(form.weight) < 0)) {
+  if (form.weight && (Number.isNaN(form.weight) || Number.parseFloat(form.weight) < 0)) {
     errors.weight = 'Weight must be a positive number in pounds'
     isValid = false
   }
@@ -386,7 +379,7 @@ const handleSubmit = async () => {
       updateData.weight = Number.parseFloat(form.weight) * 453.592
     }
 
-    const { data, error } = await $supabase
+    const { error } = await $supabase
       .from('racers')
       .update(updateData)
       .eq('id', route.params.id)
@@ -422,25 +415,25 @@ const handleSubmit = async () => {
 }
 
 // Photo event handlers
-const onPhotoUploaded = async (uploadedUrls) => {
+const onPhotoUploaded = async (_uploadedUrls) => {
   // Photos are already added to form.photos by the PhotoUpload component
   // Auto-save the updated photos array
   await savePhotos()
 }
 
-const onPhotoDeleted = async ({ index, url }) => {
+const onPhotoDeleted = async ({ index: _index, url: _url }) => {
   // Photos are already removed from form.photos by the PhotoUpload component
   // Auto-save the updated photos array
   await savePhotos()
 }
 
-const onPhotosReordered = async ({ fromIndex, toIndex }) => {
+const onPhotosReordered = async ({ fromIndex: _fromIndex, toIndex: _toIndex }) => {
   // Photos are already reordered in form.photos by the PhotoUpload component
   // Auto-save the updated photos array
   await savePhotos()
 }
 
-const onFeaturedChanged = async ({ index, featured }) => {
+const onFeaturedChanged = async ({ index: _index, featured: _featured }) => {
   // Photos are already updated in form.photos by the PhotoUpload component
   // Auto-save the updated photos array
   await savePhotos()
@@ -492,7 +485,7 @@ const savePreviewedPhoto = async () => {
     const filePath = `racers/${fileName}`
 
     // Upload file to Supabase Storage
-    const { data: uploadData, error: uploadError } = await $supabase.storage
+    const { error: uploadError } = await $supabase.storage
       .from('race-images')
       .upload(filePath, file)
 
@@ -582,8 +575,8 @@ onMounted(async () => {
 useHead({
   title: computed(() =>
     racer.value
-      ? `Edit ${racer.value.name} - Brick Race Championship`
-      : 'Edit Racer - Brick Race Championship'
+      ? `Edit ${racer.value.name} - The Great Holyoke Brick Race`
+      : 'Edit Racer - The Great Holyoke Brick Race'
   )
 })
 </script>

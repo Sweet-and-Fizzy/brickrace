@@ -104,7 +104,7 @@
                 alt="Race preview"
                 class="max-w-xs rounded-lg shadow-md"
                 @error="form.image_url = ''"
-              />
+              >
             </div>
 
             <!-- Submit Button -->
@@ -129,26 +129,12 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-import InputText from 'primevue/inputtext'
-import Calendar from 'primevue/calendar'
-import FileUpload from 'primevue/fileupload'
 
 const route = useRoute()
 const authStore = useAuthStore()
 const { $supabase } = useNuxtApp()
 const $toast = useToast()
 
-// Initialize and fetch data
-onMounted(async () => {
-  await authStore.initAuth()
-  if (!authStore.isRaceAdmin) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Access denied. Race admin privileges required.'
-    })
-  }
-  await fetchRace()
-})
 
 // State
 const race = ref(null)
@@ -243,7 +229,7 @@ const handleImageUpload = async (event) => {
     const filePath = `races/${fileName}`
 
     // Upload to Supabase Storage
-    const { data, error } = await $supabase.storage.from('race-images').upload(filePath, file)
+    const { error } = await $supabase.storage.from('race-images').upload(filePath, file)
 
     if (error) throw error
 
@@ -309,14 +295,20 @@ const updateRace = async () => {
 // Initialize
 onMounted(async () => {
   await authStore.initAuth()
+  if (!authStore.isRaceAdmin) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Access denied. Race admin privileges required.'
+    })
+  }
   await fetchRace()
 })
 
 useHead({
   title: computed(() =>
     race.value
-      ? `Edit ${race.value.name} - Brick Race Championship`
-      : 'Edit Race - Brick Race Championship'
+      ? `Edit ${race.value.name} - The Great Holyoke Brick Race`
+      : 'Edit Race - The Great Holyoke Brick Race'
   )
 })
 </script>

@@ -98,7 +98,7 @@ export const BREAKPOINTS = {
 
 // Form validation rules
 export const VALIDATION_RULES = {
-  EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  EMAIL_REGEX: /^[^\s@]+@[^\s@][^\s.@]*\.[^\s@]+$/,
   MIN_PASSWORD_LENGTH: 8,
   MAX_DESCRIPTION_LENGTH: 500,
   MAX_NAME_LENGTH: 100

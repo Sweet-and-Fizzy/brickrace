@@ -4,7 +4,7 @@
       <div class="flex items-center justify-between mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create New Race</h1>
         <NuxtLink to="/races">
-          <Button severity="secondary" outlined>
+          <Button class="btn-brick-secondary">
             <i class="pi pi-arrow-left mr-2" />
             Back to Races
           </Button>
@@ -94,7 +94,7 @@
                     alt="Race preview"
                     class="max-w-xs rounded-lg shadow-md"
                     @error="form.image_url = ''"
-                  />
+                  >
                 </div>
               </div>
             </Panel>
@@ -114,15 +114,14 @@
             <!-- Submit Button -->
             <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
               <NuxtLink to="/races" class="flex-1">
-                <Button type="button" severity="secondary" outlined class="w-full"> Cancel </Button>
+                <Button type="button" class="btn-brick-secondary w-full"> Cancel </Button>
               </NuxtLink>
               <Button
                 type="submit"
                 :loading="loading"
                 icon="pi pi-plus"
                 label="Create Race"
-                class="flex-1"
-                severity="primary"
+                class="btn-brick flex-1"
               />
             </div>
           </form>
@@ -134,10 +133,6 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-import InputText from 'primevue/inputtext'
-import Calendar from 'primevue/calendar'
-import FileUpload from 'primevue/fileupload'
-import Button from 'primevue/button'
 
 // Auth and redirect check
 const authStore = useAuthStore()
@@ -208,7 +203,7 @@ const handleImageUpload = async (event) => {
     const filePath = `races/${fileName}`
 
     // Upload to Supabase Storage
-    const { data, error } = await $supabase.storage.from('race-images').upload(filePath, file)
+    const { error } = await $supabase.storage.from('race-images').upload(filePath, file)
 
     if (error) throw error
 
@@ -259,7 +254,7 @@ const createRace = async () => {
 }
 
 useHead({
-  title: 'Create New Race - Brick Race Championship',
+  title: 'Create New Race - The Great Holyoke Brick Race',
   meta: [{ name: 'description', content: 'Create a new LEGO car racing event.' }]
 })
 </script>

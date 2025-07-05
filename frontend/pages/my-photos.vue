@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <!-- Header -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="text-center">
           <div class="flex justify-center mb-6">
             <div
-              class="bg-gradient-to-r from-green-600 to-blue-600 rounded-full w-16 h-16 flex items-center justify-center"
+              class="bg-gradient-to-r from-green-600 to-green-700 rounded-full w-16 h-16 flex items-center justify-center"
             >
               <i class="pi pi-images text-2xl text-white" />
             </div>
@@ -30,14 +30,14 @@
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="space-y-8">
         <!-- Quick Upload Section -->
-        <Card class="border-2 border-dashed border-blue-300 dark:border-blue-700">
+        <Card class="border-2 border-dashed border-green-500 dark:border-green-600">
           <template #content>
             <div class="text-center space-y-6">
               <div class="flex justify-center">
                 <div
-                  class="bg-blue-100 dark:bg-blue-900/30 rounded-full w-20 h-20 flex items-center justify-center"
+                  class="bg-green-100 dark:bg-green-900/30 rounded-full w-20 h-20 flex items-center justify-center"
                 >
-                  <i class="pi pi-plus text-3xl text-blue-600 dark:text-blue-400" />
+                  <i class="pi pi-plus text-3xl text-green-700 dark:text-green-400" />
                 </div>
               </div>
 
@@ -76,7 +76,7 @@
             <template #title>
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-car text-blue-600 dark:text-blue-400" />
+                  <i class="pi pi-car text-green-700 dark:text-green-400" />
                   <span>My Racer Photos</span>
                 </div>
                 <Badge :value="racerPhotoCount" />
@@ -235,7 +235,7 @@
           <template #content>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div class="text-center">
-                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
+                <div class="text-2xl font-bold text-green-700 dark:text-green-400 mb-1">
                   {{ totalPhotos }}
                 </div>
                 <div class="text-sm text-gray-600 dark:text-gray-300">Total Photos</div>
@@ -310,7 +310,7 @@
             :src="editingPhoto.url"
             :alt="editingPhoto.description || 'Photo'"
             class="max-w-full max-h-48 rounded-lg mx-auto"
-          />
+          >
         </div>
 
         <!-- Description Field -->
@@ -519,10 +519,6 @@ const navigateToRacerEdit = (racerId) => {
   navigateTo(`/racers/${racerId}/edit`)
 }
 
-const openGeneralGallery = (index) => {
-  activeFeaturedIndex.value = index
-  featuredGalleryVisible.value = true
-}
 
 const editGeneralPhoto = (photo) => {
   editingPhoto.value = { ...photo }
@@ -569,13 +565,11 @@ const savePhotoChanges = async () => {
   }
 }
 
-const onGeneralPhotoUploaded = (photoData) => {
-  console.log('General photo uploaded:', photoData)
+const onGeneralPhotoUploaded = () => {
   // Photo will be handled by the upload component
 }
 
 const onGeneralUploadComplete = (uploadData) => {
-  console.log('General upload complete:', uploadData)
 
   // Show success toast
   const message = authStore.isRaceAdmin

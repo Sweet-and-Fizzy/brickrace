@@ -1,11 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-green-600 to-blue-600 text-white">
+    <div class="bg-gradient-to-r from-orange-700 to-orange-900 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl font-bold mb-6">🏗️ Build Your Own Racer</h1>
-          <p class="text-xl md:text-2xl text-green-100 max-w-4xl mx-auto">
+          <p class="text-xl md:text-2xl text-orange-100 max-w-4xl mx-auto">
             Ready to join the creative chaos? Learn everything you need to know about building your
             brick racer and joining our community of artists, engineers, and dreamers.
           </p>
@@ -31,7 +31,7 @@
             <AccordionTab>
               <template #header>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-users text-blue-600 dark:text-blue-400" />
+                  <i class="pi pi-users text-green-700 dark:text-green-400" />
                   <span class="font-semibold">Who can enter?</span>
                 </div>
               </template>
@@ -174,9 +174,9 @@
                 <div class="space-y-5">
                   <div class="flex items-start gap-4">
                     <div
-                      class="bg-blue-100 dark:bg-blue-900/30 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
+                      class="bg-green-100 dark:bg-green-900/30 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
                     >
-                      <span class="text-blue-600 dark:text-blue-400 font-bold">1</span>
+                      <span class="text-green-700 dark:text-green-400 font-bold">1</span>
                     </div>
                     <div>
                       <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
@@ -189,9 +189,9 @@
                         can check in on race day.
                       </p>
                       <div
-                        class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3"
+                        class="bg-green-100 dark:bg-green-900/20 border border-green-500 dark:border-green-600 rounded-lg p-3"
                       >
-                        <p class="text-sm text-blue-800 dark:text-blue-200">
+                        <p class="text-sm text-green-800 dark:text-green-200">
                           <i class="pi pi-info-circle mr-1" />
                           <strong>Important:</strong> You cannot participate in the race without
                           first registering your racer on this website.
@@ -364,19 +364,19 @@
                   </div>
 
                   <div
-                    class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-5"
+                    class="bg-green-100 dark:bg-green-900/20 border border-green-500 dark:border-green-600 rounded-lg p-5"
                   >
                     <div class="flex items-center gap-3 mb-3">
                       <div
-                        class="bg-blue-100 dark:bg-blue-900/30 rounded-full w-10 h-10 flex items-center justify-center"
+                        class="bg-green-100 dark:bg-green-900/30 rounded-full w-10 h-10 flex items-center justify-center"
                       >
-                        <i class="pi pi-star text-blue-600 dark:text-blue-400" />
+                        <i class="pi pi-star text-green-700 dark:text-green-400" />
                       </div>
-                      <h4 class="font-semibold text-blue-800 dark:text-blue-200">
+                      <h4 class="font-semibold text-green-800 dark:text-green-200">
                         Special Categories
                       </h4>
                     </div>
-                    <p class="text-blue-700 dark:text-blue-300 text-sm leading-relaxed">
+                    <p class="text-green-800 dark:text-green-300 text-sm leading-relaxed">
                       Additional awards may be given based on the year's entries and the judges'
                       discretion.
                     </p>
@@ -452,9 +452,9 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-blue-100 dark:bg-blue-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-green-100 dark:bg-green-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <i class="pi pi-car text-blue-600 dark:text-blue-400 text-sm" />
+                      <i class="pi pi-car text-green-700 dark:text-green-400 text-sm" />
                     </div>
                     <div>
                       <p class="font-medium text-gray-900 dark:text-white mb-1">Parking</p>
@@ -521,7 +521,7 @@
             <div class="text-center space-y-6">
               <div class="flex justify-center">
                 <div
-                  class="bg-gradient-to-r from-green-600 to-blue-600 rounded-full w-16 h-16 flex items-center justify-center"
+                  class="bg-gradient-to-r from-orange-700 to-orange-800 rounded-full w-16 h-16 flex items-center justify-center"
                 >
                   <i class="pi pi-car text-2xl text-white" />
                 </div>

@@ -1,9 +1,10 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">All Racers</h1>
       <NuxtLink v-if="authStore.isAuthenticated" to="/racers/add">
-        <Button label="Add Racer" icon="pi pi-plus" severity="primary" />
+        <Button label="Add Racer" icon="pi pi-plus" class="btn-brick" />
       </NuxtLink>
       <!-- Show login prompt if not authenticated -->
       <NuxtLink v-else to="/login">
@@ -53,10 +54,18 @@
                         :src="slotProps.option.image_url"
                         :alt="slotProps.option.name"
                         class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-                      />
+                      >
                       <div
                         v-else
-                        class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-mono font-bold"
+                        class="w-10 h-10 bg-white text-gray-800 flex items-center justify-center text-xs font-semibold border-2 border-gray-300 shadow-sm"
+                        style="
+                          border-radius: 8px 8px 8px 0;
+                          font-family: 'Inter', sans-serif;
+                          letter-spacing: 0.05em;
+                          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                          min-width: 40px;
+                          text-align: center;
+                        "
                       >
                         #{{ slotProps.option.racer_number }}
                       </div>
@@ -161,184 +170,185 @@
     </div>
 
     <!-- Racers DataView -->
-    <DataView v-else-if="filteredRacers.length" :value="filteredRacers" layout="grid">
-      <template #grid="slotProps">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          <div
-            v-for="racer in slotProps.data || slotProps.items || []"
-            :key="racer.id"
-            class="cursor-pointer"
-          >
-            <NuxtLink :to="`/racers/${racer.id}`" class="block">
-              <Card
-                class="group hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer border-2 border-gray-100 dark:border-gray-700 hover:border-red-400 dark:hover:border-red-500 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 h-full relative"
-                style="box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05)"
-              >
-                <template #header>
-                  <div class="relative overflow-hidden group/slideshow">
-                    <!-- Mini Slideshow -->
-                    <div
-                      v-if="getAllRacerImages(racer).length > 1"
-                      class="relative w-full h-48 overflow-hidden"
-                    >
-                      <!-- Single image with smooth transition -->
-                      <div class="absolute inset-0">
-                        <img
-                          :key="getCurrentImage(racer)"
-                          :src="getCurrentImage(racer)"
-                          :alt="racer.name"
-                          class="w-full h-48 object-cover transition-all duration-300 ease-in-out"
-                        />
-                      </div>
-
-                      <!-- Glass Effect Navigation Arrows -->
-                      <button
-                        class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-red-600 w-10 h-10 flex items-center justify-center opacity-0 group-hover/slideshow:opacity-100 transition-all duration-300 z-10"
-                        style="
-                          border-radius: 8px;
-                          background: rgba(255, 255, 255, 0.2);
-                          backdrop-filter: blur(12px);
-                          border: 1px solid rgba(255, 255, 255, 0.3);
-                          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                        "
-                        @click.prevent="previousImage(racer)"
-                      >
-                        <i class="pi pi-chevron-left text-sm font-bold" />
-                      </button>
-
-                      <button
-                        class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-red-600 w-10 h-10 flex items-center justify-center opacity-0 group-hover/slideshow:opacity-100 transition-all duration-300 z-10"
-                        style="
-                          border-radius: 8px;
-                          background: rgba(255, 255, 255, 0.2);
-                          backdrop-filter: blur(12px);
-                          border: 1px solid rgba(255, 255, 255, 0.3);
-                          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                        "
-                        @click.prevent="nextImage(racer)"
-                      >
-                        <i class="pi pi-chevron-right text-sm font-bold" />
-                      </button>
-
-                      <!-- Brick Stud Progress Indicators -->
-                      <div class="absolute bottom-3 right-3 flex gap-1.5">
-                        <div
-                          v-for="(image, index) in getAllRacerImages(racer)"
-                          :key="index"
-                          class="w-3 h-3 rounded-full transition-all duration-300 border-2 shadow-sm"
-                          :class="
-                            getCurrentImageIndex(racer) === index
-                              ? 'bg-red-500 border-red-600 shadow-red-500/50'
-                              : 'bg-white bg-opacity-70 border-white border-opacity-80'
-                          "
-                          :style="
-                            getCurrentImageIndex(racer) === index
-                              ? 'box-shadow: 0 0 8px rgba(239, 68, 68, 0.4), inset 0 1px 2px rgba(255,255,255,0.3)'
-                              : 'box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.4)'
-                          "
-                        />
-                      </div>
-                    </div>
-
-                    <!-- Single image or no image -->
-                    <div v-else>
-                      <Image
-                        v-if="racer.image_url"
-                        :src="racer.image_url"
-                        :alt="racer.name"
-                        image-class="w-full h-48 object-cover"
-                        class="w-full h-48"
-                        :preview="false"
-                      />
+    <div v-else-if="filteredRacers.length" class="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-lg p-6">
+      <DataView 
+        :value="filteredRacers" 
+        layout="grid"
+        :pt="{
+          root: { class: 'bg-transparent' },
+          content: { class: 'bg-transparent' }
+        }"
+      >
+        <template #grid="slotProps">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div
+              v-for="racer in slotProps.data || slotProps.items || []"
+              :key="racer.id"
+              class="cursor-pointer"
+            >
+              <NuxtLink :to="`/racers/${racer.id}`" class="block">
+                <Card
+                  class="group hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer border-2 border-gray-100 dark:border-gray-700 hover:border-red-400 dark:hover:border-red-500 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 h-full relative"
+                  style="box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05)"
+                >
+                  <template #header>
+                    <div class="relative overflow-hidden group/slideshow">
+                      <!-- Mini Slideshow -->
                       <div
-                        v-else
-                        class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                        v-if="getAllRacerImages(racer).length > 1"
+                        class="relative w-full h-48 overflow-hidden"
                       >
-                        <i class="pi pi-car text-4xl text-gray-400 dark:text-gray-500" />
+                        <!-- Single image with smooth transition -->
+                        <div class="absolute inset-0">
+                          <img
+                            :key="getCurrentImage(racer)"
+                            :src="getCurrentImage(racer)"
+                            :alt="racer.name"
+                            class="w-full h-48 object-cover transition-all duration-300 ease-in-out"
+                          >
+                        </div>
+
+                        <!-- Glass Effect Navigation Arrows -->
+                        <button
+                          class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-red-600 w-10 h-10 flex items-center justify-center opacity-0 group-hover/slideshow:opacity-100 transition-all duration-300 z-10"
+                          style="
+                            border-radius: 8px;
+                            background: rgba(255, 255, 255, 0.2);
+                            backdrop-filter: blur(12px);
+                            border: 1px solid rgba(255, 255, 255, 0.3);
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                          "
+                          @click.prevent="previousImage(racer)"
+                        >
+                          <i class="pi pi-chevron-left text-sm font-bold" />
+                        </button>
+
+                        <button
+                          class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-red-600 w-10 h-10 flex items-center justify-center opacity-0 group-hover/slideshow:opacity-100 transition-all duration-300 z-10"
+                          style="
+                            border-radius: 8px;
+                            background: rgba(255, 255, 255, 0.2);
+                            backdrop-filter: blur(12px);
+                            border: 1px solid rgba(255, 255, 255, 0.3);
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                          "
+                          @click.prevent="nextImage(racer)"
+                        >
+                          <i class="pi pi-chevron-right text-sm font-bold" />
+                        </button>
+
+                        <!-- Brick Stud Progress Indicators -->
+                        <div class="absolute bottom-3 right-3 flex gap-1.5">
+                          <div
+                            v-for="(image, index) in getAllRacerImages(racer)"
+                            :key="index"
+                            class="w-3 h-3 rounded-full transition-all duration-300 border-2 shadow-sm"
+                            :class="
+                              getCurrentImageIndex(racer) === index
+                                ? 'bg-red-500 border-red-600 shadow-red-500/50'
+                                : 'bg-white bg-opacity-70 border-white border-opacity-80'
+                            "
+                            :style="
+                              getCurrentImageIndex(racer) === index
+                                ? 'box-shadow: 0 0 8px rgba(239, 68, 68, 0.4), inset 0 1px 2px rgba(255,255,255,0.3)'
+                                : 'box-shadow: 0 1px 3px rgba(0,0,0,0.2), inset 0 1px 1px rgba(255,255,255,0.4)'
+                            "
+                          />
+                        </div>
+                      </div>
+
+                      <!-- Single image or no image -->
+                      <div v-else>
+                        <Image
+                          v-if="racer.image_url"
+                          :src="racer.image_url"
+                          :alt="racer.name"
+                          image-class="w-full h-48 object-cover"
+                          class="w-full h-48"
+                          :preview="false"
+                        />
+                        <div
+                          v-else
+                          class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                        >
+                          <i class="pi pi-car text-4xl text-gray-400 dark:text-gray-500" />
+                        </div>
+                      </div>
+
+                      <!-- Name Tag Badge -->
+                      <div
+                        class="absolute top-3 right-3 bg-white text-gray-800 px-3 py-1 text-sm font-semibold transition-all duration-300 transform group-hover:scale-105 border-2 border-gray-300 shadow-lg"
+                        style="
+                          border-radius: 12px 12px 12px 0;
+                          font-family: 'Inter', sans-serif;
+                          letter-spacing: 0.05em;
+                          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+                          min-width: 40px;
+                          text-align: center;
+                        "
+                      >
+                        #{{ racer.racer_number }}
                       </div>
                     </div>
+                  </template>
 
-                    <!-- 3D Brick Red Badge -->
-                    <div
-                      class="absolute top-3 right-3 text-white px-4 py-2 text-sm font-black transition-all duration-300 transform group-hover:scale-105"
-                      style="
-                        background: linear-gradient(135deg, #c53030 0%, #9c1c1c 45%, #742a2a 100%);
-                        border-top: 3px solid #d53f3f;
-                        border-left: 3px solid #d53f3f;
-                        border-right: 3px solid #4a1313;
-                        border-bottom: 3px solid #4a1313;
-                        box-shadow:
-                          0 6px 12px rgba(0, 0, 0, 0.3),
-                          inset 2px 2px 4px rgba(255, 255, 255, 0.3),
-                          inset -2px -2px 4px rgba(0, 0, 0, 0.2);
-                        font-family: 'Courier New', monospace;
-                        letter-spacing: 0.8px;
-                        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-                        min-width: 36px;
-                        text-align: center;
-                      "
-                    >
-                      #{{ racer.racer_number }}
-                    </div>
-                  </div>
-                </template>
-
-                <template #content>
-                  <div>
-                    <!-- Racer Name -->
+                  <template #content>
                     <div>
-                      <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight">
-                        {{ racer.name || 'NO NAME FOUND' }}
-                      </h3>
+                      <!-- Racer Name -->
+                      <div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white leading-tight normal-case">
+                          {{ racer.name || 'NO NAME FOUND' }}
+                        </h3>
+                      </div>
+
+                      <!-- Times and Awards -->
+                      <div class="mt-3 space-y-2">
+                        <!-- Times -->
+                        <div v-if="racer.qualifiers?.length" class="flex gap-2 flex-wrap">
+                          <span
+                            v-if="getTimeRange(racer)"
+                            class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm"
+                            style="font-family: 'Courier New', monospace; letter-spacing: 0.3px"
+                          >
+                            <i class="pi pi-clock mr-1.5 text-gray-500" />
+                            {{ getTimeRange(racer) }}
+                          </span>
+                        </div>
+
+                        <!-- Awards -->
+                        <div v-if="racer.awards?.length" class="flex gap-2 flex-wrap">
+                          <span
+                            v-for="award in racer.awards"
+                            :key="award.id"
+                            class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-yellow-700 dark:text-yellow-300 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg shadow-sm"
+                            style="font-weight: 600"
+                          >
+                            <i class="pi pi-star-fill mr-1.5 text-yellow-500" />
+                            {{ award.award_definition?.name || 'Award' }}
+                          </span>
+                        </div>
+
+                        <!-- Vote Counts -->
+                        <div v-if="getVoteCounts(racer).length" class="flex gap-2 flex-wrap">
+                          <span
+                            v-for="vote in getVoteCounts(racer)"
+                            :key="vote.awardId"
+                            class="inline-flex items-center px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-md shadow-sm"
+                          >
+                            <i class="pi pi-heart-fill mr-1 text-red-500" />
+                            {{ vote.count }} {{ vote.awardName }}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-
-                    <!-- Times and Awards -->
-                    <div class="mt-3 space-y-2">
-                      <!-- Times -->
-                      <div v-if="racer.qualifiers?.length" class="flex gap-2 flex-wrap">
-                        <span
-                          v-if="getTimeRange(racer)"
-                          class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm"
-                          style="font-family: 'Courier New', monospace; letter-spacing: 0.3px"
-                        >
-                          <i class="pi pi-clock mr-1.5 text-gray-500" />
-                          {{ getTimeRange(racer) }}
-                        </span>
-                      </div>
-
-                      <!-- Awards -->
-                      <div v-if="racer.awards?.length" class="flex gap-2 flex-wrap">
-                        <span
-                          v-for="award in racer.awards"
-                          :key="award.id"
-                          class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-yellow-700 dark:text-yellow-300 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg shadow-sm"
-                          style="font-weight: 600"
-                        >
-                          <i class="pi pi-star-fill mr-1.5 text-yellow-500" />
-                          {{ award.award_definition?.name || 'Award' }}
-                        </span>
-                      </div>
-
-                      <!-- Vote Counts -->
-                      <div v-if="getVoteCounts(racer).length" class="flex gap-2 flex-wrap">
-                        <span
-                          v-for="vote in getVoteCounts(racer)"
-                          :key="vote.awardId"
-                          class="inline-flex items-center px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-md shadow-sm"
-                        >
-                          <i class="pi pi-heart-fill mr-1 text-red-500" />
-                          {{ vote.count }} {{ vote.awardName }}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </template>
-              </Card>
-            </NuxtLink>
+                  </template>
+                </Card>
+              </NuxtLink>
+            </div>
           </div>
-        </div>
-      </template>
-    </DataView>
+        </template>
+      </DataView>
+    </div>
 
     <!-- No Results -->
     <div v-else class="text-center py-12">
@@ -356,6 +366,7 @@
       <NuxtLink v-if="authStore.isAuthenticated && !searchQuery" to="/racers/add">
         <Button>Add First Racer</Button>
       </NuxtLink>
+    </div>
     </div>
   </div>
 </template>
@@ -655,7 +666,6 @@ const searchRacers = (event) => {
     })
     .slice(0, 10) // Limit to 10 suggestions
 
-  console.log('Search suggestions:', filtered)
   searchSuggestions.value = filtered
 }
 
@@ -669,24 +679,10 @@ const clearSearch = () => {
   searchSuggestions.value = []
 }
 
-// Helper functions for times
-const getFastestTime = (racer) => {
-  if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
-  if (times.length === 0) return null
-  return `${Math.min(...times).toFixed(2)}s`
-}
-
-const getSlowestTime = (racer) => {
-  if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
-  if (times.length === 0) return null
-  return `${Math.max(...times).toFixed(2)}s`
-}
 
 const getTimeRange = (racer) => {
   if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
+  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
   if (times.length === 0) return null
 
   const fastest = Math.min(...times).toFixed(2)
@@ -704,14 +700,14 @@ const getTimeRange = (racer) => {
 // Helper functions for sorting (return raw numbers)
 const getFastestTimeValue = (racer) => {
   if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
+  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
   if (times.length === 0) return null
   return Math.min(...times)
 }
 
 const getSlowestTimeValue = (racer) => {
   if (!racer.qualifiers?.length) return null
-  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !isNaN(t))
+  const times = racer.qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
   if (times.length === 0) return null
   return Math.max(...times)
 }
@@ -854,11 +850,11 @@ onMounted(async () => {
 })
 
 useHead({
-  title: 'All Racers - Brick Race Championship',
+  title: 'All Racers - The Great Holyoke Brick Race',
   meta: [
     {
       name: 'description',
-      content: 'Browse all LEGO car racers in the Brick Race Championship competition.'
+      content: 'Browse all brick car racers in the The Great Holyoke Brick Race competition.'
     }
   ]
 })
