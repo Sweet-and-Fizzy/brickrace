@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8"
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
   >
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
@@ -24,15 +24,24 @@
       </div>
 
       <!-- Email Confirmation Message -->
-      <Card v-if="showConfirmation" class="shadow-xl border-0 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+      <Card
+        v-if="showConfirmation"
+        class="shadow-xl border-0 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+      >
         <template #content>
           <div class="text-center p-6">
             <div class="mb-4">
               <i class="pi pi-envelope text-4xl text-green-600 dark:text-green-400" />
             </div>
-            <h3 class="text-xl font-bold text-green-800 dark:text-green-200 mb-3">Check Your Email!</h3>
-            <p class="text-green-700 dark:text-green-300 mb-4">We've sent a confirmation link to:</p>
-            <p class="font-mono text-green-800 dark:text-green-200 bg-green-100 dark:bg-green-800/30 px-4 py-2 rounded-lg mb-4">
+            <h3 class="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
+              Check Your Email!
+            </h3>
+            <p class="text-green-700 dark:text-green-300 mb-4">
+              We've sent a confirmation link to:
+            </p>
+            <p
+              class="font-mono text-green-800 dark:text-green-200 bg-green-100 dark:bg-green-800/30 px-4 py-2 rounded-lg mb-4"
+            >
               {{ registeredEmail }}
             </p>
             <p class="text-green-700 dark:text-green-300 text-sm mb-6">
@@ -77,7 +86,9 @@
                 <div class="w-full border-t border-gray-300 dark:border-gray-600" />
               </div>
               <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or use email</span>
+                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                  >Or use email</span
+                >
               </div>
             </div>
 
@@ -137,7 +148,9 @@
                   input-class="w-full"
                   class="w-full"
                 />
-                <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
+                <p v-if="errors.password" class="mt-1 text-sm text-red-600">
+                  {{ errors.password }}
+                </p>
               </div>
 
               <div>
@@ -189,7 +202,6 @@ import { useAuthStore } from '~/stores/auth'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Message from 'primevue/message'
-
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -278,6 +290,7 @@ const handleRegister = async () => {
       await router.push('/')
     }
   } catch (error) {
+    // Keep essential error logging for production debugging
     console.error('Registration error:', error)
 
     if (error.message) {
@@ -298,6 +311,7 @@ const handleSocialLogin = async (provider) => {
     await authStore.signInWithProvider(provider)
     // The redirect will be handled by Supabase
   } catch (error) {
+    // Keep essential error logging for production debugging
     console.error('Social login error:', error)
     errors.general = error.message || `Failed to sign up with ${provider}. Please try again.`
   } finally {

@@ -1,9 +1,11 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+  >
     <!-- Breadcrumb Navigation -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <Breadcrumb :model="breadcrumbItems" class="mb-2" />
+        <BreadcrumbWrapper :items="breadcrumbItems" class="mb-2" />
       </div>
     </div>
 
@@ -32,7 +34,7 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="pending" class="flex justify-center py-12">
+    <div v-if="loading" class="flex justify-center py-12">
       <ProgressSpinner />
     </div>
 
@@ -49,9 +51,9 @@
                 icon="pi pi-refresh"
                 severity="secondary"
                 :loading="refreshing"
-                @click="fetchPhotos"
+                @click="refreshPhotos"
               />
-              <Dropdown
+              <Select
                 v-model="sortBy"
                 :options="sortOptions"
                 option-label="label"
@@ -134,7 +136,7 @@
                     severity="success"
                     class="flex-1"
                     :loading="processingPhoto === photo.id"
-                    @click="approvePhoto(photo)"
+                    @click="handleApprovePhoto(photo)"
                   >
                     <i class="pi pi-check mr-1" />
                     Approve
@@ -144,7 +146,7 @@
                     severity="danger"
                     class="flex-1"
                     :loading="processingPhoto === photo.id"
-                    @click="rejectPhoto(photo)"
+                    @click="handleRejectPhoto(photo)"
                   >
                     <i class="pi pi-times mr-1" />
                     Reject
@@ -159,7 +161,7 @@
                     :severity="photo.featured ? 'warning' : 'secondary'"
                     class="flex-1"
                     :loading="processingPhoto === photo.id"
-                    @click="toggleFeatured(photo)"
+                    @click="handleToggleFeatured(photo)"
                   >
                     <i class="pi pi-star mr-1" />
                     {{ photo.featured ? 'Unfeature' : 'Feature' }}
@@ -202,7 +204,7 @@
         <p class="text-gray-500 dark:text-gray-500 mb-6">
           {{ getEmptyStateSubtitle() }}
         </p>
-        <Button :loading="refreshing" @click="fetchPhotos">
+        <Button :loading="refreshing" @click="refreshPhotos">
           <i class="pi pi-refresh mr-2" />
           Refresh Photos
         </Button>
@@ -289,11 +291,13 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
+
 const $toast = useToast()
 
+// Use photo composable
+const { allPhotos, loading, initialize: initializePhotos, fetchAllPhotos } = usePhotos()
+
 // State
-const pending = ref(true)
 const refreshing = ref(false)
 const processingPhoto = ref(null)
 const showPhotoDetails = ref(false)
@@ -302,9 +306,6 @@ const activeTab = ref(0)
 const sortBy = ref('newest')
 const currentPage = ref(0)
 const photosPerPage = ref(12)
-
-// Photos data
-const allPhotos = ref([])
 
 // Breadcrumb navigation
 const breadcrumbItems = computed(() => [
@@ -379,10 +380,14 @@ const paginatedPhotos = computed(() => {
 const totalPages = computed(() => Math.ceil(filteredPhotos.value.length / photosPerPage.value))
 
 const pendingCount = computed(
-  () => allPhotos.value.filter((p) => !p.status || p.status === 'pending').length
+  () => allPhotos.value.filter((photo) => !photo.status || photo.status === 'pending').length
 )
-const approvedCount = computed(() => allPhotos.value.filter((p) => p.status === 'approved').length)
-const rejectedCount = computed(() => allPhotos.value.filter((p) => p.status === 'rejected').length)
+const approvedCount = computed(
+  () => allPhotos.value.filter((photo) => photo.status === 'approved').length
+)
+const rejectedCount = computed(
+  () => allPhotos.value.filter((photo) => photo.status === 'rejected').length
+)
 
 // Methods
 const getStatusSeverity = (status) => {
@@ -438,311 +443,27 @@ const getEmptyStateSubtitle = () => {
   }
 }
 
-const fetchPhotos = async () => {
-  if (!pending.value) refreshing.value = true
+// Remove the old fetchPhotos function and replace with composable usage
+const refreshPhotos = async () => {
+  if (!loading.value) refreshing.value = true
 
   try {
-    // Get all racers with photos
-    const { data: racersData, error: racersError } = await $supabase
-      .from('racers')
-      .select(
-        `
-        id,
-        name,
-        racer_number,
-        photos,
-        user_id
-      `
-      )
-      .not('photos', 'is', null)
-
-    if (racersError) throw racersError
-
-    // Fetch general race photos first to get all user IDs
-    const { data: generalPhotosData, error: generalPhotosError } = await $supabase
-      .from('general_photos')
-      .select(
-        `
-        *,
-        races(name)
-      `
-      )
-      .order('uploaded_at', { ascending: false })
-
-    // Get unique user IDs for batch lookup
-    const allUserIds = [
-      ...new Set([
-        ...(racersData || []).map((r) => r.user_id),
-        ...(generalPhotosData || []).map((p) => p.user_id)
-      ])
-    ]
-
-    // Create a simple user lookup using just user IDs since we can't access auth.users easily
-    const userMap = new Map()
-    allUserIds.forEach((userId) => {
-      // For now, just display a truncated user ID since we can't access user metadata
-      const displayId = userId.substring(0, 8) + '...'
-      userMap.set(userId, {
-        name: `User ${displayId}`,
-        email: `${displayId}@...`
-      })
-    })
-
-    console.log('Racers found:', racersData?.length)
-    console.log('Racers data:', racersData)
-
-    const photos = []
-
-    // Process racer photos
-    for (const racer of racersData || []) {
-      console.log(`Processing racer: ${racer.name} (ID: ${racer.id})`)
-      console.log(`Racer photos:`, racer.photos)
-
-      if (racer.photos && Array.isArray(racer.photos)) {
-        console.log(`Found ${racer.photos.length} photos for ${racer.name}`)
-        for (const [index, photo] of racer.photos.entries()) {
-          console.log(`Photo ${index}:`, photo)
-
-          // Get user info from lookup map
-          const userInfo = userMap.get(racer.user_id) || { name: 'Unknown User', email: 'Unknown' }
-          const uploaderName = userInfo.name
-          const uploaderEmail = userInfo.email
-
-          photos.push({
-            id: `racer-${racer.id}-${index}`, // Use index for consistent ID
-            url: photo.url || photo,
-            status: photo.status || 'approved', // Auto-approved but can be moderated
-            featured: photo.featured || false,
-            racerName: racer.name,
-            racerNumber: racer.racer_number,
-            raceName: 'Racer Gallery',
-            uploadedAt: photo.uploadedAt || new Date().toISOString(),
-            uploaderEmail: uploaderEmail,
-            uploaderName: uploaderName,
-            type: 'racer',
-            racerId: racer.id,
-            photoIndex: index // Track position in array for updates
-          })
-        }
-      } else {
-        console.log(`No photos array found for ${racer.name}`)
-      }
-    }
-
-    if (generalPhotosError) {
-      console.error('Error fetching general photos:', generalPhotosError)
-      console.error('Error details:', generalPhotosError.message)
-    } else {
-      console.log('General photos fetched:', generalPhotosData?.length || 0, 'photos')
-      // Process general photos
-      for (const photo of generalPhotosData || []) {
-        // Get user info from lookup map
-        const userInfo = userMap.get(photo.user_id) || { name: 'Unknown User', email: 'Unknown' }
-        const uploaderName = userInfo.name
-        const uploaderEmail = userInfo.email
-
-        photos.push({
-          id: `general-${photo.id}`,
-          url: photo.url,
-          status: photo.status,
-          featured: photo.featured,
-          racerName: null, // General photos aren't associated with specific racers
-          racerNumber: null,
-          raceName: photo.races?.name || 'General Photo',
-          uploadedAt: photo.uploaded_at,
-          uploaderEmail: uploaderEmail,
-          uploaderName: uploaderName,
-          type: 'general',
-          category: photo.category,
-          description: photo.description
-        })
-      }
-    }
-
-    allPhotos.value = photos
-    console.log('Total photos loaded:', photos.length)
-    console.log('Pending photos:', photos.filter((p) => p.status === 'pending').length)
+    await fetchAllPhotos()
   } catch (error) {
-    console.error('Error fetching photos:', error)
-    allPhotos.value = []
+    // Keep essential error logging for production debugging
+    console.error('Error refreshing photos:', error)
+    $toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to refresh photos',
+      life: 3000
+    })
   } finally {
-    pending.value = false
     refreshing.value = false
   }
 }
 
-const approvePhoto = async (photo) => {
-  processingPhoto.value = photo.id
-
-  try {
-    if (photo.type === 'general') {
-      // Update general photo status
-      const photoId = photo.id.replace('general-', '')
-      const { error } = await $supabase
-        .from('general_photos')
-        .update({ status: 'approved' })
-        .eq('id', photoId)
-
-      if (error) throw error
-    } else if (photo.type === 'racer') {
-      // For racer photos, update the status in the racer's photos array
-      const { data: racerData, error: fetchError } = await $supabase
-        .from('racers')
-        .select('photos')
-        .eq('id', photo.racerId)
-        .single()
-
-      if (fetchError) throw fetchError
-
-      const updatedPhotos = [...(racerData.photos || [])]
-      if (updatedPhotos[photo.photoIndex]) {
-        // Ensure photo object structure
-        if (typeof updatedPhotos[photo.photoIndex] === 'string') {
-          updatedPhotos[photo.photoIndex] = {
-            url: updatedPhotos[photo.photoIndex],
-            status: 'approved'
-          }
-        } else {
-          updatedPhotos[photo.photoIndex].status = 'approved'
-        }
-
-        const { error: updateError } = await $supabase
-          .from('racers')
-          .update({ photos: updatedPhotos })
-          .eq('id', photo.racerId)
-
-        if (updateError) throw updateError
-      }
-    }
-
-    // Update local state
-    photo.status = 'approved'
-
-    // Show success message
-    console.log('Photo approved successfully')
-  } catch (error) {
-    console.error('Error approving photo:', error)
-    // Could add toast notification here
-  } finally {
-    processingPhoto.value = null
-  }
-}
-
-const rejectPhoto = async (photo) => {
-  processingPhoto.value = photo.id
-
-  try {
-    if (photo.type === 'general') {
-      // Update general photo status
-      const photoId = photo.id.replace('general-', '')
-      const { error } = await $supabase
-        .from('general_photos')
-        .update({ status: 'rejected' })
-        .eq('id', photoId)
-
-      if (error) throw error
-    } else if (photo.type === 'racer') {
-      // For racer photos, update the status in the racer's photos array
-      const { data: racerData, error: fetchError } = await $supabase
-        .from('racers')
-        .select('photos')
-        .eq('id', photo.racerId)
-        .single()
-
-      if (fetchError) throw fetchError
-
-      const updatedPhotos = [...(racerData.photos || [])]
-      if (updatedPhotos[photo.photoIndex]) {
-        // Ensure photo object structure
-        if (typeof updatedPhotos[photo.photoIndex] === 'string') {
-          updatedPhotos[photo.photoIndex] = {
-            url: updatedPhotos[photo.photoIndex],
-            status: 'rejected'
-          }
-        } else {
-          updatedPhotos[photo.photoIndex].status = 'rejected'
-        }
-
-        const { error: updateError } = await $supabase
-          .from('racers')
-          .update({ photos: updatedPhotos })
-          .eq('id', photo.racerId)
-
-        if (updateError) throw updateError
-      }
-    }
-
-    // Update local state
-    photo.status = 'rejected'
-
-    // Show success message
-    console.log('Photo rejected successfully')
-  } catch (error) {
-    console.error('Error rejecting photo:', error)
-    // Could add toast notification here
-  } finally {
-    processingPhoto.value = null
-  }
-}
-
-const toggleFeatured = async (photo) => {
-  processingPhoto.value = photo.id
-
-  try {
-    const newFeaturedStatus = !photo.featured
-
-    if (photo.type === 'general') {
-      // Update general photo featured status
-      const photoId = photo.id.replace('general-', '')
-      const { error } = await $supabase
-        .from('general_photos')
-        .update({ featured: newFeaturedStatus })
-        .eq('id', photoId)
-
-      if (error) throw error
-    } else if (photo.type === 'racer') {
-      // For racer photos, update the featured status in the racer's photos array
-      const { data: racerData, error: fetchError } = await $supabase
-        .from('racers')
-        .select('photos')
-        .eq('id', photo.racerId)
-        .single()
-
-      if (fetchError) throw fetchError
-
-      const updatedPhotos = [...(racerData.photos || [])]
-      if (updatedPhotos[photo.photoIndex]) {
-        // Ensure photo object structure
-        if (typeof updatedPhotos[photo.photoIndex] === 'string') {
-          updatedPhotos[photo.photoIndex] = {
-            url: updatedPhotos[photo.photoIndex],
-            featured: newFeaturedStatus
-          }
-        } else {
-          updatedPhotos[photo.photoIndex].featured = newFeaturedStatus
-        }
-
-        const { error: updateError } = await $supabase
-          .from('racers')
-          .update({ photos: updatedPhotos })
-          .eq('id', photo.racerId)
-
-        if (updateError) throw updateError
-      }
-    }
-
-    // Update local state
-    photo.featured = newFeaturedStatus
-
-    // Show success message
-    console.log(`Photo ${newFeaturedStatus ? 'featured' : 'unfeatured'} successfully`)
-  } catch (error) {
-    console.error('Error toggling featured status:', error)
-    // Could add toast notification here
-  } finally {
-    processingPhoto.value = null
-  }
-}
+// Old fetchPhotos function removed - now using composable
 
 const viewPhotoDetails = (photo) => {
   selectedPhoto.value = photo
@@ -766,79 +487,10 @@ const getPhotoActions = (photo) => {
   actions.push({
     label: 'Delete Photo',
     icon: 'pi pi-trash',
-    command: () => deletePhoto(photo)
+    command: () => handleDeletePhoto(photo)
   })
 
   return actions
-}
-
-const deletePhoto = async (photo) => {
-  // Show confirmation dialog
-  if (!confirm(`Are you sure you want to delete this photo? This action cannot be undone.`)) {
-    return
-  }
-
-  processingPhoto.value = photo.id
-
-  try {
-    if (photo.type === 'general') {
-      // Delete general photo
-      const photoId = photo.id.replace('general-', '')
-      const { error } = await $supabase.from('general_photos').delete().eq('id', photoId)
-
-      if (error) throw error
-
-      // Remove from local state
-      allPhotos.value = allPhotos.value.filter((p) => p.id !== photo.id)
-    } else if (photo.type === 'racer') {
-      // Delete racer photo by removing it from the photos array
-      const { data: racerData, error: fetchError } = await $supabase
-        .from('racers')
-        .select('photos')
-        .eq('id', photo.racerId)
-        .single()
-
-      if (fetchError) throw fetchError
-
-      const updatedPhotos = [...(racerData.photos || [])]
-      updatedPhotos.splice(photo.photoIndex, 1) // Remove the photo at the specific index
-
-      const { error: updateError } = await $supabase
-        .from('racers')
-        .update({ photos: updatedPhotos })
-        .eq('id', photo.racerId)
-
-      if (updateError) throw updateError
-
-      // Remove from local state and update indices for remaining photos
-      allPhotos.value = allPhotos.value.filter((p) => p.id !== photo.id)
-
-      // Update photo indices for remaining photos from the same racer
-      allPhotos.value.forEach((p) => {
-        if (p.type === 'racer' && p.racerId === photo.racerId && p.photoIndex > photo.photoIndex) {
-          p.photoIndex -= 1
-          p.id = `racer-${p.racerId}-${p.photoIndex}`
-        }
-      })
-    }
-
-    $toast.add({
-      severity: 'success',
-      summary: 'Photo Deleted',
-      detail: 'The photo has been successfully deleted.',
-      life: 4000
-    })
-  } catch (error) {
-    console.error('Error deleting photo:', error)
-    $toast.add({
-      severity: 'error',
-      summary: 'Delete Failed',
-      detail: 'Failed to delete photo. Please try again.',
-      life: 5000
-    })
-  } finally {
-    processingPhoto.value = null
-  }
 }
 
 // Initialize
@@ -851,8 +503,9 @@ onMounted(async () => {
         statusMessage: 'Access denied. Admin privileges required.'
       })
     }
-    await fetchPhotos()
+    await initializePhotos()
   } catch (error) {
+    // Keep essential error logging for production debugging
     console.error('Error initializing admin photos page:', error)
     throw createError({
       statusCode: 500,

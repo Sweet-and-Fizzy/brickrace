@@ -17,6 +17,7 @@ export const useDarkMode = () => {
       }
       applyDarkMode()
     } catch (error) {
+      // Keep essential error logging for production debugging
       console.warn('Failed to initialize dark mode:', error)
       // Fallback to light mode
       isDark.value = false
@@ -35,6 +36,7 @@ export const useDarkMode = () => {
         document.documentElement.classList.remove(CSS_CLASS)
       }
     } catch (error) {
+      // Keep essential error logging for production debugging
       console.warn('Failed to apply dark mode:', error)
     }
   }
@@ -47,6 +49,7 @@ export const useDarkMode = () => {
         localStorage.setItem(STORAGE_KEY, isDark.value.toString())
         applyDarkMode()
       } catch (error) {
+        // Keep essential error logging for production debugging
         console.warn('Failed to save dark mode preference:', error)
       }
     }
@@ -60,6 +63,7 @@ export const useDarkMode = () => {
         localStorage.setItem(STORAGE_KEY, isDark.value.toString())
         applyDarkMode()
       } catch (error) {
+        // Keep essential error logging for production debugging
         console.warn('Failed to save dark mode preference:', error)
       }
     }
@@ -79,6 +83,7 @@ export const useDarkMode = () => {
         }
       })
     } catch (error) {
+      // Keep essential error logging for production debugging
       console.warn('Failed to watch system theme changes:', error)
     }
   }

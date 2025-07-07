@@ -72,8 +72,8 @@ export interface CheckIn {
   id: string
   racer_id: string
   race_id: string
-  checked_in_at: string
-  notes?: string
+  time: string
+  created_at: string
 }
 
 export interface Qualifier {

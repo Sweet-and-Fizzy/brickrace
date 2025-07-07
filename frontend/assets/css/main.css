@@ -54,19 +54,26 @@
     letter-spacing: 0.025em;
     font-size: 1.25rem;
   }
-
 }
 
 @layer components {
   .btn-brick {
     @apply relative transition-all duration-300 font-medium text-white;
     /* Exact masonry brick styling */
-    background: linear-gradient(135deg, rgb(197, 48, 48) 0%, rgb(156, 28, 28) 45%, rgb(116, 42, 42) 100%) !important;
+    background: linear-gradient(
+      135deg,
+      rgb(197, 48, 48) 0%,
+      rgb(156, 28, 28) 45%,
+      rgb(116, 42, 42) 100%
+    ) !important;
     border-width: 3px !important;
     border-style: solid !important;
     border-color: rgb(213, 63, 63) rgb(74, 19, 19) rgb(74, 19, 19) rgb(213, 63, 63) !important;
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 6px 12px, rgba(255, 255, 255, 0.3) 2px 2px 4px inset, rgba(0, 0, 0, 0.2) -2px -2px 4px inset !important;
-    font-family: "Inter", sans-serif !important;
+    box-shadow:
+      rgba(0, 0, 0, 0.3) 0px 6px 12px,
+      rgba(255, 255, 255, 0.3) 2px 2px 4px inset,
+      rgba(0, 0, 0, 0.2) -2px -2px 4px inset !important;
+    font-family: 'Inter', sans-serif !important;
     font-weight: 700 !important;
     letter-spacing: 0.8px !important;
     text-shadow: rgba(0, 0, 0, 0.5) 0px 1px 2px !important;
@@ -75,58 +82,81 @@
     border-radius: 3px !important;
     box-sizing: border-box !important;
   }
-  
+
   .btn-brick:hover {
     position: relative !important;
     top: -2px !important;
     @apply text-white;
     /* Darker, richer brick on hover */
-    background: linear-gradient(135deg, rgb(180, 35, 35) 0%, rgb(140, 20, 20) 45%, rgb(100, 30, 30) 100%) !important;
+    background: linear-gradient(
+      135deg,
+      rgb(180, 35, 35) 0%,
+      rgb(140, 20, 20) 45%,
+      rgb(100, 30, 30) 100%
+    ) !important;
     /* Enhanced brick effect on hover */
-    box-shadow: rgba(0, 0, 0, 0.4) 0px 8px 16px, rgba(255, 255, 255, 0.4) 2px 2px 4px inset, rgba(0, 0, 0, 0.3) -2px -2px 4px inset !important;
+    box-shadow:
+      rgba(0, 0, 0, 0.4) 0px 8px 16px,
+      rgba(255, 255, 255, 0.4) 2px 2px 4px inset,
+      rgba(0, 0, 0, 0.3) -2px -2px 4px inset !important;
     /* Keep white text and text shadow - maintain same typography */
     color: white !important;
     text-shadow: rgba(0, 0, 0, 0.6) 0px 1px 2px !important;
-    font-family: "Inter", sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
     font-weight: 700 !important;
     letter-spacing: 0.8px !important;
     box-sizing: border-box !important;
   }
-  
+
   .btn-brick:active {
     @apply translate-y-0;
     /* Pressed brick effect */
-    box-shadow: rgba(0, 0, 0, 0.5) 0px 2px 6px, rgba(255, 255, 255, 0.2) 1px 1px 2px inset, rgba(0, 0, 0, 0.4) -1px -1px 2px inset !important;
+    box-shadow:
+      rgba(0, 0, 0, 0.5) 0px 2px 6px,
+      rgba(255, 255, 255, 0.2) 1px 1px 2px inset,
+      rgba(0, 0, 0, 0.4) -1px -1px 2px inset !important;
   }
-  
+
   /* Primary brick - classic red masonry brick (same as default) */
   .btn-brick.btn-brick-primary {
     @apply bg-red-500 border-red-600 text-white;
   }
-  
+
   .btn-brick.btn-brick-primary:hover {
-    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4), inset 0 1px 2px rgba(255,255,255,0.3) !important;
+    box-shadow:
+      0 0 8px rgba(239, 68, 68, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
   }
-  
+
   /* Success brick - green masonry */
   .btn-brick.btn-brick-success {
     @apply bg-green-500 border-green-600 text-white;
   }
-  
+
   .btn-brick.btn-brick-success:hover {
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4), inset 0 1px 2px rgba(255,255,255,0.3) !important;
+    box-shadow:
+      0 0 8px rgba(34, 197, 94, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
   }
-  
+
   /* Secondary brick - classic yellow brick masonry */
   .btn-brick-secondary {
     @apply relative transition-all duration-300 font-medium;
     /* Yellow brick styling with improved contrast */
-    background: linear-gradient(135deg, rgb(250, 215, 90) 0%, rgb(235, 180, 45) 45%, rgb(200, 150, 25) 100%) !important;
+    background: linear-gradient(
+      135deg,
+      rgb(250, 215, 90) 0%,
+      rgb(235, 180, 45) 45%,
+      rgb(200, 150, 25) 100%
+    ) !important;
     border-width: 2px !important;
     border-style: solid !important;
     border-color: rgb(250, 220, 120) rgb(146, 104, 8) rgb(146, 104, 8) rgb(250, 220, 120) !important;
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 4px 8px, rgba(255, 255, 255, 0.4) 1px 1px 2px inset, rgba(0, 0, 0, 0.2) -1px -1px 2px inset !important;
-    font-family: "Inter", sans-serif !important;
+    box-shadow:
+      rgba(0, 0, 0, 0.3) 0px 4px 8px,
+      rgba(255, 255, 255, 0.4) 1px 1px 2px inset,
+      rgba(0, 0, 0, 0.2) -1px -1px 2px inset !important;
+    font-family: 'Inter', sans-serif !important;
     font-weight: 700 !important;
     letter-spacing: 0.6px !important;
     text-shadow: rgba(0, 0, 0, 0.8) 0px 1px 2px !important;
@@ -136,47 +166,69 @@
     border-radius: 3px !important;
     box-sizing: border-box !important;
   }
-  
+
   .btn-brick-secondary:hover {
     position: relative !important;
     top: -1px !important;
     /* Brighter yellow brick on hover */
-    background: linear-gradient(135deg, rgb(250, 215, 96) 0%, rgb(235, 180, 52) 45%, rgb(200, 150, 25) 100%) !important;
-    box-shadow: rgba(0, 0, 0, 0.4) 0px 6px 12px, rgba(255, 255, 255, 0.5) 1px 1px 3px inset, rgba(0, 0, 0, 0.25) -1px -1px 3px inset !important;
+    background: linear-gradient(
+      135deg,
+      rgb(250, 215, 96) 0%,
+      rgb(235, 180, 52) 45%,
+      rgb(200, 150, 25) 100%
+    ) !important;
+    box-shadow:
+      rgba(0, 0, 0, 0.4) 0px 6px 12px,
+      rgba(255, 255, 255, 0.5) 1px 1px 3px inset,
+      rgba(0, 0, 0, 0.25) -1px -1px 3px inset !important;
     color: rgb(92, 57, 0) !important;
     text-shadow: rgba(0, 0, 0, 0.9) 0px 1px 2px !important;
-    font-family: "Inter", sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
     font-weight: 700 !important;
     letter-spacing: 0.6px !important;
     box-sizing: border-box !important;
   }
-  
+
   .btn-brick-secondary:active {
     @apply translate-y-0;
     /* Subtle pressed effect */
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 4px, rgba(255, 255, 255, 0.3) 1px 1px 2px inset, rgba(0, 0, 0, 0.2) -1px -1px 2px inset !important;
+    box-shadow:
+      rgba(0, 0, 0, 0.3) 0px 2px 4px,
+      rgba(255, 255, 255, 0.3) 1px 1px 2px inset,
+      rgba(0, 0, 0, 0.2) -1px -1px 2px inset !important;
   }
-  
+
   /* Danger brick - dark red masonry */
   .btn-brick.btn-brick-danger {
     @apply bg-red-600 border-red-700 text-white;
   }
-  
+
   .btn-brick.btn-brick-danger:hover {
-    box-shadow: 0 0 8px rgba(220, 38, 38, 0.4), inset 0 1px 2px rgba(255,255,255,0.3) !important;
+    box-shadow:
+      0 0 8px rgba(220, 38, 38, 0.4),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
   }
-  
+
   /* Dark mode variants */
   .dark .btn-brick {
     /* Adjusted shadows for dark mode */
-    box-shadow: 0 1px 3px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 1px rgba(0,0,0,0.4);
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.4),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.4);
   }
-  
+
   .dark .btn-brick:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.3), inset 0 -1px 2px rgba(0,0,0,0.4);
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.5),
+      inset 0 1px 2px rgba(255, 255, 255, 0.3),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.4);
   }
-  
+
   .dark .btn-brick:active {
-    box-shadow: 0 1px 2px rgba(0,0,0,0.5), inset 0 2px 4px rgba(0,0,0,0.5), inset 0 -1px 1px rgba(255,255,255,0.1);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.5),
+      inset 0 2px 4px rgba(0, 0, 0, 0.5),
+      inset 0 -1px 1px rgba(255, 255, 255, 0.1);
   }
 }

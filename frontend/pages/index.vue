@@ -1,5 +1,7 @@
 <template>
-  <div>
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+  >
     <!-- Featured Race (Hero Section) -->
     <div
       v-if="activeRace && !pending"
@@ -208,11 +210,7 @@
                   </p>
                 </div>
 
-                <Button
-                  size="large"
-                  class="btn-brick font-semibold"
-                  @click="navigateTo('/about')"
-                >
+                <Button size="large" class="btn-brick font-semibold" @click="navigateTo('/about')">
                   <i class="pi pi-book mr-2" />
                   Read Our History
                 </Button>
@@ -263,7 +261,10 @@
     </div>
 
     <!-- Featured Photos -->
-    <div v-if="!pending && featuredPhotos.length > 0" class="py-16 bg-gray-50 dark:bg-gray-800">
+    <div
+      v-if="!pending && featuredPhotos.length > 0"
+      class="py-16 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
           <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Featured Photos</h2>
@@ -333,13 +334,22 @@
         <div class="text-center mt-12 space-y-6">
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <NuxtLink to="/gallery">
-              <Button outlined size="large" class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900">
+              <Button
+                outlined
+                size="large"
+                class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900"
+              >
                 <i class="pi pi-images mr-2" />
                 View Photo Gallery
               </Button>
             </NuxtLink>
             <NuxtLink to="/my-photos">
-              <Button severity="secondary" outlined size="large" class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900">
+              <Button
+                severity="secondary"
+                outlined
+                size="large"
+                class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900"
+              >
                 <i class="pi pi-upload mr-2" />
                 Share Your Photos
               </Button>
@@ -385,7 +395,10 @@
     </Galleria>
 
     <!-- Past Races -->
-    <div v-if="!pending && pastRaces.length > 0" class="py-16 bg-gray-50 dark:bg-gray-800">
+    <div
+      v-if="!pending && pastRaces.length > 0"
+      class="py-16 bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
           Past Races
@@ -429,7 +442,11 @@
 
         <div class="text-center mt-8">
           <NuxtLink to="/races">
-            <Button outlined class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900">View All Races</Button>
+            <Button
+              outlined
+              class="border-green-600 text-green-700 hover:bg-green-600 hover:text-white dark:border-green-400 dark:text-green-400 dark:hover:bg-green-400 dark:hover:text-gray-900"
+              >View All Races</Button
+            >
           </NuxtLink>
         </div>
       </div>
@@ -440,12 +457,13 @@
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <h2 class="text-3xl md:text-4xl font-bold mb-6">Stay Connected</h2>
         <p class="text-xl text-red-100 mb-8 max-w-2xl mx-auto">
-          Follow along for race updates, behind-the-scenes content, and inspiration from our amazing community of builders and racers!
+          Follow along for race updates, behind-the-scenes content, and inspiration from our amazing
+          community of builders and racers!
         </p>
-        
+
         <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
           <!-- Facebook -->
-          <a 
+          <a
             href="https://www.facebook.com/HolyokeBrickRace"
             target="_blank"
             rel="noopener noreferrer"
@@ -456,7 +474,7 @@
           </a>
 
           <!-- Instagram -->
-          <a 
+          <a
             href="https://www.instagram.com/thegreatholyokebrickrace"
             target="_blank"
             rel="noopener noreferrer"
@@ -467,7 +485,7 @@
           </a>
 
           <!-- Email -->
-          <a 
+          <a
             href="mailto:thegreatholyokebrickrace@gmail.com"
             class="flex items-center gap-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 px-6 py-3 rounded-lg"
           >
@@ -481,10 +499,6 @@
 </template>
 
 <script setup>
-const { $supabase } = useNuxtApp()
-
-const recentRaces = ref([])
-const activeRace = ref(null)
 const pending = ref(true)
 const countdown = ref({
   days: 0,
@@ -494,63 +508,28 @@ const countdown = ref({
   isActive: false
 })
 
-// Featured photos state
-const featuredPhotos = ref([])
+// Use singleton composables for data
+const { activeRace, recentPastRaces, initialize: initializeRaces } = useRaces()
+const { featuredPhotos, initialize: initializePhotos } = usePhotos()
+
+// Featured photos gallery state
 const featuredGalleryVisible = ref(false)
 const activeFeaturedIndex = ref(0)
 
-// Fetch races from Supabase
-const fetchRaces = async () => {
-  try {
-    const { data, error } = await $supabase
-      .from('races')
-      .select('*')
-      .order('date', { ascending: false })
-      .limit(6)
-
-    if (error) throw error
-
-    const races = data || []
-
-    // Get checkin counts for each race
-    for (const race of races) {
-      const { count } = await $supabase
-        .from('checkins')
-        .select('*', { count: 'exact', head: true })
-        .eq('race_id', race.id)
-
-      race.checkinCount = count || 0
-    }
-
-    recentRaces.value = races
-
-    // Find the active race
-    activeRace.value = races.find((race) => race.active) || null
-  } catch (error) {
-    console.error('Error fetching races:', error)
-    recentRaces.value = []
-    activeRace.value = null
-  } finally {
-    pending.value = false
-  }
-}
-
-// Show past races (excluding active race)
-const pastRaces = computed(() => {
-  return recentRaces.value
-    .filter((race) => !race.active) // Exclude active race
-    .slice(0, 6) // Show last 6 past races
-})
+// Alias for easier template usage
+const pastRaces = recentPastRaces
 
 // Countdown timer logic
 const updateCountdown = () => {
-  if (!activeRace.value?.date) {
+  // Use race_datetime if available, otherwise fall back to date
+  const raceDateTime = activeRace.value?.race_datetime || activeRace.value?.date
+  if (!raceDateTime) {
     countdown.value.isActive = false
     return
   }
 
   const now = new Date().getTime()
-  const raceTime = new Date(activeRace.value.date).getTime()
+  const raceTime = new Date(raceDateTime).getTime()
   const distance = raceTime - now
 
   if (distance > 0) {
@@ -567,10 +546,18 @@ const updateCountdown = () => {
 // Update countdown every second
 let countdownInterval = null
 
-// Fetch data on mount
-onMounted(() => {
-  fetchRaces()
-  fetchFeaturedPhotos()
+// Initialize data on mount
+onMounted(async () => {
+  pending.value = true
+
+  try {
+    await Promise.all([initializeRaces(), initializePhotos()])
+  } catch (error) {
+    // Keep essential error logging for production debugging
+    console.error('Error initializing homepage data:', error)
+  } finally {
+    pending.value = false
+  }
 
   // Start countdown timer
   countdownInterval = setInterval(updateCountdown, 1000)
@@ -580,6 +567,7 @@ onUnmounted(() => {
   if (countdownInterval) {
     clearInterval(countdownInterval)
   }
+  // Composable cleanup is handled automatically by their own onUnmounted hooks
 })
 
 // Watch for activeRace changes to update countdown
@@ -625,114 +613,6 @@ const galleryResponsiveOptions = ref([
   { breakpoint: '768px', numVisible: 3 },
   { breakpoint: '560px', numVisible: 1 }
 ])
-
-// Featured photos functions
-const fetchFeaturedPhotos = async () => {
-  try {
-    const allFeaturedPhotos = []
-
-    // Fetch featured general photos (just URLs)
-    const { data: generalPhotos, error: generalError } = await $supabase
-      .from('general_photos')
-      .select('url')
-      .eq('featured', true)
-      .eq('status', 'approved')
-      .order('uploaded_at', { ascending: false })
-      .limit(6)
-
-    if (generalError) {
-      console.error('Error fetching general photos:', generalError)
-    } else {
-      // Add general photo URLs
-      for (const photo of generalPhotos || []) {
-        allFeaturedPhotos.push({ url: photo.url })
-      }
-    }
-
-    // Fetch racer photos that are featured (just URLs)
-    const { data: racerData, error: racerError } = await $supabase
-      .from('racers')
-      .select('photos')
-      .not('photos', 'is', null)
-      .order('created_at', { ascending: false })
-      .limit(10)
-
-    if (racerError) {
-      console.error('Error fetching racer photos:', racerError)
-    } else {
-      // Process racer photos - look for featured ones
-      for (const racer of racerData || []) {
-        if (racer.photos && Array.isArray(racer.photos)) {
-          for (const photo of racer.photos) {
-            // Handle both string URLs and photo objects
-            let photoObj = photo
-            if (typeof photo === 'string') {
-              try {
-                // Try to parse as JSON in case it's a stringified object
-                photoObj = JSON.parse(photo)
-              } catch {
-                // If parsing fails, treat as simple URL string
-                photoObj = { url: photo, status: 'approved', featured: false }
-              }
-            }
-
-            // Only include approved and featured racer photos
-            const photoStatus = photoObj.status || 'approved'
-            if (photoObj.featured && photoStatus === 'approved') {
-              allFeaturedPhotos.push({ url: photoObj.url || photoObj })
-            }
-          }
-        }
-      }
-    }
-
-    // If no featured photos found, get some recent approved photos as fallback
-    if (allFeaturedPhotos.length === 0) {
-      // Fetch recent general photos as fallback
-      const { data: fallbackGeneralPhotos } = await $supabase
-        .from('general_photos')
-        .select('url')
-        .eq('status', 'approved')
-        .order('uploaded_at', { ascending: false })
-        .limit(4)
-
-      for (const photo of fallbackGeneralPhotos || []) {
-        allFeaturedPhotos.push({ url: photo.url })
-      }
-
-      // Fetch some recent racer photos as fallback
-      const { data: fallbackRacerData } = await $supabase
-        .from('racers')
-        .select('photos, image_url')
-        .not('photos', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(5)
-
-      for (const racer of fallbackRacerData || []) {
-        // Add main racer image if available
-        if (racer.image_url) {
-          allFeaturedPhotos.push({ url: racer.image_url })
-        }
-
-        // Add first photo from photos array if available
-        if (racer.photos && Array.isArray(racer.photos) && racer.photos.length > 0) {
-          const firstPhoto = racer.photos[0]
-          const photoUrl =
-            typeof firstPhoto === 'string' ? firstPhoto : firstPhoto.url || firstPhoto
-          if (photoUrl) {
-            allFeaturedPhotos.push({ url: photoUrl })
-          }
-        }
-      }
-    }
-
-    // Limit to 8 photos and randomize order
-    featuredPhotos.value = allFeaturedPhotos.sort(() => Math.random() - 0.5).slice(0, 8)
-  } catch (error) {
-    console.error('Error fetching featured photos:', error)
-    featuredPhotos.value = []
-  }
-}
 
 const openFeaturedGallery = (index) => {
   activeFeaturedIndex.value = index

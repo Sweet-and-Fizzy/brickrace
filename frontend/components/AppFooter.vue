@@ -13,7 +13,8 @@
             <span class="site-name text-xl font-bold">The Great Holyoke Brick Race</span>
           </div>
           <p class="text-gray-300">
-            A celebration of creativity, engineering, and friendly competition where custom gravity-powered vehicles race for glory.
+            A celebration of creativity, engineering, and friendly competition where custom
+            gravity-powered vehicles race for glory.
           </p>
         </div>
 
@@ -21,11 +22,23 @@
         <div class="space-y-4">
           <h3 class="text-lg font-semibold">Quick Links</h3>
           <nav class="space-y-2">
-            <NuxtLink to="/about" class="block text-gray-300 hover:text-white transition-colors">About</NuxtLink>
-            <NuxtLink to="/build-racer" class="block text-gray-300 hover:text-white transition-colors">Build a Racer</NuxtLink>
-            <NuxtLink to="/racers" class="block text-gray-300 hover:text-white transition-colors">All Racers</NuxtLink>
-            <NuxtLink to="/gallery" class="block text-gray-300 hover:text-white transition-colors">Photo Gallery</NuxtLink>
-            <NuxtLink to="/awards" class="block text-gray-300 hover:text-white transition-colors">Awards</NuxtLink>
+            <NuxtLink to="/about" class="block text-gray-300 hover:text-white transition-colors"
+              >About</NuxtLink
+            >
+            <NuxtLink
+              to="/build-racer"
+              class="block text-gray-300 hover:text-white transition-colors"
+              >Build a Racer</NuxtLink
+            >
+            <NuxtLink to="/racers" class="block text-gray-300 hover:text-white transition-colors"
+              >All Racers</NuxtLink
+            >
+            <NuxtLink to="/gallery" class="block text-gray-300 hover:text-white transition-colors"
+              >Photo Gallery</NuxtLink
+            >
+            <NuxtLink to="/awards" class="block text-gray-300 hover:text-white transition-colors"
+              >Awards</NuxtLink
+            >
           </nav>
         </div>
 
@@ -34,7 +47,7 @@
           <h3 class="text-lg font-semibold">Connect With Us</h3>
           <div class="space-y-3">
             <!-- Email -->
-            <a 
+            <a
               href="mailto:thegreatholyokebrickrace@gmail.com"
               class="flex items-center gap-3 text-gray-300 hover:text-white transition-colors"
             >
@@ -43,7 +56,7 @@
             </a>
 
             <!-- Facebook -->
-            <a 
+            <a
               href="https://www.facebook.com/HolyokeBrickRace"
               target="_blank"
               rel="noopener noreferrer"
@@ -54,7 +67,7 @@
             </a>
 
             <!-- Instagram -->
-            <a 
+            <a
               href="https://www.instagram.com/thegreatholyokebrickrace"
               target="_blank"
               rel="noopener noreferrer"
@@ -69,7 +82,10 @@
 
       <!-- Bottom Bar -->
       <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-        <p>&copy; {{ new Date().getFullYear() }} The Great Holyoke Brick Race. Built with creativity and community spirit.</p>
+        <p>
+          &copy; {{ new Date().getFullYear() }} The Great Holyoke Brick Race. Built with creativity
+          and community spirit.
+        </p>
       </div>
     </div>
   </footer>

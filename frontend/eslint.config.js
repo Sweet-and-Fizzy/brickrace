@@ -71,12 +71,14 @@ export default createConfigForNuxt({
         useHead: 'readonly',
         useToast: 'readonly',
         useDarkMode: 'readonly',
+        useNotifications: 'readonly',
         createError: 'readonly',
         definePageMeta: 'readonly',
         defineNuxtPlugin: 'readonly',
         defineNuxtRouteMiddleware: 'readonly',
         defineNuxtConfig: 'readonly',
         useRuntimeConfig: 'readonly',
+        useState: 'readonly',
         readonly: 'readonly',
         // Browser globals
         console: 'readonly',
@@ -90,6 +92,7 @@ export default createConfigForNuxt({
         confirm: 'readonly',
         FileReader: 'readonly',
         Image: 'readonly',
+        Notification: 'readonly',
         // Node.js globals
         process: 'readonly',
         require: 'readonly'

@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+  >
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div class="flex justify-center">
         <img
@@ -26,14 +28,12 @@
 
           <div v-else-if="error" class="space-y-4">
             <i class="pi pi-exclamation-triangle text-4xl text-red-600" />
-            <h3 class="text-lg font-medium text-red-800 dark:text-red-200">Authentication Failed</h3>
+            <h3 class="text-lg font-medium text-red-800 dark:text-red-200">
+              Authentication Failed
+            </h3>
             <p class="text-red-600 dark:text-red-300">{{ error }}</p>
             <div class="mt-4">
-              <Button
-                severity="secondary"
-                outlined
-                @click="navigateToLogin"
-              >
+              <Button severity="secondary" outlined @click="navigateToLogin">
                 Return to Login
               </Button>
             </div>
@@ -72,7 +72,7 @@ onMounted(async () => {
   try {
     // Handle the OAuth callback
     const { data, error: authError } = await $supabase.auth.getSession()
-    
+
     if (authError) {
       throw authError
     }
@@ -81,7 +81,7 @@ onMounted(async () => {
       // Update auth store with session data
       authStore.user = data.session.user
       authStore.session = data.session
-      
+
       // Redirect to home page
       await router.push('/')
     } else {

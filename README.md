@@ -48,9 +48,86 @@ This application provides a complete digital platform for the racing community, 
 - **Row Level Security** - Database-level security policies
 
 ### Design & Typography
-- **Bebas Neue** - Bold display font for headers
-- **Red Color Scheme** - Reflecting the brick race theme
+- **Righteous** - Bold display font for headers and branding
+- **Inter** - Clean body font for readability
+- **Brand Color Scheme** - Red-orange gradient reflecting the brick race theme
 - **DIY/Maker Aesthetic** - Clean, industrial design elements
+
+## Brand Guidelines
+
+### Color Palette
+
+#### Primary Colors (Brick Race Brand)
+- **Primary Red**: `#dc2626` (red-600) - Main brand color, primary buttons
+- **Primary Orange**: `#ea580c` (orange-600) - Secondary brand color, accent elements
+- **Gradient Background**: `from-red-50 via-orange-50 to-yellow-50` - Light mode page backgrounds
+- **Dark Gradient**: `from-gray-900 via-gray-800 to-gray-900` - Dark mode page backgrounds
+
+#### Secondary Colors
+- **Brick Red**: `#b91c1c` (red-700) - Darker brand accents
+- **Orange Accent**: `#fb923c` (orange-400) - Hover states, highlights
+- **Yellow Accent**: `#fbbf24` (yellow-400) - Completion states, success indicators
+
+#### Tertiary Colors
+- **Dark Green**: `#166534` (green-800) - Call-to-action elements, special features
+- **Success Green**: `#16a34a` (green-600) - Success states, positive actions
+- **Info Blue**: `#2563eb` (blue-600) - Information, neutral actions
+
+#### Neutral Colors
+- **Text Dark**: `#111827` (gray-900) - Primary text in light mode
+- **Text Light**: `#ffffff` (white) - Primary text in dark mode
+- **Text Muted**: `#6b7280` (gray-500) - Secondary text
+- **Border**: `#d1d5db` (gray-300) - Light borders and dividers
+
+### Color Usage Guidelines
+
+#### Backgrounds
+- **Page Backgrounds**: Always use the brand gradient (`from-red-50 via-orange-50 to-yellow-50`)
+- **Card Backgrounds**: White/gray-800 for contrast against gradient
+- **Hero Sections**: Can use solid red gradients for special emphasis
+
+#### Buttons
+- **Primary Actions**: `.btn-brick` class (red-orange gradient)
+- **Secondary Actions**: `.btn-brick-secondary` class (yellow brick style)
+- **Tertiary Actions**: Dark green for special CTAs (homepage)
+- **Neutral Actions**: Standard PrimeVue button styles
+
+#### Interactive Elements
+- **Links**: Blue-600 for information, red-600 for brand-related
+- **Hover States**: Darker versions of base colors
+- **Active States**: Even darker versions with pressed effects
+
+#### Status Indicators
+- **Success**: Green variants
+- **Warning**: Yellow/orange variants
+- **Error**: Red variants (but not brand red to avoid confusion)
+- **Info**: Blue variants
+
+### Typography
+
+#### Font Families
+- **Display Font**: `'Righteous', sans-serif` - Headers, titles, branding
+- **Body Font**: `'Inter', sans-serif` - All body text, UI elements
+
+#### Font Weights
+- **Righteous**: 400 (only weight available)
+- **Inter**: 300, 400, 500, 600, 700 (use 400 for body, 600+ for emphasis)
+
+### Component Styling
+
+#### Cards
+- Use white/gray-800 backgrounds for contrast
+- Subtle shadows for depth
+- Brand-colored borders for emphasis
+
+#### Navigation
+- Transparent breadcrumbs using pass-through API
+- Brand gradient backgrounds throughout
+
+#### Forms
+- Consistent with PrimeVue theme
+- Brand-colored focus states
+- Error states use non-brand red to avoid confusion
 
 ## Project Structure
 

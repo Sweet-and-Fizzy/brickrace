@@ -127,6 +127,15 @@ pnpm run lint:fix
 pnpm run format
 ```
 
+### Import Strategy
+
+This project uses a **hybrid auto-import approach**:
+
+- **Auto-imported**: Nuxt/Vue composables, project composables, utilities, and stores
+- **Explicit imports**: Third-party libraries and external dependencies
+
+See [IMPORTS.md](./IMPORTS.md) for detailed documentation on the import strategy.
+
 ### Database Schema
 
 The application uses Supabase with the following main tables:
@@ -153,15 +162,16 @@ This project is configured for easy deployment on Netlify:
    - Create a new site from your repository
 
 2. **Configure Build Settings**
-   
+
    Netlify will automatically detect the `netlify.toml` configuration, but verify these settings:
    - **Build command**: `pnpm run build`
    - **Publish directory**: `dist`
    - **Node version**: 18
 
 3. **Environment Variables**
-   
+
    In your Netlify dashboard, go to Site Settings > Environment Variables and add:
+
    ```
    SUPABASE_URL=https://your-project.supabase.co
    SUPABASE_ANON_KEY=your-anon-key-here
@@ -190,11 +200,13 @@ netlify deploy --prod --dir=dist
 ### Alternative Deployment Options
 
 #### Vercel
+
 ```bash
 pnpm run build
 ```
 
 #### Static Generation
+
 ```bash
 pnpm run generate
 ```
@@ -209,6 +221,7 @@ For all deployment platforms, ensure these environment variables are set:
 ### Domain Configuration
 
 After deployment:
+
 1. Configure your custom domain in Netlify dashboard
 2. Update Supabase authentication settings with your domain
 3. Update any CORS settings in your Supabase project

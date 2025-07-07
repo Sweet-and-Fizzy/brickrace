@@ -17,6 +17,7 @@ export default defineNuxtPlugin(() => {
 
   if (missingVars.length > 0) {
     const errorMessage = `Missing required environment variables: ${missingVars.join(', ')}`
+    // Keep essential error logging for production debugging
     console.error(errorMessage)
 
     if (import.meta.dev) {
@@ -27,6 +28,7 @@ export default defineNuxtPlugin(() => {
   // Validate Supabase URL format
   const supabaseUrl = config.public.supabase.url
   if (supabaseUrl && !supabaseUrl.match(/^https:\/\/[a-z0-9]+\.supabase\.co$/)) {
+    // Keep essential error logging for production debugging
     console.warn('Supabase URL format appears invalid. Expected format: https://xxx.supabase.co')
   }
 })

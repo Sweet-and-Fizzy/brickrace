@@ -4,7 +4,7 @@
   >
     <div class="container mx-auto px-4 py-12 max-w-2xl">
       <!-- Breadcrumb Navigation -->
-      <Breadcrumb :model="breadcrumbItems" class="mb-6" />
+      <BreadcrumbWrapper :items="breadcrumbItems" />
 
       <!-- Loading State -->
       <div v-if="pending" class="flex justify-center py-12">
@@ -184,16 +184,14 @@
                   <div class="text-center">
                     <FileUpload
                       mode="basic"
-                      name="main-photo"
                       accept="image/*"
-                      :max-file-size="5000000"
-                      :choose-label="form.image_url ? 'Replace Photo' : 'Upload Main Photo'"
-                      :custom-upload="true"
-                      :auto="true"
-                      class="mb-3"
+                      :max-file-size="10000000"
+                      :auto="false"
+                      choose-label="Choose Photo"
+                      class="w-full"
                       @select="onMainPhotoSelect"
                     />
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
                       This will be the primary photo displayed on the racer's detail page.
                     </p>
                   </div>
@@ -273,6 +271,16 @@ const authStore = useAuthStore()
 const { $supabase } = useNuxtApp()
 const $toast = useToast()
 
+// Use racers composable
+const {
+  getRacerById,
+  fetchRacerDetails,
+  updateRacer: updateRacerComposable,
+  updateRacerImage,
+  updateRacerPhotos,
+  initialize: initializeRacers
+} = useRacers()
+
 const racer = ref(null)
 const pending = ref(true)
 const error = ref(null)
@@ -305,16 +313,23 @@ const errors = reactive({
   general: ''
 })
 
-// Fetch racer data and check permissions
+// Fetch racer data and check permissions using composable
 const fetchRacer = async () => {
   try {
-    const { data: racerData, error: racerError } = await $supabase
-      .from('racers')
-      .select('*')
-      .eq('id', route.params.id)
-      .single()
+    // Initialize racers composable if needed
+    await initializeRacers()
 
-    if (racerError) throw racerError
+    // Try to get racer from cache first
+    let racerData = getRacerById(route.params.id)
+
+    // If not in cache or incomplete, fetch detailed data
+    if (!racerData) {
+      racerData = await fetchRacerDetails(route.params.id)
+    }
+
+    if (!racerData) {
+      throw new Error('Racer not found')
+    }
 
     // Check if user has permission to edit
     if (racerData.user_id !== authStore.userId && !authStore.isAdmin) {
@@ -370,8 +385,7 @@ const handleSubmit = async () => {
       name: form.name.trim(),
       team_members: form.team_members.trim() || null,
       image_url: form.image_url || null,
-      photos: form.photos,
-      updated_at: new Date().toISOString()
+      photos: form.photos
     }
 
     // Only include weight if it's provided (convert pounds to grams for storage)
@@ -379,13 +393,7 @@ const handleSubmit = async () => {
       updateData.weight = Number.parseFloat(form.weight) * 453.592
     }
 
-    const { error } = await $supabase
-      .from('racers')
-      .update(updateData)
-      .eq('id', route.params.id)
-      .select()
-
-    if (error) throw error
+    await updateRacerComposable(route.params.id, updateData)
 
     // Show success toast
     $toast.add({
@@ -441,15 +449,7 @@ const onFeaturedChanged = async ({ index: _index, featured: _featured }) => {
 
 const savePhotos = async () => {
   try {
-    const { error } = await $supabase
-      .from('racers')
-      .update({
-        photos: form.photos,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', racer.value.id)
-
-    if (error) throw error
+    await updateRacerPhotos(racer.value.id, form.photos)
   } catch (err) {
     console.error('Error saving photos:', err)
     errors.general = 'Failed to save photos. Please try again.'
@@ -458,10 +458,23 @@ const savePhotos = async () => {
 
 // Main photo select handler (for preview)
 const onMainPhotoSelect = (event) => {
-  const files = event.files
+  const files = event.files || []
+
   if (!files || files.length === 0) return
 
   const file = files[0]
+
+  // Check if file has the expected properties
+  if (!file || typeof file !== 'object') {
+    return
+  }
+
+  // Try different possible property names for the file name
+  const fileName = file.name || file.fileName || file.filename
+  if (!fileName) {
+    return
+  }
+
   previewFile.value = file
 
   // Create preview URL
@@ -480,14 +493,27 @@ const savePreviewedPhoto = async () => {
 
   try {
     const file = previewFile.value
-    const fileExt = file.name.split('.').pop()
-    const fileName = `racer-${racer.value.id}-main-${Date.now()}.${fileExt}`
-    const filePath = `racers/${fileName}`
+    if (!file || typeof file !== 'object') {
+      throw new Error('Invalid file selected')
+    }
+
+    // Handle Vue reactive objects - get the actual file data
+    const actualFile = file.object || file
+
+    // Try different possible property names for the file name
+    const fileName = actualFile.name || actualFile.fileName || actualFile.filename
+    if (!fileName) {
+      throw new Error('File name not found')
+    }
+
+    const fileExt = fileName.split('.').pop()
+    const newFileName = `racer-${racer.value.id}-main-${Date.now()}.${fileExt}`
+    const filePath = `racers/${authStore.userId}/${newFileName}`
 
     // Upload file to Supabase Storage
     const { error: uploadError } = await $supabase.storage
       .from('race-images')
-      .upload(filePath, file)
+      .upload(filePath, actualFile)
 
     if (uploadError) throw uploadError
 
@@ -496,18 +522,9 @@ const savePreviewedPhoto = async () => {
 
     if (!urlData.publicUrl) throw new Error('Failed to get public URL')
 
-    // Update form and save immediately
+    // Update form and save immediately using composable
     form.image_url = urlData.publicUrl
-
-    const { error: updateError } = await $supabase
-      .from('racers')
-      .update({
-        image_url: form.image_url,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', racer.value.id)
-
-    if (updateError) throw updateError
+    await updateRacerImage(racer.value.id, form.image_url)
 
     // Clear preview
     cancelPreview()
@@ -537,16 +554,7 @@ const cancelPreview = () => {
 const removeMainPhoto = async () => {
   try {
     form.image_url = ''
-
-    const { error } = await $supabase
-      .from('racers')
-      .update({
-        image_url: null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', racer.value.id)
-
-    if (error) throw error
+    await updateRacerImage(racer.value.id, null)
 
     // Show success toast
     $toast.add({

@@ -6,115 +6,75 @@
     </div>
 
     <!-- Upload Area -->
-    <Card v-if="canUpload" class="border-2 border-dashed border-gray-300 dark:border-gray-600">
-      <template #content>
+    <div
+      v-if="canUpload"
+      class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6"
+    >
+      <div class="text-center">
         <FileUpload
-          ref="fileUpload"
-          name="photos"
-          :multiple="true"
+          mode="basic"
+          multiple
           accept="image/*"
-          :max-file-size="2000000"
-          :disabled="isAtMaxPhotos"
-          :custom-upload="true"
-          :pt="{
-            root: { class: 'border-0' },
-            chooseButton: {
-              class: isAtMaxPhotos
-                ? 'bg-gray-400 border-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 border-blue-600 hover:bg-blue-700'
-            }
-          }"
-          @uploader="onUpload"
-          @select="onSelect"
-          @error="onError"
-        >
-          <template #header="{ chooseCallback, clearCallback, files }">
-            <div class="flex flex-wrap justify-between items-center flex-1 gap-2">
-              <div class="flex gap-2">
+          :max-file-size="10000000"
+          :file-limit="maxPhotos - photos.length"
+          :auto="false"
+          choose-label="Choose Photos"
+          class="w-full"
+          @select="onFileChange"
+        />
+      </div>
+
+      <!-- Selected Files Preview -->
+      <div v-if="selectedFiles.length > 0" class="mt-4 space-y-4">
+        <div>
+          <h4 class="font-medium text-gray-900 dark:text-white mb-3">Selected Files</h4>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div v-for="(file, index) in selectedFiles" :key="index" class="relative">
+              <img
+                :src="file.objectURL"
+                :alt="file.name"
+                class="w-full h-24 object-cover rounded-lg border"
+              >
+              <div
+                class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
+              >
                 <Button
-                  icon="pi pi-images"
-                  :label="files && files.length > 0 ? 'Add More Photos' : 'Choose Photos'"
-                  :disabled="isAtMaxPhotos"
-                  class="font-semibold"
-                  @click="chooseCallback()"
-                />
-                <Button
-                  v-if="files && files.length > 0"
+                  v-tooltip="'Remove'"
                   icon="pi pi-times"
-                  label="Clear"
-                  severity="secondary"
-                  outlined
-                  @click="clearCallback()"
+                  rounded
+                  text
+                  severity="danger"
+                  @click="removeSelectedFile(index)"
                 />
               </div>
-            </div>
-          </template>
-
-          <template
-            #content="{
-              files,
-              uploadedFiles: _uploadedFiles,
-              removeUploadedFileCallback: _removeUploadedFileCallback,
-              removeFileCallback
-            }"
-          >
-            <div v-if="files && files.length > 0" class="space-y-4">
-              <div>
-                <h4 class="font-medium text-gray-900 dark:text-white mb-3">Selected Files</h4>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  <div v-for="(file, index) in files" :key="index" class="relative">
-                    <img
-                      :src="file.objectURL"
-                      :alt="file.name"
-                      class="w-full h-24 object-cover rounded-lg border"
-                    >
-                    <div
-                      class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-                    >
-                      <Button
-                        v-tooltip="'Remove'"
-                        icon="pi pi-times"
-                        rounded
-                        text
-                        severity="danger"
-                        @click="removeFileCallback(index)"
-                      />
-                    </div>
-                    <div class="absolute bottom-1 left-1 right-1">
-                      <div
-                        class="text-xs text-white bg-black bg-opacity-75 rounded px-2 py-1 truncate"
-                      >
-                        {{ file.name }}
-                      </div>
-                    </div>
-                  </div>
+              <div class="absolute bottom-1 left-1 right-1">
+                <div class="text-xs text-white bg-black bg-opacity-75 rounded px-2 py-1 truncate">
+                  {{ file.name }}
                 </div>
               </div>
-
-              <div class="flex justify-center">
-                <Button
-                  icon="pi pi-upload"
-                  label="Upload Photos"
-                  :loading="uploading"
-                  class="font-semibold"
-                  @click="onUpload({ files })"
-                />
-              </div>
             </div>
+          </div>
+        </div>
 
-            <div v-else-if="!photos.length" class="text-center py-8">
-              <i class="pi pi-images text-4xl text-gray-400 dark:text-gray-500 mb-4" />
-              <p class="text-gray-500 dark:text-gray-400 mb-2">No photos yet</p>
-              <p class="text-sm text-gray-400 dark:text-gray-500">
-                {{
-                  isAtMaxPhotos ? 'Maximum photos reached' : 'Upload images to showcase your racer'
-                }}
-              </p>
-            </div>
-          </template>
-        </FileUpload>
-      </template>
-    </Card>
+        <div class="flex justify-center">
+          <Button
+            icon="pi pi-upload"
+            label="Upload Photos"
+            :loading="uploading"
+            class="font-semibold"
+            @click="onUpload({ files: selectedFiles })"
+          />
+        </div>
+      </div>
+
+      <div v-else-if="!photos.length" class="text-center py-8">
+        <i class="pi pi-images text-4xl text-gray-400 dark:text-gray-500 mb-4" />
+        <p class="text-gray-500 dark:text-gray-400 mb-2">No photos yet</p>
+        <p class="text-sm text-gray-400 dark:text-gray-500">
+          {{ isAtMaxPhotos ? 'Maximum photos reached' : 'Upload images to showcase your racer' }}
+        </p>
+      </div>
+    </div>
 
     <!-- Current Photos Gallery -->
     <div v-if="photos.length > 0" class="space-y-4">
@@ -207,6 +167,12 @@
 <script setup>
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
+import { useAuthStore } from '~/stores/auth'
+import { resizeImage, getResizeOptions, needsResizing } from '~/utils/imageResizer'
+
+// Ensure Toast is available
+const toast = useToast()
+const confirm = useConfirm()
 
 const props = defineProps({
   racerId: {
@@ -243,20 +209,27 @@ const emit = defineEmits([
   'featured-changed'
 ])
 
-const toast = useToast()
-const confirm = useConfirm()
 const { $supabase } = useNuxtApp()
+const authStore = useAuthStore()
 
 const uploading = ref(false)
-const fileUpload = ref()
+const selectedFiles = ref([])
+
+// Component mounted
+onMounted(() => {
+  // Component initialization complete
+})
 
 const isAtMaxPhotos = computed(() => {
   return props.maxPhotos && props.photos.length >= props.maxPhotos
 })
 
 // File upload handling
-const onSelect = (event) => {
-  const files = event.files
+const onFileChange = (event) => {
+  // PrimeVue FileUpload passes files directly in the event
+  const files = Array.from(event.files || [])
+
+  if (files.length === 0) return
 
   // Check if adding these files would exceed the limit
   if (props.maxPhotos && props.photos.length + files.length > props.maxPhotos) {
@@ -267,8 +240,33 @@ const onSelect = (event) => {
       detail: `You can only add ${remaining} more photo${remaining !== 1 ? 's' : ''}`,
       life: 5000
     })
-    return false
+    return
   }
+
+  // Validate file size (10MB limit for original files - will be resized before upload)
+  const oversizedFiles = files.filter((file) => file.size > 10000000)
+  if (oversizedFiles.length > 0) {
+    toast.add({
+      severity: 'error',
+      summary: 'File Too Large',
+      detail: `${oversizedFiles.length} file(s) exceed the 10MB limit`,
+      life: 5000
+    })
+    return
+  }
+
+  // Store selected files for preview with object URLs
+  selectedFiles.value = files.map((file) => ({
+    originalFile: file, // Preserve the original file object
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    objectURL: URL.createObjectURL(file)
+  }))
+}
+
+const removeSelectedFile = (index) => {
+  selectedFiles.value.splice(index, 1)
 }
 
 const onUpload = async ({ files }) => {
@@ -280,14 +278,40 @@ const onUpload = async ({ files }) => {
     const uploadedUrls = []
 
     for (const file of files) {
+      // Validate file object
+      if (!file || typeof file !== 'object') {
+        throw new Error('Invalid file selected')
+      }
+
+      // Get the original file object that we preserved
+      const originalFile = file.originalFile || file
+
+      // Use the file name from the stored object or original file
+      const fileName = file.name || originalFile.name
+      if (!fileName) {
+        throw new Error('File name not found')
+      }
+
+      // Resize image if needed
+      let uploadFile = originalFile
+      if (needsResizing(originalFile)) {
+        try {
+          const resizeOptions = getResizeOptions(originalFile)
+          uploadFile = await resizeImage(originalFile, resizeOptions)
+        } catch (error) {
+          console.warn('Failed to resize image, uploading original:', error)
+          uploadFile = originalFile
+        }
+      }
+
       // Generate unique filename
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${props.racerId}/gallery/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`
+      const fileExt = fileName.split('.').pop()
+      const newFileName = `racers/${authStore.userId}/${props.racerId}/gallery/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`
 
       // Upload to Supabase Storage
       const { data: _data, error } = await $supabase.storage
         .from('race-images')
-        .upload(fileName, file, {
+        .upload(newFileName, uploadFile, {
           cacheControl: '3600',
           upsert: false
         })
@@ -297,7 +321,7 @@ const onUpload = async ({ files }) => {
       // Get public URL
       const {
         data: { publicUrl }
-      } = $supabase.storage.from('race-images').getPublicUrl(fileName)
+      } = $supabase.storage.from('race-images').getPublicUrl(newFileName)
 
       uploadedUrls.push(publicUrl)
     }
@@ -307,10 +331,8 @@ const onUpload = async ({ files }) => {
     emit('update:photos', newPhotos)
     emit('photo-uploaded', uploadedUrls)
 
-    // Clear the file upload
-    if (fileUpload.value) {
-      fileUpload.value.clear()
-    }
+    // Clear the selected files
+    selectedFiles.value = []
 
     toast.add({
       severity: 'success',
@@ -329,15 +351,6 @@ const onUpload = async ({ files }) => {
   } finally {
     uploading.value = false
   }
-}
-
-const onError = (_event) => {
-  toast.add({
-    severity: 'error',
-    summary: 'Upload Error',
-    detail: 'Failed to select files. Please check file size and format.',
-    life: 5000
-  })
 }
 
 // Photo management
@@ -391,7 +404,7 @@ const deletePhoto = async (index, photoUrl) => {
     // Extract file path from URL for Supabase Storage deletion
     if (photoUrl.includes('supabase')) {
       const urlParts = photoUrl.split('/')
-      const fileName = urlParts.slice(-3).join('/') // Get racerId/gallery/filename
+      const fileName = urlParts.slice(-4).join('/') // Get racers/userId/racerId/gallery/filename
 
       const { error } = await $supabase.storage.from('race-images').remove([fileName])
 

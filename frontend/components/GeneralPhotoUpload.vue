@@ -11,7 +11,7 @@
           mode="advanced"
           multiple
           accept="image/*"
-          :max-file-size="5000000"
+          :max-file-size="10000000"
           :file-limit="10"
           :auto="false"
           choose-label="Choose Photos"
@@ -28,6 +28,7 @@
           @remove="onFileRemoved"
           @clear="onFilesClear"
           @upload="onUpload"
+          @before-choose="onBeforeChoose"
         >
           <template #empty>
             <div class="text-center">
@@ -36,7 +37,7 @@
                 Drag and drop photos here, or click to select files
               </p>
               <p class="text-sm text-gray-500 dark:text-gray-500">
-                JPG, PNG, GIF up to 5MB each • Maximum 10 photos
+                JPG, PNG, GIF up to 10MB each • Maximum 10 photos
               </p>
             </div>
           </template>
@@ -91,7 +92,7 @@
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Photo Category
           </label>
-          <Dropdown
+          <Select
             v-model="photoCategory"
             :options="categoryOptions"
             option-label="label"
@@ -234,8 +235,8 @@ const onFilesSelected = (event) => {
   // Validate files
   const validFiles = []
   for (const file of event.files) {
-    if (file.size > 5000000) {
-      errors.value.push(`${file.name} is too large (max 5MB)`)
+    if (file.size > 10000000) {
+      errors.value.push(`${file.name} is too large (max 10MB)`)
       continue
     }
     if (!file.type.startsWith('image/')) {
@@ -263,6 +264,10 @@ const onFilesClear = () => {
 
 const onUpload = () => {
   // This is called by the PrimeVue component but we handle upload manually
+}
+
+const onBeforeChoose = () => {
+  // File selection about to begin
 }
 
 const startUpload = async () => {

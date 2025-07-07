@@ -1,779 +1,863 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <!-- Breadcrumb Navigation -->
-    <Breadcrumb :model="breadcrumbItems" class="mb-6" />
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+  >
+    <div class="container mx-auto px-4 py-8">
+      <!-- Breadcrumb Navigation -->
+      <BreadcrumbWrapper :items="breadcrumbItems" />
 
-    <!-- Loading State -->
-    <div v-if="pending">
-      <!-- Breadcrumb Skeleton -->
-      <Skeleton width="20rem" height="1.5rem" class="mb-6" />
+      <!-- Loading State -->
+      <div v-if="isLoading">
+        <!-- Breadcrumb Skeleton -->
+        <Skeleton width="20rem" height="1.5rem" class="mb-6" />
 
-      <!-- Header Skeleton -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div>
-          <Skeleton width="15rem" height="2.5rem" class="mb-2" />
-          <div class="flex items-center gap-4">
-            <Skeleton width="8rem" height="1rem" />
-            <Skeleton width="6rem" height="1rem" />
+        <!-- Header Skeleton -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <Skeleton width="15rem" height="2.5rem" class="mb-2" />
+            <div class="flex items-center gap-4">
+              <Skeleton width="8rem" height="1rem" />
+              <Skeleton width="6rem" height="1rem" />
+            </div>
+          </div>
+          <div class="flex gap-2 mt-4 md:mt-0">
+            <Skeleton width="8rem" height="2.5rem" />
+            <Skeleton width="7rem" height="2.5rem" />
+            <Skeleton width="6rem" height="2.5rem" />
           </div>
         </div>
-        <div class="flex gap-2 mt-4 md:mt-0">
-          <Skeleton width="8rem" height="2.5rem" />
-          <Skeleton width="7rem" height="2.5rem" />
-          <Skeleton width="6rem" height="2.5rem" />
-        </div>
-      </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Content Skeleton -->
-        <div class="lg:col-span-2 space-y-6">
-          <!-- Tournament Results Skeleton -->
-          <Card>
-            <template #title>
-              <Skeleton width="12rem" height="1.5rem" />
-            </template>
-            <template #content>
-              <div class="space-y-6">
-                <Skeleton width="100%" height="8rem" />
-                <Skeleton width="100%" height="6rem" />
-              </div>
-            </template>
-          </Card>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Main Content Skeleton -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Tournament Results Skeleton -->
+            <Card>
+              <template #title>
+                <Skeleton width="12rem" height="1.5rem" />
+              </template>
+              <template #content>
+                <div class="space-y-6">
+                  <Skeleton width="100%" height="8rem" />
+                  <Skeleton width="100%" height="6rem" />
+                </div>
+              </template>
+            </Card>
 
-          <!-- Race Image Skeleton -->
-          <Card>
-            <template #header>
-              <Skeleton width="100%" height="24rem" />
-            </template>
-          </Card>
+            <!-- Race Image Skeleton -->
+            <Card>
+              <template #header>
+                <Skeleton width="100%" height="24rem" />
+              </template>
+            </Card>
 
-          <!-- Qualifiers/Brackets Skeleton -->
-          <Card>
-            <template #title>
-              <Skeleton width="10rem" height="1.5rem" />
-            </template>
-            <template #content>
-              <div class="space-y-3">
-                <div
-                  v-for="n in 5"
-                  :key="n"
-                  class="flex items-center justify-between p-3 border rounded"
-                >
-                  <div class="flex items-center gap-3">
-                    <Skeleton width="2rem" height="1rem" />
-                    <Skeleton width="8rem" height="1rem" />
+            <!-- Qualifiers/Brackets Skeleton -->
+            <Card>
+              <template #title>
+                <Skeleton width="10rem" height="1.5rem" />
+              </template>
+              <template #content>
+                <div class="space-y-3">
+                  <div
+                    v-for="n in 5"
+                    :key="n"
+                    class="flex items-center justify-between p-3 border rounded"
+                  >
+                    <div class="flex items-center gap-3">
+                      <Skeleton width="2rem" height="1rem" />
+                      <Skeleton width="8rem" height="1rem" />
+                    </div>
+                    <Skeleton width="4rem" height="1rem" />
                   </div>
-                  <Skeleton width="4rem" height="1rem" />
                 </div>
-              </div>
-            </template>
-          </Card>
-        </div>
-
-        <!-- Sidebar Skeleton -->
-        <div class="space-y-6">
-          <Card>
-            <template #title>
-              <Skeleton width="6rem" height="1.25rem" />
-            </template>
-            <template #content>
-              <div class="space-y-4">
-                <div v-for="n in 4" :key="n" class="flex justify-between">
-                  <Skeleton width="5rem" height="1rem" />
-                  <Skeleton width="3rem" height="1rem" />
-                </div>
-              </div>
-            </template>
-          </Card>
-        </div>
-      </div>
-    </div>
-
-    <!-- Error State -->
-    <div v-else-if="error" class="text-center py-12">
-      <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
-      <p class="text-gray-600 dark:text-gray-300 mb-2">
-        The race you're looking for doesn't exist or has been removed.
-      </p>
-      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-        ID requested: {{ route.params.id }}
-      </p>
-      <div class="space-x-4">
-        <NuxtLink to="/races">
-          <Button severity="primary">
-            <i class="pi pi-arrow-left mr-2" />
-            Back to All Races
-          </Button>
-        </NuxtLink>
-      </div>
-    </div>
-
-    <!-- Race Details -->
-    <div v-else-if="race">
-      <!-- Header -->
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-        <div>
-          <div class="flex items-center gap-3 mb-2">
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ race.name }}</h1>
-            <div
-              v-if="race.active"
-              class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
-            >
-              <i class="pi pi-check-circle mr-1" />
-              ACTIVE
-            </div>
-            <div v-else class="bg-gray-400 text-white px-3 py-1 rounded-full text-sm font-semibold">
-              <i class="pi pi-clock mr-1" />
-              HISTORICAL
-            </div>
+              </template>
+            </Card>
           </div>
-          <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
-            <span>{{
-              new Date(race.date).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })
-            }}</span>
-            <span v-if="!race.active" class="text-amber-600 dark:text-amber-400 font-medium">
-              <i class="pi pi-info-circle mr-1" />
-              Read-only view
-            </span>
+
+          <!-- Sidebar Skeleton -->
+          <div class="space-y-6">
+            <Card>
+              <template #title>
+                <Skeleton width="6rem" height="1.25rem" />
+              </template>
+              <template #content>
+                <div class="space-y-4">
+                  <div v-for="n in 4" :key="n" class="flex justify-between">
+                    <Skeleton width="5rem" height="1rem" />
+                    <Skeleton width="3rem" height="1rem" />
+                  </div>
+                </div>
+              </template>
+            </Card>
           </div>
         </div>
+      </div>
 
-        <div class="flex gap-2 mt-4 md:mt-0">
-          <!-- Active Race Admin Controls -->
-          <template v-if="authStore.isRaceAdmin && race.active">
-            <NuxtLink :to="`/races/${race.id}/checkin`">
-              <Button severity="success">
-                <i class="pi pi-check mr-2" />
-                Check-in Racers
-              </Button>
-            </NuxtLink>
-            <NuxtLink :to="`/races/${race.id}/qualifiers`">
-              <Button severity="info">
-                <i class="pi pi-clock mr-2" />
-                Qualifiers
-              </Button>
-            </NuxtLink>
-            <NuxtLink :to="`/races/${race.id}/brackets`">
-              <Button severity="help">
-                <i class="pi pi-sitemap mr-2" />
-                Brackets
-              </Button>
-            </NuxtLink>
-          </template>
-
-          <!-- General Admin Controls (available for all races) -->
-          <NuxtLink v-if="authStore.isRaceAdmin" :to="`/races/${race.id}/edit`">
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center py-12">
+        <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
+        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
+        <p class="text-gray-600 dark:text-gray-300 mb-2">
+          The race you're looking for doesn't exist or has been removed.
+        </p>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+          ID requested: {{ route.params.id }}
+        </p>
+        <div class="space-x-4">
+          <NuxtLink to="/races">
             <Button severity="primary">
-              <i class="pi pi-pencil mr-2" />
-              Edit Race
+              <i class="pi pi-arrow-left mr-2" />
+              Back to All Races
             </Button>
           </NuxtLink>
         </div>
       </div>
 
-      <!-- Race Process Steps -->
-      <Card class="mb-8">
-        <template #content>
-          <div class="px-2">
-            <Steps :model="raceSteps" :active-step="currentStep" class="mb-4" />
-            <div class="text-center mt-4">
-              <p class="text-sm text-gray-600 dark:text-gray-400">
-                Current Status:
-                <span class="font-semibold">{{ raceSteps[currentStep]?.label || 'Unknown' }}</span>
-              </p>
+      <!-- Race Details -->
+      <div v-else-if="race">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ race.name }}</h1>
+              <div
+                v-if="race.active"
+                class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
+              >
+                <i class="pi pi-check-circle mr-1" />
+                ACTIVE
+              </div>
+              <div
+                v-else
+                class="bg-gray-400 text-white px-3 py-1 rounded-full text-sm font-semibold"
+              >
+                <i class="pi pi-clock mr-1" />
+                HISTORICAL
+              </div>
+            </div>
+            <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
+              <span>{{
+                new Date(race.date).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })
+              }}</span>
+              <span v-if="!race.active" class="text-amber-600 dark:text-amber-400 font-medium">
+                <i class="pi pi-info-circle mr-1" />
+                Read-only view
+              </span>
             </div>
           </div>
-        </template>
-      </Card>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Content -->
-        <div class="lg:col-span-2 space-y-6">
-          <!-- Tournament Results Podium -->
-          <Card v-if="tournamentResults.Fastest || tournamentResults.Slowest">
-            <template #title>
-              <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                <i class="pi pi-crown text-yellow-500 text-xl" />
-                Tournament Results
-              </h2>
+          <div class="flex gap-2 mt-4 md:mt-0">
+            <!-- Active Race Admin Controls -->
+            <template v-if="authStore.isRaceAdmin && race.active">
+              <NuxtLink :to="`/races/${race.id}/checkin`">
+                <Button severity="success">
+                  <i class="pi pi-check mr-2" />
+                  Check-in Racers
+                </Button>
+              </NuxtLink>
+              <NuxtLink :to="`/races/${race.id}/qualifiers`">
+                <Button severity="info">
+                  <i class="pi pi-clock mr-2" />
+                  Qualifiers
+                </Button>
+              </NuxtLink>
+              <NuxtLink :to="`/races/${race.id}/brackets`">
+                <Button severity="help">
+                  <i class="pi pi-sitemap mr-2" />
+                  Brackets
+                </Button>
+              </NuxtLink>
             </template>
-            <template #content>
-              <div v-for="(result, bracketType) in tournamentResults" :key="bracketType">
-                <div v-if="result" class="mb-6 last:mb-0">
-                  <h3 class="text-lg font-bold text-center mb-4 text-gray-800 dark:text-gray-200">
-                    {{ bracketType }} Tournament Podium
-                  </h3>
 
-                  <!-- Compact Podium Display -->
-                  <div class="flex items-end justify-center gap-2 mb-4">
-                    <!-- 2nd Place -->
-                    <div v-if="result.second" class="text-center flex-1 max-w-24">
-                      <div
-                        class="bg-gradient-to-br from-gray-200 to-gray-300 border border-gray-400 rounded-lg p-2 shadow-md mb-1"
-                      >
-                        <div class="text-2xl mb-1">🥈</div>
-                        <NuxtLink
-                          :to="`/racers/${result.second.racer_id}`"
-                          class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
-                        >
-                          {{ result.second.racer_name }}
-                        </NuxtLink>
-                        <div
-                          class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-1 py-0.5 rounded text-xs font-semibold"
-                        >
-                          #{{ result.second.racer_number }}
-                        </div>
-                        <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
-                          {{ formatTime(result.second.time) }}
-                        </div>
-                      </div>
-                      <div
-                        class="bg-gray-300 dark:bg-gray-600 h-8 rounded-t text-xs flex items-center justify-center"
-                      >
-                        <span class="font-bold text-gray-700 dark:text-gray-200">2nd</span>
-                      </div>
-                    </div>
-
-                    <!-- 1st Place (Champion) -->
-                    <div class="text-center flex-1 max-w-28">
-                      <div
-                        class="bg-gradient-to-br from-yellow-200 to-orange-200 border border-yellow-400 rounded-lg p-3 shadow-xl mb-1"
-                      >
-                        <div class="text-3xl mb-1">🏆</div>
-                        <NuxtLink
-                          :to="`/racers/${result.first.racer_id}`"
-                          class="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
-                        >
-                          {{ result.first.racer_name }}
-                        </NuxtLink>
-                        <div
-                          class="bg-yellow-200 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-0.5 rounded-full text-sm font-bold mb-1"
-                        >
-                          #{{ result.first.racer_number }}
-                        </div>
-                        <div class="text-sm font-bold text-blue-600">
-                          {{ formatTime(result.first.winning_time) }}
-                        </div>
-                        <div class="mt-1">
-                          <span
-                            class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full text-xs font-bold"
-                          >
-                            CHAMPION
-                          </span>
-                        </div>
-                      </div>
-                      <div
-                        class="bg-gradient-to-r from-yellow-400 to-orange-400 h-12 rounded-t text-sm flex items-center justify-center"
-                      >
-                        <span class="font-bold text-white">1st</span>
-                      </div>
-                    </div>
-
-                    <!-- 3rd Place -->
-                    <div v-if="result.third" class="text-center flex-1 max-w-24">
-                      <div
-                        class="bg-gradient-to-br from-orange-200 to-orange-300 border border-orange-400 rounded-lg p-2 shadow-md mb-1"
-                      >
-                        <div class="text-2xl mb-1">🥉</div>
-                        <NuxtLink
-                          :to="`/racers/${result.third.racer_id}`"
-                          class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
-                        >
-                          {{ result.third.racer_name }}
-                        </NuxtLink>
-                        <div
-                          class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-1 py-0.5 rounded text-xs font-semibold"
-                        >
-                          #{{ result.third.racer_number }}
-                        </div>
-                        <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
-                          {{ formatTime(result.third.time) }}
-                        </div>
-                      </div>
-                      <div
-                        class="bg-orange-400 dark:bg-orange-600 h-6 rounded-t text-xs flex items-center justify-center"
-                      >
-                        <span class="font-bold text-white">3rd</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Tournament Type Badge -->
-                  <div class="text-center">
-                    <span
-                      class="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-bold"
-                    >
-                      {{ bracketType }} Tournament Complete
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </Card>
-
-          <!-- Brackets -->
-          <Card v-if="brackets.length">
-            <template #title>
-              <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="pi pi-sitemap text-purple-600" />
-                Tournament Brackets
-              </h2>
-            </template>
-            <template #content>
-              <div class="space-y-6">
-                <div
-                  v-for="(bracket, index) in brackets"
-                  :key="bracket.id"
-                  class="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
-                >
-                  <div class="flex items-center justify-between mb-4">
-                    <h3
-                      class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2"
-                    >
-                      <span
-                        class="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-2 py-1 rounded-full text-sm font-medium"
-                      >
-                        {{ bracket.bracket_type }}
-                      </span>
-                      Bracket #{{ index + 1 }}
-                    </h3>
-                    <NuxtLink
-                      v-if="authStore.isRaceAdmin"
-                      :to="`/races/${race.id}/brackets`"
-                      class="text-purple-600 hover:text-purple-800 text-sm font-medium"
-                    >
-                      Manage →
-                    </NuxtLink>
-                  </div>
-
-                  <div class="flex items-center gap-4">
-                    <!-- Track 1 -->
-                    <div
-                      class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600"
-                    >
-                      <div class="text-center">
-                        <p class="text-sm font-medium text-blue-600 mb-2">Track 1</p>
-                        <div v-if="bracket.track1_racer_name">
-                          <NuxtLink
-                            :to="`/racers/${bracket.track1_racer_id}`"
-                            class="font-bold text-lg text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200 block"
-                          >
-                            {{ bracket.track1_racer_name }}
-                          </NuxtLink>
-                          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                            #{{ bracket.track1_racer_number }}
-                          </p>
-                          <div
-                            v-if="bracket.track1_time"
-                            class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2"
-                          >
-                            <p class="text-lg font-bold text-blue-600">
-                              {{ formatTime(bracket.track1_time) }}
-                            </p>
-                          </div>
-                          <div v-else class="text-gray-400">
-                            <p class="text-sm">No time recorded</p>
-                          </div>
-                        </div>
-                        <div v-else class="text-gray-400">
-                          <p class="font-medium">TBD</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- VS Divider -->
-                    <div class="flex items-center justify-center flex-shrink-0">
-                      <div
-                        class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-12 h-12 flex items-center justify-center shadow-md"
-                      >
-                        <span class="font-bold text-purple-600 dark:text-purple-300">VS</span>
-                      </div>
-                    </div>
-
-                    <!-- Track 2 -->
-                    <div
-                      class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-red-200 dark:border-red-600"
-                    >
-                      <div class="text-center">
-                        <p class="text-sm font-medium text-red-600 mb-2">Track 2</p>
-                        <div v-if="bracket.track2_racer_name">
-                          <NuxtLink
-                            :to="`/racers/${bracket.track2_racer_id}`"
-                            class="font-bold text-lg text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200 block"
-                          >
-                            {{ bracket.track2_racer_name }}
-                          </NuxtLink>
-                          <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                            #{{ bracket.track2_racer_number }}
-                          </p>
-                          <div
-                            v-if="bracket.track2_time"
-                            class="bg-red-50 dark:bg-red-900/20 rounded-lg p-2"
-                          >
-                            <p class="text-lg font-bold text-red-600">
-                              {{ formatTime(bracket.track2_time) }}
-                            </p>
-                          </div>
-                          <div v-else class="text-gray-400">
-                            <p class="text-sm">No time recorded</p>
-                          </div>
-                        </div>
-                        <div v-else class="text-gray-400">
-                          <p class="font-medium">TBD</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Winner Display -->
-                  <div v-if="bracket.track1_time && bracket.track2_time" class="mt-4 text-center">
-                    <div
-                      class="bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg p-3"
-                    >
-                      <p
-                        class="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-1 flex items-center justify-center gap-1"
-                      >
-                        <i class="pi pi-trophy" />
-                        Winner
-                      </p>
-                      <p class="font-bold text-lg text-yellow-900 dark:text-yellow-200">
-                        {{ getWinner(bracket) }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </Card>
-
-          <!-- Race Image -->
-          <Card v-if="race.image_url">
-            <template #header>
-              <img
-                :src="race.image_url"
-                :alt="race.name"
-                class="w-full h-64 md:h-96 object-cover"
-              >
-            </template>
-          </Card>
-
-          <!-- Qualifiers Results -->
-          <Card v-if="qualifiers.length">
-            <template #title>
-              <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="pi pi-clock" />
-                Qualifying Times
-              </h2>
-            </template>
-            <template #content>
-              <DataTable
-                :value="qualifiers"
-                striped-rows
-                responsive-layout="scroll"
-                :sort-field="'time'"
-                :sort-order="1"
-                class="custom-datatable"
-              >
-                <Column field="racer_number" header="#" style="width: 60px">
-                  <template #body="slotProps">
-                    <span class="font-semibold text-blue-600"
-                      >#{{ slotProps.data.racer_number }}</span
-                    >
-                  </template>
-                </Column>
-                <Column field="racer_name" header="Racer">
-                  <template #body="slotProps">
-                    <span class="font-medium text-gray-900 dark:text-white">{{
-                      slotProps.data.racer_name
-                    }}</span>
-                  </template>
-                </Column>
-                <Column field="time" header="Time" sortable>
-                  <template #body="slotProps">
-                    <span class="font-bold text-lg text-blue-600">{{
-                      formatTime(slotProps.data.time)
-                    }}</span>
-                  </template>
-                </Column>
-                <Column field="created_at" header="Time">
-                  <template #body="slotProps">
-                    <span class="text-sm text-gray-600 dark:text-gray-300">{{
-                      new Date(slotProps.data.created_at).toLocaleTimeString()
-                    }}</span>
-                  </template>
-                </Column>
-              </DataTable>
-            </template>
-          </Card>
-
-          <!-- Checked In Racers -->
-          <Card v-if="checkins.length">
-            <template #title>
-              <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="pi pi-users" />
-                Checked In Racers ({{ checkins.length }})
-              </h2>
-            </template>
-            <template #content>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                <NuxtLink
-                  v-for="checkin in checkins"
-                  :key="checkin.id"
-                  :to="`/racers/${checkin.racer_id}`"
-                  class="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200"
-                >
-                  <div class="relative">
-                    <img
-                      v-if="checkin.racer_image_url"
-                      :src="checkin.racer_image_url"
-                      :alt="checkin.racer_name"
-                      class="w-12 h-12 object-cover rounded-full border-2 border-green-300"
-                    >
-                    <div
-                      v-else
-                      class="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-full border-2 border-green-300 flex items-center justify-center"
-                    >
-                      <i class="pi pi-car text-gray-500 dark:text-gray-300" />
-                    </div>
-                    <i
-                      class="pi pi-check-circle text-green-600 text-sm absolute -bottom-1 -right-1 bg-white rounded-full"
-                    />
-                  </div>
-                  <div class="flex-1">
-                    <p class="font-medium text-gray-900 dark:text-white hover:text-indigo-600">
-                      {{ checkin.racer_name }}
-                    </p>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
-                      #{{ checkin.racer_number }} •
-                      {{ new Date(checkin.time).toLocaleTimeString() }}
-                    </p>
-                  </div>
-                </NuxtLink>
-              </div>
-            </template>
-          </Card>
-
-          <!-- Photo Management (Admin Only) -->
-          <Card v-if="authStore.isRaceAdmin">
-            <template #title>
-              <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <i class="pi pi-images text-blue-600" />
-                  Race Photo Management
-                </h2>
-                <div class="flex items-center gap-2">
-                  <Badge :value="`${racePhotosCount} photos`" severity="info" />
-                  <Badge :value="`${pendingRacePhotos} pending`" severity="warning" />
-                </div>
-              </div>
-            </template>
-            <template #content>
-              <div class="space-y-6">
-                <!-- Quick Stats -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div class="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
-                      {{ racerPhotosCount }}
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Racer Photos</div>
-                  </div>
-                  <div class="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <div class="text-lg font-bold text-green-600 dark:text-green-400">
-                      {{ generalPhotosCount }}
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">General Photos</div>
-                  </div>
-                  <div class="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                    <div class="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                      {{ featuredPhotosCount }}
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Featured</div>
-                  </div>
-                  <div class="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                    <div class="text-lg font-bold text-purple-600 dark:text-purple-400">
-                      {{ pendingRacePhotos }}
-                    </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Pending</div>
-                  </div>
-                </div>
-
-                <!-- Recent Race Photos Preview -->
-                <div v-if="recentRacePhotos.length > 0">
-                  <h4 class="font-semibold text-gray-900 dark:text-white mb-3">
-                    Recent Photos from This Race
-                  </h4>
-                  <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                    <div
-                      v-for="(photo, index) in recentRacePhotos.slice(0, 6)"
-                      :key="index"
-                      class="relative group cursor-pointer"
-                      @click="viewPhotoInGallery(photo)"
-                    >
-                      <Image
-                        :src="photo.url"
-                        :alt="`Race photo ${index + 1}`"
-                        image-class="w-full h-20 object-cover rounded-lg border hover:border-blue-400 transition-colors"
-                        class="w-full h-20"
-                        :preview="false"
-                      />
-
-                      <!-- Status Badge -->
-                      <div class="absolute top-1 right-1">
-                        <Badge
-                          :value="photo.status || 'approved'"
-                          :severity="getPhotoStatusSeverity(photo.status)"
-                          class="text-xs"
-                        />
-                      </div>
-
-                      <!-- Featured Badge -->
-                      <div
-                        v-if="photo.featured"
-                        class="absolute top-1 left-1 bg-yellow-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                      >
-                        <i class="pi pi-star text-xs" />
-                      </div>
-
-                      <!-- Hover Overlay -->
-                      <div
-                        class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 rounded-lg transition-all duration-200 flex items-center justify-center"
-                      >
-                        <i
-                          class="pi pi-eye text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div v-if="recentRacePhotos.length > 6" class="text-center mt-3">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      +{{ recentRacePhotos.length - 6 }} more photos from this race
-                    </p>
-                  </div>
-                </div>
-
-                <!-- No Photos State -->
-                <div v-else class="text-center py-8">
-                  <i class="pi pi-images text-4xl text-gray-300 dark:text-gray-600 mb-3" />
-                  <h4 class="font-semibold text-gray-600 dark:text-gray-400 mb-2">No Photos Yet</h4>
-                  <p class="text-sm text-gray-500 dark:text-gray-500">
-                    Photos from racers in this race will appear here once uploaded
-                  </p>
-                </div>
-
-                <!-- Management Actions -->
-                <div
-                  class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700"
-                >
-                  <NuxtLink to="/admin/photos" class="flex-1">
-                    <Button class="w-full" severity="primary">
-                      <i class="pi pi-cog mr-2" />
-                      Manage All Photos
-                    </Button>
-                  </NuxtLink>
-                  <Button
-                    class="flex-1"
-                    severity="secondary"
-                    :loading="loadingPhotos"
-                    @click="refreshRacePhotos"
-                  >
-                    <i class="pi pi-refresh mr-2" />
-                    Refresh Photos
-                  </Button>
-                  <Button
-                    class="flex-1"
-                    severity="success"
-                    outlined
-                    @click="showUploadDialog = true"
-                  >
-                    <i class="pi pi-plus mr-2" />
-                    Add Photos
-                  </Button>
-                </div>
-              </div>
-            </template>
-          </Card>
+            <!-- General Admin Controls (available for all races) -->
+            <NuxtLink v-if="authStore.isRaceAdmin" :to="`/races/${race.id}/edit`">
+              <Button severity="primary">
+                <i class="pi pi-pencil mr-2" />
+                Edit Race
+              </Button>
+            </NuxtLink>
+          </div>
         </div>
 
-        <!-- Sidebar -->
-        <div class="space-y-6">
-          <!-- Quick Stats -->
-          <Card>
-            <template #title>Race Stats</template>
-            <template #content>
-              <div class="space-y-4">
-                <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Total Racers</span>
-                  <span class="font-semibold">{{ checkins.length }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Qualifying Runs</span>
-                  <span class="font-semibold">{{ qualifiers.length }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Bracket Races</span>
-                  <span class="font-semibold">{{ brackets.length }}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600 dark:text-gray-300">Fastest Time</span>
-                  <span class="font-semibold">{{ fastestTime || 'N/A' }}</span>
-                </div>
+        <!-- Race Process Steps -->
+        <Card class="mb-8">
+          <template #content>
+            <div class="px-2">
+              <Steps :model="raceSteps" :active-step="currentStep" class="mb-4" />
+              <div class="text-center mt-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  Current Status:
+                  <span class="font-semibold">{{
+                    raceSteps[currentStep]?.label || 'Unknown'
+                  }}</span>
+                </p>
               </div>
-            </template>
-          </Card>
+            </div>
+          </template>
+        </Card>
 
-          <!-- Race Timeline -->
-          <Card>
-            <template #title>
-              <h3
-                class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
-              >
-                <i class="pi pi-history" />
-                Race Timeline
-              </h3>
-            </template>
-            <template #content>
-              <Timeline :value="raceEvents" class="w-full">
-                <template #marker="{ item }">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Main Content -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Tournament Results Podium -->
+            <Card v-if="tournamentResults.Fastest || tournamentResults.Slowest">
+              <template #title>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                  <i class="pi pi-crown text-yellow-500 text-xl" />
+                  Tournament Results
+                </h2>
+              </template>
+              <template #content>
+                <div v-for="(result, bracketType) in tournamentResults" :key="bracketType">
+                  <div v-if="result" class="mb-6 last:mb-0">
+                    <h3 class="text-lg font-bold text-center mb-4 text-gray-800 dark:text-gray-200">
+                      {{ bracketType }} Tournament Podium
+                    </h3>
+
+                    <!-- Compact Podium Display -->
+                    <div class="flex items-end justify-center gap-2 mb-4">
+                      <!-- 2nd Place -->
+                      <div v-if="result.second" class="text-center flex-1 max-w-24">
+                        <div
+                          class="bg-gradient-to-br from-gray-200 to-gray-300 border border-gray-400 rounded-lg p-2 shadow-md mb-1"
+                        >
+                          <div class="text-2xl mb-1">🥈</div>
+                          <NuxtLink
+                            :to="`/racers/${result.second.racer_id}`"
+                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
+                          >
+                            {{ result.second.racer_name }}
+                          </NuxtLink>
+                          <div
+                            class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-1 py-0.5 rounded text-xs font-semibold"
+                          >
+                            #{{ result.second.racer_number }}
+                          </div>
+                          <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                            {{ formatTime(result.second.time) }}
+                          </div>
+                        </div>
+                        <div
+                          class="bg-gray-300 dark:bg-gray-600 h-8 rounded-t text-xs flex items-center justify-center"
+                        >
+                          <span class="font-bold text-gray-700 dark:text-gray-200">2nd</span>
+                        </div>
+                      </div>
+
+                      <!-- 1st Place (Champion) -->
+                      <div class="text-center flex-1 max-w-28">
+                        <div
+                          class="bg-gradient-to-br from-yellow-200 to-orange-200 border border-yellow-400 rounded-lg p-3 shadow-xl mb-1"
+                        >
+                          <div class="text-3xl mb-1">🏆</div>
+                          <NuxtLink
+                            :to="`/racers/${result.first.racer_id}`"
+                            class="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
+                          >
+                            {{ result.first.racer_name }}
+                          </NuxtLink>
+                          <div
+                            class="bg-yellow-200 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-0.5 rounded-full text-sm font-bold mb-1"
+                          >
+                            #{{ result.first.racer_number }}
+                          </div>
+                          <div class="text-sm font-bold text-blue-600">
+                            {{ formatTime(result.first.winning_time) }}
+                          </div>
+                          <div class="mt-1">
+                            <span
+                              class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full text-xs font-bold"
+                            >
+                              CHAMPION
+                            </span>
+                          </div>
+                        </div>
+                        <div
+                          class="bg-gradient-to-r from-yellow-400 to-orange-400 h-12 rounded-t text-sm flex items-center justify-center"
+                        >
+                          <span class="font-bold text-white">1st</span>
+                        </div>
+                      </div>
+
+                      <!-- 3rd Place -->
+                      <div v-if="result.third" class="text-center flex-1 max-w-24">
+                        <div
+                          class="bg-gradient-to-br from-orange-200 to-orange-300 border border-orange-400 rounded-lg p-2 shadow-md mb-1"
+                        >
+                          <div class="text-2xl mb-1">🥉</div>
+                          <NuxtLink
+                            :to="`/racers/${result.third.racer_id}`"
+                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
+                          >
+                            {{ result.third.racer_name }}
+                          </NuxtLink>
+                          <div
+                            class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-1 py-0.5 rounded text-xs font-semibold"
+                          >
+                            #{{ result.third.racer_number }}
+                          </div>
+                          <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                            {{ formatTime(result.third.time) }}
+                          </div>
+                        </div>
+                        <div
+                          class="bg-orange-400 dark:bg-orange-600 h-6 rounded-t text-xs flex items-center justify-center"
+                        >
+                          <span class="font-bold text-white">3rd</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Tournament Type Badge -->
+                    <div class="text-center">
+                      <span
+                        class="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-bold"
+                      >
+                        {{ bracketType }} Tournament Complete
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </Card>
+
+            <!-- Brackets -->
+            <Card v-if="brackets.length">
+              <template #title>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <i class="pi pi-sitemap text-purple-600" />
+                  Tournament Brackets
+                </h2>
+              </template>
+              <template #content>
+                <div class="space-y-6">
                   <div
-                    class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
-                    :class="{
-                      'bg-green-500': item.type === 'created',
-                      'bg-blue-500': item.type === 'checkin',
-                      'bg-purple-500': item.type === 'qualifying',
-                      'bg-orange-500': item.type === 'brackets',
-                      'bg-yellow-500': item.type === 'completed'
-                    }"
+                    v-for="(bracket, index) in brackets"
+                    :key="bracket.id"
+                    class="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
                   >
-                    <i :class="item.icon" />
+                    <div class="flex items-center justify-between mb-4">
+                      <h3
+                        class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                      >
+                        <span
+                          class="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-2 py-1 rounded-full text-sm font-medium"
+                        >
+                          {{ bracket.bracket_type }}
+                        </span>
+                        Bracket #{{ index + 1 }}
+                      </h3>
+                      <NuxtLink
+                        v-if="authStore.isRaceAdmin"
+                        :to="`/races/${race.id}/brackets`"
+                        class="text-purple-600 hover:text-purple-800 text-sm font-medium"
+                      >
+                        Manage →
+                      </NuxtLink>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                      <!-- Track 1 -->
+                      <div
+                        class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600"
+                      >
+                        <div class="text-center">
+                          <p class="text-sm font-medium text-blue-600 mb-2">Track 1</p>
+                          <div v-if="bracket.track1_racer_name">
+                            <NuxtLink
+                              :to="`/racers/${bracket.track1_racer_id}`"
+                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200 block"
+                            >
+                              {{ bracket.track1_racer_name }}
+                            </NuxtLink>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                              #{{ bracket.track1_racer_number }}
+                            </p>
+                            <div
+                              v-if="bracket.track1_time"
+                              class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2"
+                            >
+                              <p class="text-lg font-bold text-blue-600">
+                                {{ formatTime(bracket.track1_time) }}
+                              </p>
+                            </div>
+                            <div v-else class="text-gray-400">
+                              <p class="text-sm">No time recorded</p>
+                            </div>
+                          </div>
+                          <div v-else class="text-gray-400">
+                            <p class="font-medium">TBD</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- VS Divider -->
+                      <div class="flex items-center justify-center flex-shrink-0">
+                        <div
+                          class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-12 h-12 flex items-center justify-center shadow-md"
+                        >
+                          <span class="font-bold text-purple-600 dark:text-purple-300">VS</span>
+                        </div>
+                      </div>
+
+                      <!-- Track 2 -->
+                      <div
+                        class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-red-200 dark:border-red-600"
+                      >
+                        <div class="text-center">
+                          <p class="text-sm font-medium text-red-600 mb-2">Track 2</p>
+                          <div v-if="bracket.track2_racer_name">
+                            <NuxtLink
+                              :to="`/racers/${bracket.track2_racer_id}`"
+                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200 block"
+                            >
+                              {{ bracket.track2_racer_name }}
+                            </NuxtLink>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                              #{{ bracket.track2_racer_number }}
+                            </p>
+                            <div
+                              v-if="bracket.track2_time"
+                              class="bg-red-50 dark:bg-red-900/20 rounded-lg p-2"
+                            >
+                              <p class="text-lg font-bold text-red-600">
+                                {{ formatTime(bracket.track2_time) }}
+                              </p>
+                            </div>
+                            <div v-else class="text-gray-400">
+                              <p class="text-sm">No time recorded</p>
+                            </div>
+                          </div>
+                          <div v-else class="text-gray-400">
+                            <p class="font-medium">TBD</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Winner Display -->
+                    <div v-if="bracket.track1_time && bracket.track2_time" class="mt-4 text-center">
+                      <div
+                        class="bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg p-3"
+                      >
+                        <p
+                          class="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-1 flex items-center justify-center gap-1"
+                        >
+                          <i class="pi pi-trophy" />
+                          Winner
+                        </p>
+                        <p class="font-bold text-lg text-yellow-900 dark:text-yellow-200">
+                          {{ getWinner(bracket) }}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </template>
-                <template #opposite="{ item }">
-                  <div class="pr-4 text-right">
-                    <p class="text-gray-500 dark:text-gray-500 text-xs font-medium">
-                      {{ formatEventTime(item.date) }}
-                    </p>
+                </div>
+              </template>
+            </Card>
+
+            <!-- Awards Voting Section -->
+            <Card v-if="voteableAwards.length && race?.active">
+              <template #title>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <i class="pi pi-trophy text-yellow-500" />
+                  Vote for Awards
+                </h2>
+              </template>
+              <template #content>
+                <div class="space-y-6">
+                  <div
+                    v-for="award in voteableAwards"
+                    :key="award.id"
+                    class="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800"
+                  >
+                    <div class="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 class="font-bold text-gray-900 dark:text-white">{{ award.name }}</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                          {{ award.description }}
+                        </p>
+                      </div>
+                      <NuxtLink
+                        to="/awards"
+                        class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      >
+                        Vote Now →
+                      </NuxtLink>
+                    </div>
+
+                    <!-- Current Vote Leaders -->
+                    <div v-if="awardLeaderboards[award.id]?.length > 0" class="mt-4">
+                      <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Current Leaders:
+                      </h4>
+                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div
+                          v-for="(leader, index) in awardLeaderboards[award.id]?.slice(0, 3)"
+                          :key="`${leader.racer_id}-${leader.award_definition_id}`"
+                          class="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border"
+                        >
+                          <div class="flex-shrink-0">
+                            <span
+                              class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+                              :class="{
+                                'bg-yellow-400 text-yellow-900': index === 0,
+                                'bg-gray-400 text-gray-900': index === 1,
+                                'bg-orange-400 text-orange-900': index === 2
+                              }"
+                            >
+                              {{ index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉' }}
+                            </span>
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <NuxtLink
+                              :to="`/racers/${leader.racer_id}`"
+                              class="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
+                            >
+                              {{ leader.racer_name }}
+                            </NuxtLink>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                              {{ leader.vote_count }} vote{{ leader.vote_count !== 1 ? 's' : '' }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-else class="text-center text-gray-500 dark:text-gray-400 py-4">
+                      <i class="pi pi-info-circle mb-2" />
+                      <p class="text-sm">No votes yet - be the first to vote!</p>
+                    </div>
                   </div>
-                </template>
-                <template #content="{ item }">
-                  <div class="pl-4">
-                    <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
-                      {{ item.title }}
+                </div>
+              </template>
+            </Card>
+
+            <!-- Race Image -->
+            <Card v-if="race.image_url">
+              <template #header>
+                <img
+                  :src="race.image_url"
+                  :alt="race.name"
+                  class="w-full h-64 md:h-96 object-cover"
+                >
+              </template>
+            </Card>
+
+            <!-- Qualifiers Results -->
+            <Card v-if="qualifiers.length">
+              <template #title>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <i class="pi pi-clock" />
+                  Qualifying Times
+                </h2>
+              </template>
+              <template #content>
+                <DataTable
+                  :value="qualifiers"
+                  striped-rows
+                  responsive-layout="scroll"
+                  :sort-field="'time'"
+                  :sort-order="1"
+                  class="custom-datatable"
+                >
+                  <Column field="racer_number" header="#" style="width: 60px">
+                    <template #body="slotProps">
+                      <span class="font-semibold text-blue-600"
+                        >#{{ slotProps.data.racer_number }}</span
+                      >
+                    </template>
+                  </Column>
+                  <Column field="racer_name" header="Racer">
+                    <template #body="slotProps">
+                      <NuxtLink
+                        :to="`/racers/${slotProps.data.racer_id}`"
+                        class="font-medium text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200"
+                      >
+                        {{ slotProps.data.racer_name }}
+                      </NuxtLink>
+                    </template>
+                  </Column>
+                  <Column field="time" header="Time" sortable>
+                    <template #body="slotProps">
+                      <span class="font-bold text-lg text-blue-600">{{
+                        formatTime(slotProps.data.time)
+                      }}</span>
+                    </template>
+                  </Column>
+                  <Column field="created_at" header="Time">
+                    <template #body="slotProps">
+                      <span class="text-sm text-gray-600 dark:text-gray-300">{{
+                        new Date(slotProps.data.created_at).toLocaleTimeString()
+                      }}</span>
+                    </template>
+                  </Column>
+                </DataTable>
+              </template>
+            </Card>
+
+            <!-- Checked In Racers -->
+            <Card v-if="checkins.length">
+              <template #title>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <i class="pi pi-users" />
+                  Checked In Racers ({{ checkins.length }})
+                </h2>
+              </template>
+              <template #content>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <NuxtLink
+                    v-for="checkin in checkins"
+                    :key="checkin.id"
+                    :to="`/racers/${checkin.racer_id}`"
+                    class="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200"
+                  >
+                    <div class="relative">
+                      <img
+                        v-if="checkin.racer_image_url"
+                        :src="checkin.racer_image_url"
+                        :alt="checkin.racer_name"
+                        class="w-12 h-12 object-cover rounded-full border-2 border-green-300"
+                      >
+                      <div
+                        v-else
+                        class="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-full border-2 border-green-300 flex items-center justify-center"
+                      >
+                        <i class="pi pi-car text-gray-500 dark:text-gray-300" />
+                      </div>
+                      <i
+                        class="pi pi-check-circle text-green-600 text-sm absolute -bottom-1 -right-1 bg-white rounded-full"
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <p class="font-medium text-gray-900 dark:text-white hover:text-indigo-600">
+                        {{ checkin.racer_name }}
+                      </p>
+                      <p class="text-sm text-gray-600 dark:text-gray-300">
+                        #{{ checkin.racer_number }} •
+                        {{ new Date(checkin.time).toLocaleTimeString() }}
+                      </p>
+                    </div>
+                  </NuxtLink>
+                </div>
+              </template>
+            </Card>
+
+            <!-- Photo Management (Admin Only) -->
+            <Card v-if="authStore.isRaceAdmin">
+              <template #title>
+                <div class="flex items-center justify-between">
+                  <h2
+                    class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2"
+                  >
+                    <i class="pi pi-images text-blue-600" />
+                    Race Photo Management
+                  </h2>
+                  <div class="flex items-center gap-2">
+                    <Badge :value="`${racePhotosCount} photos`" severity="info" />
+                    <Badge :value="`${pendingRacePhotos} pending`" severity="warning" />
+                  </div>
+                </div>
+              </template>
+              <template #content>
+                <div class="space-y-6">
+                  <!-- Quick Stats -->
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                        {{ racerPhotosCount }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">Racer Photos</div>
+                    </div>
+                    <div class="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                      <div class="text-lg font-bold text-green-600 dark:text-green-400">
+                        {{ generalPhotosCount }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">General Photos</div>
+                    </div>
+                    <div class="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                      <div class="text-lg font-bold text-yellow-600 dark:text-yellow-400">
+                        {{ featuredPhotosCount }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">Featured</div>
+                    </div>
+                    <div class="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                      <div class="text-lg font-bold text-purple-600 dark:text-purple-400">
+                        {{ pendingRacePhotos }}
+                      </div>
+                      <div class="text-sm text-gray-600 dark:text-gray-400">Pending</div>
+                    </div>
+                  </div>
+
+                  <!-- Recent Race Photos Preview -->
+                  <div v-if="racePhotos.length > 0">
+                    <h4 class="font-semibold text-gray-900 dark:text-white mb-3">
+                      Recent Photos from This Race
                     </h4>
-                    <p class="text-gray-600 dark:text-gray-400 text-xs mt-1">
-                      {{ item.description }}
+                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                      <div
+                        v-for="(photo, index) in racePhotos.slice(0, 6)"
+                        :key="index"
+                        class="relative group cursor-pointer"
+                        @click="viewPhotoInGallery(photo)"
+                      >
+                        <Image
+                          :src="photo.url"
+                          :alt="`Race photo ${index + 1}`"
+                          image-class="w-full h-20 object-cover rounded-lg border hover:border-blue-400 transition-colors"
+                          class="w-full h-20"
+                          :preview="false"
+                        />
+
+                        <!-- Status Badge -->
+                        <div class="absolute top-1 right-1">
+                          <Badge
+                            :value="photo.status || 'approved'"
+                            :severity="getPhotoStatusSeverity(photo.status)"
+                            class="text-xs"
+                          />
+                        </div>
+
+                        <!-- Featured Badge -->
+                        <div
+                          v-if="photo.featured"
+                          class="absolute top-1 left-1 bg-yellow-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                        >
+                          <i class="pi pi-star text-xs" />
+                        </div>
+
+                        <!-- Hover Overlay -->
+                        <div
+                          class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 rounded-lg transition-all duration-200 flex items-center justify-center"
+                        >
+                          <i
+                            class="pi pi-eye text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div v-if="racePhotos.length > 6" class="text-center mt-3">
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        +{{ racePhotos.length - 6 }} more photos from this race
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- No Photos State -->
+                  <div v-else class="text-center py-8">
+                    <i class="pi pi-images text-4xl text-gray-300 dark:text-gray-600 mb-3" />
+                    <h4 class="font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                      No Photos Yet
+                    </h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-500">
+                      Photos from racers in this race will appear here once uploaded
                     </p>
                   </div>
-                </template>
-              </Timeline>
-            </template>
-          </Card>
+
+                  <!-- Management Actions -->
+                  <div
+                    class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700"
+                  >
+                    <NuxtLink to="/admin/photos" class="flex-1">
+                      <Button class="w-full" severity="primary">
+                        <i class="pi pi-cog mr-2" />
+                        Manage All Photos
+                      </Button>
+                    </NuxtLink>
+                    <Button
+                      class="flex-1"
+                      severity="success"
+                      outlined
+                      @click="showUploadDialog = true"
+                    >
+                      <i class="pi pi-plus mr-2" />
+                      Add Photos
+                    </Button>
+                  </div>
+                </div>
+              </template>
+            </Card>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="space-y-6">
+            <!-- Quick Stats -->
+            <Card>
+              <template #title>Race Stats</template>
+              <template #content>
+                <div class="space-y-4">
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-300">Total Racers</span>
+                    <span class="font-semibold">{{ checkins.length }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-300">Qualifying Runs</span>
+                    <span class="font-semibold">{{ qualifiers.length }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-300">Bracket Races</span>
+                    <span class="font-semibold">{{ brackets.length }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-300">Fastest Time</span>
+                    <span class="font-semibold">{{ fastestTime || 'N/A' }}</span>
+                  </div>
+                </div>
+              </template>
+            </Card>
+
+            <!-- Race Timeline -->
+            <Card>
+              <template #title>
+                <h3
+                  class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="pi pi-history" />
+                  Race Timeline
+                </h3>
+              </template>
+              <template #content>
+                <Timeline :value="raceEvents" class="w-full">
+                  <template #marker="{ item }">
+                    <div
+                      class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                      :class="{
+                        'bg-green-500': item.type === 'created',
+                        'bg-blue-500': item.type === 'checkin',
+                        'bg-purple-500': item.type === 'qualifying',
+                        'bg-orange-500': item.type === 'brackets',
+                        'bg-yellow-500': item.type === 'completed'
+                      }"
+                    >
+                      <i :class="item.icon" />
+                    </div>
+                  </template>
+                  <template #opposite="{ item }">
+                    <div class="pr-4 text-right">
+                      <p class="text-gray-500 dark:text-gray-500 text-xs font-medium">
+                        {{ formatEventTime(item.date) }}
+                      </p>
+                    </div>
+                  </template>
+                  <template #content="{ item }">
+                    <div class="pl-4">
+                      <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                        {{ item.title }}
+                      </h4>
+                      <p class="text-gray-600 dark:text-gray-400 text-xs mt-1">
+                        {{ item.description }}
+                      </p>
+                    </div>
+                  </template>
+                </Timeline>
+              </template>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
@@ -785,19 +869,74 @@ import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
 
+// Use reactive composables for all data
+const { getPhotosByRace } = usePhotos()
+
+const {
+  races,
+  fetchRaceById,
+  loading,
+  initialize: initializeRaces
+} = useRaces()
+
+const { qualifiers, formatTime } = useQualifiers(route.params.id)
+
+const { brackets, getBracketsForRace } = useBrackets()
+
+const {
+  checkins: checkinsData,
+  racers: checkinsRacers,
+  getCheckinsForRace
+} = useCheckins()
+
+const {
+  voteableAwards,
+  getAwardLeaderboard,
+  initialize: initializeAwards
+} = useAwards()
+
+// Local state
 const race = ref(null)
-const qualifiers = ref([])
-const brackets = ref([])
-const checkins = ref([])
-const pending = ref(true)
+const showUploadDialog = ref(false)
 const error = ref(null)
 
-// Photo management state
-const racePhotos = ref([])
-const loadingPhotos = ref(false)
-const showUploadDialog = ref(false)
+// Separate loading states for progressive loading
+const raceDataLoading = ref(true)
+const isLoading = computed(() => raceDataLoading.value)
+
+// Reactive race photos computed from composable
+const racePhotos = computed(() => {
+  if (!race.value?.id) return []
+  return getPhotosByRace(race.value.id)
+})
+
+// Reactive checkins with racer data
+const checkins = computed(() => {
+  if (!race.value?.id) return []
+
+  const raceCheckins = getCheckinsForRace(route.params.id)
+  console.log(
+    'Race page - checkins computed, found:',
+    raceCheckins.length,
+    'checkins for race:',
+    route.params.id
+  )
+  console.log('All checkins data:', checkinsData.value)
+  console.log('Racers data:', checkinsRacers.value.length, 'racers')
+
+  return raceCheckins
+    .map((checkin) => {
+      const racer = checkinsRacers.value.find((r) => r.id === checkin.racer_id)
+      return {
+        ...checkin,
+        racer_name: racer?.name || `Racer #${racer?.racer_number || 'Unknown'}`,
+        racer_number: racer?.racer_number,
+        racer_image_url: racer?.image_url
+      }
+    })
+    .sort((a, b) => new Date(b.time) - new Date(a.time))
+})
 
 // Breadcrumb navigation
 const breadcrumbItems = computed(() => [
@@ -807,79 +946,30 @@ const breadcrumbItems = computed(() => [
 ])
 
 // Fetch race data from Supabase
-const fetchRace = async () => {
-  try {
-    // Fetch race basic data
-    const { data: raceData, error: raceError } = await $supabase
-      .from('races')
-      .select('*')
-      .eq('id', route.params.id)
-      .single()
+// Get race data from singleton composable (already loaded)
+const getRaceData = async () => {
+  const raceId = route.params.id
 
-    if (raceError) throw raceError
+  // First try to get from already loaded races
+  race.value = races.value.find((r) => r.id === raceId) || null
 
-    race.value = raceData
+  // If not found and races are loaded, it truly doesn't exist
+  if (!race.value && races.value.length > 0) {
+    error.value = new Error('Race not found')
+    return
+  }
 
-    // Fetch related data with racer names
-    const { data: qualifiersData } = await $supabase
-      .from('qualifiers')
-      .select(
-        `
-        *,
-        racers(name, racer_number)
-      `
-      )
-      .eq('race_id', route.params.id)
-      .order('time', { ascending: true })
-
-    const { data: bracketsData } = await $supabase
-      .from('brackets')
-      .select(
-        `
-        *,
-        track1_racer:racers!track1_racer_id(name, racer_number),
-        track2_racer:racers!track2_racer_id(name, racer_number)
-      `
-      )
-      .eq('race_id', route.params.id)
-
-    const { data: checkinsData } = await $supabase
-      .from('checkins')
-      .select(
-        `
-        *,
-        racers(name, racer_number, image_url)
-      `
-      )
-      .eq('race_id', route.params.id)
-      .order('time', { ascending: false })
-
-    // Transform data with proper racer names
-    qualifiers.value = (qualifiersData || []).map((q) => ({
-      ...q,
-      racer_name: q.racers?.name || `Racer #${q.racers?.racer_number || 'Unknown'}`,
-      racer_number: q.racers?.racer_number
-    }))
-
-    brackets.value = (bracketsData || []).map((b) => ({
-      ...b,
-      track1_racer_name:
-        b.track1_racer?.name || (b.track1_racer ? `Racer #${b.track1_racer.racer_number}` : 'TBD'),
-      track2_racer_name:
-        b.track2_racer?.name || (b.track2_racer ? `Racer #${b.track2_racer.racer_number}` : 'TBD')
-    }))
-
-    checkins.value = (checkinsData || []).map((c) => ({
-      ...c,
-      racer_name: c.racers?.name || `Racer #${c.racers?.racer_number || 'Unknown'}`,
-      racer_number: c.racers?.racer_number,
-      racer_image_url: c.racers?.image_url
-    }))
-  } catch (err) {
-    console.error('Error fetching race:', err)
-    error.value = err
-  } finally {
-    pending.value = false
+  // If races aren't loaded yet or race not found, fetch specifically
+  if (!race.value) {
+    try {
+      race.value = await fetchRaceById(raceId)
+      if (!race.value) {
+        error.value = new Error('Race not found')
+      }
+    } catch (err) {
+      console.error('Error fetching race data:', err)
+      error.value = err
+    }
   }
 }
 
@@ -893,8 +983,9 @@ const fastestTime = computed(() => {
 })
 
 const winners = computed(() => {
-  // Get all completed brackets by type
-  const completedBrackets = brackets.value.filter(
+  // Get all completed brackets for this race by type
+  const raceBrackets = getBracketsForRace(route.params.id)
+  const completedBrackets = raceBrackets.filter(
     (b) => b.track1_time && b.track2_time && b.track1_time !== b.track2_time
   )
 
@@ -962,8 +1053,9 @@ const winners = computed(() => {
 })
 
 const completedBracketsByType = computed(() => {
+  const raceBrackets = getBracketsForRace(route.params.id)
   const byType = { Fastest: 0, Slowest: 0 }
-  brackets.value.forEach((b) => {
+  raceBrackets.forEach((b) => {
     if (b.track1_time && b.track2_time && b.bracket_type) {
       byType[b.bracket_type]++
     }
@@ -972,8 +1064,9 @@ const completedBracketsByType = computed(() => {
 })
 
 const totalBracketsByType = computed(() => {
+  const raceBrackets = getBracketsForRace(route.params.id)
   const byType = { Fastest: 0, Slowest: 0 }
-  brackets.value.forEach((b) => {
+  raceBrackets.forEach((b) => {
     if (b.bracket_type) {
       byType[b.bracket_type]++
     }
@@ -986,7 +1079,8 @@ const tournamentResults = computed(() => {
 
   // Check each bracket type for tournament completion
   for (const bracketType of ['Fastest', 'Slowest']) {
-    const typeBrackets = brackets.value.filter((b) => b.bracket_type === bracketType)
+    const raceBrackets = getBracketsForRace(route.params.id)
+    const typeBrackets = raceBrackets.filter((b) => b.bracket_type === bracketType)
     const typeCompleted = completedBracketsByType.value[bracketType]
     const typeTotal = totalBracketsByType.value[bracketType]
     const typeWinners = winners.value.filter((w) => w.bracket_type === bracketType)
@@ -1048,15 +1142,16 @@ const raceEvents = computed(() => {
   }
 
   // First bracket race
-  if (brackets.value.length > 0) {
-    const firstBracket = brackets.value.reduce((earliest, b) =>
+  const raceBrackets = getBracketsForRace(route.params.id)
+  if (raceBrackets.length > 0) {
+    const firstBracket = raceBrackets.reduce((earliest, b) =>
       new Date(b.created_at) < new Date(earliest.created_at) ? b : earliest
     )
     events.push({
       type: 'brackets',
       icon: 'pi pi-sitemap',
       title: 'Brackets Generated',
-      description: `${brackets.value.length} bracket races created`,
+      description: `${raceBrackets.length} bracket races created`,
       date: firstBracket.created_at
     })
   }
@@ -1078,7 +1173,6 @@ const raceEvents = computed(() => {
   // Sort events by date
   return events.sort((a, b) => new Date(a.date) - new Date(b.date))
 })
-
 
 // Race process steps
 const raceSteps = computed(() => [
@@ -1114,7 +1208,8 @@ const currentStep = computed(() => {
   if (completedTournaments.length > 0) return 4
 
   // Brackets phase - if any brackets exist
-  if (brackets.value.length > 0) return 3
+  const raceBrackets = getBracketsForRace(route.params.id)
+  if (raceBrackets.length > 0) return 3
 
   // Qualifying phase - if any qualifying times exist
   if (qualifiers.value.length > 0) return 2
@@ -1127,7 +1222,8 @@ const currentStep = computed(() => {
 })
 
 const getTournamentPlacings = (bracketType) => {
-  const typeBrackets = brackets.value
+  const raceBrackets = getBracketsForRace(route.params.id)
+  const typeBrackets = raceBrackets
     .filter((b) => b.bracket_type === bracketType && b.track1_time && b.track2_time)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
@@ -1195,41 +1291,40 @@ const getTournamentPlacings = (bracketType) => {
 }
 
 // Photo management computed properties
-const recentRacePhotos = computed(() => {
-  // Get photos from racers checked into this race
-  const raceRacerIds = checkins.value.map((c) => c.racer_id)
-
-  return racePhotos.value
-    .filter((photo) => photo.raceId === race.value?.id || raceRacerIds.includes(photo.racerId))
-    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))
-})
+// recentRacePhotos functionality is now handled by racePhotos computed property
 
 const racerPhotosCount = computed(() => {
-  return recentRacePhotos.value.filter((photo) => photo.type === 'racer').length
+  return racePhotos.value.filter((photo) => photo.type === 'racer').length
 })
 
 const generalPhotosCount = computed(() => {
-  return recentRacePhotos.value.filter((photo) => photo.type === 'general').length
+  return racePhotos.value.filter((photo) => photo.type === 'general').length
 })
 
 const featuredPhotosCount = computed(() => {
-  return recentRacePhotos.value.filter((photo) => photo.featured).length
+  return racePhotos.value.filter((photo) => photo.featured).length
 })
 
 const pendingRacePhotos = computed(() => {
-  return recentRacePhotos.value.filter((photo) => !photo.status || photo.status === 'pending')
-    .length
+  return racePhotos.value.filter((photo) => !photo.status || photo.status === 'pending').length
 })
 
 const racePhotosCount = computed(() => {
-  return recentRacePhotos.value.length
+  return racePhotos.value.length
 })
 
-// Helper functions
-const formatTime = (time) => {
-  if (!time) return 'N/A'
-  return `${Number.parseFloat(time).toFixed(3)}s`
-}
+// Reactive award leaderboards for the current race
+const awardLeaderboards = computed(() => {
+  if (!race.value?.id || !voteableAwards.value.length) return {}
+
+  const leaderboards = {}
+  voteableAwards.value.forEach((award) => {
+    leaderboards[award.id] = getAwardLeaderboard(award.id, race.value.id)
+  })
+  return leaderboards
+})
+
+// Helper functions (formatTime is provided by useQualifiers composable)
 
 const formatEventTime = (dateString) => {
   if (!dateString) return 'Unknown time'
@@ -1274,70 +1369,6 @@ const getPhotoStatusSeverity = (status) => {
   }
 }
 
-const fetchRacePhotos = async () => {
-  if (!authStore.isRaceAdmin) return
-
-  loadingPhotos.value = true
-
-  try {
-    // Get photos from racers who are checked into this race
-    const raceRacerIds = checkins.value.map((c) => c.racer_id)
-
-    if (raceRacerIds.length > 0) {
-      const { data: racersData, error: racersError } = await $supabase
-        .from('racers')
-        .select(
-          `
-          id,
-          name,
-          racer_number,
-          photos,
-          races!inner(name)
-        `
-        )
-        .in('id', raceRacerIds)
-        .not('photos', 'is', null)
-
-      if (racersError) throw racersError
-
-      const photos = []
-
-      // Process racer photos
-      for (const racer of racersData || []) {
-        if (racer.photos && Array.isArray(racer.photos)) {
-          for (const photo of racer.photos) {
-            photos.push({
-              id: `racer-${racer.id}-${photo.url}`,
-              url: photo.url,
-              status: 'approved', // Racer photos are auto-approved
-              featured: photo.featured || false,
-              racerId: racer.id,
-              racerName: racer.name,
-              racerNumber: racer.racer_number,
-              raceName: racer.races?.name,
-              raceId: race.value?.id,
-              uploadedAt: photo.uploadedAt || new Date().toISOString(),
-              type: 'racer'
-            })
-          }
-        }
-      }
-
-      racePhotos.value = photos
-    }
-
-    // General race photos are handled through the general_photos table
-  } catch (error) {
-    console.error('Error fetching race photos:', error)
-  } finally {
-    loadingPhotos.value = false
-  }
-}
-
-const refreshRacePhotos = async () => {
-  await fetchRacePhotos()
-}
-
 const viewPhotoInGallery = (photo) => {
   // Open photo in preview
   if (photo.racerId) {
@@ -1348,15 +1379,37 @@ const viewPhotoInGallery = (photo) => {
 // Initialize auth and fetch data
 onMounted(async () => {
   await authStore.initAuth()
-  await fetchRace()
-  if (authStore.isRaceAdmin) {
-    await fetchRacePhotos()
+
+  // Check if data is already loaded (from previous navigation)
+  console.log('Race detail: Checking cached data...')
+  console.log('Race detail: races.value.length:', races.value.length)
+  console.log('Race detail: loading.value:', loading.value)
+
+  if (races.value.length > 0) {
+    console.log('Race detail: Data already loaded, using cached data')
+    await getRaceData()
+  } else {
+    console.log('Race detail: No cached data, initializing from scratch')
+    // Initialize races first to get the race data
+    await initializeRaces()
+    await getRaceData()
   }
+
+  // Initialize awards for voting functionality
+  await initializeAwards()
+
+  // Race data is now available, hide main loading
+  raceDataLoading.value = false
 })
+
+// Note: Removed cleanup calls to prevent composable reloading on navigation
+// Composables will manage their own lifecycle and subscriptions
 
 useHead({
   title: computed(() =>
-    race.value ? `${race.value.name} - The Great Holyoke Brick Race` : 'Race - The Great Holyoke Brick Race'
+    race.value
+      ? `${race.value.name} - The Great Holyoke Brick Race`
+      : 'Race - The Great Holyoke Brick Race'
   )
 })
 </script>

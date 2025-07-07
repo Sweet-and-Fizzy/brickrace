@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+  >
     <div class="max-w-md w-full space-y-8">
       <div>
         <div class="flex justify-center">
@@ -14,7 +16,10 @@
         </h2>
         <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
           Or
-          <NuxtLink to="/register" class="font-medium text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300">
+          <NuxtLink
+            to="/register"
+            class="font-medium text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300"
+          >
             create a new account
           </NuxtLink>
         </p>
@@ -43,14 +48,19 @@
                 <div class="w-full border-t border-gray-300 dark:border-gray-600" />
               </div>
               <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or use email</span>
+                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400"
+                  >Or use email</span
+                >
               </div>
             </div>
 
             <!-- Email/Password Form -->
             <form class="space-y-4" @submit.prevent="handleLogin">
               <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  for="email"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Email address
                 </label>
                 <InputText
@@ -66,7 +76,10 @@
               </div>
 
               <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label
+                  for="password"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
                   Password
                 </label>
                 <Password
@@ -80,7 +93,9 @@
                   input-class="w-full"
                   class="w-full"
                 />
-                <p v-if="errors.password" class="mt-1 text-sm text-red-600">{{ errors.password }}</p>
+                <p v-if="errors.password" class="mt-1 text-sm text-red-600">
+                  {{ errors.password }}
+                </p>
               </div>
 
               <div>
@@ -111,7 +126,6 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -160,6 +174,7 @@ const handleLogin = async () => {
     // Redirect to home page after successful login
     await router.push('/')
   } catch (error) {
+    // Keep essential error logging for production debugging
     console.error('Login error:', error)
 
     if (error.message) {
@@ -188,6 +203,7 @@ const handleSocialLogin = async (provider) => {
     await authStore.signInWithProvider(provider)
     // The redirect will be handled by Supabase
   } catch (error) {
+    // Keep essential error logging for production debugging
     console.error('Social login error:', error)
     errors.general = error.message || `Failed to sign in with ${provider}. Please try again.`
   } finally {

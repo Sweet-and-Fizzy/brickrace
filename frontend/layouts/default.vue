@@ -37,13 +37,15 @@
             severity="danger"
             text
             class="w-full justify-start"
-            @click="handleSidebarNavigation(async () => {
-              try {
-                await authStore.logout()
-              } catch (error) {
-                console.error('Logout error:', error)
-              }
-            })"
+            @click="
+              handleSidebarNavigation(async () => {
+                try {
+                  await authStore.logout()
+                } catch (error) {
+                  console.error('Logout error:', error)
+                }
+              })
+            "
           />
         </template>
 
@@ -158,10 +160,19 @@
                 <!-- Auth buttons or user menu -->
                 <template v-if="!authStore.isAuthenticated">
                   <NuxtLink to="/login">
-                    <Button v-tooltip.bottom="'Login'" severity="secondary" text icon="pi pi-sign-in" />
+                    <Button
+                      v-tooltip.bottom="'Login'"
+                      severity="secondary"
+                      text
+                      icon="pi pi-sign-in"
+                    />
                   </NuxtLink>
                   <NuxtLink to="/register">
-                    <Button v-tooltip.bottom="'Register'" class="btn-brick-secondary text-sm" icon="pi pi-user-plus" />
+                    <Button
+                      v-tooltip.bottom="'Register'"
+                      class="btn-brick-secondary text-sm"
+                      icon="pi pi-user-plus"
+                    />
                   </NuxtLink>
                 </template>
                 <template v-else>
@@ -252,10 +263,19 @@
                   <!-- Auth Section for non-authenticated users -->
                   <template v-if="!authStore.isAuthenticated">
                     <NuxtLink to="/login">
-                      <Button v-tooltip.bottom="'Login'" severity="secondary" text icon="pi pi-sign-in" />
+                      <Button
+                        v-tooltip.bottom="'Login'"
+                        severity="secondary"
+                        text
+                        icon="pi pi-sign-in"
+                      />
                     </NuxtLink>
                     <NuxtLink to="/register">
-                      <Button v-tooltip.bottom="'Register'" class="btn-brick-secondary" icon="pi pi-user-plus" />
+                      <Button
+                        v-tooltip.bottom="'Register'"
+                        class="btn-brick-secondary"
+                        icon="pi pi-user-plus"
+                      />
                     </NuxtLink>
                   </template>
                 </div>
@@ -275,7 +295,7 @@
                 The Great Holyoke Brick Race
               </span>
             </NuxtLink>
-            
+
             <!-- Mobile menu button -->
             <Button
               v-tooltip.bottom="'Open navigation menu'"
@@ -356,7 +376,6 @@ const menuItems = computed(() => [
     command: () => navigateTo('/races')
   }
 ])
-
 
 // User menu items for tablet (icons only)
 const userMenuItemsIconsOnly = computed(() =>

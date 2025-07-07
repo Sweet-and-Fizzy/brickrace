@@ -56,7 +56,7 @@ export const USER_ROLES = {
 
 // File upload limits
 export const UPLOAD_LIMITS = {
-  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+  MAX_FILE_SIZE: 10 * 1024 * 1024, // 10MB
   MAX_FILES: 10,
   ALLOWED_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
 }

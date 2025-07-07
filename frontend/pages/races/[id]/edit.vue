@@ -1,129 +1,163 @@
 <template>
-  <div class="container mx-auto px-4 py-8">
-    <!-- Breadcrumb Navigation -->
-    <Breadcrumb :model="breadcrumbItems" class="mb-6" />
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+  >
+    <div class="container mx-auto px-4 py-8">
+      <!-- Breadcrumb Navigation -->
+      <BreadcrumbWrapper :items="breadcrumbItems" />
 
-    <!-- Loading State -->
-    <div v-if="pending" class="flex justify-center py-12">
-      <ProgressSpinner />
-    </div>
-
-    <!-- Error State -->
-    <div v-else-if="error" class="text-center py-12">
-      <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-      <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
-      <p class="text-gray-600 dark:text-gray-400 mb-6">
-        The race you're trying to edit doesn't exist.
-      </p>
-      <NuxtLink to="/races">
-        <Button severity="primary"> Back to All Races </Button>
-      </NuxtLink>
-    </div>
-
-    <!-- Edit Form -->
-    <div v-else-if="race" class="max-w-2xl mx-auto">
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Edit Race</h1>
+      <!-- Loading State -->
+      <div v-if="pending" class="flex justify-center py-12">
+        <ProgressSpinner />
       </div>
 
-      <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-        <div class="p-8">
-          <form class="space-y-8" @submit.prevent="updateRace">
-            <!-- Race Name -->
-            <div>
-              <label
-                for="name"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Race Name *
-              </label>
-              <InputText
-                id="name"
-                v-model="form.name"
-                placeholder="e.g., Summer Championship 2024"
-                :invalid="!!errors.name"
-                class="w-full"
-              />
-              <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
-            </div>
+      <!-- Error State -->
+      <div v-else-if="error" class="text-center py-12">
+        <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
+        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+          The race you're trying to edit doesn't exist.
+        </p>
+        <NuxtLink to="/races">
+          <Button severity="primary"> Back to All Races </Button>
+        </NuxtLink>
+      </div>
 
-            <!-- Race Date -->
-            <div>
-              <label
-                for="date"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Race Date *
-              </label>
-              <Calendar
-                id="date"
-                v-model="form.date"
-                v-tooltip.right="'Choose the date when the race will take place'"
-                date-format="mm/dd/yy"
-                placeholder="Select race date"
-                :invalid="!!errors.date"
-                class="w-full"
-                show-icon
-                :manual-input="false"
-              />
-              <p v-if="errors.date" class="mt-1 text-sm text-red-600">{{ errors.date }}</p>
-            </div>
+      <!-- Edit Form -->
+      <div v-else-if="race" class="max-w-2xl mx-auto">
+        <div class="mb-8">
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Edit Race</h1>
+        </div>
 
-            <!-- Race Image -->
-            <div>
-              <label
-                for="imageFile"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Race Image
-              </label>
-              <FileUpload
-                mode="basic"
-                accept="image/*"
-                :max-file-size="2000000"
-                choose-label="Choose Image"
-                class="w-full"
-                @select="handleImageUpload"
-              />
-              <p class="mt-1 text-sm text-gray-500">JPG, PNG, GIF up to 2MB</p>
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+          <div class="p-8">
+            <form class="space-y-8" @submit.prevent="updateRace">
+              <!-- Race Name -->
+              <div>
+                <label
+                  for="name"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Race Name *
+                </label>
+                <InputText
+                  id="name"
+                  v-model="form.name"
+                  placeholder="e.g., Summer Championship 2024"
+                  :invalid="!!errors.name"
+                  class="w-full"
+                />
+                <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+              </div>
 
-              <p v-if="uploading" class="mt-2 text-sm text-blue-600">
-                <i class="pi pi-spin pi-spinner mr-1" />
-                Uploading image...
-              </p>
-              <p v-if="uploadError" class="mt-2 text-sm text-red-600">{{ uploadError }}</p>
-            </div>
+              <!-- Race Date and Time -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Race Date -->
+                <div>
+                  <label
+                    for="date"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Race Date *
+                  </label>
+                  <DatePicker
+                    id="date"
+                    v-model="form.date"
+                    v-tooltip.right="'Choose the date when the race will take place'"
+                    date-format="mm/dd/yy"
+                    placeholder="Select race date"
+                    :invalid="!!errors.date"
+                    class="w-full"
+                    show-icon
+                    :manual-input="false"
+                  />
+                  <p v-if="errors.date" class="mt-1 text-sm text-red-600">{{ errors.date }}</p>
+                </div>
 
-            <!-- Image Preview -->
-            <div v-if="form.image_url" class="mt-4">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >Preview</label
-              >
-              <img
-                :src="form.image_url"
-                alt="Race preview"
-                class="max-w-xs rounded-lg shadow-md"
-                @error="form.image_url = ''"
-              >
-            </div>
+                <!-- Race Time -->
+                <div>
+                  <label
+                    for="time"
+                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
+                    Race Time *
+                  </label>
+                  <DatePicker
+                    id="time"
+                    v-model="form.time"
+                    time-only
+                    show-icon
+                    icon-display="input"
+                    :invalid="!!errors.time"
+                    class="w-full"
+                  />
+                  <p v-if="errors.time" class="mt-1 text-sm text-red-600">{{ errors.time }}</p>
+                  <p class="mt-1 text-xs text-gray-500">Select the race start time</p>
+                </div>
+              </div>
 
-            <!-- Submit Button -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-              <NuxtLink :to="`/races/${$route.params.id}`" class="flex-1">
-                <Button type="button" severity="secondary" outlined label="Cancel" class="w-full" />
-              </NuxtLink>
-              <Button type="submit" :loading="loading" severity="primary" class="flex-1">
-                <i class="pi pi-save mr-2" />
-                Save Changes
-              </Button>
-            </div>
-          </form>
+              <!-- Race Image -->
+              <div>
+                <label
+                  for="imageFile"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Race Image
+                </label>
+                <FileUpload
+                  mode="basic"
+                  accept="image/*"
+                  :max-file-size="2000000"
+                  choose-label="Choose Image"
+                  class="w-full"
+                  @select="handleImageUpload"
+                />
+                <p class="mt-1 text-sm text-gray-500">JPG, PNG, GIF up to 2MB</p>
+
+                <p v-if="uploading" class="mt-2 text-sm text-blue-600">
+                  <i class="pi pi-spin pi-spinner mr-1" />
+                  Uploading image...
+                </p>
+                <p v-if="uploadError" class="mt-2 text-sm text-red-600">{{ uploadError }}</p>
+              </div>
+
+              <!-- Image Preview -->
+              <div v-if="form.image_url" class="mt-4">
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >Preview</label
+                >
+                <img
+                  :src="form.image_url"
+                  alt="Race preview"
+                  class="max-w-xs rounded-lg shadow-md"
+                  @error="form.image_url = ''"
+                >
+              </div>
+
+              <!-- Submit Button -->
+              <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+                <NuxtLink :to="`/races/${$route.params.id}`" class="flex-1">
+                  <Button
+                    type="button"
+                    severity="secondary"
+                    outlined
+                    label="Cancel"
+                    class="w-full"
+                  />
+                </NuxtLink>
+                <Button type="submit" :loading="loading" severity="primary" class="flex-1">
+                  <i class="pi pi-save mr-2" />
+                  Save Changes
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Toast Messages -->
-    <Toast />
+      <!-- Toast Messages -->
+      <Toast />
+    </div>
   </div>
 </template>
 
@@ -135,6 +169,8 @@ const authStore = useAuthStore()
 const { $supabase } = useNuxtApp()
 const $toast = useToast()
 
+// Use races composable
+const { getRaceById, updateRace: updateRaceComposable, initialize: initializeRaces } = useRaces()
 
 // State
 const race = ref(null)
@@ -157,27 +193,50 @@ const breadcrumbItems = computed(() => [
 const form = ref({
   name: '',
   date: null,
+  time: null,
   image_url: ''
 })
 
-// Fetch race data
+// Fetch race data using composable
 const fetchRace = async () => {
   try {
-    const { data, error: fetchError } = await $supabase
-      .from('races')
-      .select('*')
-      .eq('id', route.params.id)
-      .single()
+    // Initialize races composable if needed
+    await initializeRaces()
 
-    if (fetchError) throw fetchError
+    // Get race from cached data
+    const raceData = getRaceById(route.params.id)
 
-    race.value = data
+    if (!raceData) {
+      throw new Error('Race not found')
+    }
+
+    race.value = raceData
 
     // Populate form
-    form.value = {
-      name: data.name,
-      date: data.date ? new Date(data.date) : null,
-      image_url: data.image_url || ''
+    if (raceData.race_datetime) {
+      // If we have a datetime, split it into date and time
+      const datetime = new Date(raceData.race_datetime)
+      form.value = {
+        name: raceData.name,
+        date: datetime,
+        time: datetime,
+        image_url: raceData.image_url || ''
+      }
+    } else if (raceData.date) {
+      // Legacy fallback for existing races with only date
+      form.value = {
+        name: raceData.name,
+        date: new Date(raceData.date),
+        time: new Date(`1970-01-01T12:00:00`), // Default to noon
+        image_url: raceData.image_url || ''
+      }
+    } else {
+      form.value = {
+        name: raceData.name,
+        date: null,
+        time: null,
+        image_url: raceData.image_url || ''
+      }
     }
   } catch (err) {
     console.error('Error fetching race:', err)
@@ -197,6 +256,10 @@ const validateForm = () => {
 
   if (!form.value.date) {
     errors.value.date = 'Race date is required'
+  }
+
+  if (!form.value.time) {
+    errors.value.time = 'Race time is required'
   }
 
   return Object.keys(errors.value).length === 0
@@ -246,26 +309,38 @@ const handleImageUpload = async (event) => {
   }
 }
 
-// Update race
+// Update race using composable
 const updateRace = async () => {
   if (!validateForm()) return
 
   loading.value = true
 
   try {
+    // Combine date and time into a full datetime
+    let raceDateTime = null
+    if (form.value.date && form.value.time) {
+      // Create a datetime by combining the date and time
+      const dateOnly = new Date(form.value.date)
+      const timeOnly = new Date(form.value.time)
+
+      raceDateTime = new Date(
+        dateOnly.getFullYear(),
+        dateOnly.getMonth(),
+        dateOnly.getDate(),
+        timeOnly.getHours(),
+        timeOnly.getMinutes(),
+        timeOnly.getSeconds()
+      )
+    }
+
     const raceData = {
       name: form.value.name.trim(),
-      date: form.value.date ? form.value.date.toISOString().split('T')[0] : null,
+      race_datetime: raceDateTime ? raceDateTime.toISOString() : null,
       image_url: form.value.image_url?.trim() || null,
       updated_at: new Date().toISOString()
     }
 
-    const { error: updateError } = await $supabase
-      .from('races')
-      .update(raceData)
-      .eq('id', route.params.id)
-
-    if (updateError) throw updateError
+    await updateRaceComposable(route.params.id, raceData)
 
     // Show success toast
     $toast.add({
@@ -302,6 +377,8 @@ onMounted(async () => {
     })
   }
   await fetchRace()
+
+  // Component initialization complete
 })
 
 useHead({

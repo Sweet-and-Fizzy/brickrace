@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+  >
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <div class="flex justify-center">
         <img
@@ -20,7 +22,10 @@
       <div class="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
         <form class="space-y-6" @submit.prevent="handlePasswordReset">
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              for="password"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               New Password
             </label>
             <div class="mt-1">
@@ -42,7 +47,10 @@
           </div>
 
           <div>
-            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              for="confirmPassword"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Confirm New Password
             </label>
             <div class="mt-1">
@@ -78,7 +86,10 @@
         </form>
 
         <!-- Success Message -->
-        <div v-if="resetComplete" class="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+        <div
+          v-if="resetComplete"
+          class="mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg"
+        >
           <div class="flex">
             <div class="flex-shrink-0">
               <i class="pi pi-check-circle text-green-400" />
@@ -88,17 +99,10 @@
                 Password updated successfully!
               </h3>
               <div class="mt-2 text-sm text-green-700 dark:text-green-300">
-                <p>
-                  Your password has been updated. You can now sign in with your new password.
-                </p>
+                <p>Your password has been updated. You can now sign in with your new password.</p>
               </div>
               <div class="mt-4">
-                <Button
-                  severity="secondary"
-                  size="small"
-                  outlined
-                  @click="navigateToLogin"
-                >
+                <Button severity="secondary" size="small" outlined @click="navigateToLogin">
                   Go to Login
                 </Button>
               </div>
@@ -107,7 +111,10 @@
         </div>
 
         <!-- Error Message -->
-        <div v-if="error" class="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div
+          v-if="error"
+          class="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+        >
           <div class="flex">
             <div class="flex-shrink-0">
               <i class="pi pi-exclamation-triangle text-red-400" />
@@ -181,12 +188,14 @@ const validateConfirmPassword = () => {
 }
 
 const isFormValid = computed(() => {
-  return password.value && 
-         confirmPassword.value && 
-         password.value === confirmPassword.value &&
-         password.value.length >= 6 &&
-         !passwordError.value && 
-         !confirmPasswordError.value
+  return (
+    password.value &&
+    confirmPassword.value &&
+    password.value === confirmPassword.value &&
+    password.value.length >= 6 &&
+    !passwordError.value &&
+    !confirmPasswordError.value
+  )
 })
 
 // Handle password reset
@@ -208,8 +217,9 @@ const handlePasswordReset = async () => {
 
     resetComplete.value = true
   } catch (err) {
+    // Keep essential error logging for production debugging
     console.error('Password reset error:', err)
-    
+
     // Handle specific error cases
     if (err.message.includes('session')) {
       error.value = 'Reset link has expired. Please request a new password reset.'

@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+  >
     <!-- Header -->
     <div class="bg-gradient-to-r from-red-600 to-red-800 text-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -14,7 +16,7 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="pending" class="flex justify-center py-12">
+    <div v-if="loading" class="flex justify-center py-12">
       <ProgressSpinner />
     </div>
 
@@ -139,7 +141,21 @@
               class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4"
             >
               <div v-if="photo.subtitle" class="flex items-center gap-2">
-                <Badge :value="`#${photo.subtitle}`" severity="info" class="text-xs" />
+                <div
+                  class="bg-white text-gray-800 px-2 py-1 text-xs font-semibold border-2 border-gray-300 shadow-lg"
+                  style="
+                    border-radius: 8px 8px 8px 0;
+                    font-family: 'Inter', sans-serif;
+                    letter-spacing: 0.05em;
+                    box-shadow:
+                      0 2px 4px rgba(0, 0, 0, 0.15),
+                      0 0 0 1px rgba(0, 0, 0, 0.05);
+                    min-width: 32px;
+                    text-align: center;
+                  "
+                >
+                  #{{ photo.subtitle }}
+                </div>
                 <h4 class="font-semibold text-white text-sm">{{ photo.title }}</h4>
               </div>
               <h4 v-else class="font-semibold text-white text-sm mb-1">{{ photo.title }}</h4>
@@ -233,7 +249,21 @@
       <template v-if="galleryImages[activeImageIndex]?.hasCaption" #caption="{ item }">
         <div class="text-center p-4">
           <div v-if="item.subtitle" class="flex items-center justify-center gap-2 mb-2">
-            <Badge :value="`#${item.subtitle}`" severity="info" class="text-xs" />
+            <div
+              class="bg-white text-gray-800 px-3 py-1 text-sm font-semibold border-2 border-gray-300 shadow-lg"
+              style="
+                border-radius: 12px 12px 12px 0;
+                font-family: 'Inter', sans-serif;
+                letter-spacing: 0.05em;
+                box-shadow:
+                  0 4px 8px rgba(0, 0, 0, 0.15),
+                  0 0 0 1px rgba(0, 0, 0, 0.05);
+                min-width: 40px;
+                text-align: center;
+              "
+            >
+              #{{ item.subtitle }}
+            </div>
             <h5 class="text-white text-lg font-semibold">{{ item.title }}</h5>
           </div>
           <h5 v-else-if="item.title" class="text-white text-lg font-semibold mb-2">
@@ -250,11 +280,15 @@
 </template>
 
 <script setup>
-const { $supabase } = useNuxtApp()
+// Use composables for data
+const { loading: photosLoading, initialize: initializePhotos, approvedPhotos } = usePhotos()
+
+const { races, loading: racesLoading, initialize: initializeRaces } = useRaces()
+
+// Combined loading state
+const loading = computed(() => photosLoading.value || racesLoading.value)
 
 // State
-const pending = ref(true)
-const allPhotos = ref([])
 const filteredPhotos = ref([])
 const searchQuery = ref('')
 const selectedCategory = ref(null)
@@ -294,7 +328,7 @@ const galleryResponsiveOptions = ref([
 ])
 
 // Computed properties
-const totalPhotos = computed(() => allPhotos.value.length)
+const totalPhotos = computed(() => approvedPhotos.value.length)
 
 const activeFilters = computed(() => {
   const filters = []
@@ -340,111 +374,26 @@ const galleryImages = computed(() => {
   }))
 })
 
-// Methods
-const fetchPhotos = async () => {
-  try {
-    const photos = []
+// Race options derived from composable
+const raceOptionsComputed = computed(() =>
+  races.value.map((race) => ({
+    label: `${race.name} (${new Date(race.date).getFullYear()})`,
+    value: race.id,
+    ...race
+  }))
+)
 
-    // Fetch approved general photos
-    const { data: generalPhotos, error: generalError } = await $supabase
-      .from('general_photos')
-      .select('*')
-      .eq('status', 'approved')
-      .order('uploaded_at', { ascending: false })
-
-    if (generalError) {
-      console.error('Error fetching general photos:', generalError)
-    } else {
-      for (const photo of generalPhotos || []) {
-        photos.push({
-          id: `general-${photo.id}`,
-          url: photo.url,
-          title: photo.description || '',
-          subtitle: '',
-          description: photo.description,
-          credit: photo.credit,
-          category: photo.category,
-          categoryLabel: getCategoryLabel(photo.category),
-          featured: photo.featured,
-          uploadedAt: photo.uploaded_at,
-          type: 'general',
-          raceId: photo.race_id,
-          raceName: null
-        })
-      }
-    }
-
-    // Fetch racer photos
-    const { data: racerData, error: racerError } = await $supabase
-      .from('racers')
-      .select('id, name, racer_number, photos, created_at')
-      .not('photos', 'is', null)
-      .order('created_at', { ascending: false })
-
-    if (racerError) {
-      console.error('Error fetching racer photos:', racerError)
-    } else {
-      for (const racer of racerData || []) {
-        if (racer.photos && Array.isArray(racer.photos)) {
-          for (const [index, photo] of racer.photos.entries()) {
-            // Only include approved racer photos in public gallery
-            const photoStatus = photo.status || 'approved'
-            if (photoStatus === 'approved') {
-              photos.push({
-                id: `racer-${racer.id}-${index}`,
-                url: photo.url || photo,
-                title: racer.name,
-                subtitle: racer.racer_number,
-                description: null,
-                credit: photo.credit,
-                category: 'racer',
-                categoryLabel: 'Racer Photo',
-                featured: photo.featured || false,
-                uploadedAt: photo.uploadedAt || racer.created_at,
-                type: 'racer',
-                raceId: null,
-                raceName: null
-              })
-            }
-          }
-        }
-      }
-    }
-
-    allPhotos.value = photos
-    applyFilters()
-
-    // Fetch race options for filter
-    const { data: races, error: raceError } = await $supabase
-      .from('races')
-      .select('id, name, date')
-      .order('date', { ascending: false })
-
-    if (!raceError) {
-      raceOptions.value = races || []
-    }
-  } catch (error) {
-    console.error('Error fetching photos:', error)
-  } finally {
-    pending.value = false
-  }
-}
-
-const getCategoryLabel = (category) => {
-  const categoryMap = {
-    racer: 'Racer Photo',
-    crowd: 'Crowd Photo',
-    setup: 'Setup Photo',
-    awards: 'Awards Photo',
-    venue: 'Venue Photo',
-    action: 'Action Shot',
-    general: 'General Photo'
-  }
-  return categoryMap[category] || 'Photo'
-}
+// Update raceOptions when races change
+watch(
+  races,
+  () => {
+    raceOptions.value = raceOptionsComputed.value
+  },
+  { immediate: true }
+)
 
 const applyFilters = () => {
-  let filtered = [...allPhotos.value]
+  let filtered = [...approvedPhotos.value]
 
   // Apply search filter
   if (searchQuery.value) {
@@ -534,11 +483,20 @@ const openGallery = (index) => {
   galleryVisible.value = true
 }
 
-
-// Initialize
-onMounted(() => {
-  fetchPhotos()
+// Initialize using composables
+onMounted(async () => {
+  await Promise.all([initializePhotos({ status: 'approved' }), initializeRaces()])
+  applyFilters()
 })
+
+// Watch for photo changes and reapply filters
+watch(
+  approvedPhotos,
+  () => {
+    applyFilters()
+  },
+  { deep: true }
+)
 
 useHead({
   title: 'Photo Gallery - The Great Holyoke Brick Race',

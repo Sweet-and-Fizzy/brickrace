@@ -4,8 +4,19 @@ import Aura from '@primevue/themes/aura'
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
+  typescript: {
+    typeCheck: 'build'
+  },
   modules: ['@nuxtjs/tailwindcss', '@primevue/nuxt-module', '@pinia/nuxt'],
-  
+
+  // Auto-import configuration
+  imports: {
+    // Auto-import composables and utilities
+    dirs: ['composables/**', 'utils/**', 'stores/**'],
+    // Global imports (Vue, Nuxt composables)
+    global: true
+  },
+
   // Netlify deployment configuration
   nitro: {
     preset: 'netlify'
@@ -31,7 +42,7 @@ export default defineNuxtConfig({
         'Column',
         'InputText',
         'Password',
-        'Calendar',
+        'DatePicker',
         'FileUpload',
         'MenuBar',
         'InputNumber',
@@ -56,7 +67,9 @@ export default defineNuxtConfig({
         'DataView',
         'AutoComplete',
         'Accordion',
-        'AccordionTab',
+        'AccordionPanel',
+        'AccordionHeader',
+        'AccordionContent',
         'InlineMessage',
         'Galleria',
         'TabMenu',

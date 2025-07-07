@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+  >
     <div class="container mx-auto px-4 py-12 max-w-2xl">
       <!-- Header -->
       <div class="text-center mb-12">
@@ -26,7 +28,10 @@
             <h3 class="font-semibold text-lg mb-2">Competition Requirements</h3>
             <ul class="space-y-1 text-red-50">
               <li>• Must contain a brick somewhere in the design</li>
-              <li>• Must be less than 10" wide × 18" long × 15" high (lighter artistic elements may exceed 15")</li>
+              <li>
+                • Must be less than 10" wide × 18" long × 15" high (lighter artistic elements may
+                exceed 15")
+              </li>
               <li>• Must weigh less than 15 lbs</li>
               <li>• Judged on speed, creativity, and artistic design</li>
             </ul>
@@ -35,7 +40,9 @@
       </div>
 
       <!-- Form Card -->
-      <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+      <div
+        class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden"
+      >
         <div class="p-8">
           <form class="space-y-8" @submit.prevent="handleSubmit">
             <!-- Name Input -->
@@ -61,7 +68,9 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-600">
+            <div
+              class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-600"
+            >
               <NuxtLink to="/racers" class="flex-1">
                 <Button type="button" class="btn-brick-secondary w-full" label="Cancel" />
               </NuxtLink>
@@ -83,7 +92,11 @@
       <div class="text-center mt-8">
         <p class="text-gray-500 dark:text-gray-400 text-sm">
           Need help? Check out our
-          <NuxtLink to="/build-racer" class="text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 font-medium">building guidelines</NuxtLink>
+          <NuxtLink
+            to="/build-racer"
+            class="text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 font-medium"
+            >building guidelines</NuxtLink
+          >
           for inspiration.
         </p>
       </div>
@@ -119,7 +132,6 @@ const loading = ref(false)
 const clearErrors = () => {
   Object.keys(errors).forEach((key) => (errors[key] = ''))
 }
-
 
 const validateForm = () => {
   clearErrors()

@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+  <div
+    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+  >
     <!-- Header -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -22,7 +24,7 @@
     </div>
 
     <!-- Loading State -->
-    <div v-if="pending" class="flex justify-center py-12">
+    <div v-if="loading" class="flex justify-center py-12">
       <ProgressSpinner />
     </div>
 
@@ -365,9 +367,9 @@
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Select Race (Optional)
           </label>
-          <Dropdown
+          <Select
             v-model="selectedRace"
-            :options="allRaces"
+            :options="races"
             option-label="name"
             option-value="id"
             placeholder="Choose a race or leave blank for general photos"
@@ -401,14 +403,24 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
 const $toast = useToast()
 
-// State
-const pending = ref(true)
-const myRacers = ref([])
-const myGeneralPhotos = ref([])
-const allRaces = ref([])
+// Use composables for data
+const {
+  loading: photosLoading,
+  initialize: initializePhotos,
+  updatePhotoMetadata,
+  getPhotosByUser
+} = usePhotos()
+
+const { races, loading: racesLoading, initialize: initializeRaces } = useRaces()
+
+const { myRacers, loading: racersLoading, initialize: initializeRacers } = useRacers()
+
+// Combined loading state
+const loading = computed(() => photosLoading.value || racesLoading.value || racersLoading.value)
+
+// State - races and racers now come from composables
 const showRacerUpload = ref(false)
 const showGeneralUpload = ref(false)
 const generalPhotosFirst = ref(0)
@@ -417,32 +429,38 @@ const selectedRace = ref(null)
 const showEditPhoto = ref(false)
 const editingPhoto = ref(null)
 
+// Get user photos using composable
+const myPhotos = computed(() => {
+  return authStore.user ? getPhotosByUser(authStore.user.id) : []
+})
+
+const myGeneralPhotos = computed(() => {
+  return myPhotos.value.filter((photo) => photo.type === 'general')
+})
+
+const myRacerPhotos = computed(() => {
+  return myPhotos.value.filter((photo) => photo.type === 'racer')
+})
+
 // Computed properties
 const racerPhotoCount = computed(() => {
-  return myRacers.value.reduce((total, racer) => total + (racer.photos?.length || 0), 0)
+  return myRacerPhotos.value.length
 })
 
 const generalPhotoCount = computed(() => myGeneralPhotos.value.length)
 
-const totalPhotos = computed(() => racerPhotoCount.value + generalPhotoCount.value)
+const totalPhotos = computed(() => myPhotos.value.length)
 
 const approvedPhotos = computed(() => {
-  return (
-    myGeneralPhotos.value.filter((photo) => photo.status === 'approved').length +
-    racerPhotoCount.value
-  )
+  return myPhotos.value.filter((photo) => photo.status === 'approved').length
 })
 
 const pendingPhotos = computed(() => {
-  return myGeneralPhotos.value.filter((photo) => photo.status === 'pending' || !photo.status).length
+  return myPhotos.value.filter((photo) => photo.status === 'pending' || !photo.status).length
 })
 
 const featuredPhotos = computed(() => {
-  const racerFeatured = myRacers.value.reduce((total, racer) => {
-    return total + (racer.photos?.filter((photo) => photo.featured) || []).length
-  }, 0)
-  const generalFeatured = myGeneralPhotos.value.filter((photo) => photo.featured).length
-  return racerFeatured + generalFeatured
+  return myPhotos.value.filter((photo) => photo.featured)
 })
 
 const paginatedGeneralPhotos = computed(() => {
@@ -470,47 +488,15 @@ const getStatusSeverity = (status) => {
 
 const fetchData = async () => {
   try {
-    // Fetch user's racers
-    const { data: racersData, error: racersError } = await $supabase
-      .from('racers')
-      .select('*')
-      .eq('user_id', authStore.user.id)
-      .order('created_at', { ascending: false })
-
-    if (racersError) throw racersError
-    myRacers.value = racersData || []
-
-    // Fetch all races for the dropdown
-    const { data: racesData, error: racesError } = await $supabase
-      .from('races')
-      .select('id, name, date')
-      .order('date', { ascending: false })
-
-    if (racesError) throw racesError
-    allRaces.value = racesData || []
-
-    // Fetch user's general photos
-    const { data: generalPhotosData, error: generalPhotosError } = await $supabase
-      .from('general_photos')
-      .select(
-        `
-        *,
-        races(name)
-      `
-      )
-      .eq('user_id', authStore.user.id)
-      .order('uploaded_at', { ascending: false })
-
-    if (generalPhotosError) {
-      console.error('Error fetching general photos:', generalPhotosError)
-      myGeneralPhotos.value = []
-    } else {
-      myGeneralPhotos.value = generalPhotosData || []
-    }
+    // Initialize all composables
+    await Promise.all([
+      initializeRacers(),
+      initializeRaces(),
+      initializePhotos({ userId: authStore.user.id })
+    ])
   } catch (error) {
+    // Keep essential error logging for production debugging
     console.error('Error fetching data:', error)
-  } finally {
-    pending.value = false
   }
 }
 
@@ -518,7 +504,6 @@ const navigateToRacerEdit = (racerId) => {
   showRacerUpload.value = false
   navigateTo(`/racers/${racerId}/edit`)
 }
-
 
 const editGeneralPhoto = (photo) => {
   editingPhoto.value = { ...photo }
@@ -529,22 +514,10 @@ const savePhotoChanges = async () => {
   if (!editingPhoto.value) return
 
   try {
-    const { error } = await $supabase
-      .from('general_photos')
-      .update({
-        description: editingPhoto.value.description?.trim() || null,
-        credit: editingPhoto.value.credit?.trim() || null,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', editingPhoto.value.id)
-
-    if (error) throw error
-
-    // Update local data
-    const photoIndex = myGeneralPhotos.value.findIndex((p) => p.id === editingPhoto.value.id)
-    if (photoIndex !== -1) {
-      myGeneralPhotos.value[photoIndex] = { ...editingPhoto.value }
-    }
+    await updatePhotoMetadata(editingPhoto.value, {
+      description: editingPhoto.value.description?.trim() || null,
+      credit: editingPhoto.value.credit?.trim() || null
+    })
 
     $toast.add({
       severity: 'success',
@@ -555,6 +528,7 @@ const savePhotoChanges = async () => {
 
     showEditPhoto.value = false
   } catch (error) {
+    // Keep essential error logging for production debugging
     console.error('Error updating photo:', error)
     $toast.add({
       severity: 'error',
@@ -569,8 +543,7 @@ const onGeneralPhotoUploaded = () => {
   // Photo will be handled by the upload component
 }
 
-const onGeneralUploadComplete = (uploadData) => {
-
+const onGeneralUploadComplete = async (uploadData) => {
   // Show success toast
   const message = authStore.isRaceAdmin
     ? `Photos are now live and visible to all users.`
@@ -586,7 +559,7 @@ const onGeneralUploadComplete = (uploadData) => {
   // Close dialog and refresh data
   showGeneralUpload.value = false
   selectedRace.value = null
-  fetchData()
+  await initialize({ userId: authStore.user.id })
 }
 
 // Initialize
