@@ -176,7 +176,7 @@
                     <i class="pi pi-pencil mr-2 text-gray-600" />
                     Edit Race
                   </NuxtLink>
-                  <NuxtLink to="/admin/photos" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <NuxtLink :to="`/admin/photos?race=${race.id}`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
                     <i class="pi pi-images mr-2 text-blue-600" />
                     Manage Photos
                   </NuxtLink>

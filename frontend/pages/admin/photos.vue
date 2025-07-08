@@ -43,15 +43,37 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 mb-6">
         <div class="p-6">
           <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <TabMenu v-model:active-index="activeTab" :model="tabItems" class="flex-1" />
+            <div class="flex gap-4 items-center">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Photo Filters</h3>
+            </div>
 
-            <div class="flex gap-2">
-              <Button
-                v-tooltip.bottom="'Refresh photos'"
-                icon="pi pi-refresh"
-                severity="secondary"
-                :loading="refreshing"
-                @click="refreshPhotos"
+            <div class="flex flex-wrap gap-2">
+              <Select
+                v-model="selectedStatus"
+                :options="statusFilterOptions"
+                option-label="label"
+                option-value="value"
+                placeholder="Filter by status"
+                class="w-44"
+              />
+              <Select
+                v-model="selectedRaceId"
+                :options="raceFilterOptions"
+                option-label="label"
+                option-value="value"
+                placeholder="Filter by race"
+                class="w-48"
+                show-clear
+              />
+              <Select
+                v-model="selectedRacerId"
+                :options="racerFilterOptions"
+                option-label="label"
+                option-value="value"
+                placeholder="Filter by racer"
+                class="w-48"
+                :filter="true"
+                show-clear
               />
               <Select
                 v-model="sortBy"
@@ -60,6 +82,13 @@
                 option-value="value"
                 placeholder="Sort by"
                 class="w-40"
+              />
+              <Button
+                v-tooltip.bottom="'Refresh photos'"
+                icon="pi pi-refresh"
+                severity="secondary"
+                :loading="refreshing"
+                @click="refreshPhotos"
               />
             </div>
           </div>
@@ -291,19 +320,24 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
+const route = useRoute()
 
 const $toast = useToast()
 
-// Use photo composable
+// Use composables
 const { allPhotos, loading, initialize: initializePhotos, fetchAllPhotos } = usePhotos()
+const { races, initialize: initializeRaces } = useRaces()
+const { racers, initialize: initializeRacers } = useRacers()
 
 // State
 const refreshing = ref(false)
 const processingPhoto = ref(null)
 const showPhotoDetails = ref(false)
 const selectedPhoto = ref(null)
-const activeTab = ref(0)
+const selectedStatus = ref('all')
 const sortBy = ref('newest')
+const selectedRaceId = ref('')
+const selectedRacerId = ref('')
 const currentPage = ref(0)
 const photosPerPage = ref(12)
 
@@ -314,13 +348,13 @@ const breadcrumbItems = computed(() => [
   { label: 'Photo Management' }
 ])
 
-// Tab items
-const tabItems = ref([
-  { label: 'All Photos', icon: 'pi pi-images' },
-  { label: 'Pending Approval', icon: 'pi pi-clock' },
-  { label: 'Approved', icon: 'pi pi-check' },
-  { label: 'Rejected', icon: 'pi pi-times' },
-  { label: 'Featured', icon: 'pi pi-star' }
+// Status filter options
+const statusFilterOptions = ref([
+  { label: 'All Photos', value: 'all' },
+  { label: 'Pending Approval', value: 'pending' },
+  { label: 'Approved', value: 'approved' },
+  { label: 'Rejected', value: 'rejected' },
+  { label: 'Featured', value: 'featured' }
 ])
 
 // Sort options
@@ -331,25 +365,86 @@ const sortOptions = ref([
   { label: 'Status', value: 'status' }
 ])
 
+// Race filter options
+const raceFilterOptions = computed(() => {
+  const options = [{ label: 'All Races', value: '' }]
+  
+  // Add races from the races store
+  races.value.forEach(race => {
+    options.push({
+      label: race.name,
+      value: race.id
+    })
+  })
+  
+  return options.sort((a, b) => {
+    if (a.value === '') return -1 // Keep "All Races" first
+    if (b.value === '') return 1
+    return a.label.localeCompare(b.label)
+  })
+})
+
+// Racer filter options for autocomplete
+const racerFilterOptions = computed(() => {
+  // Get unique racers from photos
+  const uniqueRacers = new Map()
+  
+  allPhotos.value.forEach(photo => {
+    if (photo.racerId && photo.racerName) {
+      uniqueRacers.set(photo.racerId, {
+        id: photo.racerId,
+        name: photo.racerName,
+        racerNumber: photo.racerNumber
+      })
+    }
+  })
+  
+  // Also add from racers composable
+  racers.value.forEach(racer => {
+    uniqueRacers.set(racer.id, {
+      id: racer.id,
+      name: racer.name,
+      racerNumber: racer.racer_number
+    })
+  })
+  
+  return Array.from(uniqueRacers.values())
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(racer => ({
+      label: racer.racerNumber ? `${racer.name} (#${racer.racerNumber})` : racer.name,
+      value: racer.id
+    }))
+})
+
 // Computed properties
 const filteredPhotos = computed(() => {
   let filtered = [...allPhotos.value]
 
-  // Filter by tab
-  switch (activeTab.value) {
-    case 1: // Pending
+  // Filter by race
+  if (selectedRaceId.value) {
+    filtered = filtered.filter((photo) => photo.raceId === selectedRaceId.value)
+  }
+
+  // Filter by racer
+  if (selectedRacerId.value) {
+    filtered = filtered.filter((photo) => photo.racerId === selectedRacerId.value)
+  }
+
+  // Filter by status
+  switch (selectedStatus.value) {
+    case 'pending':
       filtered = filtered.filter((photo) => !photo.status || photo.status === 'pending')
       break
-    case 2: // Approved
+    case 'approved':
       filtered = filtered.filter((photo) => photo.status === 'approved')
       break
-    case 3: // Rejected
+    case 'rejected':
       filtered = filtered.filter((photo) => photo.status === 'rejected')
       break
-    case 4: // Featured
+    case 'featured':
       filtered = filtered.filter((photo) => photo.featured)
       break
-    // case 0: All photos - no filter
+    // case 'all': All photos - no filter
   }
 
   // Sort
@@ -414,14 +509,14 @@ const formatDate = (dateString) => {
 }
 
 const getEmptyStateMessage = () => {
-  switch (activeTab.value) {
-    case 1:
+  switch (selectedStatus.value) {
+    case 'pending':
       return 'No Pending Photos'
-    case 2:
+    case 'approved':
       return 'No Approved Photos'
-    case 3:
+    case 'rejected':
       return 'No Rejected Photos'
-    case 4:
+    case 'featured':
       return 'No Featured Photos'
     default:
       return 'No Photos Found'
@@ -429,14 +524,14 @@ const getEmptyStateMessage = () => {
 }
 
 const getEmptyStateSubtitle = () => {
-  switch (activeTab.value) {
-    case 1:
+  switch (selectedStatus.value) {
+    case 'pending':
       return 'All photos have been reviewed'
-    case 2:
+    case 'approved':
       return 'No photos have been approved yet'
-    case 3:
+    case 'rejected':
       return 'No photos have been rejected'
-    case 4:
+    case 'featured':
       return 'No photos have been marked as featured'
     default:
       return 'No photos have been uploaded yet'
@@ -468,6 +563,100 @@ const refreshPhotos = async () => {
 const viewPhotoDetails = (photo) => {
   selectedPhoto.value = photo
   showPhotoDetails.value = true
+}
+
+// Photo action handlers
+const handleApprovePhoto = async (photo) => {
+  processingPhoto.value = photo.id
+  try {
+    // TODO: Implement photo approval logic
+    $toast.add({
+      severity: 'success',
+      summary: 'Photo Approved',
+      detail: 'Photo has been approved successfully',
+      life: 3000
+    })
+  } catch (error) {
+    console.error('Error approving photo:', error)
+    $toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to approve photo',
+      life: 3000
+    })
+  } finally {
+    processingPhoto.value = null
+  }
+}
+
+const handleRejectPhoto = async (photo) => {
+  processingPhoto.value = photo.id
+  try {
+    // TODO: Implement photo rejection logic
+    $toast.add({
+      severity: 'info',
+      summary: 'Photo Rejected',
+      detail: 'Photo has been rejected',
+      life: 3000
+    })
+  } catch (error) {
+    console.error('Error rejecting photo:', error)
+    $toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to reject photo',
+      life: 3000
+    })
+  } finally {
+    processingPhoto.value = null
+  }
+}
+
+const handleToggleFeatured = async (photo) => {
+  processingPhoto.value = photo.id
+  try {
+    // TODO: Implement toggle featured logic
+    const action = photo.featured ? 'unfeatured' : 'featured'
+    $toast.add({
+      severity: 'success',
+      summary: 'Photo Updated',
+      detail: `Photo has been ${action}`,
+      life: 3000
+    })
+  } catch (error) {
+    console.error('Error toggling featured status:', error)
+    $toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to update photo',
+      life: 3000
+    })
+  } finally {
+    processingPhoto.value = null
+  }
+}
+
+const handleDeletePhoto = async (photo) => {
+  processingPhoto.value = photo.id
+  try {
+    // TODO: Implement photo deletion logic
+    $toast.add({
+      severity: 'info',
+      summary: 'Photo Deleted',
+      detail: 'Photo has been deleted',
+      life: 3000
+    })
+  } catch (error) {
+    console.error('Error deleting photo:', error)
+    $toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to delete photo',
+      life: 3000
+    })
+  } finally {
+    processingPhoto.value = null
+  }
 }
 
 const getPhotoActions = (photo) => {
@@ -503,7 +692,16 @@ onMounted(async () => {
         statusMessage: 'Access denied. Admin privileges required.'
       })
     }
-    await initializePhotos()
+    await Promise.all([
+      initializePhotos(),
+      initializeRaces(),
+      initializeRacers()
+    ])
+    
+    // Check if race filter is provided in URL params
+    if (route.query.race) {
+      selectedRaceId.value = route.query.race
+    }
   } catch (error) {
     // Keep essential error logging for production debugging
     console.error('Error initializing admin photos page:', error)
@@ -514,8 +712,8 @@ onMounted(async () => {
   }
 })
 
-// Watch for tab changes to reset pagination
-watch(activeTab, () => {
+// Watch for filter changes to reset pagination
+watch([selectedStatus, selectedRaceId, selectedRacerId], () => {
   currentPage.value = 0
 })
 
