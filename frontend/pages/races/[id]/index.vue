@@ -326,7 +326,7 @@
             </Card>
 
             <!-- Brackets -->
-            <Card v-if="brackets.length">
+            <Card v-if="getBracketsForRace(route.params.id).length">
               <template #title>
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   <i class="pi pi-sitemap text-purple-600" />
@@ -336,7 +336,7 @@
               <template #content>
                 <div class="space-y-6">
                   <div
-                    v-for="(bracket, index) in brackets"
+                    v-for="(bracket, index) in getBracketsForRace(route.params.id)"
                     :key="bracket.id"
                     class="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
                   >
@@ -801,7 +801,7 @@
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Bracket Races</span>
-                    <span class="font-semibold">{{ brackets.length }}</span>
+                    <span class="font-semibold">{{ getBracketsForRace(route.params.id).length }}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Fastest Time</span>
@@ -880,14 +880,15 @@ const {
   initialize: initializeRaces
 } = useRaces()
 
-const { qualifiers, formatTime } = useQualifiers(route.params.id)
+const { qualifiers, formatTime, initialize: initializeQualifiers } = useQualifiers(route.params.id)
 
-const { brackets, getBracketsForRace } = useBrackets()
+const { brackets, getBracketsForRace, initialize: initializeBrackets } = useBrackets()
 
 const {
   checkins: checkinsData,
   racers: checkinsRacers,
-  getCheckinsForRace
+  getCheckinsForRace,
+  initialize: initializeCheckins
 } = useCheckins()
 
 const {
@@ -1395,8 +1396,13 @@ onMounted(async () => {
     await getRaceData()
   }
 
-  // Initialize awards for voting functionality
-  await initializeAwards()
+  // Initialize all other composables
+  await Promise.all([
+    initializeQualifiers(),
+    initializeBrackets(),
+    initializeCheckins(),
+    initializeAwards()
+  ])
 
   // Race data is now available, hide main loading
   raceDataLoading.value = false
