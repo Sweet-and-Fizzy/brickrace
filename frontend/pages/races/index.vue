@@ -76,7 +76,7 @@
             <div class="px-4 pb-4 space-y-3">
               <div class="flex justify-between items-center">
                 <div class="flex gap-2">
-                  <Badge :value="`${race.checkin_count || 0} racers`" severity="info" />
+                  <Badge :value="`${race.checkinCount || 0} racers`" severity="info" />
                   <Badge v-if="!race.active" value="Historical" severity="secondary" />
                 </div>
                 <div class="text-right">
