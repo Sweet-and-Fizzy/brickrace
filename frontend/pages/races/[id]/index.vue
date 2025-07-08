@@ -117,22 +117,8 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
-            <div class="flex items-center gap-3 mb-2">
+            <div class="mb-2">
               <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ race.name }}</h1>
-              <div
-                v-if="race.active"
-                class="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
-              >
-                <i class="pi pi-check-circle mr-1" />
-                ACTIVE
-              </div>
-              <div
-                v-else
-                class="bg-gray-400 text-white px-3 py-1 rounded-full text-sm font-semibold"
-              >
-                <i class="pi pi-clock mr-1" />
-                HISTORICAL
-              </div>
             </div>
             <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
               <span>{{
@@ -150,36 +136,53 @@
             </div>
           </div>
 
-          <div class="flex gap-2 mt-4 md:mt-0">
-            <!-- Active Race Admin Controls -->
-            <template v-if="authStore.isRaceAdmin && race.active">
-              <NuxtLink :to="`/races/${race.id}/checkin`">
-                <Button severity="success">
-                  <i class="pi pi-check mr-2" />
-                  Check-in Racers
-                </Button>
-              </NuxtLink>
-              <NuxtLink :to="`/races/${race.id}/qualifiers`">
-                <Button severity="info">
-                  <i class="pi pi-clock mr-2" />
-                  Qualifiers
-                </Button>
-              </NuxtLink>
-              <NuxtLink :to="`/races/${race.id}/brackets`">
-                <Button severity="help">
-                  <i class="pi pi-sitemap mr-2" />
-                  Brackets
-                </Button>
-              </NuxtLink>
-            </template>
-
-            <!-- General Admin Controls (available for all races) -->
-            <NuxtLink v-if="authStore.isRaceAdmin" :to="`/races/${race.id}/edit`">
-              <Button severity="primary">
-                <i class="pi pi-pencil mr-2" />
-                Edit Race
+          <!-- Admin Controls - Clean Dropdown -->
+          <div v-if="authStore.isRaceAdmin" class="mt-4 md:mt-0">
+            <div class="relative">
+              <Button 
+                @click="showAdminMenu = !showAdminMenu"
+                severity="secondary" 
+                outlined
+                size="small"
+              >
+                <i class="pi pi-cog mr-2" />
+                Admin
+                <i :class="showAdminMenu ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" class="ml-2" />
               </Button>
-            </NuxtLink>
+              
+              <!-- Admin Dropdown Menu -->
+              <div 
+                v-if="showAdminMenu" 
+                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50"
+                @click="showAdminMenu = false"
+              >
+                <div class="py-2">
+                  <template v-if="race.active">
+                    <NuxtLink :to="`/races/${race.id}/checkin`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <i class="pi pi-check mr-2 text-green-600" />
+                      Check-in Racers
+                    </NuxtLink>
+                    <NuxtLink :to="`/races/${race.id}/qualifiers`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <i class="pi pi-clock mr-2 text-blue-600" />
+                      Qualifiers
+                    </NuxtLink>
+                    <NuxtLink :to="`/races/${race.id}/brackets`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <i class="pi pi-sitemap mr-2 text-purple-600" />
+                      Brackets
+                    </NuxtLink>
+                    <hr class="my-2 border-gray-200 dark:border-gray-600" />
+                  </template>
+                  <NuxtLink :to="`/races/${race.id}/edit`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="pi pi-pencil mr-2 text-gray-600" />
+                    Edit Race
+                  </NuxtLink>
+                  <NuxtLink to="/admin/photos" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <i class="pi pi-images mr-2 text-blue-600" />
+                    Manage Photos
+                  </NuxtLink>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -409,13 +412,6 @@
                         </span>
                         Bracket #{{ index + 1 }}
                       </h3>
-                      <NuxtLink
-                        v-if="authStore.isRaceAdmin"
-                        :to="`/races/${race.id}/brackets`"
-                        class="text-purple-600 hover:text-purple-800 text-sm font-medium"
-                      >
-                        Manage →
-                      </NuxtLink>
                     </div>
 
                     <div class="flex items-center gap-4">
@@ -705,141 +701,6 @@
               </template>
             </Card>
 
-            <!-- Photo Management (Admin Only) -->
-            <Card v-if="authStore.isRaceAdmin">
-              <template #title>
-                <div class="flex items-center justify-between">
-                  <h2
-                    class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2"
-                  >
-                    <i class="pi pi-images text-blue-600" />
-                    Race Photo Management
-                  </h2>
-                  <div class="flex items-center gap-2">
-                    <Badge :value="`${racePhotosCount} photos`" severity="info" />
-                    <Badge :value="`${pendingRacePhotos} pending`" severity="warning" />
-                  </div>
-                </div>
-              </template>
-              <template #content>
-                <div class="space-y-6">
-                  <!-- Quick Stats -->
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                      <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
-                        {{ racerPhotosCount }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Racer Photos</div>
-                    </div>
-                    <div class="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                      <div class="text-lg font-bold text-green-600 dark:text-green-400">
-                        {{ generalPhotosCount }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">General Photos</div>
-                    </div>
-                    <div class="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                      <div class="text-lg font-bold text-yellow-600 dark:text-yellow-400">
-                        {{ featuredPhotosCount }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Featured</div>
-                    </div>
-                    <div class="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                      <div class="text-lg font-bold text-purple-600 dark:text-purple-400">
-                        {{ pendingRacePhotos }}
-                      </div>
-                      <div class="text-sm text-gray-600 dark:text-gray-400">Pending</div>
-                    </div>
-                  </div>
-
-                  <!-- Recent Race Photos Preview -->
-                  <div v-if="racePhotos.length > 0">
-                    <h4 class="font-semibold text-gray-900 dark:text-white mb-3">
-                      Recent Photos from This Race
-                    </h4>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
-                      <div
-                        v-for="(photo, index) in racePhotos.slice(0, 6)"
-                        :key="index"
-                        class="relative group cursor-pointer"
-                        @click="viewPhotoInGallery(photo)"
-                      >
-                        <Image
-                          :src="photo.url"
-                          :alt="`Race photo ${index + 1}`"
-                          image-class="w-full h-20 object-cover rounded-lg border hover:border-blue-400 transition-colors"
-                          class="w-full h-20"
-                          :preview="false"
-                        />
-
-                        <!-- Status Badge -->
-                        <div class="absolute top-1 right-1">
-                          <Badge
-                            :value="photo.status || 'approved'"
-                            :severity="getPhotoStatusSeverity(photo.status)"
-                            class="text-xs"
-                          />
-                        </div>
-
-                        <!-- Featured Badge -->
-                        <div
-                          v-if="photo.featured"
-                          class="absolute top-1 left-1 bg-yellow-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                        >
-                          <i class="pi pi-star text-xs" />
-                        </div>
-
-                        <!-- Hover Overlay -->
-                        <div
-                          class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-30 rounded-lg transition-all duration-200 flex items-center justify-center"
-                        >
-                          <i
-                            class="pi pi-eye text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div v-if="racePhotos.length > 6" class="text-center mt-3">
-                      <p class="text-sm text-gray-500 dark:text-gray-400">
-                        +{{ racePhotos.length - 6 }} more photos from this race
-                      </p>
-                    </div>
-                  </div>
-
-                  <!-- No Photos State -->
-                  <div v-else class="text-center py-8">
-                    <i class="pi pi-images text-4xl text-gray-300 dark:text-gray-600 mb-3" />
-                    <h4 class="font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                      No Photos Yet
-                    </h4>
-                    <p class="text-sm text-gray-500 dark:text-gray-500">
-                      Photos from racers in this race will appear here once uploaded
-                    </p>
-                  </div>
-
-                  <!-- Management Actions -->
-                  <div
-                    class="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700"
-                  >
-                    <NuxtLink to="/admin/photos" class="flex-1">
-                      <Button class="w-full" severity="primary">
-                        <i class="pi pi-cog mr-2" />
-                        Manage All Photos
-                      </Button>
-                    </NuxtLink>
-                    <Button
-                      class="flex-1"
-                      severity="success"
-                      outlined
-                      @click="showUploadDialog = true"
-                    >
-                      <i class="pi pi-plus mr-2" />
-                      Add Photos
-                    </Button>
-                  </div>
-                </div>
-              </template>
-            </Card>
           </div>
 
           <!-- Sidebar -->
@@ -958,6 +819,7 @@ const {
 // Local state
 const race = ref(null)
 const showUploadDialog = ref(false)
+const showAdminMenu = ref(false)
 const error = ref(null)
 
 // Separate loading states for progressive loading
