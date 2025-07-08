@@ -156,8 +156,7 @@
                     <p class="leading-relaxed">
                       The total weight of the brick racer, including the brick and all materials
                       attached to it, should not exceed
-                      <strong>15lbs in total weight</strong>. We'll get you the full description of
-                      the Brickrace with entry form and other details later.
+                      <strong>15lbs in total weight</strong>.
                     </p>
                   </div>
                 </div>
