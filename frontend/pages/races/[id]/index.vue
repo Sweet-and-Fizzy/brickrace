@@ -186,7 +186,8 @@
         <!-- Race Process Steps -->
         <Card class="mb-8">
           <template #content>
-            <div class="px-2">
+            <!-- Desktop: Horizontal Steps -->
+            <div class="hidden md:block px-2">
               <Steps :model="raceSteps" :active-step="currentStep" class="mb-4" />
               <div class="text-center mt-4">
                 <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -195,6 +196,63 @@
                     raceSteps[currentStep]?.label || 'Unknown'
                   }}</span>
                 </p>
+              </div>
+            </div>
+
+            <!-- Mobile: Vertical Timeline -->
+            <div class="block md:hidden">
+              <!-- Current Step Highlight -->
+              <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-600 rounded-lg p-4 mb-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center">
+                    <i :class="raceSteps[currentStep]?.icon" />
+                  </div>
+                  <div>
+                    <p class="font-semibold text-blue-900 dark:text-blue-100">Current Step</p>
+                    <p class="text-sm text-blue-700 dark:text-blue-300">{{ raceSteps[currentStep]?.label }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="mb-4">
+                <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <span>Progress</span>
+                  <span>{{ Math.round(((currentStep + 1) / raceSteps.length) * 100) }}%</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div 
+                    class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    :style="{ width: `${((currentStep + 1) / raceSteps.length) * 100}%` }"
+                  ></div>
+                </div>
+              </div>
+
+              <!-- Compact Steps List -->
+              <div class="space-y-2">
+                <div 
+                  v-for="(step, index) in raceSteps" 
+                  :key="index"
+                  class="flex items-center gap-3 p-2 rounded-lg transition-colors"
+                  :class="{
+                    'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200': index < currentStep,
+                    'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200': index === currentStep,
+                    'text-gray-500 dark:text-gray-400': index > currentStep
+                  }"
+                >
+                  <div 
+                    class="w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                    :class="{
+                      'bg-green-600 text-white': index < currentStep,
+                      'bg-blue-600 text-white': index === currentStep,
+                      'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300': index > currentStep
+                    }"
+                  >
+                    <i v-if="index < currentStep" class="pi pi-check" />
+                    <i v-else :class="step.icon" />
+                  </div>
+                  <span class="text-sm font-medium">{{ step.label }}</span>
+                </div>
               </div>
             </div>
           </template>
@@ -1194,7 +1252,7 @@ const raceSteps = computed(() => [
     icon: 'pi pi-sitemap'
   },
   {
-    label: 'Complete',
+    label: 'Results',
     icon: 'pi pi-trophy'
   }
 ])
