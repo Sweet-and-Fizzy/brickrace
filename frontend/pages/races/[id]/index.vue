@@ -44,11 +44,9 @@
             </Card>
 
             <!-- Race Image Skeleton -->
-            <Card>
-              <template #header>
-                <Skeleton width="100%" height="24rem" />
-              </template>
-            </Card>
+            <div class="mb-8">
+              <Skeleton width="100%" height="16rem" class="md:h-96 rounded-lg" />
+            </div>
 
             <!-- Qualifiers/Brackets Skeleton -->
             <Card>

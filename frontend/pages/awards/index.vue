@@ -60,19 +60,26 @@
         <!-- Voteable Awards Skeleton -->
         <div>
           <Skeleton width="15rem" height="2rem" class="mb-6" />
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card v-for="n in 3" :key="n" class="overflow-hidden">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Card v-for="n in 3" :key="n" class="hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
               <template #header>
-                <Skeleton width="100%" height="8rem" />
+                <div class="relative">
+                  <Skeleton width="100%" height="20rem" />
+                </div>
               </template>
               <template #title>
-                <Skeleton width="80%" height="1.5rem" class="mb-2" />
+                <div class="px-6 pt-6">
+                  <Skeleton width="80%" height="1.5rem" class="mb-2" />
+                </div>
               </template>
               <template #subtitle>
-                <Skeleton width="100%" height="1rem" class="mb-4" />
+                <div class="px-6 pb-4">
+                  <Skeleton width="100%" height="1rem" />
+                </div>
               </template>
               <template #content>
-                <div class="space-y-3">
+                <div class="px-6 pb-6 space-y-3">
+                  <Skeleton width="60%" height="1rem" />
                   <Skeleton width="100%" height="2.5rem" />
                   <Skeleton width="70%" height="2rem" />
                 </div>
@@ -84,18 +91,32 @@
         <!-- Assigned Awards Skeleton -->
         <div>
           <Skeleton width="18rem" height="2rem" class="mb-6" />
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card v-for="n in 2" :key="n + 10" class="overflow-hidden">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <Card v-for="n in 2" :key="n + 10" class="border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 dark:border-yellow-500 hover:shadow-2xl transition-all duration-300 rounded-lg overflow-hidden">
               <template #header>
-                <Skeleton width="100%" height="8rem" />
+                <div class="relative">
+                  <Skeleton width="100%" height="20rem" />
+                  <!-- Winner Badge Skeleton -->
+                  <div class="absolute top-3 right-3">
+                    <Skeleton width="4rem" height="1.5rem" />
+                  </div>
+                </div>
               </template>
               <template #title>
-                <Skeleton width="75%" height="1.5rem" class="mb-2" />
+                <div class="px-6 pt-6">
+                  <Skeleton width="75%" height="1.5rem" class="mb-2" />
+                </div>
               </template>
               <template #content>
-                <div class="space-y-2">
-                  <Skeleton width="90%" height="1rem" />
-                  <Skeleton width="60%" height="1rem" />
+                <div class="px-6 pb-6 space-y-3">
+                  <!-- Winner display skeleton -->
+                  <div class="flex items-center gap-3 p-3 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-lg">
+                    <Skeleton width="3rem" height="3rem" class="rounded-full" />
+                    <div class="space-y-1 flex-1">
+                      <Skeleton width="60%" height="1rem" />
+                      <Skeleton width="40%" height="0.75rem" />
+                    </div>
+                  </div>
                 </div>
               </template>
             </Card>
