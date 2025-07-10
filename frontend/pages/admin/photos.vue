@@ -368,15 +368,15 @@ const sortOptions = ref([
 // Race filter options
 const raceFilterOptions = computed(() => {
   const options = [{ label: 'All Races', value: '' }]
-  
+
   // Add races from the races store
-  races.value.forEach(race => {
+  races.value.forEach((race) => {
     options.push({
       label: race.name,
       value: race.id
     })
   })
-  
+
   return options.sort((a, b) => {
     if (a.value === '') return -1 // Keep "All Races" first
     if (b.value === '') return 1
@@ -388,8 +388,8 @@ const raceFilterOptions = computed(() => {
 const racerFilterOptions = computed(() => {
   // Get unique racers from photos
   const uniqueRacers = new Map()
-  
-  allPhotos.value.forEach(photo => {
+
+  allPhotos.value.forEach((photo) => {
     if (photo.racerId && photo.racerName) {
       uniqueRacers.set(photo.racerId, {
         id: photo.racerId,
@@ -398,19 +398,19 @@ const racerFilterOptions = computed(() => {
       })
     }
   })
-  
+
   // Also add from racers composable
-  racers.value.forEach(racer => {
+  racers.value.forEach((racer) => {
     uniqueRacers.set(racer.id, {
       id: racer.id,
       name: racer.name,
       racerNumber: racer.racer_number
     })
   })
-  
+
   return Array.from(uniqueRacers.values())
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(racer => ({
+    .map((racer) => ({
       label: racer.racerNumber ? `${racer.name} (#${racer.racerNumber})` : racer.name,
       value: racer.id
     }))
@@ -692,12 +692,8 @@ onMounted(async () => {
         statusMessage: 'Access denied. Admin privileges required.'
       })
     }
-    await Promise.all([
-      initializePhotos(),
-      initializeRaces(),
-      initializeRacers()
-    ])
-    
+    await Promise.all([initializePhotos(), initializeRaces(), initializeRacers()])
+
     // Check if race filter is provided in URL params
     if (route.query.race) {
       selectedRaceId.value = route.query.race
