@@ -158,7 +158,7 @@ export const useRacers = () => {
       // Fetch vote counts
       const voteCounts = await fetchVoteCounts()
 
-      // Get unique user IDs for owner info
+      // Get unique user IDs for maker info
       const userIds = [...new Set(racersData.map((racer) => racer.user_id))]
       const userMap = new Map()
 
@@ -180,7 +180,7 @@ export const useRacers = () => {
         }
       })
 
-      // Map racers with owner info and vote counts
+      // Map racers with maker info and vote counts
       const racersWithData = racersData.map((racer) => {
         const displayName = userMap.get(racer.user_id) || `User-${racer.user_id.slice(0, 8)}`
 
@@ -196,7 +196,7 @@ export const useRacers = () => {
 
         return {
           ...racer,
-          owner: {
+          maker: {
             id: racer.user_id,
             displayName
           },
@@ -228,7 +228,7 @@ export const useRacers = () => {
           qualifiers: [],
           awards: [],
           votesByAward: {},
-          owner: {
+          maker: {
             id: newRecord.user_id,
             displayName: `User-${newRecord.user_id.slice(0, 8)}`
           }
@@ -444,8 +444,8 @@ export const useRacers = () => {
       if (bracketsData.error) throw bracketsData.error
       if (checkinsData.error) throw checkinsData.error
 
-      // Get owner info
-      let ownerInfo = {
+      // Get maker info
+      let makerInfo = {
         id: racerData.user_id,
         email: 'Unknown User',
         user_metadata: { username: 'Unknown User' }
@@ -453,7 +453,7 @@ export const useRacers = () => {
 
       // If this is the current user's racer, get their info from auth store
       if (racerData.user_id === authStore.userId && authStore.user) {
-        ownerInfo = {
+        makerInfo = {
           id: authStore.user.id,
           email: authStore.user.email,
           user_metadata: authStore.user.user_metadata || {}
@@ -463,7 +463,7 @@ export const useRacers = () => {
       // Cache the detailed racer data
       const detailedRacer = {
         ...racerData,
-        owner: ownerInfo,
+        maker: makerInfo,
         qualifiers: qualifiersData.data || [],
         awards: awardsData.data || [],
         brackets: bracketsData.data || [],

@@ -30,8 +30,10 @@
                 <AutoComplete
                   v-model="searchQuery"
                   :suggestions="searchSuggestions"
-                  placeholder="Search by name, ID, or owner..."
+                  placeholder="Search by name, ID, or maker..."
                   class="w-full"
+                  style="width: 100%"
+                  input-style="width: 100%"
                   :complete-on-focus="true"
                   option-label="name"
                   :force-selection="false"
@@ -471,9 +473,9 @@ const filteredRacers = computed(() => {
     result = result.filter((racer) => {
       const name = racer.name?.toLowerCase() || ''
       const idNumber = racer.racer_number?.toString()?.toLowerCase() || ''
-      const owner = racer.owner?.displayName?.toLowerCase() || ''
+      const maker = racer.maker?.displayName?.toLowerCase() || ''
 
-      return name.includes(query) || idNumber.includes(query) || owner.includes(query)
+      return name.includes(query) || idNumber.includes(query) || maker.includes(query)
     })
   }
 
@@ -563,9 +565,9 @@ const searchRacers = (event) => {
     .filter((racer) => {
       const name = racer.name?.toLowerCase() || ''
       const idNumber = racer.racer_number?.toString()?.toLowerCase() || ''
-      const owner = racer.owner?.displayName?.toLowerCase() || ''
+      const maker = racer.maker?.displayName?.toLowerCase() || ''
 
-      return name.includes(query) || idNumber.includes(query) || owner.includes(query)
+      return name.includes(query) || idNumber.includes(query) || maker.includes(query)
     })
     .slice(0, 10) // Limit to 10 suggestions
 
