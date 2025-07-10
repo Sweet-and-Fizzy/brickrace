@@ -265,26 +265,9 @@ const createRace = async () => {
   loading.value = true
 
   try {
-    // Combine date and time into a full datetime
-    let raceDateTime = null
-    if (form.value.date && form.value.time) {
-      // Create a datetime by combining the date and time
-      const dateOnly = new Date(form.value.date)
-      const timeOnly = new Date(form.value.time)
-
-      raceDateTime = new Date(
-        dateOnly.getFullYear(),
-        dateOnly.getMonth(),
-        dateOnly.getDate(),
-        timeOnly.getHours(),
-        timeOnly.getMinutes(),
-        timeOnly.getSeconds()
-      )
-    }
-
     const raceData = {
       name: form.value.name.trim(),
-      race_datetime: raceDateTime ? raceDateTime.toISOString() : null,
+      date: form.value.date ? new Date(form.value.date).toISOString().split('T')[0] : null,
       image_url: form.value.image_url?.trim() || null
     }
 

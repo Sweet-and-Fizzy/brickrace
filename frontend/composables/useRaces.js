@@ -25,9 +25,9 @@ export const useRaces = () => {
     return new Date(dateString).toISOString().split('T')[0]
   }
 
-  // Get race datetime (prefers race_datetime over date)
+  // Get race date
   const getRaceDateTime = (race) => {
-    return race.race_datetime || race.date
+    return race.date
   }
 
   // Format race datetime for display

@@ -104,20 +104,31 @@
                 >
                   Race Image
                 </label>
-                <FileUpload
-                  mode="basic"
+
+                <!-- Hidden file input -->
+                <input
+                  ref="fileInput"
+                  type="file"
                   accept="image/*"
-                  :max-file-size="2000000"
-                  choose-label="Choose Image"
+                  class="hidden"
+                  @change="handleImageUpload"
+                >
+
+                <!-- Custom upload button -->
+                <Button
+                  type="button"
+                  severity="secondary"
+                  outlined
+                  :loading="uploading"
                   class="w-full"
-                  @select="handleImageUpload"
-                />
+                  @click="openFileDialog"
+                >
+                  <i class="pi pi-upload mr-2" />
+                  {{ uploading ? 'Uploading...' : 'Choose Image' }}
+                </Button>
+
                 <p class="mt-1 text-sm text-gray-500">JPG, PNG, GIF up to 2MB</p>
 
-                <p v-if="uploading" class="mt-2 text-sm text-blue-600">
-                  <i class="pi pi-spin pi-spinner mr-1" />
-                  Uploading image...
-                </p>
                 <p v-if="uploadError" class="mt-2 text-sm text-red-600">{{ uploadError }}</p>
               </div>
 
@@ -180,6 +191,7 @@ const loading = ref(false)
 const errors = ref({})
 const uploading = ref(false)
 const uploadError = ref('')
+const fileInput = ref(null)
 
 // Breadcrumb navigation
 const breadcrumbItems = computed(() => [
@@ -265,9 +277,14 @@ const validateForm = () => {
   return Object.keys(errors.value).length === 0
 }
 
+// Open file dialog
+const openFileDialog = () => {
+  fileInput.value?.click()
+}
+
 // Handle image upload
 const handleImageUpload = async (event) => {
-  const file = event.files ? event.files[0] : event.target?.files?.[0]
+  const file = event.target?.files?.[0]
   if (!file) return
 
   // Validate file size (2MB limit)
@@ -301,6 +318,11 @@ const handleImageUpload = async (event) => {
 
     // Set the image URL in the form
     form.value.image_url = urlData.publicUrl
+
+    // Clear the file input for future uploads
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
   } catch (error) {
     console.error('Error uploading image:', error)
     uploadError.value = 'Failed to upload image. Please try again.'
@@ -316,26 +338,9 @@ const updateRace = async () => {
   loading.value = true
 
   try {
-    // Combine date and time into a full datetime
-    let raceDateTime = null
-    if (form.value.date && form.value.time) {
-      // Create a datetime by combining the date and time
-      const dateOnly = new Date(form.value.date)
-      const timeOnly = new Date(form.value.time)
-
-      raceDateTime = new Date(
-        dateOnly.getFullYear(),
-        dateOnly.getMonth(),
-        dateOnly.getDate(),
-        timeOnly.getHours(),
-        timeOnly.getMinutes(),
-        timeOnly.getSeconds()
-      )
-    }
-
     const raceData = {
       name: form.value.name.trim(),
-      race_datetime: raceDateTime ? raceDateTime.toISOString() : null,
+      date: form.value.date ? new Date(form.value.date).toISOString().split('T')[0] : null,
       image_url: form.value.image_url?.trim() || null,
       updated_at: new Date().toISOString()
     }

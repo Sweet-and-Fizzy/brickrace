@@ -139,44 +139,62 @@
           <!-- Admin Controls - Clean Dropdown -->
           <div v-if="authStore.isRaceAdmin" class="mt-4 md:mt-0">
             <div class="relative">
-              <Button 
-                @click="showAdminMenu = !showAdminMenu"
-                severity="secondary" 
+              <Button
+                severity="secondary"
                 outlined
                 size="small"
+                @click="showAdminMenu = !showAdminMenu"
               >
                 <i class="pi pi-cog mr-2" />
                 Admin
-                <i :class="showAdminMenu ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" class="ml-2" />
+                <i
+                  :class="showAdminMenu ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
+                  class="ml-2"
+                />
               </Button>
-              
+
               <!-- Admin Dropdown Menu -->
-              <div 
-                v-if="showAdminMenu" 
+              <div
+                v-if="showAdminMenu"
                 class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50"
                 @click="showAdminMenu = false"
               >
                 <div class="py-2">
                   <template v-if="race.active">
-                    <NuxtLink :to="`/races/${race.id}/checkin`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <NuxtLink
+                      :to="`/races/${race.id}/checkin`"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
                       <i class="pi pi-check mr-2 text-green-600" />
                       Check-in Racers
                     </NuxtLink>
-                    <NuxtLink :to="`/races/${race.id}/qualifiers`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <NuxtLink
+                      :to="`/races/${race.id}/qualifiers`"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
                       <i class="pi pi-clock mr-2 text-blue-600" />
                       Qualifiers
                     </NuxtLink>
-                    <NuxtLink :to="`/races/${race.id}/brackets`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <NuxtLink
+                      :to="`/races/${race.id}/brackets`"
+                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
                       <i class="pi pi-sitemap mr-2 text-purple-600" />
                       Brackets
                     </NuxtLink>
-                    <hr class="my-2 border-gray-200 dark:border-gray-600" />
+                    <hr class="my-2 border-gray-200 dark:border-gray-600" >
                   </template>
-                  <NuxtLink :to="`/races/${race.id}/edit`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <NuxtLink
+                    :to="`/races/${race.id}/edit`"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                     <i class="pi pi-pencil mr-2 text-gray-600" />
                     Edit Race
                   </NuxtLink>
-                  <NuxtLink :to="`/admin/photos?race=${race.id}`" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                  <NuxtLink
+                    :to="`/admin/photos?race=${race.id}`"
+                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
                     <i class="pi pi-images mr-2 text-blue-600" />
                     Manage Photos
                   </NuxtLink>
@@ -184,6 +202,15 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Race Image -->
+        <div v-if="race.image_url" class="mb-8">
+          <img
+            :src="race.image_url"
+            :alt="race.name"
+            class="w-full h-64 md:h-96 object-cover rounded-lg shadow-sm"
+          >
         </div>
 
         <!-- Race Process Steps -->
@@ -205,14 +232,20 @@
             <!-- Mobile: Vertical Timeline -->
             <div class="block md:hidden">
               <!-- Current Step Highlight -->
-              <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-600 rounded-lg p-4 mb-4">
+              <div
+                class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-600 rounded-lg p-4 mb-4"
+              >
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center">
+                  <div
+                    class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center"
+                  >
                     <i :class="raceSteps[currentStep]?.icon" />
                   </div>
                   <div>
                     <p class="font-semibold text-blue-900 dark:text-blue-100">Current Step</p>
-                    <p class="text-sm text-blue-700 dark:text-blue-300">{{ raceSteps[currentStep]?.label }}</p>
+                    <p class="text-sm text-blue-700 dark:text-blue-300">
+                      {{ raceSteps[currentStep]?.label }}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -224,31 +257,34 @@
                   <span>{{ Math.round(((currentStep + 1) / raceSteps.length) * 100) }}%</span>
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                  <div 
+                  <div
                     class="bg-blue-600 h-2 rounded-full transition-all duration-300"
                     :style="{ width: `${((currentStep + 1) / raceSteps.length) * 100}%` }"
-                  ></div>
+                  />
                 </div>
               </div>
 
               <!-- Compact Steps List -->
               <div class="space-y-2">
-                <div 
-                  v-for="(step, index) in raceSteps" 
+                <div
+                  v-for="(step, index) in raceSteps"
                   :key="index"
                   class="flex items-center gap-3 p-2 rounded-lg transition-colors"
                   :class="{
-                    'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200': index < currentStep,
-                    'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200': index === currentStep,
+                    'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200':
+                      index < currentStep,
+                    'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200':
+                      index === currentStep,
                     'text-gray-500 dark:text-gray-400': index > currentStep
                   }"
                 >
-                  <div 
+                  <div
                     class="w-6 h-6 rounded-full flex items-center justify-center text-xs"
                     :class="{
                       'bg-green-600 text-white': index < currentStep,
                       'bg-blue-600 text-white': index === currentStep,
-                      'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300': index > currentStep
+                      'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300':
+                        index > currentStep
                     }"
                   >
                     <i v-if="index < currentStep" class="pi pi-check" />
@@ -591,17 +627,6 @@
               </template>
             </Card>
 
-            <!-- Race Image -->
-            <Card v-if="race.image_url">
-              <template #header>
-                <img
-                  :src="race.image_url"
-                  :alt="race.name"
-                  class="w-full h-64 md:h-96 object-cover"
-                >
-              </template>
-            </Card>
-
             <!-- Qualifiers Results -->
             <Card v-if="qualifiers.length">
               <template #title>
@@ -700,7 +725,6 @@
                 </div>
               </template>
             </Card>
-
           </div>
 
           <!-- Sidebar -->
@@ -720,7 +744,9 @@
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Bracket Races</span>
-                    <span class="font-semibold">{{ getBracketsForRace(route.params.id).length }}</span>
+                    <span class="font-semibold">{{
+                      getBracketsForRace(route.params.id).length
+                    }}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Fastest Time</span>
@@ -790,18 +816,12 @@ const route = useRoute()
 const authStore = useAuthStore()
 
 // Use reactive composables for all data
-const { getPhotosByRace } = usePhotos()
 
-const {
-  races,
-  fetchRaceById,
-  loading,
-  initialize: initializeRaces
-} = useRaces()
+const { races, fetchRaceById, loading, initialize: initializeRaces } = useRaces()
 
 const { qualifiers, formatTime, initialize: initializeQualifiers } = useQualifiers(route.params.id)
 
-const { brackets, getBracketsForRace, initialize: initializeBrackets } = useBrackets()
+const { getBracketsForRace, initialize: initializeBrackets } = useBrackets()
 
 const {
   checkins: checkinsData,
@@ -810,27 +830,16 @@ const {
   initialize: initializeCheckins
 } = useCheckins()
 
-const {
-  voteableAwards,
-  getAwardLeaderboard,
-  initialize: initializeAwards
-} = useAwards()
+const { voteableAwards, getAwardLeaderboard, initialize: initializeAwards } = useAwards()
 
 // Local state
 const race = ref(null)
-const showUploadDialog = ref(false)
 const showAdminMenu = ref(false)
 const error = ref(null)
 
 // Separate loading states for progressive loading
 const raceDataLoading = ref(true)
 const isLoading = computed(() => raceDataLoading.value)
-
-// Reactive race photos computed from composable
-const racePhotos = computed(() => {
-  if (!race.value?.id) return []
-  return getPhotosByRace(race.value.id)
-})
 
 // Reactive checkins with racer data
 const checkins = computed(() => {
@@ -1214,26 +1223,6 @@ const getTournamentPlacings = (bracketType) => {
 // Photo management computed properties
 // recentRacePhotos functionality is now handled by racePhotos computed property
 
-const racerPhotosCount = computed(() => {
-  return racePhotos.value.filter((photo) => photo.type === 'racer').length
-})
-
-const generalPhotosCount = computed(() => {
-  return racePhotos.value.filter((photo) => photo.type === 'general').length
-})
-
-const featuredPhotosCount = computed(() => {
-  return racePhotos.value.filter((photo) => photo.featured).length
-})
-
-const pendingRacePhotos = computed(() => {
-  return racePhotos.value.filter((photo) => !photo.status || photo.status === 'pending').length
-})
-
-const racePhotosCount = computed(() => {
-  return racePhotos.value.length
-})
-
 // Reactive award leaderboards for the current race
 const awardLeaderboards = computed(() => {
   if (!race.value?.id || !voteableAwards.value.length) return {}
@@ -1274,26 +1263,6 @@ const getWinner = (bracket) => {
     return bracket.track1_time > bracket.track2_time
       ? bracket.track1_racer_name
       : bracket.track2_racer_name
-  }
-}
-
-// Photo management functions
-const getPhotoStatusSeverity = (status) => {
-  switch (status) {
-    case 'approved':
-      return 'success'
-    case 'rejected':
-      return 'danger'
-    case 'pending':
-    default:
-      return 'warning'
-  }
-}
-
-const viewPhotoInGallery = (photo) => {
-  // Open photo in preview
-  if (photo.racerId) {
-    navigateTo(`/racers/${photo.racerId}`)
   }
 }
 
