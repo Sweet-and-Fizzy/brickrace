@@ -145,7 +145,7 @@
       <!-- Racers DataView -->
       <div
         v-else-if="filteredRacers.length"
-        class="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-lg p-6"
+        class="p-6"
       >
         <DataView
           :value="filteredRacers"
