@@ -378,7 +378,7 @@
                     :alt="item.alt"
                     class="max-w-full max-h-full object-contain"
                     style="max-height: 80vh; max-width: 90vw"
-                  >
+                  />
                 </div>
               </template>
             </Galleria>
@@ -423,7 +423,7 @@
                         :src="award.award_definition.image_url"
                         :alt="award.award_definition.name"
                         class="w-full aspect-square object-cover rounded border border-gray-300 dark:border-gray-600"
-                      >
+                      />
                       <div
                         v-else
                         class="w-full aspect-square bg-gray-100 dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 flex items-center justify-center"

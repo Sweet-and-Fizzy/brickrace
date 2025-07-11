@@ -25,13 +25,13 @@
           <Skeleton :width="'80%'" height="1.5rem" />
         </div>
       </template>
-      
+
       <template v-if="variant === 'race'" #subtitle>
         <div class="px-4 pb-2">
           <Skeleton :width="'60%'" height="1rem" />
         </div>
       </template>
-      
+
       <template v-if="variant === 'race'" #footer>
         <div class="px-4 pb-4 space-y-3">
           <div class="flex justify-between items-center">
@@ -57,13 +57,13 @@
             <div class="flex gap-2 flex-wrap">
               <Skeleton width="6rem" height="1rem" />
             </div>
-            
+
             <!-- Awards Badges Skeleton -->
             <div class="flex gap-2 flex-wrap">
               <Skeleton width="4rem" height="1rem" />
               <Skeleton v-if="showFooter" width="5rem" height="1rem" />
             </div>
-            
+
             <!-- Vote Counts Skeleton -->
             <div v-if="showFooter" class="flex gap-2 flex-wrap">
               <Skeleton width="3rem" height="1rem" />

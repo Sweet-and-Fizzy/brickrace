@@ -180,7 +180,7 @@
                       <i class="pi pi-sitemap mr-2 text-purple-600" />
                       Brackets
                     </NuxtLink>
-                    <hr class="my-2 border-gray-200 dark:border-gray-600" >
+                    <hr class="my-2 border-gray-200 dark:border-gray-600" />
                   </template>
                   <NuxtLink
                     :to="`/races/${race.id}/edit`"
@@ -208,7 +208,7 @@
             :src="race.image_url"
             :alt="race.name"
             class="w-full h-64 md:h-96 object-cover rounded-lg shadow-sm"
-          >
+          />
         </div>
 
         <!-- Race Process Steps -->
@@ -563,19 +563,40 @@
                     :key="award.id"
                     class="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800"
                   >
-                    <div class="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white">{{ award.name }}</h3>
+                    <div class="flex items-start gap-4 mb-4">
+                      <!-- Award Image -->
+                      <div class="flex-shrink-0">
+                        <Image
+                          v-if="award.image_url"
+                          :src="award.image_url"
+                          :alt="award.name"
+                          image-class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600"
+                          class="w-16 h-16"
+                          preview
+                        />
+                        <div
+                          v-else
+                          class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center rounded-lg border-2 border-gray-200 dark:border-gray-600"
+                        >
+                          <i class="pi pi-trophy text-2xl text-red-500" />
+                        </div>
+                      </div>
+
+                      <!-- Award Info -->
+                      <div class="flex-1">
+                        <div class="flex items-center justify-between mb-2">
+                          <h3 class="font-bold text-gray-900 dark:text-white">{{ award.name }}</h3>
+                          <NuxtLink
+                            to="/awards"
+                            class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          >
+                            Vote Now →
+                          </NuxtLink>
+                        </div>
                         <p class="text-sm text-gray-600 dark:text-gray-300">
                           {{ award.description }}
                         </p>
                       </div>
-                      <NuxtLink
-                        to="/awards"
-                        class="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                      >
-                        Vote Now →
-                      </NuxtLink>
                     </div>
 
                     <!-- Current Vote Leaders -->
@@ -699,7 +720,7 @@
                         :src="checkin.racer_image_url"
                         :alt="checkin.racer_name"
                         class="w-12 h-12 object-cover rounded-full border-2 border-green-300"
-                      >
+                      />
                       <div
                         v-else
                         class="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-full border-2 border-green-300 flex items-center justify-center"
@@ -720,6 +741,72 @@
                       </p>
                     </div>
                   </NuxtLink>
+                </div>
+              </template>
+            </Card>
+
+            <!-- Race Photo Gallery -->
+            <Card v-if="racePhotos.length > 0">
+              <template #title>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <i class="pi pi-images" />
+                  Race Photos
+                </h2>
+              </template>
+              <template #content>
+                <div class="space-y-6">
+                  <!-- Filter Controls -->
+                  <div
+                    class="flex items-center justify-between border-b border-gray-200 dark:border-gray-600 pb-4"
+                  >
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {{ filteredRacePhotos.length }} photo{{
+                        filteredRacePhotos.length !== 1 ? 's' : ''
+                      }}
+                    </span>
+                    <Select
+                      v-model="selectedPhotoRacer"
+                      :options="racerFilterOptions"
+                      option-label="name"
+                      option-value="id"
+                      placeholder="Filter by racer"
+                      class="w-48"
+                      show-clear
+                      filter
+                    />
+                  </div>
+
+                  <PhotoGallery
+                    :photos="paginatedRacePhotos"
+                    :title="''"
+                    :show-empty-state="false"
+                    :enable-featured-section="false"
+                    :show-contribution-links="false"
+                    :show-thumbnails="false"
+                  />
+
+                  <!-- Pagination -->
+                  <div v-if="photoTotalPages > 1" class="flex justify-center">
+                    <Paginator
+                      v-model:first="currentPhotoPage"
+                      v-model:rows="photosPerPage"
+                      :total-records="filteredRacePhotos.length"
+                      :rows-per-page-options="[6, 9, 12, 18]"
+                      template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                    />
+                  </div>
+
+                  <!-- See All Photos Link -->
+                  <div class="text-center pt-4 border-t border-gray-200 dark:border-gray-600">
+                    <NuxtLink
+                      to="/gallery"
+                      class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 font-medium transition-colors"
+                    >
+                      <i class="pi pi-images" />
+                      See all photos
+                      <i class="pi pi-arrow-right" />
+                    </NuxtLink>
+                  </div>
                 </div>
               </template>
             </Card>
@@ -830,10 +917,16 @@ const {
 
 const { voteableAwards, getAwardLeaderboard, initialize: initializeAwards } = useAwards()
 
+// Photo management
+const { getPhotosByRace, allPhotos, initialize: initializePhotos } = usePhotos()
+
 // Local state
 const race = ref(null)
 const showAdminMenu = ref(false)
 const error = ref(null)
+const selectedPhotoRacer = ref(null)
+const currentPhotoPage = ref(0)
+const photosPerPage = ref(9)
 
 // Separate loading states for progressive loading
 const raceDataLoading = ref(true)
@@ -1219,7 +1312,70 @@ const getTournamentPlacings = (bracketType) => {
 }
 
 // Photo management computed properties
-// recentRacePhotos functionality is now handled by racePhotos computed property
+const racePhotos = computed(() => {
+  if (!race.value?.id) return []
+
+  // Get general photos for this race
+  const generalPhotos = getPhotosByRace(race.value.id).filter(
+    (photo) => photo.status === 'approved'
+  )
+
+  // Get racer photos from racers who are checked in for this race
+  const checkedInRacerIds = checkins.value.map((checkin) => checkin.racer_id)
+  const racerPhotos = allPhotos.value.filter(
+    (photo) =>
+      photo.type === 'racer' &&
+      photo.status === 'approved' &&
+      checkedInRacerIds.includes(photo.racerId)
+  )
+
+  // Combine both types of photos
+  return [...generalPhotos, ...racerPhotos]
+})
+
+const racerFilterOptions = computed(() => {
+  // Get unique racers from race photos
+  const racers = new Map()
+  racePhotos.value.forEach((photo) => {
+    if (photo.type === 'racer' && photo.racerId && photo.racerName) {
+      racers.set(photo.racerId, {
+        id: photo.racerId,
+        name: photo.racerName,
+        number: photo.racerNumber
+      })
+    }
+  })
+
+  // Convert to array and sort by name
+  return Array.from(racers.values()).sort((a, b) => a.name.localeCompare(b.name))
+})
+
+const filteredRacePhotos = computed(() => {
+  let photos = racePhotos.value
+
+  // Filter by selected racer
+  if (selectedPhotoRacer.value) {
+    // Handle both object and ID formats from AutoComplete
+    const racerId =
+      typeof selectedPhotoRacer.value === 'object'
+        ? selectedPhotoRacer.value.id
+        : selectedPhotoRacer.value
+
+    photos = photos.filter((photo) => photo.type === 'racer' && photo.racerId === racerId)
+  }
+
+  return photos
+})
+
+const paginatedRacePhotos = computed(() => {
+  const start = currentPhotoPage.value
+  const end = start + photosPerPage.value
+  return filteredRacePhotos.value.slice(start, end)
+})
+
+const photoTotalPages = computed(() =>
+  Math.ceil(filteredRacePhotos.value.length / photosPerPage.value)
+)
 
 // Reactive award leaderboards for the current race
 const awardLeaderboards = computed(() => {
@@ -1264,6 +1420,11 @@ const getWinner = (bracket) => {
   }
 }
 
+// Watch for filter changes to reset pagination
+watch(selectedPhotoRacer, () => {
+  currentPhotoPage.value = 0
+})
+
 // Initialize auth and fetch data
 onMounted(async () => {
   await authStore.initAuth()
@@ -1288,7 +1449,8 @@ onMounted(async () => {
     initializeQualifiers(),
     initializeBrackets(),
     initializeCheckins(),
-    initializeAwards()
+    initializeAwards(),
+    initializePhotos()
   ])
 
   // Race data is now available, hide main loading

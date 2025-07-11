@@ -312,7 +312,7 @@
             :src="editingPhoto.url"
             :alt="editingPhoto.description || 'Photo'"
             class="max-w-full max-h-48 rounded-lg mx-auto"
-          >
+          />
         </div>
 
         <!-- Description Field -->

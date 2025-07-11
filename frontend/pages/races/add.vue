@@ -121,7 +121,7 @@
                       alt="Race preview"
                       class="max-w-xs rounded-lg shadow-md"
                       @error="form.image_url = ''"
-                    >
+                    />
                   </div>
                 </div>
               </Panel>

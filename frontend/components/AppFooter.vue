@@ -9,7 +9,7 @@
               src="~/assets/img/brick_race_logo.jpg"
               alt="The Great Holyoke Brick Race Logo"
               class="h-14 w-auto object-contain rounded"
-            >
+            />
             <span class="site-name text-2xl font-bold">The Great Holyoke Brick Race</span>
           </div>
           <p class="text-gray-300 max-w-2xl text-lg">

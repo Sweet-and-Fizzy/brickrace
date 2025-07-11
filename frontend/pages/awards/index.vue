@@ -61,7 +61,11 @@
         <div>
           <Skeleton width="15rem" height="2rem" class="mb-6" />
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card v-for="n in 3" :key="n" class="hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+            <Card
+              v-for="n in 3"
+              :key="n"
+              class="hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
+            >
               <template #header>
                 <div class="relative">
                   <Skeleton width="100%" height="20rem" />
@@ -92,7 +96,11 @@
         <div>
           <Skeleton width="18rem" height="2rem" class="mb-6" />
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Card v-for="n in 2" :key="n + 10" class="border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 dark:border-yellow-500 hover:shadow-2xl transition-all duration-300 rounded-lg overflow-hidden">
+            <Card
+              v-for="n in 2"
+              :key="n + 10"
+              class="border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 dark:border-yellow-500 hover:shadow-2xl transition-all duration-300 rounded-lg overflow-hidden"
+            >
               <template #header>
                 <div class="relative">
                   <Skeleton width="100%" height="20rem" />
@@ -110,7 +118,9 @@
               <template #content>
                 <div class="px-6 pb-6 space-y-3">
                   <!-- Winner display skeleton -->
-                  <div class="flex items-center gap-3 p-3 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-lg">
+                  <div
+                    class="flex items-center gap-3 p-3 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-lg"
+                  >
                     <Skeleton width="3rem" height="3rem" class="rounded-full" />
                     <div class="space-y-1 flex-1">
                       <Skeleton width="60%" height="1rem" />
@@ -217,7 +227,7 @@
                                 :src="slotProps.option.image_url"
                                 :alt="slotProps.option.name"
                                 class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-                              >
+                              />
                               <div
                                 v-else
                                 class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-mono font-bold"
@@ -250,7 +260,7 @@
                               :src="getSelectedRacer(slotProps.value)?.image_url"
                               :alt="getSelectedRacer(slotProps.value)?.name"
                               class="w-6 h-6 rounded-full object-cover"
-                            >
+                            />
                             <div
                               v-else
                               class="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-mono font-bold"

@@ -8,7 +8,7 @@
             src="~/assets/img/brick_race_logo.jpg"
             alt="Brick Race Logo"
             class="h-8 w-auto object-contain rounded"
-          >
+          />
           <span class="font-bold text-lg">The Great Holyoke Brick Race</span>
         </div>
       </template>
@@ -96,7 +96,7 @@
                   src="~/assets/img/brick_race_logo.jpg"
                   alt="Brick Race Logo"
                   class="h-10 w-auto object-contain rounded"
-                >
+                />
                 <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
                   The Great Holyoke Brick Race
                 </span>
@@ -215,7 +215,7 @@
                     src="~/assets/img/brick_race_logo.jpg"
                     alt="Brick Race Logo"
                     class="h-10 w-auto object-contain rounded"
-                  >
+                  />
                   <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
                     The Great Holyoke Brick Race
                   </span>
@@ -290,7 +290,7 @@
                 src="~/assets/img/brick_race_logo.jpg"
                 alt="Brick Race Logo"
                 class="h-8 w-auto object-contain rounded"
-              >
+              />
               <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
                 The Great Holyoke Brick Race
               </span>

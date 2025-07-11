@@ -28,17 +28,16 @@
           <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <!-- Search and Filters -->
             <div class="flex flex-col sm:flex-row gap-3 flex-1">
-              <div class="flex-1">
+              <div class="flex-1 relative">
+                <i
+                  class="pi pi-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                />
                 <InputText
                   v-model="searchQuery"
                   placeholder="Search photos..."
-                  class="w-full"
+                  class="w-full pl-10"
                   @input="onSearchChange"
-                >
-                  <template #prefix>
-                    <i class="pi pi-search" />
-                  </template>
-                </InputText>
+                />
               </div>
 
               <Select
@@ -46,8 +45,8 @@
                 :options="categoryOptions"
                 option-label="label"
                 option-value="value"
-                placeholder="All Categories"
-                class="w-full sm:w-48"
+                placeholder="Category"
+                class="w-full sm:w-32"
                 show-clear
                 @change="applyFilters"
               />
@@ -57,9 +56,21 @@
                 :options="raceOptions"
                 option-label="name"
                 option-value="id"
-                placeholder="All Races"
-                class="w-full sm:w-48"
+                placeholder="Race"
+                class="w-full sm:w-32"
                 show-clear
+                @change="applyFilters"
+              />
+
+              <Select
+                v-model="selectedRacer"
+                :options="racerOptions"
+                option-label="name"
+                option-value="id"
+                placeholder="Racer"
+                class="w-full sm:w-32"
+                show-clear
+                filter
                 @change="applyFilters"
               />
             </div>
@@ -142,14 +153,11 @@
             >
               <div v-if="photo.subtitle" class="flex items-center gap-2">
                 <div
-                  class="bg-white text-gray-800 px-2 py-1 text-xs font-semibold border-2 border-gray-300 shadow-lg"
+                  class="bg-white text-gray-800 px-2 py-1 text-xs font-semibold border-2 border-gray-300"
                   style="
                     border-radius: 8px 8px 8px 0;
                     font-family: 'Inter', sans-serif;
                     letter-spacing: 0.05em;
-                    box-shadow:
-                      0 2px 4px rgba(0, 0, 0, 0.15),
-                      0 0 0 1px rgba(0, 0, 0, 0.05);
                     min-width: 32px;
                     text-align: center;
                   "
@@ -164,7 +172,7 @@
             <!-- Featured Badge -->
             <div
               v-if="photo.featured"
-              class="absolute top-3 right-3 bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+              class="absolute top-3 right-3 bg-gradient-to-br from-red-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center border-2 border-red-400"
             >
               <i class="pi pi-star text-sm" />
             </div>
@@ -178,7 +186,7 @@
         <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No Photos Found</h3>
         <p class="text-gray-500 dark:text-gray-500 mb-6">
           {{
-            searchQuery || selectedCategory || selectedRace
+            searchQuery || selectedCategory || selectedRace || selectedRacer
               ? 'Try adjusting your search criteria'
               : 'No photos have been uploaded yet'
           }}
@@ -211,6 +219,7 @@
 
     <!-- Photo Gallery Lightbox -->
     <Galleria
+      v-if="galleryImages.length > 0"
       v-model:visible="galleryVisible"
       v-model:active-index="activeImageIndex"
       :value="galleryImages"
@@ -232,7 +241,7 @@
             :alt="item.alt"
             class="max-w-full max-h-full object-contain"
             style="max-height: 85vh"
-          >
+          />
         </div>
       </template>
 
@@ -242,7 +251,7 @@
             :src="item.thumbnailImageSrc"
             :alt="item.alt"
             class="w-16 h-16 object-cover rounded"
-          >
+          />
         </div>
       </template>
 
@@ -250,16 +259,16 @@
         <div class="text-center p-4">
           <div v-if="item.subtitle" class="flex items-center justify-center gap-2 mb-2">
             <div
-              class="bg-white text-gray-800 px-3 py-1 text-sm font-semibold border-2 border-gray-300 shadow-lg"
+              class="bg-white text-gray-800 px-3 py-1 text-sm font-semibold border-2 border-gray-300"
               style="
-                border-radius: 12px 12px 12px 0;
-                font-family: 'Inter', sans-serif;
-                letter-spacing: 0.05em;
-                box-shadow:
-                  0 4px 8px rgba(0, 0, 0, 0.15),
-                  0 0 0 1px rgba(0, 0, 0, 0.05);
-                min-width: 40px;
-                text-align: center;
+                border-radius: 12px 12px 12px 0 !important;
+                font-family: 'Inter', sans-serif !important;
+                letter-spacing: 0.05em !important;
+                min-width: 40px !important;
+                text-align: center !important;
+                box-shadow: none !important;
+                filter: none !important;
+                drop-shadow: none !important;
               "
             >
               #{{ item.subtitle }}
@@ -293,6 +302,7 @@ const filteredPhotos = ref([])
 const searchQuery = ref('')
 const selectedCategory = ref(null)
 const selectedRace = ref(null)
+const selectedRacer = ref(null)
 const sortBy = ref('newest')
 const currentPage = ref(0)
 const photosPerPage = ref(20)
@@ -330,6 +340,23 @@ const galleryResponsiveOptions = ref([
 // Computed properties
 const totalPhotos = computed(() => approvedPhotos.value.length)
 
+const racerOptions = computed(() => {
+  // Get unique racers from approved photos
+  const racers = new Map()
+  approvedPhotos.value.forEach((photo) => {
+    if (photo.type === 'racer' && photo.racerId && photo.racerName) {
+      racers.set(photo.racerId, {
+        id: photo.racerId,
+        name: photo.racerName,
+        number: photo.racerNumber
+      })
+    }
+  })
+
+  // Convert to array and sort by name
+  return Array.from(racers.values()).sort((a, b) => a.name.localeCompare(b.name))
+})
+
 const activeFilters = computed(() => {
   const filters = []
   if (searchQuery.value) {
@@ -342,6 +369,10 @@ const activeFilters = computed(() => {
   if (selectedRace.value) {
     const race = raceOptions.value.find((r) => r.id === selectedRace.value)
     filters.push({ key: 'race', label: `Race: ${race?.name}` })
+  }
+  if (selectedRacer.value) {
+    const racer = racerOptions.value.find((r) => r.id === selectedRacer.value)
+    filters.push({ key: 'racer', label: `Racer: ${racer?.name}` })
   }
   return filters
 })
@@ -364,13 +395,7 @@ const galleryImages = computed(() => {
     description: photo.description,
     credit: photo.credit,
     featured: photo.featured,
-    hasCaption: !!(
-      photo.title ||
-      photo.subtitle ||
-      photo.description ||
-      photo.credit ||
-      photo.featured
-    )
+    hasCaption: !!(photo.title || photo.subtitle || photo.description || photo.credit)
   }))
 })
 
@@ -400,9 +425,21 @@ const applyFilters = () => {
     const query = searchQuery.value.toLowerCase()
     filtered = filtered.filter(
       (photo) =>
-        photo.title.toLowerCase().includes(query) ||
-        photo.subtitle.toLowerCase().includes(query) ||
-        (photo.description && photo.description.toLowerCase().includes(query))
+        (photo.title &&
+          typeof photo.title === 'string' &&
+          photo.title.toLowerCase().includes(query)) ||
+        (photo.subtitle &&
+          typeof photo.subtitle === 'string' &&
+          photo.subtitle.toLowerCase().includes(query)) ||
+        (photo.description &&
+          typeof photo.description === 'string' &&
+          photo.description.toLowerCase().includes(query)) ||
+        (photo.racerName &&
+          typeof photo.racerName === 'string' &&
+          photo.racerName.toLowerCase().includes(query)) ||
+        (photo.raceName &&
+          typeof photo.raceName === 'string' &&
+          photo.raceName.toLowerCase().includes(query))
     )
   }
 
@@ -414,6 +451,15 @@ const applyFilters = () => {
   // Apply race filter
   if (selectedRace.value) {
     filtered = filtered.filter((photo) => photo.raceId === selectedRace.value)
+  }
+
+  // Apply racer filter
+  if (selectedRacer.value) {
+    // Handle both object and ID formats from AutoComplete
+    const racerId =
+      typeof selectedRacer.value === 'object' ? selectedRacer.value.id : selectedRacer.value
+
+    filtered = filtered.filter((photo) => photo.type === 'racer' && photo.racerId === racerId)
   }
 
   filteredPhotos.value = filtered
@@ -446,6 +492,8 @@ const applySort = () => {
   }
 }
 
+let searchTimeout
+
 const onSearchChange = () => {
   // Debounce search
   clearTimeout(searchTimeout)
@@ -453,8 +501,6 @@ const onSearchChange = () => {
     applyFilters()
   }, 300)
 }
-
-let searchTimeout
 
 const removeFilter = (filter) => {
   switch (filter.key) {
@@ -467,6 +513,9 @@ const removeFilter = (filter) => {
     case 'race':
       selectedRace.value = null
       break
+    case 'racer':
+      selectedRacer.value = null
+      break
   }
   applyFilters()
 }
@@ -475,6 +524,7 @@ const clearAllFilters = () => {
   searchQuery.value = ''
   selectedCategory.value = null
   selectedRace.value = null
+  selectedRacer.value = null
   applyFilters()
 }
 
@@ -498,6 +548,11 @@ watch(
   { deep: true }
 )
 
+// Watch for racer filter changes to reset pagination
+watch(selectedRacer, () => {
+  currentPage.value = 0
+})
+
 useHead({
   title: 'Photo Gallery - The Great Holyoke Brick Race',
   meta: [
@@ -510,7 +565,7 @@ useHead({
 })
 </script>
 
-<style scoped>
+<style>
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -528,13 +583,149 @@ useHead({
   border: 2px solid #3b82f6;
 }
 
-:deep(.p-galleria-item-nav) {
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border-radius: 50%;
+/* Main galleria container - semi-transparent dark background for lightbox feel */
+.p-galleria {
+  background: rgba(0, 0, 0, 0.6) !important;
 }
 
-:deep(.p-galleria-item-nav:hover) {
-  background: rgba(0, 0, 0, 0.7);
+/* Thumbnail area - dark background */
+.p-galleria-thumbnails {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.p-galleria-thumbnails-content {
+  background: rgba(0, 0, 0, 0.8) !important;
+  padding: 0 !important;
+}
+
+.p-galleria-thumbnails-viewport {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.p-galleria-thumbnail-items {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Glass styling for thumbnail navigation buttons */
+:deep(.p-galleria-thumbnail-prev-button),
+:deep(.p-galleria-thumbnail-next-button) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  transition: all 0.3s ease !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+:deep(.p-galleria-thumbnail-prev-button:hover),
+:deep(.p-galleria-thumbnail-next-button:hover) {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Glass navigation buttons */
+.p-galleria-nav-button {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  transition: all 0.3s ease !important;
+  width: 56px !important;
+  height: 56px !important;
+}
+
+.p-galleria-nav-button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.1) !important;
+}
+
+.p-galleria-nav-button:active {
+  transform: scale(0.9) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Glass caption area - ultra subtle, only show if content exists */
+.p-galleria-caption {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Dark text shadow for better contrast on white text - but not on badges */
+.p-galleria-caption h5,
+.p-galleria-caption p {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 0 4px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Hide caption completely if it's empty */
+.p-galleria-caption:empty {
+  display: none !important;
+}
+
+/* Make the lightbox mask more opaque for better contrast */
+.p-galleria-mask {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Glass styling for close button */
+:deep(.p-galleria-close) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  transition: all 0.3s ease !important;
+  width: 56px !important;
+  height: 56px !important;
+}
+
+:deep(.p-galleria-close:hover) {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.1) !important;
 }
 </style>

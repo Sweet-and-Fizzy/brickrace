@@ -1,12 +1,5 @@
 <template>
   <div v-if="photos.length > 0" class="space-y-6">
-    <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-        {{ title || 'Photo Gallery' }}
-      </h3>
-      <Badge :value="`${photos.length} photo${photos.length !== 1 ? 's' : ''}`" />
-    </div>
-
     <!-- Featured Photos (if any) -->
     <div v-if="featuredPhotos.length > 0" class="space-y-4">
       <h4 class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
@@ -31,7 +24,7 @@
 
           <!-- Featured Badge -->
           <div
-            class="absolute top-2 right-2 bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+            class="absolute top-2 right-2 bg-gradient-to-br from-red-500 to-orange-600 text-white rounded-full w-8 h-8 flex items-center justify-center border-2 border-red-400"
           >
             <i class="pi pi-star text-sm" />
           </div>
@@ -55,7 +48,11 @@
       </h4>
 
       <div
-        class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
+        :class="
+          enableFeaturedSection
+            ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'
+            : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'
+        "
       >
         <div
           v-for="(photo, index) in photos"
@@ -66,19 +63,23 @@
           <Image
             :src="photo.url || photo"
             :alt="`Photo ${index + 1}`"
-            image-class="w-full h-24 object-cover rounded-lg border hover:border-blue-400 transition-colors"
+            :image-class="
+              enableFeaturedSection
+                ? 'w-full h-24 object-cover rounded-lg border hover:border-blue-400 transition-colors'
+                : 'w-full h-48 object-cover rounded-lg border hover:border-blue-400 transition-colors'
+            "
             :class="{
               'border-yellow-400': photo.featured,
               'border-gray-300 dark:border-gray-600': !photo.featured
             }"
-            class="w-full h-24"
+            :class-name="enableFeaturedSection ? 'w-full h-24' : 'w-full h-48'"
             :preview="false"
           />
 
           <!-- Featured Badge for small grid -->
           <div
             v-if="photo.featured"
-            class="absolute top-1 right-1 bg-yellow-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+            class="absolute top-1 right-1 bg-gradient-to-br from-red-500 to-orange-600 text-white rounded-full w-5 h-5 flex items-center justify-center border-2 border-red-400"
           >
             <i class="pi pi-star text-xs" />
           </div>
@@ -97,6 +98,8 @@
 
     <!-- Lightbox Gallery -->
     <Galleria
+      v-if="galleryImages.length > 0"
+      ref="galleryRef"
       v-model:visible="galleryVisible"
       v-model:active-index="activeImageIndex"
       :value="galleryImages"
@@ -106,10 +109,10 @@
       :circular="true"
       :full-screen="true"
       :show-item-navigators="true"
-      :show-thumbnails="true"
+      :show-thumbnails="showThumbnails"
       :show-item-navigators-on-hover="true"
-      :show-indicators="true"
-      :change-item-on-indicator-hover="true"
+      :show-indicators="false"
+      :change-item-on-indicator-hover="false"
     >
       <template #item="{ item }">
         <div class="flex justify-center items-center h-full">
@@ -118,7 +121,7 @@
             :alt="item.alt"
             class="max-w-full max-h-full object-contain"
             style="max-height: 80vh"
-          >
+          />
         </div>
       </template>
 
@@ -128,14 +131,19 @@
             :src="item.thumbnailImageSrc"
             :alt="item.alt"
             class="w-16 h-16 object-cover rounded"
-          >
+          />
         </div>
       </template>
 
       <template #caption="{ item }">
         <div v-if="item.title || item.featured" class="text-center p-4">
           <h5 v-if="item.title" class="text-white text-lg font-semibold mb-2">{{ item.title }}</h5>
-          <Badge v-if="item.featured" value="Featured Photo" severity="warning" />
+          <Badge
+            v-if="item.featured"
+            value="Featured Photo"
+            class="bg-gradient-to-br from-red-500 to-orange-600 text-white border-2 border-red-400"
+            style="box-shadow: none !important"
+          />
         </div>
       </template>
     </Galleria>
@@ -206,11 +214,16 @@ const props = defineProps({
   showContributionLinks: {
     type: Boolean,
     default: true
+  },
+  showThumbnails: {
+    type: Boolean,
+    default: true
   }
 })
 
 const galleryVisible = ref(false)
 const activeImageIndex = ref(0)
+const galleryRef = ref(null)
 
 // Responsive options for the gallery
 const galleryResponsiveOptions = ref([
@@ -251,7 +264,97 @@ const openGallery = (index) => {
 }
 </script>
 
-<style scoped>
+<style>
+/* Glass navigation buttons */
+.p-galleria-nav-button {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  transition: all 0.3s ease !important;
+  width: 56px !important;
+  height: 56px !important;
+}
+
+.p-galleria-nav-button:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.1) !important;
+}
+
+.p-galleria-nav-button:active {
+  transform: scale(0.9) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Glass caption area - ultra subtle, only show if content exists */
+.p-galleria-caption {
+  background: rgba(255, 255, 255, 0.03) !important;
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin: 0 !important;
+  padding: 12px 16px !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Dark text shadow for better contrast on white text - but not on badges */
+.p-galleria-caption h5,
+.p-galleria-caption p {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 0 4px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Hide caption completely if it's empty */
+.p-galleria-caption:empty {
+  display: none !important;
+}
+
+/* Make the lightbox mask more opaque for better contrast */
+.p-galleria-mask {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Glass styling for close button */
+:deep(.p-galleria-close) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  transition: all 0.3s ease !important;
+  width: 56px !important;
+  height: 56px !important;
+}
+
+:deep(.p-galleria-close:hover) {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.1) !important;
+}
+
 /* Custom styles for the gallery */
 :deep(.p-galleria-thumbnail-item) {
   border-radius: 0.5rem;
@@ -262,13 +365,151 @@ const openGallery = (index) => {
   border: 2px solid #3b82f6;
 }
 
-:deep(.p-galleria-item-nav) {
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border-radius: 50%;
+/* Main galleria container - semi-transparent dark background for lightbox feel */
+.p-galleria {
+  background: rgba(0, 0, 0, 0.6) !important;
 }
 
-:deep(.p-galleria-item-nav:hover) {
-  background: rgba(0, 0, 0, 0.7);
+/* Thumbnail area - dark background */
+.p-galleria-thumbnails {
+  background: rgba(0, 0, 0, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.p-galleria-thumbnails-content {
+  background: rgba(0, 0, 0, 0.8) !important;
+  padding: 0 !important;
+}
+
+.p-galleria-thumbnails-viewport {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.p-galleria-thumbnail-items {
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Glass styling for thumbnail navigation buttons */
+:deep(.p-galleria-thumbnail-prev-button),
+:deep(.p-galleria-thumbnail-next-button) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  transition: all 0.3s ease !important;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+:deep(.p-galleria-thumbnail-prev-button:hover),
+:deep(.p-galleria-thumbnail-next-button:hover) {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Glass navigation buttons - using maximum specificity */
+:deep(.p-galleria-mask .p-galleria-nav-button),
+:deep(.p-galleria-mask .p-galleria-next-button),
+:deep(.p-galleria-mask .p-galleria-prev-button),
+:deep(.p-galleria .p-galleria-nav-button),
+:deep(.p-galleria .p-galleria-next-button),
+:deep(.p-galleria .p-galleria-prev-button) {
+  background: rgba(255, 0, 0, 0.8) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 5px solid rgba(255, 255, 0, 0.9) !important;
+  color: white !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.4),
+    inset 0 2px 6px rgba(255, 255, 255, 0.7) !important;
+  transition: all 0.3s ease !important;
+  width: 80px !important;
+  height: 80px !important;
+}
+
+:deep(.p-galleria-mask .p-galleria-nav-button:hover),
+:deep(.p-galleria-mask .p-galleria-next-button:hover),
+:deep(.p-galleria-mask .p-galleria-prev-button:hover),
+:deep(.p-galleria .p-galleria-nav-button:hover),
+:deep(.p-galleria .p-galleria-next-button:hover),
+:deep(.p-galleria .p-galleria-prev-button:hover) {
+  background: rgba(0, 255, 0, 0.8) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 6px solid rgba(0, 255, 255, 0.9) !important;
+  box-shadow:
+    0 16px 60px rgba(0, 0, 0, 0.5),
+    inset 0 3px 8px rgba(255, 255, 255, 0.8) !important;
+  transform: scale(1.2) !important;
+}
+
+:deep(.p-galleria-mask .p-galleria-nav-button:active),
+:deep(.p-galleria-mask .p-galleria-next-button:active),
+:deep(.p-galleria-mask .p-galleria-prev-button:active),
+:deep(.p-galleria .p-galleria-nav-button:active),
+:deep(.p-galleria .p-galleria-next-button:active),
+:deep(.p-galleria .p-galleria-prev-button:active) {
+  background: rgba(255, 0, 255, 0.8) !important;
+  transform: scale(0.8) !important;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+}
+
+:deep(.p-galleria-caption) {
+  background: rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 3px solid rgba(255, 255, 255, 0.6) !important;
+  border-radius: 20px !important;
+  margin: 20px !important;
+  padding: 24px 32px !important;
+  box-shadow:
+    0 16px 64px rgba(0, 0, 0, 0.4),
+    inset 0 2px 8px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Additional specific selectors for navigation buttons */
+:deep(.p-galleria-item-nav-prev),
+:deep(.p-galleria-item-nav-next) {
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(15px) !important;
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 3px solid rgba(255, 255, 255, 0.7) !important;
+  color: white !important;
+  border-radius: 50% !important;
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.4),
+    inset 0 2px 6px rgba(255, 255, 255, 0.7) !important;
+  transition: all 0.3s ease !important;
+  width: 64px !important;
+  height: 64px !important;
+}
+
+:deep(.p-galleria-item-nav-prev:hover),
+:deep(.p-galleria-item-nav-next:hover) {
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 4px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow:
+    0 16px 60px rgba(0, 0, 0, 0.5),
+    inset 0 3px 8px rgba(255, 255, 255, 0.8) !important;
+  transform: scale(1.15) !important;
 }
 </style>

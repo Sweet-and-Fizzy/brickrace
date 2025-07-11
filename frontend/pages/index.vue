@@ -172,7 +172,7 @@
               src="~/assets/img/brick_race_logo.jpg"
               alt="The Great Holyoke Brick Race Logo"
               class="h-32 md:h-40 w-auto object-contain rounded-lg"
-            >
+            />
           </div>
           <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
             The Great Holyoke Brick Race
@@ -301,7 +301,7 @@
                     :src="item.itemImageSrc"
                     :alt="item.alt"
                     class="w-full h-96 object-cover rounded-lg shadow-lg"
-                  >
+                  />
 
                   <!-- Click to expand hint -->
                   <div
@@ -323,7 +323,7 @@
                     :src="item.thumbnailImageSrc"
                     :alt="item.alt"
                     class="w-20 h-16 object-cover rounded border-2 border-transparent hover:border-green-600 dark:hover:border-green-400 transition-colors cursor-pointer"
-                  >
+                  />
                 </div>
               </template>
             </Galleria>
@@ -389,7 +389,7 @@
             :alt="item.alt"
             class="max-w-full max-h-full object-contain"
             style="max-height: 90vh"
-          >
+          />
         </div>
       </template>
     </Galleria>

@@ -6,7 +6,14 @@
       <PageHeader title="All Races" :actions="headerActions" />
 
       <!-- Loading State -->
-      <LoadingGrid v-if="racesLoading" :count="6" :columns="3" header-height="12rem" show-footer variant="race" />
+      <LoadingGrid
+        v-if="racesLoading"
+        :count="6"
+        :columns="3"
+        header-height="12rem"
+        show-footer
+        variant="race"
+      />
 
       <!-- Races Grid -->
       <div v-else-if="races.length" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
