@@ -70,6 +70,12 @@ export const useCheckins = () => {
           race:races(
             id,
             name
+          ),
+          racer:racers(
+            id,
+            name,
+            racer_number,
+            image_url
           )
         `)
 

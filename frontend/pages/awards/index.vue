@@ -388,15 +388,51 @@
               </template>
               <template #subtitle>
                 <div class="px-6 pb-4">
-                  <p
-                    class="text-lg font-black text-yellow-800 dark:text-yellow-200"
-                    style="
-                      font-family: 'Courier New', monospace;
-                      text-shadow: 0 1px 2px rgba(245, 158, 11, 0.2);
-                    "
+                  <NuxtLink
+                    :to="`/racers/${award.racer.id}`"
+                    class="flex items-center gap-4 p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all duration-200 border border-yellow-300 dark:border-yellow-600"
                   >
-                    🏁 {{ award.racer.name }}
-                  </p>
+                    <!-- Racer Photo -->
+                    <div class="flex-shrink-0">
+                      <img
+                        v-if="award.racer.image_url"
+                        :src="award.racer.image_url"
+                        :alt="award.racer.name"
+                        class="w-16 h-16 rounded-full object-cover border-2 border-yellow-400 dark:border-yellow-500"
+                      />
+                      <div
+                        v-else
+                        class="w-16 h-16 bg-yellow-600 text-white flex items-center justify-center text-sm font-bold border-2 border-yellow-400 dark:border-yellow-500 rounded-full"
+                        style="font-family: 'Courier New', monospace"
+                      >
+                        #{{ award.racer.racer_number || '?' }}
+                      </div>
+                    </div>
+
+                    <!-- Racer Info -->
+                    <div class="flex-1">
+                      <p
+                        class="text-lg font-black text-yellow-800 dark:text-yellow-200"
+                        style="
+                          font-family: 'Courier New', monospace;
+                          text-shadow: 0 1px 2px rgba(245, 158, 11, 0.2);
+                        "
+                      >
+                        🏁 {{ award.racer.name }}
+                      </p>
+                      <p
+                        class="text-sm font-bold text-yellow-700 dark:text-yellow-300 mt-1"
+                        style="font-family: 'Courier New', monospace"
+                      >
+                        Racer #{{ award.racer.racer_number || 'N/A' }}
+                      </p>
+                    </div>
+
+                    <!-- Link Indicator -->
+                    <div class="flex-shrink-0">
+                      <i class="pi pi-external-link text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                  </NuxtLink>
                 </div>
               </template>
 
@@ -540,7 +576,8 @@ const authStore = useAuthStore()
 const toast = useToast()
 
 // Use reactive composables
-const { racers, loading, initialize: initializeRacers } = useRacers()
+const { initialize: initializeRacers } = useRacers()
+const { initialize: initializeCheckins, getCheckinsForRace } = useCheckins()
 const {
   awards: assignedAwards,
   loading: awardsLoading,
@@ -561,6 +598,32 @@ const activeRace = ref(null)
 const selectedRace = computed(() => activeRace.value?.id)
 const submittingVotes = ref({})
 const votes = ref({})
+
+// Get racers who are checked in for the active race
+const racers = computed(() => {
+  if (!activeRace.value?.id) return []
+
+  const raceCheckins = getCheckinsForRace(activeRace.value.id)
+  const checkedInRacers = []
+  const seen = new Set()
+
+  raceCheckins.forEach((checkin) => {
+    if (checkin.racer && checkin.racer.id && !seen.has(checkin.racer.id)) {
+      seen.add(checkin.racer.id)
+      checkedInRacers.push({
+        id: checkin.racer.id,
+        name: checkin.racer.name,
+        racer_number: checkin.racer.racer_number,
+        image_url: checkin.racer.image_url
+      })
+    }
+  })
+
+  // Sort by racer number for consistent ordering
+  const sortedRacers = checkedInRacers.sort((a, b) => (a.racer_number || 0) - (b.racer_number || 0))
+
+  return sortedRacers
+})
 
 // Pre-populate votes with user's existing selections
 const prePopulatedVotes = computed(() => {
@@ -686,7 +749,15 @@ const getSelectedRacer = (racerId) => {
 // Initialize
 onMounted(async () => {
   await authStore.initAuth()
-  await Promise.all([initializeRacers(), initializeAwards(), fetchActiveRace()])
+
+  // First fetch the active race, then initialize awards with race filter
+  await fetchActiveRace()
+
+  await Promise.all([
+    initializeRacers(),
+    initializeCheckins(),
+    initializeAwards({ raceId: activeRace.value?.id })
+  ])
 })
 
 // Note: Removed cleanup calls to prevent composable reloading on navigation

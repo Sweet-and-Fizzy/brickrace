@@ -28,6 +28,7 @@
               <Badge :value="`${approvedCount} Approved`" severity="success" />
               <Badge :value="`${rejectedCount} Rejected`" severity="danger" />
             </div>
+            <AdminMenu />
           </div>
         </div>
       </div>
@@ -325,7 +326,16 @@ const route = useRoute()
 const $toast = useToast()
 
 // Use composables
-const { allPhotos, loading, initialize: initializePhotos, fetchAllPhotos } = usePhotos()
+const {
+  allPhotos,
+  loading,
+  initialize: initializePhotos,
+  fetchAllPhotos,
+  approvePhoto,
+  rejectPhoto,
+  deletePhoto,
+  toggleFeatured
+} = usePhotos()
 const { races, initialize: initializeRaces } = useRaces()
 const { racers, initialize: initializeRacers } = useRacers()
 
@@ -569,7 +579,7 @@ const viewPhotoDetails = (photo) => {
 const handleApprovePhoto = async (photo) => {
   processingPhoto.value = photo.id
   try {
-    // TODO: Implement photo approval logic
+    await approvePhoto(photo)
     $toast.add({
       severity: 'success',
       summary: 'Photo Approved',
@@ -592,7 +602,7 @@ const handleApprovePhoto = async (photo) => {
 const handleRejectPhoto = async (photo) => {
   processingPhoto.value = photo.id
   try {
-    // TODO: Implement photo rejection logic
+    await rejectPhoto(photo)
     $toast.add({
       severity: 'info',
       summary: 'Photo Rejected',
@@ -615,8 +625,8 @@ const handleRejectPhoto = async (photo) => {
 const handleToggleFeatured = async (photo) => {
   processingPhoto.value = photo.id
   try {
-    // TODO: Implement toggle featured logic
-    const action = photo.featured ? 'unfeatured' : 'featured'
+    const newFeaturedStatus = await toggleFeatured(photo)
+    const action = newFeaturedStatus ? 'featured' : 'unfeatured'
     $toast.add({
       severity: 'success',
       summary: 'Photo Updated',
@@ -639,7 +649,7 @@ const handleToggleFeatured = async (photo) => {
 const handleDeletePhoto = async (photo) => {
   processingPhoto.value = photo.id
   try {
-    // TODO: Implement photo deletion logic
+    await deletePhoto(photo)
     $toast.add({
       severity: 'info',
       summary: 'Photo Deleted',

@@ -134,72 +134,8 @@
             </div>
           </div>
 
-          <!-- Admin Controls - Clean Dropdown -->
-          <div v-if="authStore.isRaceAdmin" class="mt-4 md:mt-0">
-            <div class="relative">
-              <Button
-                severity="secondary"
-                outlined
-                size="small"
-                @click="showAdminMenu = !showAdminMenu"
-              >
-                <i class="pi pi-cog mr-2" />
-                Admin
-                <i
-                  :class="showAdminMenu ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-                  class="ml-2"
-                />
-              </Button>
-
-              <!-- Admin Dropdown Menu -->
-              <div
-                v-if="showAdminMenu"
-                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50"
-                @click="showAdminMenu = false"
-              >
-                <div class="py-2">
-                  <template v-if="race.active">
-                    <NuxtLink
-                      :to="`/races/${race.id}/checkin`"
-                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <i class="pi pi-check mr-2 text-green-600" />
-                      Check-in Racers
-                    </NuxtLink>
-                    <NuxtLink
-                      :to="`/races/${race.id}/qualifiers`"
-                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <i class="pi pi-clock mr-2 text-blue-600" />
-                      Qualifiers
-                    </NuxtLink>
-                    <NuxtLink
-                      :to="`/races/${race.id}/brackets`"
-                      class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <i class="pi pi-sitemap mr-2 text-purple-600" />
-                      Brackets
-                    </NuxtLink>
-                    <hr class="my-2 border-gray-200 dark:border-gray-600" />
-                  </template>
-                  <NuxtLink
-                    :to="`/races/${race.id}/edit`"
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <i class="pi pi-pencil mr-2 text-gray-600" />
-                    Edit Race
-                  </NuxtLink>
-                  <NuxtLink
-                    :to="`/admin/photos?race=${race.id}`"
-                    class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <i class="pi pi-images mr-2 text-blue-600" />
-                    Manage Photos
-                  </NuxtLink>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- Admin Controls -->
+          <AdminMenu v-if="authStore.isRaceAdmin" :race-id="race.id" class="mt-4 md:mt-0" />
         </div>
 
         <!-- Race Image -->
@@ -902,18 +838,13 @@ const authStore = useAuthStore()
 
 // Use reactive composables for all data
 
-const { races, fetchRaceById, loading, initialize: initializeRaces } = useRaces()
+const { races, fetchRaceById, initialize: initializeRaces } = useRaces()
 
 const { qualifiers, formatTime, initialize: initializeQualifiers } = useQualifiers(route.params.id)
 
 const { getBracketsForRace, initialize: initializeBrackets } = useBrackets()
 
-const {
-  checkins: checkinsData,
-  racers: checkinsRacers,
-  getCheckinsForRace,
-  initialize: initializeCheckins
-} = useCheckins()
+const { racers: checkinsRacers, getCheckinsForRace, initialize: initializeCheckins } = useCheckins()
 
 const { voteableAwards, getAwardLeaderboard, initialize: initializeAwards } = useAwards()
 
@@ -922,7 +853,6 @@ const { getPhotosByRace, allPhotos, initialize: initializePhotos } = usePhotos()
 
 // Local state
 const race = ref(null)
-const showAdminMenu = ref(false)
 const error = ref(null)
 const selectedPhotoRacer = ref(null)
 const currentPhotoPage = ref(0)
@@ -937,14 +867,6 @@ const checkins = computed(() => {
   if (!race.value?.id) return []
 
   const raceCheckins = getCheckinsForRace(route.params.id)
-  console.log(
-    'Race page - checkins computed, found:',
-    raceCheckins.length,
-    'checkins for race:',
-    route.params.id
-  )
-  console.log('All checkins data:', checkinsData.value)
-  console.log('Racers data:', checkinsRacers.value.length, 'racers')
 
   return raceCheckins
     .map((checkin) => {
@@ -1430,15 +1352,9 @@ onMounted(async () => {
   await authStore.initAuth()
 
   // Check if data is already loaded (from previous navigation)
-  console.log('Race detail: Checking cached data...')
-  console.log('Race detail: races.value.length:', races.value.length)
-  console.log('Race detail: loading.value:', loading.value)
-
   if (races.value.length > 0) {
-    console.log('Race detail: Data already loaded, using cached data')
     await getRaceData()
   } else {
-    console.log('Race detail: No cached data, initializing from scratch')
     // Initialize races first to get the race data
     await initializeRaces()
     await getRaceData()
@@ -1449,7 +1365,7 @@ onMounted(async () => {
     initializeQualifiers(),
     initializeBrackets(),
     initializeCheckins(),
-    initializeAwards(),
+    initializeAwards({ raceId }),
     initializePhotos()
   ])
 

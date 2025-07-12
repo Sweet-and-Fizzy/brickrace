@@ -78,15 +78,30 @@ export const useAwards = () => {
     }
   }
 
-  const fetchVoteCounts = async () => {
+  const fetchVoteCounts = async (raceId = null) => {
     try {
-      const { data: counts, error: countsError } = await $supabase
+      let query = $supabase
         .from('award_vote_counts')
         .select('*')
         .order('vote_count', { ascending: false })
 
+      // Filter by race if raceId is provided
+      if (raceId) {
+        query = query.eq('race_id', raceId)
+      }
+
+      const { data: counts, error: countsError } = await query
+
       if (countsError) throw countsError
-      state.voteCounts.value = counts || []
+
+      if (raceId) {
+        // If filtering by race, replace only the vote counts for that race
+        const otherRaceCounts = state.voteCounts.value.filter((vc) => vc.race_id !== raceId)
+        state.voteCounts.value = [...otherRaceCounts, ...(counts || [])]
+      } else {
+        // If not filtering, replace all vote counts
+        state.voteCounts.value = counts || []
+      }
     } catch (err) {
       // Keep essential error logging for production debugging
       console.error('Error fetching vote counts:', err)
@@ -517,7 +532,7 @@ export const useAwards = () => {
       await Promise.all([
         fetchAwardDefinitions(options.includeInactive || false),
         fetchAwards(),
-        fetchVoteCounts(),
+        fetchVoteCounts(options.raceId),
         fetchUserVotes()
       ])
       setupSubscriptions()

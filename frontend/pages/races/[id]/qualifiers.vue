@@ -39,21 +39,28 @@
       <div v-else-if="race">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Qualifiers: {{ race.name }}
-          </h1>
-          <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
-            <span>{{
-              new Date(race.date).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })
-            }}</span>
-            <span class="font-semibold text-blue-600 dark:text-blue-400"
-              >{{ qualifiers.length }} qualifying runs</span
-            >
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Qualifiers: {{ race.name }}
+              </h1>
+              <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
+                <span>{{
+                  new Date(race.date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })
+                }}</span>
+                <span class="font-semibold text-blue-600 dark:text-blue-400"
+                  >{{ qualifiers.length }} qualifying runs</span
+                >
+              </div>
+            </div>
+            <div class="mt-4 md:mt-0">
+              <AdminMenu :race-id="raceId" />
+            </div>
           </div>
         </div>
 
@@ -93,7 +100,9 @@
                 class="border rounded-lg p-4 bg-white dark:bg-gray-800 dark:border-gray-600"
               >
                 <!-- Racer Header -->
-                <div class="flex items-center justify-between mb-4">
+                <div
+                  class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+                >
                   <div class="flex items-center gap-3">
                     <Image
                       v-if="racer.image_url"
@@ -119,7 +128,7 @@
                       </p>
                     </div>
                   </div>
-                  <div class="text-right">
+                  <div class="text-left sm:text-right">
                     <p class="text-sm text-gray-500 dark:text-gray-400">Best Time</p>
                     <p class="text-lg font-bold text-blue-600 dark:text-blue-400">
                       {{ getBestTime(racer.id) || 'No runs' }}
@@ -128,9 +137,10 @@
                 </div>
 
                 <!-- Add New Qualifying Time and Previous Runs -->
-                <div class="flex items-start gap-6">
-                  <div class="flex items-end gap-3">
-                    <div class="w-32">
+                <div class="space-y-4">
+                  <!-- Add Time Section -->
+                  <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+                    <div class="flex-shrink-0 sm:w-32">
                       <label
                         :for="`time-${racer.id}`"
                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
@@ -160,6 +170,7 @@
                       :disabled="!newTimes[racer.id] || processing === `add-${racer.id}`"
                       :loading="processing === `add-${racer.id}`"
                       severity="info"
+                      class="w-full sm:w-auto"
                       @click="addQualifyingTime(racer)"
                     >
                       <i class="pi pi-plus mr-2" />
@@ -168,7 +179,7 @@
                   </div>
 
                   <!-- Previous Runs -->
-                  <div v-if="getRacerQualifiers(racer.id).length > 0" class="flex-1">
+                  <div v-if="getRacerQualifiers(racer.id).length > 0" class="w-full">
                     <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Previous Runs:
                     </h4>

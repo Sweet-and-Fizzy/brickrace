@@ -167,9 +167,18 @@
 
       <!-- Bottom Bar -->
       <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+        <p class="mb-4">&copy; {{ new Date().getFullYear() }} The Great Holyoke Brick Race</p>
         <p>
-          &copy; {{ new Date().getFullYear() }} The Great Holyoke Brick Race. Built with creativity
-          and community spirit.
+          Built with
+          <i class="pi pi-heart-fill text-red-400" /> by
+          <a
+            href="https://sweetandfizzy.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-blue-400 hover:text-blue-300 transition-colors"
+          >
+            Sweet & Fizzy Digital
+          </a>
         </p>
       </div>
     </div>

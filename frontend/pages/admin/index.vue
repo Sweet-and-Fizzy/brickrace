@@ -5,20 +5,25 @@
     <!-- Header -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="text-center">
-          <div class="flex justify-center mb-6">
-            <div
-              class="bg-gradient-to-r from-red-600 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center"
-            >
-              <i class="pi pi-shield text-2xl text-white" />
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div class="text-center md:text-left">
+            <div class="flex justify-center md:justify-start mb-6">
+              <div
+                class="bg-gradient-to-r from-red-600 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center"
+              >
+                <i class="pi pi-shield text-2xl text-white" />
+              </div>
             </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              Admin Dashboard
+            </h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl">
+              Manage races, approve photos, and oversee the racing community
+            </p>
           </div>
-          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Admin Dashboard
-          </h1>
-          <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Manage races, approve photos, and oversee the racing community
-          </p>
+          <div class="mt-4 md:mt-0 flex justify-center md:justify-end">
+            <AdminMenu />
+          </div>
         </div>
       </div>
     </div>

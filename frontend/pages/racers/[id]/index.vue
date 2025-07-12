@@ -461,35 +461,73 @@
                 </div>
               </template>
               <template #content>
-                <div class="space-y-3">
+                <div class="space-y-4">
+                  <!-- Group by Race -->
                   <div
-                    v-for="voteCount in racerVoteCounts"
-                    :key="`${voteCount.award_definition_id}-${voteCount.race_id}`"
-                    class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                    v-for="raceGroup in voteCountsByRace"
+                    :key="raceGroup.raceId"
+                    class="space-y-3"
                   >
-                    <div>
-                      <p class="font-medium text-gray-900 dark:text-white">
-                        {{ voteCount.award_name }}
-                      </p>
-                      <p class="text-sm text-gray-600 dark:text-gray-300">
-                        {{ voteCount.race_name }}
-                      </p>
-                    </div>
-                    <div class="flex items-center gap-2">
+                    <!-- Race Header -->
+                    <div
+                      class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700"
+                    >
+                      <h4 class="font-semibold text-blue-900 dark:text-blue-200">
+                        {{ raceGroup.raceName }}
+                      </h4>
                       <Badge
-                        :value="`❤️ ${voteCount.vote_count}`"
+                        :value="`❤️ ${raceGroup.totalVotes} total`"
                         severity="info"
                         class="font-bold"
                       />
                     </div>
+
+                    <!-- Awards for this race -->
+                    <div class="ml-4 space-y-2">
+                      <div
+                        v-for="voteCount in raceGroup.votes"
+                        :key="`${voteCount.award_definition_id}-${voteCount.race_id}`"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                      >
+                        <div>
+                          <p class="font-medium text-gray-900 dark:text-white">
+                            {{ voteCount.award_name }}
+                          </p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <Badge
+                            :value="`❤️ ${voteCount.vote_count}`"
+                            severity="success"
+                            class="font-bold"
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <!-- Total votes summary -->
-                  <div class="border-t pt-3 mt-3">
-                    <div class="flex items-center justify-between">
-                      <span class="font-semibold text-gray-900 dark:text-white">Total Votes:</span>
-                      <Badge :value="`❤️ ${totalVotes}`" severity="success" class="font-bold" />
+                  <!-- Overall Total -->
+                  <div v-if="voteCountsByRace.length > 1" class="border-t pt-4 mt-4">
+                    <div
+                      class="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700"
+                    >
+                      <span class="font-bold text-green-900 dark:text-green-200"
+                        >All-Time Total:</span
+                      >
+                      <Badge
+                        :value="`❤️ ${totalVotes}`"
+                        severity="success"
+                        class="font-bold text-lg"
+                      />
                     </div>
+                  </div>
+
+                  <!-- No votes message -->
+                  <div
+                    v-if="voteCountsByRace.length === 0"
+                    class="text-center py-6 text-gray-500 dark:text-gray-400"
+                  >
+                    <i class="pi pi-heart text-2xl mb-2" />
+                    <p>No votes received yet</p>
                   </div>
                 </div>
               </template>
@@ -765,6 +803,31 @@ const racerVoteCounts = computed(() => {
       race_name: race?.name || 'Unknown Race'
     }
   })
+})
+
+// Group vote counts by race
+const voteCountsByRace = computed(() => {
+  const grouped = {}
+
+  racerVoteCounts.value.forEach((voteCount) => {
+    const raceId = voteCount.race_id
+    const raceName = voteCount.race_name || 'Unknown Race'
+
+    if (!grouped[raceId]) {
+      grouped[raceId] = {
+        raceId,
+        raceName,
+        votes: [],
+        totalVotes: 0
+      }
+    }
+
+    grouped[raceId].votes.push(voteCount)
+    grouped[raceId].totalVotes += voteCount.vote_count
+  })
+
+  // Convert to array and sort by race name
+  return Object.values(grouped).sort((a, b) => a.raceName.localeCompare(b.raceName))
 })
 
 // Total votes received across all awards

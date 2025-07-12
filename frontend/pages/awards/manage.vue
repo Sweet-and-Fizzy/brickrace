@@ -15,87 +15,12 @@
             severity="primary"
             @click="showAddDefinitionDialog = true"
           />
-        </div>
-      </div>
-
-      <!-- Race Selection -->
-      <div class="mb-6">
-        <label
-          for="race-select"
-          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-        >
-          Select Race for Award Assignment
-        </label>
-        <Select
-          v-model="selectedRace"
-          :options="races"
-          option-label="name"
-          option-value="id"
-          placeholder="Choose a race"
-          class="w-full md:w-80"
-          show-clear
-        />
-      </div>
-
-      <!-- Award Definitions Management -->
-      <div class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Award Types</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card
-            v-for="definition in awardDefinitions"
-            :key="definition.id"
-            class="hover:shadow-lg transition-shadow"
-          >
-            <template #header>
-              <div class="relative">
-                <img
-                  v-if="definition.image_url"
-                  :src="definition.image_url"
-                  :alt="definition.name"
-                  class="w-full aspect-square object-cover"
-                />
-                <div
-                  v-else
-                  class="w-full aspect-square bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
-                >
-                  <i class="pi pi-trophy text-4xl text-gray-400 dark:text-gray-500" />
-                </div>
-                <div class="absolute top-2 right-2 flex gap-1">
-                  <Badge v-if="definition.voteable" value="Voteable" severity="info" />
-                  <Badge v-if="!definition.active" value="Inactive" severity="warning" />
-                </div>
-              </div>
-            </template>
-
-            <template #title>{{ definition.name }}</template>
-            <template #subtitle>{{ definition.description }}</template>
-
-            <template #footer>
-              <div class="flex justify-between">
-                <Button
-                  label="Edit"
-                  icon="pi pi-pencil"
-                  size="small"
-                  severity="info"
-                  outlined
-                  @click="editDefinition(definition)"
-                />
-                <Button
-                  :label="definition.active ? 'Deactivate' : 'Activate'"
-                  :icon="definition.active ? 'pi pi-times' : 'pi pi-check'"
-                  size="small"
-                  :severity="definition.active ? 'danger' : 'success'"
-                  outlined
-                  @click="toggleDefinitionActiveStatus(definition)"
-                />
-              </div>
-            </template>
-          </Card>
+          <AdminMenu v-if="authStore.isRaceAdmin" :race-id="activeRace?.id" />
         </div>
       </div>
 
       <!-- Award Assignment Section -->
-      <div v-if="selectedRace">
+      <div v-if="activeRace">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Assign Awards</h2>
 
         <!-- Current Assignments -->
@@ -157,9 +82,18 @@
                 :options="racerOptions"
                 option-label="label"
                 option-value="value"
-                placeholder="Select racer"
+                placeholder="Type to search racers..."
                 class="w-full"
-              />
+                filter
+                filter-placeholder="Search racers..."
+                :show-clear="true"
+              >
+                <template #option="slotProps">
+                  <div class="flex items-center gap-2">
+                    <span class="font-medium">{{ slotProps.option.label }}</span>
+                  </div>
+                </template>
+              </Select>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -201,6 +135,63 @@
               </template>
             </Card>
           </div>
+        </div>
+      </div>
+
+      <!-- Award Definitions Management -->
+      <div class="mb-12">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Award Types</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card
+            v-for="definition in awardDefinitions"
+            :key="definition.id"
+            class="hover:shadow-lg transition-shadow"
+          >
+            <template #header>
+              <div class="relative">
+                <img
+                  v-if="definition.image_url"
+                  :src="definition.image_url"
+                  :alt="definition.name"
+                  class="w-full aspect-square object-cover"
+                />
+                <div
+                  v-else
+                  class="w-full aspect-square bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                >
+                  <i class="pi pi-trophy text-4xl text-gray-400 dark:text-gray-500" />
+                </div>
+                <div class="absolute top-2 right-2 flex gap-1">
+                  <Badge v-if="definition.voteable" value="Voteable" severity="info" />
+                  <Badge v-if="!definition.active" value="Inactive" severity="warning" />
+                </div>
+              </div>
+            </template>
+
+            <template #title>{{ definition.name }}</template>
+            <template #subtitle>{{ definition.description }}</template>
+
+            <template #footer>
+              <div class="flex justify-between">
+                <Button
+                  label="Edit"
+                  icon="pi pi-pencil"
+                  size="small"
+                  severity="info"
+                  outlined
+                  @click="editDefinition(definition)"
+                />
+                <Button
+                  :label="definition.active ? 'Deactivate' : 'Activate'"
+                  :icon="definition.active ? 'pi pi-times' : 'pi pi-check'"
+                  size="small"
+                  :severity="definition.active ? 'danger' : 'success'"
+                  outlined
+                  @click="toggleDefinitionActiveStatus(definition)"
+                />
+              </div>
+            </template>
+          </Card>
         </div>
       </div>
 
@@ -349,7 +340,7 @@ definePageMeta({
 })
 
 // Use composables
-const { races, initialize: initializeRaces } = useRaces()
+const { activeRace, initialize: initializeRaces } = useRaces()
 
 const {
   awardDefinitions,
@@ -363,9 +354,8 @@ const {
   getVoteResultsByRace
 } = useAwards()
 
-const { initialize: initializeCheckins, getCheckinsByRace } = useCheckins()
+const { initialize: initializeCheckins, getCheckinsForRace, fetchCheckins } = useCheckins()
 
-const selectedRace = ref(null)
 const racers = ref([])
 
 const showAddDefinitionDialog = ref(false)
@@ -394,43 +384,70 @@ const awardDefinitionOptions = computed(() =>
 )
 
 const racerOptions = computed(() =>
-  racers.value.map((racer) => ({ label: racer.name, value: racer.id }))
+  racers.value.map((racer) => ({
+    label: `${racer.name}${racer.racer_number ? ` (#${racer.racer_number})` : ''}`,
+    value: racer.id
+  }))
 )
 
 const currentAssignments = computed(() => {
-  if (!selectedRace.value) return []
-  return getAwardsByRace(selectedRace.value)
+  if (!activeRace.value) return []
+  return getAwardsByRace(activeRace.value.id)
 })
 
 const voteResults = computed(() => {
-  if (!selectedRace.value) return []
-  return getVoteResultsByRace(selectedRace.value)
+  if (!activeRace.value) return []
+  const results = getVoteResultsByRace(activeRace.value.id)
+
+  return results
 })
 
-// Fetch racers for selected race using checkins composable
+// Fetch racers for active race using checkins and vote data
 const fetchRacers = async () => {
-  if (!selectedRace.value) return
+  if (!activeRace.value) return
 
   try {
-    const raceCheckins = getCheckinsByRace(selectedRace.value)
+    // Get current checkins for the active race
+    const raceCheckins = getCheckinsForRace(activeRace.value.id)
 
     const uniqueRacers = []
     const seen = new Set()
 
+    // First, add all currently checked-in racers
     raceCheckins.forEach((checkin) => {
-      if (checkin.racer && !seen.has(checkin.racer.id)) {
+      // Only include checkins that have complete racer data
+      if (checkin.racer && checkin.racer.id && checkin.racer.name && !seen.has(checkin.racer.id)) {
         seen.add(checkin.racer.id)
         uniqueRacers.push({
           id: checkin.racer.id,
-          name: checkin.racer.name
+          name: checkin.racer.name,
+          racer_number: checkin.racer.racer_number,
+          source: 'checkin'
         })
       }
+    })
+
+    // Then, add any racers who appear in vote results for this race (but aren't already included)
+    const voteResults = getVoteResultsByRace(activeRace.value.id)
+    voteResults.forEach((result) => {
+      result.votes.forEach((vote) => {
+        if (vote.racer_id && vote.racer_name && !seen.has(vote.racer_id)) {
+          seen.add(vote.racer_id)
+          uniqueRacers.push({
+            id: vote.racer_id,
+            name: vote.racer_name,
+            racer_number: null, // We don't have this from vote data
+            source: 'votes'
+          })
+        }
+      })
     })
 
     racers.value = uniqueRacers
   } catch (error) {
     // Keep essential error logging for production debugging
     console.error('Error fetching racers:', error)
+    racers.value = []
   }
 }
 
@@ -510,7 +527,7 @@ const assignAwardToRacer = async () => {
     await assignAward(
       newAssignment.value.racerId,
       newAssignment.value.awardDefinitionId,
-      selectedRace.value,
+      activeRace.value.id,
       newAssignment.value.notes || null
     )
 
@@ -621,9 +638,9 @@ const resetDefinitionForm = () => {
   editingDefinition.value = null
 }
 
-// Watch for race selection changes
-watch(selectedRace, async () => {
-  if (selectedRace.value) {
+// Watch for active race changes
+watch(activeRace, async () => {
+  if (activeRace.value) {
     await fetchRacers()
   }
 })
@@ -646,11 +663,18 @@ onMounted(async () => {
   }
 
   // Initialize all composables
-  await Promise.all([
-    initializeRaces(),
-    initializeAwards({ includeInactive: true }), // Include inactive award definitions for management
-    initializeCheckins()
-  ])
+  await Promise.all([initializeRaces(), initializeCheckins()])
+
+  // Initialize awards with active race filter after races are loaded
+  if (activeRace.value) {
+    await initializeAwards({
+      includeInactive: true, // Include inactive award definitions for management
+      raceId: activeRace.value.id
+    })
+    // Refresh checkins data to ensure we have current check-in status
+    await fetchCheckins(activeRace.value.id)
+    await fetchRacers()
+  }
 })
 
 useHead({

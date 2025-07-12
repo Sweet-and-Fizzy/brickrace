@@ -39,21 +39,28 @@
       <div v-else-if="race">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Check-in: {{ race.name }}
-          </h1>
-          <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
-            <span>{{
-              new Date(race.date).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })
-            }}</span>
-            <span class="font-semibold text-green-600 dark:text-green-400"
-              >{{ checkedInCount }} checked in</span
-            >
+          <div class="flex flex-col md:flex-row md:items-start md:justify-between">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                Check-in: {{ race.name }}
+              </h1>
+              <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
+                <span>{{
+                  new Date(race.date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })
+                }}</span>
+                <span class="font-semibold text-green-600 dark:text-green-400"
+                  >{{ checkedInCount }} checked in</span
+                >
+              </div>
+            </div>
+            <div class="mt-4 md:mt-0">
+              <AdminMenu :race-id="raceId" />
+            </div>
           </div>
         </div>
 
