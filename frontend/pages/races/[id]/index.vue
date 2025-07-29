@@ -1365,7 +1365,7 @@ onMounted(async () => {
     initializeQualifiers(),
     initializeBrackets(),
     initializeCheckins(),
-    initializeAwards({ raceId }),
+    initializeAwards({ raceId: route.params.id }),
     initializePhotos()
   ])
 
