@@ -703,12 +703,29 @@
                 </h2>
               </template>
               <template #content>
+                <!-- Sort Controls -->
+                <div class="mb-4 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Sort by:
+                    </label>
+                    <Dropdown
+                      v-model="qualifiersSortOption"
+                      :options="sortOptions"
+                      option-label="label"
+                      option-value="value"
+                      class="w-48"
+                    />
+                  </div>
+                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                    {{ completedQualifiers.length }} qualifying runs
+                  </div>
+                </div>
+
                 <DataTable
-                  :value="completedQualifiers"
+                  :value="sortedQualifiers"
                   striped-rows
                   responsive-layout="scroll"
-                  :sort-field="'time'"
-                  :sort-order="1"
                   class="custom-datatable"
                 >
                   <Column field="racer_number" header="#" style="width: 60px">
@@ -733,13 +750,11 @@
                       </div>
                     </template>
                   </Column>
-                  <Column field="time" header="Time" sortable>
+                  <Column field="time" header="Time">
                     <template #body="slotProps">
-                      <div class="text-right">
-                        <span class="font-bold text-lg text-brand-blue">{{
-                          formatTime(slotProps.data.time)
-                        }}</span>
-                      </div>
+                      <span class="font-bold text-lg text-brand-blue">{{
+                        formatTime(slotProps.data.time)
+                      }}</span>
                     </template>
                   </Column>
                   <Column field="created_at" header="Completed">
@@ -1110,6 +1125,14 @@ const photosPerPage = ref(9)
 
 // Separate loading states for progressive loading
 const raceDataLoading = ref(true)
+
+// Qualifiers sorting
+const qualifiersSortOption = ref('time-asc')
+const sortOptions = [
+  { label: 'Fastest Time', value: 'time-asc' },
+  { label: 'Slowest Time', value: 'time-desc' },
+  { label: 'Heat Order', value: 'heat' }
+]
 const isLoading = computed(() => raceDataLoading.value)
 
 // Reactive checkins with racer data
@@ -1185,6 +1208,28 @@ const completedQualifiers = computed(() => {
     q.time > 0 && 
     !isNaN(q.time)
   )
+})
+
+const sortedQualifiers = computed(() => {
+  if (!completedQualifiers.value.length) return []
+  
+  const sorted = [...completedQualifiers.value]
+  
+  if (qualifiersSortOption.value === 'heat') {
+    // Sort by heat number, then by track number
+    return sorted.sort((a, b) => {
+      if (a.heat_number !== b.heat_number) {
+        return a.heat_number - b.heat_number
+      }
+      return a.track_number - b.track_number
+    })
+  } else if (qualifiersSortOption.value === 'time-desc') {
+    // Sort by time (slowest first)
+    return sorted.sort((a, b) => b.time - a.time)
+  } else {
+    // Sort by time (fastest first) - default
+    return sorted.sort((a, b) => a.time - b.time)
+  }
 })
 
 const fastestTime = computed(() => {
