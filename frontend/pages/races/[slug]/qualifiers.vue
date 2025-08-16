@@ -337,6 +337,12 @@
                       fastestTime || 'N/A'
                     }}</span>
                   </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-300">Slowest Time</span>
+                    <span class="font-semibold text-gray-900 dark:text-white">{{
+                      slowestTime || 'N/A'
+                    }}</span>
+                  </div>
                 </div>
               </template>
             </Card>
@@ -433,6 +439,12 @@ const leaderboard = computed(() => {
 const fastestTime = computed(() => {
   if (leaderboard.value.length === 0) return null
   return formatTime(leaderboard.value[0].best_time)
+})
+
+const slowestTime = computed(() => {
+  if (leaderboard.value.length === 0) return null
+  const slowest = leaderboard.value[leaderboard.value.length - 1]
+  return formatTime(slowest.best_time)
 })
 
 // Helper functions

@@ -23,7 +23,7 @@ const usePhotosState = () => {
 }
 
 export const usePhotos = () => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
   // Get useState-based state
   const state = usePhotosState()
 
@@ -37,7 +37,7 @@ export const usePhotos = () => {
   // Photo fetching functions
   const fetchGeneralPhotos = async (filters = {}) => {
     try {
-      let query = $supabase
+      let query = supabase
         .from('general_photos')
         .select(
           `
@@ -77,7 +77,7 @@ export const usePhotos = () => {
 
   const fetchRacerPhotos = async (filters = {}) => {
     try {
-      let query = $supabase
+      let query = supabase
         .from('racers')
         .select('id, name, racer_number, photos, user_id, created_at')
         .not('photos', 'is', null)
@@ -193,7 +193,7 @@ export const usePhotos = () => {
     try {
       if (photo.type === 'general') {
         const photoId = photo.id.replace('general-', '')
-        const { error } = await $supabase
+        const { error } = await supabase
           .from('general_photos')
           .update({ status: 'approved' })
           .eq('id', photoId)
@@ -206,7 +206,7 @@ export const usePhotos = () => {
           generalPhotos.value[generalIndex].status = 'approved'
         }
       } else if (photo.type === 'racer') {
-        const { data: racerData, error: fetchError } = await $supabase
+        const { data: racerData, error: fetchError } = await supabase
           .from('racers')
           .select('photos')
           .eq('id', photo.racerId)
@@ -225,7 +225,7 @@ export const usePhotos = () => {
             updatedPhotos[photo.photoIndex].status = 'approved'
           }
 
-          const { error: updateError } = await $supabase
+          const { error: updateError } = await supabase
             .from('racers')
             .update({ photos: updatedPhotos })
             .eq('id', photo.racerId)
@@ -253,7 +253,7 @@ export const usePhotos = () => {
     try {
       if (photo.type === 'general') {
         const photoId = photo.id.replace('general-', '')
-        const { error } = await $supabase
+        const { error } = await supabase
           .from('general_photos')
           .update({ status: 'rejected' })
           .eq('id', photoId)
@@ -266,7 +266,7 @@ export const usePhotos = () => {
           generalPhotos.value[generalIndex].status = 'rejected'
         }
       } else if (photo.type === 'racer') {
-        const { data: racerData, error: fetchError } = await $supabase
+        const { data: racerData, error: fetchError } = await supabase
           .from('racers')
           .select('photos')
           .eq('id', photo.racerId)
@@ -285,7 +285,7 @@ export const usePhotos = () => {
             updatedPhotos[photo.photoIndex].status = 'rejected'
           }
 
-          const { error: updateError } = await $supabase
+          const { error: updateError } = await supabase
             .from('racers')
             .update({ photos: updatedPhotos })
             .eq('id', photo.racerId)
@@ -315,7 +315,7 @@ export const usePhotos = () => {
 
       if (photo.type === 'general') {
         const photoId = photo.id.replace('general-', '')
-        const { error } = await $supabase
+        const { error } = await supabase
           .from('general_photos')
           .update({ featured: newFeaturedStatus })
           .eq('id', photoId)
@@ -328,7 +328,7 @@ export const usePhotos = () => {
           generalPhotos.value[generalIndex].featured = newFeaturedStatus
         }
       } else if (photo.type === 'racer') {
-        const { data: racerData, error: fetchError } = await $supabase
+        const { data: racerData, error: fetchError } = await supabase
           .from('racers')
           .select('photos')
           .eq('id', photo.racerId)
@@ -347,7 +347,7 @@ export const usePhotos = () => {
             updatedPhotos[photo.photoIndex].featured = newFeaturedStatus
           }
 
-          const { error: updateError } = await $supabase
+          const { error: updateError } = await supabase
             .from('racers')
             .update({ photos: updatedPhotos })
             .eq('id', photo.racerId)
@@ -375,7 +375,7 @@ export const usePhotos = () => {
     try {
       if (photo.type === 'general') {
         const photoId = photo.id.replace('general-', '')
-        const { error } = await $supabase.from('general_photos').delete().eq('id', photoId)
+        const { error } = await supabase.from('general_photos').delete().eq('id', photoId)
 
         if (error) throw error
 
@@ -383,7 +383,7 @@ export const usePhotos = () => {
         generalPhotos.value = generalPhotos.value.filter((p) => p.id !== photoId)
         allPhotos.value = allPhotos.value.filter((p) => p.id !== photo.id)
       } else if (photo.type === 'racer') {
-        const { data: racerData, error: fetchError } = await $supabase
+        const { data: racerData, error: fetchError } = await supabase
           .from('racers')
           .select('photos')
           .eq('id', photo.racerId)
@@ -394,7 +394,7 @@ export const usePhotos = () => {
         const updatedPhotos = [...(racerData.photos || [])]
         updatedPhotos.splice(photo.photoIndex, 1)
 
-        const { error: updateError } = await $supabase
+        const { error: updateError } = await supabase
           .from('racers')
           .update({ photos: updatedPhotos })
           .eq('id', photo.racerId)
@@ -437,7 +437,7 @@ export const usePhotos = () => {
     try {
       if (photo.type === 'general') {
         const photoId = photo.id.replace('general-', '')
-        const { error } = await $supabase
+        const { error } = await supabase
           .from('general_photos')
           .update({
             description: metadata.description?.trim() || null,
@@ -477,7 +477,7 @@ export const usePhotos = () => {
     }
 
     // Subscribe to general photos changes
-    state.channels.value.generalPhotosChannel = $supabase
+    state.channels.value.generalPhotosChannel = supabase
       .channel('global-general-photos-realtime')
       .on(
         'postgres_changes',
@@ -491,7 +491,7 @@ export const usePhotos = () => {
       .subscribe()
 
     // Subscribe to racer photos changes
-    state.channels.value.racersChannel = $supabase
+    state.channels.value.racersChannel = supabase
       .channel('global-racers-photos-realtime')
       .on(
         'postgres_changes',
@@ -573,11 +573,11 @@ export const usePhotos = () => {
   // Cleanup subscriptions
   const cleanup = () => {
     if (state.channels.value.generalPhotosChannel) {
-      $supabase.removeChannel(state.channels.value.generalPhotosChannel)
+      supabase.removeChannel(state.channels.value.generalPhotosChannel)
       state.channels.value.generalPhotosChannel = null
     }
     if (state.channels.value.racersChannel) {
-      $supabase.removeChannel(state.channels.value.racersChannel)
+      supabase.removeChannel(state.channels.value.racersChannel)
       state.channels.value.racersChannel = null
     }
   }

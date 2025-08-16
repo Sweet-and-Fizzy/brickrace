@@ -18,9 +18,9 @@ export const useAuthStore = defineStore('auth', {
 
   actions: {
     async login(credentials) {
-      const { $supabase } = useNuxtApp()
+      const supabase = useSupabaseClient()
 
-      const { data, error } = await $supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.email,
         password: credentials.password
       })
@@ -34,9 +34,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async register(userData) {
-      const { $supabase } = useNuxtApp()
+      const supabase = useSupabaseClient()
 
-      const { data, error } = await $supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: userData.email,
         password: userData.password,
         options: {
@@ -58,10 +58,10 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async logout() {
-      const { $supabase } = useNuxtApp()
+      const supabase = useSupabaseClient()
 
       try {
-        const { error } = await $supabase.auth.signOut()
+        const { error } = await supabase.auth.signOut()
         if (error) throw error
 
         this.user = null
@@ -80,9 +80,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async resetPassword(email) {
-      const { $supabase } = useNuxtApp()
+      const supabase = useSupabaseClient()
 
-      const { error } = await $supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`
       })
 
@@ -90,9 +90,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async updatePassword(newPassword) {
-      const { $supabase } = useNuxtApp()
+      const supabase = useSupabaseClient()
 
-      const { error } = await $supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         password: newPassword
       })
 
@@ -100,9 +100,9 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async signInWithProvider(provider) {
-      const { $supabase } = useNuxtApp()
+      const supabase = useSupabaseClient()
 
-      const { data, error } = await $supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`
@@ -114,12 +114,12 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async initAuth() {
-      const { $supabase } = useNuxtApp()
+      const supabase = useSupabaseClient()
 
       // Get initial session
       const {
         data: { session }
-      } = await $supabase.auth.getSession()
+      } = await supabase.auth.getSession()
 
       if (session) {
         this.user = session.user
@@ -127,7 +127,7 @@ export const useAuthStore = defineStore('auth', {
       }
 
       // Listen for auth changes
-      $supabase.auth.onAuthStateChange((event, session) => {
+      supabase.auth.onAuthStateChange((event, session) => {
         if (session) {
           this.user = session.user
           this.session = session

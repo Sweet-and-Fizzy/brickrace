@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-8">
       <PageHeader title="All Races" :actions="headerActions" />
@@ -20,19 +20,19 @@
         <Card
           v-for="race in races"
           :key="race.id"
-          class="hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-gray-800/50 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-300 relative overflow-hidden cursor-pointer group"
+          class="hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-gray-800/50 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-300 relative overflow-hidden cursor-pointer group"
           :class="{
-            'ring-2 ring-green-500 bg-green-50 dark:bg-green-900/20 hover:ring-green-600':
+            'ring-2 ring-brand-green bg-white dark:bg-gray-800 hover:ring-brand-green':
               race.active,
-            'border border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500':
+            'border border-gray-300 dark:border-gray-600 hover:border-brand-blue dark:hover:border-brand-blue':
               !race.active
           }"
           tabindex="0"
           role="button"
           :aria-label="`View details for ${race.name} race on ${new Date(race.date).toLocaleDateString()}`"
-          @click="navigateToRace(race.id, $event)"
-          @keydown.enter="navigateToRace(race.id, $event)"
-          @keydown.space.prevent="navigateToRace(race.id, $event)"
+          @click="navigateToRace(race, $event)"
+          @keydown.enter="navigateToRace(race, $event)"
+          @keydown.space.prevent="navigateToRace(race, $event)"
         >
           <template #header>
             <div class="relative">
@@ -53,7 +53,7 @@
               <!-- Active Badge -->
               <div
                 v-if="race.active"
-                class="absolute top-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-sm font-semibold z-20"
+                class="absolute top-2 left-2 bg-brand-green text-white px-2 py-1 rounded text-sm font-semibold z-20"
               >
                 <i class="pi pi-check-circle mr-1" />
                 ACTIVE
@@ -64,7 +64,7 @@
           <template #title>
             <div class="px-4 pt-4">
               <h3
-                class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300"
+                class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-brand-blue dark:group-hover:text-brand-blue transition-colors duration-300"
               >
                 {{ race.name }}
               </h3>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="text-right">
                   <i
-                    class="pi pi-arrow-right text-gray-400 dark:text-gray-500 group-hover:text-blue-500 group-hover:translate-x-1 transition-all duration-300"
+                    class="pi pi-arrow-right text-gray-400 dark:text-gray-500 group-hover:text-brand-blue group-hover:translate-x-1 transition-all duration-300"
                   />
                 </div>
               </div>
@@ -100,10 +100,8 @@
               >
                 <Button
                   :loading="settingActive === race.id"
-                  severity="success"
-                  outlined
                   size="small"
-                  class="relative z-20 w-full"
+                  class="btn-secondary relative z-20 w-full"
                   @click.stop="setActiveRace(race.id)"
                 >
                   <i class="pi pi-play mr-1" />
@@ -153,7 +151,7 @@ const headerActions = computed(() => {
         label: 'Add Race',
         icon: 'pi pi-plus',
         to: '/races/add',
-        class: 'btn-brick'
+        class: 'btn-primary'
       }
     ]
   }
@@ -163,12 +161,14 @@ const headerActions = computed(() => {
 // Races data is now handled by the useRaces composable
 
 // Navigate to race (with event check to avoid conflicts with admin button)
-const navigateToRace = (raceId, event) => {
+const navigateToRace = (race, event) => {
   // Don't navigate if clicking on admin controls area
   if (event.target.closest('.z-20')) {
     return
   }
-  navigateTo(`/races/${raceId}`)
+  // Use slug if available, fallback to ID
+  const route = race.slug || race.id
+  navigateTo(`/races/${route}`)
 }
 
 // Set active race using composable

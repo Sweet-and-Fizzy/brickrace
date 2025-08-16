@@ -3,12 +3,7 @@
     <!-- Mobile Drawer -->
     <Drawer v-model:visible="sidebarVisible" class="w-80" position="right">
       <template #header>
-        <div class="flex items-center gap-3">
-          <img
-            src="~/assets/img/brick_race_logo.jpg"
-            alt="Brick Race Logo"
-            class="h-8 w-auto object-contain rounded"
-          />
+        <div class="flex items-center">
           <span class="font-bold text-lg">The Great Holyoke Brick Race</span>
         </div>
       </template>
@@ -91,12 +86,7 @@
           <div class="hidden md:block lg:hidden flex-1">
             <div class="flex items-center justify-between">
               <!-- Logo -->
-              <NuxtLink to="/" class="flex items-center gap-3">
-                <img
-                  src="~/assets/img/brick_race_logo.jpg"
-                  alt="Brick Race Logo"
-                  class="h-10 w-auto object-contain rounded"
-                />
+              <NuxtLink to="/" class="flex items-center">
                 <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
                   The Great Holyoke Brick Race
                 </span>
@@ -170,7 +160,7 @@
                   <NuxtLink to="/register">
                     <Button
                       v-tooltip.bottom="'Register'"
-                      class="btn-brick-secondary text-sm"
+                      class="btn-secondary text-sm"
                       icon="pi pi-user-plus"
                     />
                   </NuxtLink>
@@ -210,12 +200,7 @@
               }"
             >
               <template #start>
-                <NuxtLink to="/" class="flex items-center gap-3 mr-8">
-                  <img
-                    src="~/assets/img/brick_race_logo.jpg"
-                    alt="Brick Race Logo"
-                    class="h-10 w-auto object-contain rounded"
-                  />
+                <NuxtLink to="/" class="flex items-center mr-8">
                   <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
                     The Great Holyoke Brick Race
                   </span>
@@ -273,7 +258,7 @@
                     <NuxtLink to="/register">
                       <Button
                         v-tooltip.bottom="'Register'"
-                        class="btn-brick-secondary"
+                        class="btn-secondary"
                         icon="pi pi-user-plus"
                       />
                     </NuxtLink>
@@ -285,12 +270,7 @@
 
           <!-- Mobile Logo and Menu Button -->
           <div class="md:hidden flex items-center justify-between w-full">
-            <NuxtLink to="/" class="flex items-center gap-2">
-              <img
-                src="~/assets/img/brick_race_logo.jpg"
-                alt="Brick Race Logo"
-                class="h-8 w-auto object-contain rounded"
-              />
+            <NuxtLink to="/" class="flex items-center">
               <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
                 The Great Holyoke Brick Race
               </span>

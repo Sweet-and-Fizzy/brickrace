@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
@@ -40,9 +40,9 @@
 
           <div class="flex gap-2 mt-4 md:mt-0">
             <NuxtLink v-if="canEdit" :to="`/racers/${racer.id}/edit`">
-              <Button class="btn-brick-secondary">
+              <Button class="btn-secondary">
                 <i class="pi pi-pencil mr-2" />
-                Edit Racer
+                <span>Edit Racer</span>
               </Button>
             </NuxtLink>
           </div>
@@ -52,10 +52,8 @@
           <!-- Main Content -->
           <div class="lg:col-span-2 space-y-6">
             <!-- Photo Gallery -->
-            <div
-              v-if="allRacerPhotos.length > 0 && allRacerPhotos[0]?.url"
-              class="relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden"
-            >
+            <Card v-if="allRacerPhotos.length > 0 && allRacerPhotos[0]?.url" class="overflow-hidden" :pt="{ body: { class: 'p-0' }, content: { class: 'p-0' } }">
+              <template #content>
               <!-- Main Image Display -->
               <div
                 class="relative w-full h-64 md:h-96 cursor-pointer group"
@@ -138,13 +136,12 @@
                   </div>
                 </div>
               </div>
-            </div>
+              </template>
+            </Card>
 
             <!-- No Photos State -->
-            <div
-              v-else
-              class="relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden"
-            >
+            <Card v-else class="overflow-hidden" :pt="{ body: { class: 'p-0' }, content: { class: 'p-0' } }">
+              <template #content>
               <div
                 class="w-full h-64 md:h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
               >
@@ -171,7 +168,8 @@
               >
                 #{{ racer.racer_number }}
               </div>
-            </div>
+              </template>
+            </Card>
 
             <!-- Performance History -->
             <Card v-if="racerQualifiers.length > 0">
@@ -713,7 +711,13 @@ const loadRacer = async () => {
 // Get live qualifiers for this racer
 const racerQualifiers = computed(() => {
   if (!allQualifiers.value || !route.params.id) return []
-  const filtered = allQualifiers.value.filter((q) => q.racer_id === route.params.id)
+  // Filter for this racer and only completed qualifiers with valid times
+  const filtered = allQualifiers.value.filter((q) => 
+    q.racer_id === route.params.id && 
+    q.status === 'completed' && 
+    q.time && 
+    q.time > 0
+  )
   if (process.env.NODE_ENV === 'development') {
     console.log(
       'Racer detail: Total qualifiers:',
@@ -752,7 +756,11 @@ const fastestTime = computed(() => {
   const qualifiers = racerQualifiers.value
   if (!qualifiers || qualifiers.length === 0) return null
 
-  const times = qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
+  const times = qualifiers
+    .filter(q => q.time && q.time > 0)
+    .map((q) => Number.parseFloat(q.time))
+    .filter((t) => !Number.isNaN(t) && t > 0)
+  
   if (times.length === 0) return null
 
   const fastest = Math.min(...times)
@@ -763,7 +771,11 @@ const slowestTime = computed(() => {
   const qualifiers = racerQualifiers.value
   if (!qualifiers || qualifiers.length === 0) return null
 
-  const times = qualifiers.map((q) => Number.parseFloat(q.time)).filter((t) => !Number.isNaN(t))
+  const times = qualifiers
+    .filter(q => q.time && q.time > 0)
+    .map((q) => Number.parseFloat(q.time))
+    .filter((t) => !Number.isNaN(t) && t > 0)
+  
   if (times.length === 0) return null
 
   const slowest = Math.max(...times)

@@ -209,7 +209,7 @@ const emit = defineEmits([
   'featured-changed'
 ])
 
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 const authStore = useAuthStore()
 
 const uploading = ref(false)
@@ -309,7 +309,7 @@ const onUpload = async ({ files }) => {
       const newFileName = `racers/${authStore.userId}/${props.racerId}/gallery/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`
 
       // Upload to Supabase Storage
-      const { data: _data, error } = await $supabase.storage
+      const { data: _data, error } = await supabase.storage
         .from('race-images')
         .upload(newFileName, uploadFile, {
           cacheControl: '3600',
@@ -321,7 +321,7 @@ const onUpload = async ({ files }) => {
       // Get public URL
       const {
         data: { publicUrl }
-      } = $supabase.storage.from('race-images').getPublicUrl(newFileName)
+      } = supabase.storage.from('race-images').getPublicUrl(newFileName)
 
       uploadedUrls.push(publicUrl)
     }
@@ -406,7 +406,7 @@ const deletePhoto = async (index, photoUrl) => {
       const urlParts = photoUrl.split('/')
       const fileName = urlParts.slice(-4).join('/') // Get racers/userId/racerId/gallery/filename
 
-      const { error } = await $supabase.storage.from('race-images').remove([fileName])
+      const { error } = await supabase.storage.from('race-images').remove([fileName])
 
       if (error) {
         console.warn('Failed to delete file from storage:', error)

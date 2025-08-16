@@ -1,234 +1,232 @@
-@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Aldrich&family=Rubik+Mono+One&family=Bowlby+One&family=Comfortaa:wght@400;700&family=Righteous&family=Archivo+Black&family=Black+Ops+One&family=Poiret+One&family=Metamorphous&family=Cinzel:wght@400;600&family=Codystar&family=Megrim&family=Monoton&family=Bebas+Neue&family=Anton&family=Oswald:wght@400;500;600;700&family=Fjalla+One&family=Raleway:wght@400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Display font for headers - Righteous for bold, quirky handmade brick race theme */
+/* Typography based on new brand guidelines */
 @layer base {
-  /* Set Inter as the default body font */
-  body {
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    letter-spacing: -0.01em; /* Inter works well with slight negative letter spacing */
+  /* CSS Variables for brand colors */
+  :root {
+    --brand-blue: #175bd3;
+    --brand-green: #1e6863;
+    --brand-gold: #ffc927;
   }
 
+  /* Set Open Sans as the default body font */
+  body {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  /* Impact for h1 and h2 display headers */
   h1,
-  h2,
+  h2 {
+    font-family: Impact, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  /* Open Sans for smaller headers */
   h3,
   h4,
   h5,
   h6 {
-    font-family: 'Righteous', sans-serif;
-    font-weight: 400; /* Righteous only has one weight */
-    letter-spacing: 0.01em; /* minimal spacing for this playful font */
-    /* Removed text-transform to allow mixed case */
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
 
   /* Specific styles for different header levels */
   h1 {
-    letter-spacing: 0.1em;
-    font-size: 2.5rem; /* Larger for maximum impact */
-  }
-
-  /* Site name uses display font but isn't a heading */
-  .site-name {
-    font-family: 'Righteous', sans-serif;
-    font-weight: 400;
-    letter-spacing: 0.01em;
+    font-size: 2.5rem;
   }
 
   h2 {
-    letter-spacing: 0.075em;
     font-size: 2rem;
   }
 
   h3 {
-    letter-spacing: 0.05em;
     font-size: 1.5rem;
   }
 
-  h4,
+  h4 {
+    font-size: 1.25rem;
+  }
+
   h5,
   h6 {
-    letter-spacing: 0.025em;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
+  }
+
+  /* Site name uses Open Sans */
+  .site-name {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 }
 
 @layer components {
-  .btn-brick {
-    @apply relative transition-all duration-300 font-medium text-white;
-    /* Exact masonry brick styling */
-    background: linear-gradient(
-      135deg,
-      rgb(197, 48, 48) 0%,
-      rgb(156, 28, 28) 45%,
-      rgb(116, 42, 42) 100%
-    ) !important;
-    border-width: 3px !important;
-    border-style: solid !important;
-    border-color: rgb(213, 63, 63) rgb(74, 19, 19) rgb(74, 19, 19) rgb(213, 63, 63) !important;
-    box-shadow:
-      rgba(0, 0, 0, 0.3) 0px 6px 12px,
-      rgba(255, 255, 255, 0.3) 2px 2px 4px inset,
-      rgba(0, 0, 0, 0.2) -2px -2px 4px inset !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.8px !important;
-    text-shadow: rgba(0, 0, 0, 0.5) 0px 1px 2px !important;
-    min-width: 36px !important;
-    text-align: center !important;
-    border-radius: 3px !important;
-    box-sizing: border-box !important;
+  /* Skew button wrapper for parallelogram effect */
+  .skew-button {
+    transform: skewX(-8deg);
+    font-family: 'Open Sans', sans-serif;
+    letter-spacing: 0.02em;
+    border-radius: 0;
+  }
+  
+  .skew-button > * {
+    transform: skewX(8deg);
+  }
+  
+  .skew-button:hover {
+    transform: skewX(-8deg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .skew-button:active {
+    transform: skewX(-8deg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
-  .btn-brick:hover {
-    position: relative !important;
-    top: -2px !important;
-    @apply text-white;
-    /* Darker, richer brick on hover */
-    background: linear-gradient(
-      135deg,
-      rgb(180, 35, 35) 0%,
-      rgb(140, 20, 20) 45%,
-      rgb(100, 30, 30) 100%
-    ) !important;
-    /* Enhanced brick effect on hover */
-    box-shadow:
-      rgba(0, 0, 0, 0.4) 0px 8px 16px,
-      rgba(255, 255, 255, 0.4) 2px 2px 4px inset,
-      rgba(0, 0, 0, 0.3) -2px -2px 4px inset !important;
-    /* Keep white text and text shadow - maintain same typography */
+  /* New primary button style - black parallelogram with white text */
+  .btn-primary {
+    @apply relative inline-block px-6 py-3 font-semibold text-white bg-black transition-all duration-200;
+    transform: skewX(-8deg);
+    font-family: 'Open Sans', sans-serif;
+    letter-spacing: 0.02em;
+    border: 2px solid transparent;
+    border-radius: 0;
+    outline: none;
+  }
+
+  /* Dark mode: invert to white background with black text */
+  .app-dark .btn-primary {
+    @apply bg-white text-black;
+    border: 2px solid transparent;
+  }
+
+  .btn-primary > span,
+  .btn-primary > i {
+    display: inline-block;
+    transform: skewX(8deg);
+  }
+
+  .btn-primary:hover {
+    background-color: transparent !important;
+    color: black !important;
+    border: 2px solid black !important;
+    transform: skewX(-8deg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Dark mode hover: outline with white border */
+  .app-dark .btn-primary:hover {
+    background-color: transparent !important;
     color: white !important;
-    text-shadow: rgba(0, 0, 0, 0.6) 0px 1px 2px !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.8px !important;
-    box-sizing: border-box !important;
+    border: 2px solid white !important;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
   }
 
-  .btn-brick:active {
-    @apply translate-y-0;
-    /* Pressed brick effect */
-    box-shadow:
-      rgba(0, 0, 0, 0.5) 0px 2px 6px,
-      rgba(255, 255, 255, 0.2) 1px 1px 2px inset,
-      rgba(0, 0, 0, 0.4) -1px -1px 2px inset !important;
+  .btn-primary:active {
+    transform: skewX(-8deg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   }
 
-  /* Primary brick - classic red masonry brick (same as default) */
-  .btn-brick.btn-brick-primary {
-    @apply bg-red-500 border-red-600 text-white;
+  .app-dark .btn-primary:active {
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.2);
   }
 
-  .btn-brick.btn-brick-primary:hover {
-    box-shadow:
-      0 0 8px rgba(239, 68, 68, 0.4),
-      inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+  /* Secondary button style - outline parallelogram */
+  .btn-secondary {
+    @apply relative inline-block px-6 py-3 font-semibold text-black bg-transparent transition-all duration-200;
+    transform: skewX(-8deg);
+    font-family: 'Open Sans', sans-serif;
+    letter-spacing: 0.02em;
+    border: 2px solid black;
+    border-radius: 0;
+    outline: none;
   }
 
-  /* Success brick - green masonry */
-  .btn-brick.btn-brick-success {
-    @apply bg-green-500 border-green-600 text-white;
+  /* Dark mode: white border and text */
+  .app-dark .btn-secondary {
+    @apply text-white bg-transparent;
+    border: 2px solid white !important;
   }
 
-  .btn-brick.btn-brick-success:hover {
-    box-shadow:
-      0 0 8px rgba(34, 197, 94, 0.4),
-      inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+  .btn-secondary > span,
+  .btn-secondary > i {
+    display: inline-block;
+    transform: skewX(8deg);
   }
 
-  /* Secondary brick - classic yellow brick masonry */
-  .btn-brick-secondary {
-    @apply relative transition-all duration-300 font-medium;
-    /* Yellow brick styling with improved contrast */
-    background: linear-gradient(
-      135deg,
-      rgb(250, 215, 90) 0%,
-      rgb(235, 180, 45) 45%,
-      rgb(200, 150, 25) 100%
-    ) !important;
-    border-width: 2px !important;
-    border-style: solid !important;
-    border-color: rgb(250, 220, 120) rgb(146, 104, 8) rgb(146, 104, 8) rgb(250, 220, 120) !important;
-    box-shadow:
-      rgba(0, 0, 0, 0.3) 0px 4px 8px,
-      rgba(255, 255, 255, 0.4) 1px 1px 2px inset,
-      rgba(0, 0, 0, 0.2) -1px -1px 2px inset !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.6px !important;
-    text-shadow: rgba(0, 0, 0, 0.8) 0px 1px 2px !important;
-    color: rgb(92, 57, 0) !important;
-    min-width: 36px !important;
-    text-align: center !important;
-    border-radius: 3px !important;
-    box-sizing: border-box !important;
+  .btn-secondary:hover {
+    background-color: black !important;
+    color: white !important;
+    transform: skewX(-8deg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
-  .btn-brick-secondary:hover {
-    position: relative !important;
-    top: -1px !important;
-    /* Brighter yellow brick on hover */
-    background: linear-gradient(
-      135deg,
-      rgb(250, 215, 96) 0%,
-      rgb(235, 180, 52) 45%,
-      rgb(200, 150, 25) 100%
-    ) !important;
-    box-shadow:
-      rgba(0, 0, 0, 0.4) 0px 6px 12px,
-      rgba(255, 255, 255, 0.5) 1px 1px 3px inset,
-      rgba(0, 0, 0, 0.25) -1px -1px 3px inset !important;
-    color: rgb(92, 57, 0) !important;
-    text-shadow: rgba(0, 0, 0, 0.9) 0px 1px 2px !important;
-    font-family: 'Inter', sans-serif !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.6px !important;
-    box-sizing: border-box !important;
+  /* Dark mode hover: white background with black text */
+  .app-dark .btn-secondary:hover {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid white !important;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
   }
 
-  .btn-brick-secondary:active {
-    @apply translate-y-0;
-    /* Subtle pressed effect */
-    box-shadow:
-      rgba(0, 0, 0, 0.3) 0px 2px 4px,
-      rgba(255, 255, 255, 0.3) 1px 1px 2px inset,
-      rgba(0, 0, 0, 0.2) -1px -1px 2px inset !important;
+  .btn-secondary:active {
+    transform: skewX(-8deg);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   }
 
-  /* Danger brick - dark red masonry */
-  .btn-brick.btn-brick-danger {
-    @apply bg-red-600 border-red-700 text-white;
+  .app-dark .btn-secondary:active {
+    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15);
+  }
+  
+  /* Brand color variations */
+  .btn-brand-blue {
+    @apply bg-brand-blue text-white hover:opacity-90;
+  }
+  
+  .btn-brand-green {
+    @apply bg-brand-green text-white hover:opacity-90;
+  }
+  
+  .btn-brand-gold {
+    @apply bg-brand-gold text-black hover:opacity-90;
   }
 
-  .btn-brick.btn-brick-danger:hover {
-    box-shadow:
-      0 0 8px rgba(220, 38, 38, 0.4),
-      inset 0 1px 2px rgba(255, 255, 255, 0.3) !important;
+  /* Override PrimeVue inline styles that cause border changes */
+  .btn-primary,
+  .btn-primary:active,
+  .btn-primary:focus {
+    border: 2px solid transparent !important;
   }
 
-  /* Dark mode variants */
-  .dark .btn-brick {
-    /* Adjusted shadows for dark mode */
-    box-shadow:
-      0 1px 3px rgba(0, 0, 0, 0.4),
-      inset 0 1px 1px rgba(255, 255, 255, 0.2),
-      inset 0 -1px 1px rgba(0, 0, 0, 0.4);
+  .btn-secondary,
+  .btn-secondary:hover,
+  .btn-secondary:active,
+  .btn-secondary:focus {
+    border: 2px solid black !important;
   }
 
-  .dark .btn-brick:hover {
-    box-shadow:
-      0 4px 8px rgba(0, 0, 0, 0.5),
-      inset 0 1px 2px rgba(255, 255, 255, 0.3),
-      inset 0 -1px 2px rgba(0, 0, 0, 0.4);
+  /* Card styling using data attributes - this works! */
+  [data-pc-name="card"] {
+    border: 2px solid black !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    transition: box-shadow 0.2s ease-in-out !important;
   }
 
-  .dark .btn-brick:active {
-    box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.5),
-      inset 0 2px 4px rgba(0, 0, 0, 0.5),
-      inset 0 -1px 1px rgba(255, 255, 255, 0.1);
+  [data-pc-name="card"]:hover {
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.15) !important;
   }
+
+  .app-dark [data-pc-name="card"] {
+    border-color: white !important;
+  }
+
 }

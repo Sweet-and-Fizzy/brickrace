@@ -1,58 +1,45 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-8">
       <PageHeader title="Awards" :actions="headerActions" />
 
       <!-- Active Race Display -->
       <div v-if="activeRace" class="mb-8">
-        <div
-          class="border-2 border-red-500 rounded-lg p-6 bg-white dark:bg-gray-800 shadow-sm"
-          style="
-            background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);
-            border-color: #c53030;
-            box-shadow:
-              0 4px 12px rgba(0, 0, 0, 0.1),
-              inset 2px 2px 4px rgba(255, 255, 255, 0.3),
-              inset -2px -2px 4px rgba(197, 48, 48, 0.1);
-          "
-        >
-          <div class="flex items-center justify-between">
-            <div>
-              <h3
-                class="text-2xl font-black text-gray-900 mb-1"
-                style="font-family: 'Courier New', monospace"
-              >
-                {{ activeRace.name }}
-              </h3>
-              <p class="text-gray-600 font-medium">
-                {{
-                  new Date(activeRace.date).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })
-                }}
-              </p>
-            </div>
-            <div class="text-right">
-              <div class="text-gray-600 text-sm font-medium uppercase tracking-wide">
-                Total Awards
+        <Card>
+          <template #content>
+            <div class="flex items-center justify-between">
+              <div>
+                <h3
+                  class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
+                >
+                  {{ activeRace.name }}
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400 font-medium">
+                  {{
+                    new Date(activeRace.date).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })
+                  }}
+                </p>
               </div>
-              <div
-                class="text-3xl font-black text-red-600"
-                style="
-                  font-family: 'Courier New', monospace;
-                  text-shadow: 0 1px 2px rgba(197, 48, 48, 0.3);
-                "
-              >
-                {{ voteableAwards.length + filteredAssignedAwards.length }}
+              <div class="text-right">
+                <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                  Total Awards
+                </div>
+                <div
+                  class="text-3xl font-bold text-brand-blue"
+                >
+                  {{ voteableAwards.length + filteredAssignedAwards.length }}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </template>
+        </Card>
       </div>
 
       <!-- Loading State -->
@@ -99,7 +86,7 @@
             <Card
               v-for="n in 2"
               :key="n + 10"
-              class="border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 dark:border-yellow-500 hover:shadow-2xl transition-all duration-300 rounded-lg overflow-hidden"
+              class="border-2 border-brand-gold bg-white dark:bg-gray-800 hover:shadow-2xl transition-all duration-300 overflow-hidden"
             >
               <template #header>
                 <div class="relative">
@@ -139,8 +126,7 @@
         <!-- Voteable Awards -->
         <div v-if="voteableAwards.length" class="mb-12">
           <h2
-            class="text-3xl font-black text-gray-900 dark:text-white mb-8 uppercase tracking-wide"
-            style="font-family: 'Courier New', monospace; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1)"
+            class="text-3xl font-bold text-gray-900 dark:text-white mb-8"
           >
             Vote for Awards
           </h2>
@@ -181,8 +167,7 @@
               <template #title>
                 <div class="px-6 pt-6">
                   <h3
-                    class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-wide"
-                    style="font-family: 'Courier New', monospace; letter-spacing: 1px"
+                    class="text-xl font-bold text-gray-900 dark:text-white"
                   >
                     {{ award.name }}
                   </h3>
@@ -201,8 +186,7 @@
                   <div v-if="authStore.user && activeRace">
                     <div v-if="racers.length > 0">
                       <label
-                        class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wide"
-                        style="font-family: 'Courier New', monospace; letter-spacing: 0.5px"
+                        class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3"
                       >
                         Cast Your Vote:
                       </label>
@@ -244,7 +228,6 @@
                                 }}</span>
                                 <span
                                   class="text-xs font-mono text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded"
-                                  style="font-family: 'Courier New', monospace"
                                 >
                                   #{{ slotProps.option.racer_number }}
                                 </span>
@@ -272,7 +255,6 @@
                             }}</span>
                             <span
                               class="text-xs font-mono text-gray-500 px-1 py-0.5 bg-gray-100 rounded"
-                              style="font-family: 'Courier New', monospace"
                             >
                               #{{ getSelectedRacer(slotProps.value)?.racer_number || '?' }}
                             </span>
@@ -283,23 +265,13 @@
                       <Button
                         :disabled="!votes[award.id] || submittingVotes[award.id]"
                         :loading="submittingVotes[award.id]"
-                        class="w-full font-bold uppercase tracking-wide border-2 border-red-600 hover:border-red-700"
-                        severity="primary"
-                        style="
-                          background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-                          box-shadow:
-                            0 4px 8px rgba(220, 38, 38, 0.3),
-                            inset 1px 1px 2px rgba(255, 255, 255, 0.2),
-                            inset -1px -1px 2px rgba(0, 0, 0, 0.1);
-                          font-family: 'Courier New', monospace;
-                          letter-spacing: 1px;
-                        "
+                        class="btn-primary w-full font-bold"
                         @click="handleVoteSubmission(award.id)"
                       >
                         {{
                           hasUserVotedForAward(award.id, activeRace?.id)
-                            ? '🔄 Update Vote'
-                            : '🗳️ Submit Vote'
+                            ? 'Update Vote'
+                            : 'Submit Vote'
                         }}
                       </Button>
                     </div>
@@ -322,16 +294,15 @@
         <!-- Current Winners / Assigned Awards -->
         <div v-if="filteredAssignedAwards.length">
           <h2
-            class="text-3xl font-black text-gray-900 dark:text-white mb-8 uppercase tracking-wide"
-            style="font-family: 'Courier New', monospace; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1)"
+            class="text-3xl font-bold text-gray-900 dark:text-white mb-8"
           >
-            🏆 Award Winners
+            Award Winners
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card
               v-for="award in filteredAssignedAwards"
               :key="award.id"
-              class="border-2 border-yellow-400 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/30 dark:to-amber-900/30 dark:border-yellow-500 hover:shadow-2xl transition-all duration-300 rounded-lg overflow-hidden"
+              class="border-2 border-brand-gold bg-white dark:bg-gray-800 hover:shadow-2xl transition-all duration-300 overflow-hidden"
               style="
                 box-shadow:
                   0 8px 20px rgba(245, 158, 11, 0.2),
@@ -360,18 +331,9 @@
                   </div>
                   <!-- Winner Badge -->
                   <div
-                    class="absolute top-3 right-3 px-3 py-1 text-white font-black text-sm rounded"
-                    style="
-                      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-                      box-shadow:
-                        0 4px 8px rgba(245, 158, 11, 0.4),
-                        inset 1px 1px 2px rgba(255, 255, 255, 0.3),
-                        inset -1px -1px 2px rgba(0, 0, 0, 0.1);
-                      font-family: 'Courier New', monospace;
-                      letter-spacing: 1px;
-                    "
+                    class="absolute top-3 right-3 px-3 py-1 bg-brand-gold text-black font-black text-sm"
                   >
-                    🏆 WINNER
+                    WINNER
                   </div>
                 </div>
               </template>
@@ -379,8 +341,7 @@
               <template #title>
                 <div class="px-6 pt-6">
                   <h3
-                    class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-wide"
-                    style="font-family: 'Courier New', monospace; letter-spacing: 1px"
+                    class="text-xl font-bold text-gray-900 dark:text-white"
                   >
                     {{ award.award_definition?.name }}
                   </h3>
@@ -403,7 +364,6 @@
                       <div
                         v-else
                         class="w-16 h-16 bg-yellow-600 text-white flex items-center justify-center text-sm font-bold border-2 border-yellow-400 dark:border-yellow-500 rounded-full"
-                        style="font-family: 'Courier New', monospace"
                       >
                         #{{ award.racer.racer_number || '?' }}
                       </div>
@@ -418,11 +378,10 @@
                           text-shadow: 0 1px 2px rgba(245, 158, 11, 0.2);
                         "
                       >
-                        🏁 {{ award.racer.name }}
+                        {{ award.racer.name }}
                       </p>
                       <p
                         class="text-sm font-bold text-yellow-700 dark:text-yellow-300 mt-1"
-                        style="font-family: 'Courier New', monospace"
                       >
                         Racer #{{ award.racer.racer_number || 'N/A' }}
                       </p>
@@ -453,10 +412,9 @@
         <!-- Vote Results -->
         <div v-if="voteableAwards.length" class="mt-12">
           <h2
-            class="text-3xl font-black text-gray-900 dark:text-white mb-8 uppercase tracking-wide"
-            style="font-family: 'Courier New', monospace; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1)"
+            class="text-3xl font-bold text-gray-900 dark:text-white mb-8"
           >
-            📊 Vote Results
+            Vote Results
           </h2>
           <div class="space-y-8">
             <Card
@@ -473,14 +431,12 @@
               <template #title>
                 <div class="flex items-center gap-3 px-6 pt-6">
                   <div
-                    class="w-8 h-8 bg-blue-600 text-white rounded flex items-center justify-center font-bold"
-                    style="box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3)"
+                    class="w-8 h-8 bg-brand-blue text-white rounded-full flex items-center justify-center font-bold"
                   >
                     <i class="pi pi-chart-bar text-sm" />
                   </div>
                   <h3
-                    class="text-xl font-black text-gray-900 dark:text-white uppercase tracking-wide"
-                    style="font-family: 'Courier New', monospace; letter-spacing: 1px"
+                    class="text-xl font-bold text-gray-900 dark:text-white"
                   >
                     {{ award.name }}
                   </h3>
@@ -501,20 +457,14 @@
                         <div
                           class="flex items-center justify-center w-10 h-10 rounded font-black text-sm"
                           :class="{
-                            'bg-yellow-400 text-yellow-900': index === 0,
-                            'bg-gray-400 text-gray-900': index === 1,
-                            'bg-orange-400 text-orange-900': index === 2,
+                            'bg-brand-gold text-black': index === 0,
+                            'bg-gray-400 text-white': index === 1,
+                            'bg-orange-500 text-white': index === 2,
                             'bg-gray-200 text-gray-700': index > 2
                           }"
-                          style="
-                            box-shadow:
-                              0 2px 4px rgba(0, 0, 0, 0.2),
-                              inset 1px 1px 2px rgba(255, 255, 255, 0.3);
-                            font-family: 'Courier New', monospace;
-                          "
                         >
                           {{
-                            index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1
+                            index + 1
                           }}
                         </div>
                       </template>
@@ -524,9 +474,8 @@
                       <template #body="{ data }">
                         <NuxtLink
                           :to="`/racers/${data.racer_id}`"
-                          class="font-bold hover:text-blue-600 hover:underline transition-colors duration-200"
-                          style="font-family: 'Courier New', monospace"
-                        >
+                          class="font-bold hover:text-brand-blue hover:underline transition-colors duration-200"
+                          >
                           {{ data.racer_name }}
                         </NuxtLink>
                       </template>
@@ -535,13 +484,8 @@
                     <Column header="Votes" class="text-right">
                       <template #body="{ data }">
                         <Badge
-                          :value="`❤️ ${data.vote_count}`"
-                          severity="info"
-                          class="font-bold"
-                          style="
-                            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-                            font-family: 'Courier New', monospace;
-                          "
+                          :value="`${data.vote_count} votes`"
+                          class="font-bold bg-brand-blue text-white"
                         />
                       </template>
                     </Column>
@@ -555,10 +499,9 @@
 
       <!-- No Active Race -->
       <div v-else class="text-center py-12">
-        <i class="pi pi-trophy text-6xl text-red-300 mb-4" />
+        <i class="pi pi-trophy text-6xl text-brand-gold mb-4" />
         <h3
-          class="text-2xl font-black text-gray-700 mb-2 uppercase tracking-wide"
-          style="font-family: 'Courier New', monospace"
+          class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2"
         >
           No Active Race
         </h3>
@@ -656,7 +599,7 @@ const headerActions = computed(() => {
         label: 'Manage Awards',
         icon: 'pi pi-cog',
         to: '/awards/manage',
-        class: 'btn-brick'
+        class: 'btn-primary'
       }
     ]
   }
@@ -712,8 +655,8 @@ const handleVoteSubmission = async (awardDefinitionId) => {
 // Fetch active race
 const fetchActiveRace = async () => {
   try {
-    const { $supabase } = useNuxtApp()
-    const { data, error } = await $supabase
+    const supabase = useSupabaseClient()
+    const { data, error } = await supabase
       .from('races')
       .select('id, name, date, active')
       .eq('active', true)

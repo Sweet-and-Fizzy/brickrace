@@ -7,25 +7,22 @@
 
     <div v-if="actions.length > 0" class="flex gap-2 mt-4 md:mt-0">
       <template v-for="action in actions" :key="action.label">
-        <NuxtLink v-if="action.to" :to="action.to">
-          <Button
-            :label="action.label"
-            :icon="action.icon"
-            :class="action.class || 'btn-brick'"
-            :severity="action.severity"
-            :outlined="action.outlined"
-            @click="action.onClick"
-          />
-        </NuxtLink>
+        <Button
+          v-if="action.to"
+          :class="action.class || 'btn-primary'"
+          @click="() => navigateTo(action.to)"
+        >
+          <i v-if="action.icon" :class="action.icon + ' mr-2'" />
+          {{ action.label }}
+        </Button>
         <Button
           v-else
-          :label="action.label"
-          :icon="action.icon"
-          :class="action.class || 'btn-brick'"
-          :severity="action.severity"
-          :outlined="action.outlined"
+          :class="action.class || 'btn-primary'"
           @click="action.onClick"
-        />
+        >
+          <i v-if="action.icon" :class="action.icon + ' mr-2'" />
+          {{ action.label }}
+        </Button>
       </template>
     </div>
   </div>

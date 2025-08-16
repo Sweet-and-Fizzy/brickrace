@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: 'build'
   },
-  modules: ['@nuxtjs/tailwindcss', '@primevue/nuxt-module', '@pinia/nuxt'],
+  modules: ['@nuxtjs/tailwindcss', '@primevue/nuxt-module', '@pinia/nuxt', '@nuxtjs/supabase'],
 
   // Auto-import configuration
   imports: {
@@ -79,6 +79,11 @@ export default defineNuxtConfig({
     }
   },
   css: ['primeicons/primeicons.css', '~/assets/css/main.css'],
+  supabase: {
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_ANON_KEY,
+    redirect: false
+  },
   runtimeConfig: {
     public: {
       supabase: {

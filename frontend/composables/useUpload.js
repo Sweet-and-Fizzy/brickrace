@@ -4,7 +4,7 @@ import { useAuthStore } from '~/stores/auth'
 /* global File, URL */
 
 export const useUpload = (options = {}) => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
   const authStore = useAuthStore()
   const notifications = useNotifications()
 
@@ -162,7 +162,7 @@ export const useUpload = (options = {}) => {
       const processedFile = await resizeImage(file)
 
       // Upload to Supabase storage
-      const { data, error } = await $supabase.storage
+      const { data, error } = await supabase.storage
         .from(config.bucket)
         .upload(filePath, processedFile, {
           cacheControl: '3600',
@@ -172,7 +172,7 @@ export const useUpload = (options = {}) => {
       if (error) throw error
 
       // Get public URL
-      const { data: urlData } = $supabase.storage.from(config.bucket).getPublicUrl(filePath)
+      const { data: urlData } = supabase.storage.from(config.bucket).getPublicUrl(filePath)
 
       return {
         success: true,
@@ -345,7 +345,7 @@ export const useUpload = (options = {}) => {
   // Delete file from storage
   const deleteFile = async (filePath) => {
     try {
-      const { error } = await $supabase.storage.from(config.bucket).remove([filePath])
+      const { error } = await supabase.storage.from(config.bucket).remove([filePath])
 
       if (error) throw error
 
@@ -359,7 +359,7 @@ export const useUpload = (options = {}) => {
 
   // Get file URL
   const getFileUrl = (filePath) => {
-    const { data } = $supabase.storage.from(config.bucket).getPublicUrl(filePath)
+    const { data } = supabase.storage.from(config.bucket).getPublicUrl(filePath)
 
     return data.publicUrl
   }

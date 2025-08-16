@@ -147,7 +147,7 @@
 
               <!-- Submit Button -->
               <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                <NuxtLink :to="`/races/${$route.params.id}`" class="flex-1">
+                <NuxtLink :to="`/races/${race?.slug || $route.params.slug || $route.params.id}`" class="flex-1">
                   <Button
                     type="button"
                     severity="secondary"
@@ -174,14 +174,15 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
+import { isUUID } from '~/utils/slug-helpers'
 
 const route = useRoute()
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 const $toast = useToast()
 
 // Use races composable
-const { getRaceById, updateRace: updateRaceComposable, initialize: initializeRaces } = useRaces()
+const { getRaceById, getRaceBySlug, fetchRaceById, fetchRaceBySlug, updateRace: updateRaceComposable, initialize: initializeRaces } = useRaces()
 
 // State
 const race = ref(null)
@@ -197,7 +198,7 @@ const fileInput = ref(null)
 const breadcrumbItems = computed(() => [
   { label: 'Home', url: '/' },
   { label: 'Races', url: '/races' },
-  { label: race.value?.name || 'Race', url: `/races/${route.params.id}` },
+  { label: race.value?.name || 'Race', url: `/races/${route.params.slug || route.params.id}` },
   { label: 'Edit' } // Current page, no navigation
 ])
 
@@ -215,8 +216,23 @@ const fetchRace = async () => {
     // Initialize races composable if needed
     await initializeRaces()
 
-    // Get race from cached data
-    const raceData = getRaceById(route.params.id)
+    const param = route.params.slug || route.params.id
+    let raceData = null
+    
+    // Check if it's a UUID (legacy support)
+    if (isUUID(param)) {
+      // Get race from cached data
+      raceData = getRaceById(param)
+      if (!raceData) {
+        raceData = await fetchRaceById(param)
+      }
+    } else {
+      // Get race by slug
+      raceData = getRaceBySlug(param)
+      if (!raceData) {
+        raceData = await fetchRaceBySlug(param)
+      }
+    }
 
     if (!raceData) {
       throw new Error('Race not found')
@@ -226,20 +242,11 @@ const fetchRace = async () => {
 
     // Populate form
     if (raceData.race_datetime) {
-      // If we have a datetime, split it into date and time
       const datetime = new Date(raceData.race_datetime)
       form.value = {
         name: raceData.name,
         date: datetime,
         time: datetime,
-        image_url: raceData.image_url || ''
-      }
-    } else if (raceData.date) {
-      // Legacy fallback for existing races with only date
-      form.value = {
-        name: raceData.name,
-        date: new Date(raceData.date),
-        time: new Date(`1970-01-01T12:00:00`), // Default to noon
         image_url: raceData.image_url || ''
       }
     } else {
@@ -309,12 +316,12 @@ const handleImageUpload = async (event) => {
     const filePath = `races/${fileName}`
 
     // Upload to Supabase Storage
-    const { error } = await $supabase.storage.from('race-images').upload(filePath, file)
+    const { error } = await supabase.storage.from('race-images').upload(filePath, file)
 
     if (error) throw error
 
     // Get public URL
-    const { data: urlData } = $supabase.storage.from('race-images').getPublicUrl(filePath)
+    const { data: urlData } = supabase.storage.from('race-images').getPublicUrl(filePath)
 
     // Set the image URL in the form
     form.value.image_url = urlData.publicUrl
@@ -345,7 +352,7 @@ const updateRace = async () => {
       updated_at: new Date().toISOString()
     }
 
-    await updateRaceComposable(route.params.id, raceData)
+    await updateRaceComposable(race.value.id, raceData)
 
     // Show success toast
     $toast.add({
@@ -357,7 +364,7 @@ const updateRace = async () => {
 
     // Success - redirect back to race
     setTimeout(() => {
-      navigateTo(`/races/${route.params.id}`)
+      navigateTo(`/races/${race.value.slug || race.value.id}`)
     }, 1000)
   } catch (error) {
     console.error('Error updating race:', error)

@@ -1,16 +1,14 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
+    class="min-h-screen bg-white dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8"
   >
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <div class="flex justify-center">
-        <img
-          src="~/assets/img/brick_race_logo.jpg"
-          alt="The Great Holyoke Brick Race Logo"
-          class="h-20 w-auto object-contain rounded-lg"
-        />
+      <div class="text-center">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          The Great Holyoke Brick Race
+        </h1>
       </div>
-      <h2 class="mt-6 text-center text-3xl font-bold text-gray-900 dark:text-white">
+      <h2 class="mt-4 text-center text-3xl font-bold text-gray-900 dark:text-white">
         Reset Your Password
       </h2>
       <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
@@ -76,11 +74,11 @@
               type="submit"
               :loading="loading"
               :disabled="!isFormValid || loading"
-              class="w-full btn-brick"
+              class="w-full btn-primary"
               severity="primary"
             >
               <i class="pi pi-check mr-2" />
-              Update Password
+              <span>Update Password</span>
             </Button>
           </div>
         </form>
@@ -147,7 +145,7 @@
 <script setup>
 import { useAuthStore } from '~/stores/auth'
 
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 const authStore = useAuthStore()
 const router = useRouter()
 
@@ -207,7 +205,7 @@ const handlePasswordReset = async () => {
   resetComplete.value = false
 
   try {
-    const { error: updateError } = await $supabase.auth.updateUser({
+    const { error: updateError } = await supabase.auth.updateUser({
       password: password.value
     })
 

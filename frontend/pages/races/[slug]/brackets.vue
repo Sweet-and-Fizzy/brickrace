@@ -958,7 +958,7 @@ import { useConfirm } from 'primevue/useconfirm'
 
 const route = useRoute()
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 const toast = useToast()
 const confirm = useConfirm()
 const raceId = route.params.id
@@ -1492,7 +1492,7 @@ const generateBrackets = async () => {
     }
 
     // Insert all brackets
-    const { data: insertedBrackets, error: insertError } = await $supabase
+    const { data: insertedBrackets, error: insertError } = await supabase
       .from('brackets')
       .insert(newBrackets).select(`
         *,
@@ -1575,7 +1575,7 @@ const generateNextRound = async () => {
     }
 
     // Insert all next round brackets
-    const { error: insertError } = await $supabase.from('brackets').insert(newBrackets).select(`
+    const { error: insertError } = await supabase.from('brackets').insert(newBrackets).select(`
         *,
         track1_racer:racers!track1_racer_id(name, racer_number),
         track2_racer:racers!track2_racer_id(name, racer_number)
@@ -1616,7 +1616,7 @@ const clearBrackets = async () => {
       clearingBrackets.value = true
 
       try {
-        const { error: deleteError } = await $supabase
+        const { error: deleteError } = await supabase
           .from('brackets')
           .delete()
           .eq('race_id', route.params.id)
@@ -1674,7 +1674,7 @@ const deleteBracket = async (bracketId) => {
   processing.value = bracketId
 
   try {
-    const { error: deleteError } = await $supabase.from('brackets').delete().eq('id', bracketId)
+    const { error: deleteError } = await supabase.from('brackets').delete().eq('id', bracketId)
 
     if (deleteError) throw deleteError
 
@@ -1712,7 +1712,7 @@ const recordTime = async (bracket, track) => {
   try {
     const updateField = track === 1 ? 'track1_time' : 'track2_time'
 
-    const { error: updateError } = await $supabase
+    const { error: updateError } = await supabase
       .from('brackets')
       .update({ [updateField]: timeValue })
       .eq('id', bracket.id)
@@ -1773,7 +1773,7 @@ const updateTime = async (bracket, track) => {
   try {
     const updateField = track === 1 ? 'track1_time' : 'track2_time'
 
-    const { error: updateError } = await $supabase
+    const { error: updateError } = await supabase
       .from('brackets')
       .update({ [updateField]: timeValue })
       .eq('id', bracket.id)

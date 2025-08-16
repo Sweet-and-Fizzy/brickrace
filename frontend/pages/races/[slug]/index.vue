@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
@@ -98,11 +98,11 @@
           The race you're looking for doesn't exist or has been removed.
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          ID requested: {{ route.params.id }}
+          ID requested: {{ route.params.slug || route.params.id }}
         </p>
         <div class="space-x-4">
           <NuxtLink to="/races">
-            <Button severity="primary">
+            <Button class="btn-primary">
               <i class="pi pi-arrow-left mr-2" />
               Back to All Races
             </Button>
@@ -135,7 +135,7 @@
           </div>
 
           <!-- Admin Controls -->
-          <AdminMenu v-if="authStore.isRaceAdmin" :race-id="race.id" class="mt-4 md:mt-0" />
+          <AdminMenu v-if="authStore.isRaceAdmin" :race-id="race.slug || race.id" class="mt-4 md:mt-0" />
         </div>
 
         <!-- Race Image -->
@@ -167,17 +167,17 @@
             <div class="block md:hidden">
               <!-- Current Step Highlight -->
               <div
-                class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-600 rounded-lg p-4 mb-4"
+                class="bg-white border-2 border-brand-blue rounded-lg p-4 mb-4"
               >
                 <div class="flex items-center gap-3">
                   <div
-                    class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center"
+                    class="w-10 h-10 bg-brand-blue text-white rounded-full flex items-center justify-center"
                   >
                     <i :class="raceSteps[currentStep]?.icon" />
                   </div>
                   <div>
-                    <p class="font-semibold text-blue-900 dark:text-blue-100">Current Step</p>
-                    <p class="text-sm text-blue-700 dark:text-blue-300">
+                    <p class="font-semibold text-gray-900 dark:text-white">Current Step</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">
                       {{ raceSteps[currentStep]?.label }}
                     </p>
                   </div>
@@ -192,7 +192,7 @@
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div
-                    class="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    class="bg-brand-blue h-2 rounded-full transition-all duration-300"
                     :style="{ width: `${((currentStep + 1) / raceSteps.length) * 100}%` }"
                   />
                 </div>
@@ -259,7 +259,7 @@
                           <div class="text-2xl mb-1">🥈</div>
                           <NuxtLink
                             :to="`/racers/${result.second.racer_id}`"
-                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
+                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                           >
                             {{ result.second.racer_name }}
                           </NuxtLink>
@@ -287,7 +287,7 @@
                           <div class="text-3xl mb-1">🏆</div>
                           <NuxtLink
                             :to="`/racers/${result.first.racer_id}`"
-                            class="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
+                            class="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                           >
                             {{ result.first.racer_name }}
                           </NuxtLink>
@@ -296,7 +296,7 @@
                           >
                             #{{ result.first.racer_number }}
                           </div>
-                          <div class="text-sm font-bold text-blue-600">
+                          <div class="text-sm font-bold text-brand-blue">
                             {{ formatTime(result.first.winning_time) }}
                           </div>
                           <div class="mt-1">
@@ -322,7 +322,7 @@
                           <div class="text-2xl mb-1">🥉</div>
                           <NuxtLink
                             :to="`/racers/${result.third.racer_id}`"
-                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
+                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                           >
                             {{ result.third.racer_name }}
                           </NuxtLink>
@@ -357,7 +357,7 @@
             </Card>
 
             <!-- Brackets -->
-            <Card v-if="getBracketsForRace(route.params.id).length">
+            <Card v-if="race && getBracketsForRace(race.id).length">
               <template #title>
                 <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   <i class="pi pi-sitemap text-purple-600" />
@@ -367,7 +367,7 @@
               <template #content>
                 <div class="space-y-6">
                   <div
-                    v-for="(bracket, index) in getBracketsForRace(route.params.id)"
+                    v-for="(bracket, index) in getBracketsForRace(race.id)"
                     :key="bracket.id"
                     class="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
                   >
@@ -390,11 +390,11 @@
                         class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600"
                       >
                         <div class="text-center">
-                          <p class="text-sm font-medium text-blue-600 mb-2">Track 1</p>
+                          <p class="text-sm font-medium text-brand-blue mb-2">Track 1</p>
                           <div v-if="bracket.track1_racer_name">
                             <NuxtLink
                               :to="`/racers/${bracket.track1_racer_id}`"
-                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200 block"
+                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block"
                             >
                               {{ bracket.track1_racer_name }}
                             </NuxtLink>
@@ -405,7 +405,7 @@
                               v-if="bracket.track1_time"
                               class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2"
                             >
-                              <p class="text-lg font-bold text-blue-600">
+                              <p class="text-lg font-bold text-brand-blue">
                                 {{ formatTime(bracket.track1_time) }}
                               </p>
                             </div>
@@ -437,7 +437,7 @@
                           <div v-if="bracket.track2_racer_name">
                             <NuxtLink
                               :to="`/racers/${bracket.track2_racer_id}`"
-                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200 block"
+                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block"
                             >
                               {{ bracket.track2_racer_name }}
                             </NuxtLink>
@@ -484,6 +484,284 @@
               </template>
             </Card>
 
+            <!-- Dynamic Heat Display (Shows during active qualifying) -->
+            <div v-if="(currentHeatData || hasValidUpcomingHeats) && race.active" class="mb-8">
+              <!-- Current Heat Hero Section -->
+              <Card v-if="currentHeatData" class="border-4 border-brand-blue shadow-xl mb-4">
+                <template #content>
+                  <div class="bg-gradient-to-r from-brand-blue/10 to-brand-green/10 -m-6 p-6 rounded-t-lg">
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="flex items-center gap-3">
+                        <div class="bg-brand-blue text-white rounded-full p-3 animate-pulse">
+                          <i class="pi pi-flag-fill text-2xl" />
+                        </div>
+                        <div>
+                          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                            Heat {{ currentHeatData.heat_number }} - NOW RACING
+                          </h2>
+                          <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Qualifying Round • Live Timing
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+                          LIVE
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Current Heat Racers -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                      <!-- Track 1 -->
+                      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-brand-blue">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-sm font-bold text-brand-blue">TRACK 1</span>
+                        </div>
+                        <div v-if="getTrackRacer(currentHeatData.racers, 1)" class="flex items-center gap-3">
+                          <img
+                            v-if="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
+                            :src="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
+                            :alt="getTrackRacer(currentHeatData.racers, 1).racer_name"
+                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                          />
+                          <div
+                            v-else
+                            class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-car text-2xl text-gray-400" />
+                          </div>
+                          <div class="flex-1">
+                            <NuxtLink
+                              :to="`/racers/${getTrackRacer(currentHeatData.racers, 1).racer_id}`"
+                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                            >
+                              {{ getTrackRacer(currentHeatData.racers, 1).racer_name }}
+                            </NuxtLink>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                              #{{ getTrackRacer(currentHeatData.racers, 1).racer_number }}
+                            </p>
+                            <div v-if="getTrackRacer(currentHeatData.racers, 1).time" class="mt-2">
+                              <span class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm font-bold">
+                                {{ formatTime(getTrackRacer(currentHeatData.racers, 1).time) }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div v-else class="text-gray-400 text-center py-4">
+                          <i class="pi pi-clock text-2xl mb-2" />
+                          <p>Awaiting Racer</p>
+                        </div>
+                      </div>
+
+                      <!-- Track 2 -->
+                      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-red-500">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-sm font-bold text-red-500">TRACK 2</span>
+                        </div>
+                        <div v-if="getTrackRacer(currentHeatData.racers, 2)" class="flex items-center gap-3">
+                          <img
+                            v-if="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
+                            :src="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
+                            :alt="getTrackRacer(currentHeatData.racers, 2).racer_name"
+                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                          />
+                          <div
+                            v-else
+                            class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-car text-2xl text-gray-400" />
+                          </div>
+                          <div class="flex-1">
+                            <NuxtLink
+                              :to="`/racers/${getTrackRacer(currentHeatData.racers, 2).racer_id}`"
+                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                            >
+                              {{ getTrackRacer(currentHeatData.racers, 2).racer_name }}
+                            </NuxtLink>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                              #{{ getTrackRacer(currentHeatData.racers, 2).racer_number }}
+                            </p>
+                            <div v-if="getTrackRacer(currentHeatData.racers, 2).time" class="mt-2">
+                              <span class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm font-bold">
+                                {{ formatTime(getTrackRacer(currentHeatData.racers, 2).time) }}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <div v-else class="text-gray-400 text-center py-4">
+                          <i class="pi pi-clock text-2xl mb-2" />
+                          <p>Awaiting Racer</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </Card>
+
+              <!-- Upcoming Heats -->
+              <div v-if="hasValidUpcomingHeats" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card
+                  v-for="heat in upcomingHeatsData.slice(0, 2)"
+                  :key="heat.heat_number"
+                  class="border-2 border-gray-300 dark:border-gray-600"
+                >
+                  <template #content>
+                    <div class="flex items-center justify-between mb-4">
+                      <h3 class="font-bold text-lg text-gray-900 dark:text-white">
+                        Heat {{ heat.heat_number }}
+                      </h3>
+                      <span class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">
+                        On Deck
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <!-- Track 1 -->
+                      <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-xs font-bold text-brand-blue">TRACK 1</span>
+                        </div>
+                        <div v-if="getTrackRacer(heat.racers, 1)" class="flex items-center gap-3">
+                          <img
+                            v-if="getTrackRacer(heat.racers, 1).racer_image_url"
+                            :src="getTrackRacer(heat.racers, 1).racer_image_url"
+                            :alt="getTrackRacer(heat.racers, 1).racer_name"
+                            class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
+                          />
+                          <div
+                            v-else
+                            class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-car text-gray-400" />
+                          </div>
+                          <div class="flex-1">
+                            <NuxtLink
+                              :to="`/racers/${getTrackRacer(heat.racers, 1).racer_id}`"
+                              class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                            >
+                              {{ getTrackRacer(heat.racers, 1).racer_name }}
+                            </NuxtLink>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                              #{{ getTrackRacer(heat.racers, 1).racer_number }}
+                            </p>
+                          </div>
+                        </div>
+                        <div v-else class="text-gray-400 text-center py-2">
+                          <i class="pi pi-clock text-lg mb-1" />
+                          <p class="text-sm">TBD</p>
+                        </div>
+                      </div>
+
+                      <!-- Track 2 -->
+                      <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-xs font-bold text-red-500">TRACK 2</span>
+                        </div>
+                        <div v-if="getTrackRacer(heat.racers, 2)" class="flex items-center gap-3">
+                          <img
+                            v-if="getTrackRacer(heat.racers, 2).racer_image_url"
+                            :src="getTrackRacer(heat.racers, 2).racer_image_url"
+                            :alt="getTrackRacer(heat.racers, 2).racer_name"
+                            class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
+                          />
+                          <div
+                            v-else
+                            class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-car text-gray-400" />
+                          </div>
+                          <div class="flex-1">
+                            <NuxtLink
+                              :to="`/racers/${getTrackRacer(heat.racers, 2).racer_id}`"
+                              class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                            >
+                              {{ getTrackRacer(heat.racers, 2).racer_name }}
+                            </NuxtLink>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                              #{{ getTrackRacer(heat.racers, 2).racer_number }}
+                            </p>
+                          </div>
+                        </div>
+                        <div v-else class="text-gray-400 text-center py-2">
+                          <i class="pi pi-clock text-lg mb-1" />
+                          <p class="text-sm">TBD</p>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </Card>
+              </div>
+            </div>
+
+            <!-- Qualifiers Results -->
+            <Card v-if="completedQualifiers.length">
+              <template #title>
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <i class="pi pi-clock" />
+                  Qualifying Times
+                </h2>
+              </template>
+              <template #content>
+                <DataTable
+                  :value="completedQualifiers"
+                  striped-rows
+                  responsive-layout="scroll"
+                  :sort-field="'time'"
+                  :sort-order="1"
+                  class="custom-datatable"
+                >
+                  <Column field="racer_number" header="#" style="width: 60px">
+                    <template #body="slotProps">
+                      <span class="font-semibold text-brand-blue"
+                        >#{{ slotProps.data.racer_number }}</span
+                      >
+                    </template>
+                  </Column>
+                  <Column field="racer_name" header="Racer">
+                    <template #body="slotProps">
+                      <div>
+                        <NuxtLink
+                          :to="`/racers/${slotProps.data.racer_id}`"
+                          class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                        >
+                          {{ slotProps.data.racer_name }}
+                        </NuxtLink>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Heat {{ slotProps.data.heat_number }} • Track {{ slotProps.data.track_number }}
+                        </div>
+                      </div>
+                    </template>
+                  </Column>
+                  <Column field="time" header="Time" sortable>
+                    <template #body="slotProps">
+                      <div class="text-right">
+                        <span class="font-bold text-lg text-brand-blue">{{
+                          formatTime(slotProps.data.time)
+                        }}</span>
+                      </div>
+                    </template>
+                  </Column>
+                  <Column field="created_at" header="Completed">
+                    <template #body="slotProps">
+                      <span 
+                        v-if="slotProps.data.created_at" 
+                        class="text-sm text-gray-600 dark:text-gray-300"
+                      >
+                        {{ new Date(slotProps.data.created_at).toLocaleTimeString() }}
+                      </span>
+                      <span 
+                        v-else 
+                        class="text-sm text-gray-400 italic"
+                      >
+                        Not completed
+                      </span>
+                    </template>
+                  </Column>
+                </DataTable>
+              </template>
+            </Card>
+
             <!-- Awards Voting Section -->
             <Card v-if="voteableAwards.length && race?.active">
               <template #title>
@@ -524,7 +802,7 @@
                           <h3 class="font-bold text-gray-900 dark:text-white">{{ award.name }}</h3>
                           <NuxtLink
                             to="/awards"
-                            class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            class="text-brand-blue hover:text-blue-800 text-sm font-medium"
                           >
                             Vote Now →
                           </NuxtLink>
@@ -561,7 +839,7 @@
                           <div class="flex-1 min-w-0">
                             <NuxtLink
                               :to="`/racers/${leader.racer_id}`"
-                              class="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200 block truncate"
+                              class="text-sm font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                             >
                               {{ leader.racer_name }}
                             </NuxtLink>
@@ -579,58 +857,6 @@
                     </div>
                   </div>
                 </div>
-              </template>
-            </Card>
-
-            <!-- Qualifiers Results -->
-            <Card v-if="qualifiers.length">
-              <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <i class="pi pi-clock" />
-                  Qualifying Times
-                </h2>
-              </template>
-              <template #content>
-                <DataTable
-                  :value="qualifiers"
-                  striped-rows
-                  responsive-layout="scroll"
-                  :sort-field="'time'"
-                  :sort-order="1"
-                  class="custom-datatable"
-                >
-                  <Column field="racer_number" header="#" style="width: 60px">
-                    <template #body="slotProps">
-                      <span class="font-semibold text-blue-600"
-                        >#{{ slotProps.data.racer_number }}</span
-                      >
-                    </template>
-                  </Column>
-                  <Column field="racer_name" header="Racer">
-                    <template #body="slotProps">
-                      <NuxtLink
-                        :to="`/racers/${slotProps.data.racer_id}`"
-                        class="font-medium text-gray-900 dark:text-white hover:text-blue-600 hover:underline transition-colors duration-200"
-                      >
-                        {{ slotProps.data.racer_name }}
-                      </NuxtLink>
-                    </template>
-                  </Column>
-                  <Column field="time" header="Time" sortable>
-                    <template #body="slotProps">
-                      <span class="font-bold text-lg text-blue-600">{{
-                        formatTime(slotProps.data.time)
-                      }}</span>
-                    </template>
-                  </Column>
-                  <Column field="created_at" header="Time">
-                    <template #body="slotProps">
-                      <span class="text-sm text-gray-600 dark:text-gray-300">{{
-                        new Date(slotProps.data.created_at).toLocaleTimeString()
-                      }}</span>
-                    </template>
-                  </Column>
-                </DataTable>
               </template>
             </Card>
 
@@ -736,7 +962,7 @@
                   <div class="text-center pt-4 border-t border-gray-200 dark:border-gray-600">
                     <NuxtLink
                       to="/gallery"
-                      class="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 font-medium transition-colors"
+                      class="inline-flex items-center gap-2 text-brand-blue hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 font-medium transition-colors"
                     >
                       <i class="pi pi-images" />
                       See all photos
@@ -766,12 +992,16 @@
                   <div class="flex justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Bracket Races</span>
                     <span class="font-semibold">{{
-                      getBracketsForRace(route.params.id).length
+                      race && getBracketsForRace(race.id).length
                     }}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-600 dark:text-gray-300">Fastest Time</span>
                     <span class="font-semibold">{{ fastestTime || 'N/A' }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-600 dark:text-gray-300">Slowest Time</span>
+                    <span class="font-semibold">{{ slowestTime || 'N/A' }}</span>
                   </div>
                 </div>
               </template>
@@ -832,15 +1062,27 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
+import { isUUID } from '~/utils/slug-helpers'
 
 const route = useRoute()
 const authStore = useAuthStore()
 
 // Use reactive composables for all data
 
-const { races, fetchRaceById, initialize: initializeRaces } = useRaces()
+const { races, fetchRaceById, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
 
-const { qualifiers, formatTime, initialize: initializeQualifiers } = useQualifiers(route.params.id)
+// Race data - needs to be defined before other composables that depend on it
+const race = ref(null)
+const error = ref(null)
+
+// Qualifiers composable - will be initialized after race loads
+const qualifiersComposable = ref(null)
+const qualifiers = computed(() => {
+  if (!qualifiersComposable.value) return []
+  // qualifiers is a ref from the composable, so access its value
+  return unref(qualifiersComposable.value.qualifiers) || []
+})
+const formatTime = (time) => qualifiersComposable.value?.formatTime(time) || 'N/A'
 
 const { getBracketsForRace, initialize: initializeBrackets } = useBrackets()
 
@@ -851,9 +1093,17 @@ const { voteableAwards, getAwardLeaderboard, initialize: initializeAwards } = us
 // Photo management
 const { getPhotosByRace, allPhotos, initialize: initializePhotos } = usePhotos()
 
+// Heat management for current/upcoming heats
+const { 
+  currentRace: currentRaceHeat,
+  currentHeat,
+  upcomingHeats,
+  loading: heatsLoading,
+  initialize: initializeHeats,
+  fetchCurrentRaceData
+} = useHeats()
+
 // Local state
-const race = ref(null)
-const error = ref(null)
 const selectedPhotoRacer = ref(null)
 const currentPhotoPage = ref(0)
 const photosPerPage = ref(9)
@@ -866,7 +1116,7 @@ const isLoading = computed(() => raceDataLoading.value)
 const checkins = computed(() => {
   if (!race.value?.id) return []
 
-  const raceCheckins = getCheckinsForRace(route.params.id)
+  const raceCheckins = getCheckinsForRace(race.value.id)
 
   return raceCheckins
     .map((checkin) => {
@@ -891,43 +1141,83 @@ const breadcrumbItems = computed(() => [
 // Fetch race data from Supabase
 // Get race data from singleton composable (already loaded)
 const getRaceData = async () => {
-  const raceId = route.params.id
-
-  // First try to get from already loaded races
-  race.value = races.value.find((r) => r.id === raceId) || null
-
-  // If not found and races are loaded, it truly doesn't exist
-  if (!race.value && races.value.length > 0) {
-    error.value = new Error('Race not found')
-    return
-  }
-
-  // If races aren't loaded yet or race not found, fetch specifically
-  if (!race.value) {
-    try {
-      race.value = await fetchRaceById(raceId)
+  const param = route.params.slug || route.params.id
+  
+  try {
+    // Check if it's a UUID (legacy support)
+    if (isUUID(param)) {
+      // First try to get from already loaded races
+      race.value = races.value.find((r) => r.id === param) || null
+      // If not found, fetch specifically
       if (!race.value) {
-        error.value = new Error('Race not found')
+        race.value = await fetchRaceById(param)
       }
-    } catch (err) {
-      console.error('Error fetching race data:', err)
-      error.value = err
+    } else {
+      // It's a slug
+      // First try to get from already loaded races
+      race.value = races.value.find((r) => r.slug === param) || null
+      // If not found, fetch specifically
+      if (!race.value) {
+        race.value = await fetchRaceBySlug(param)
+      }
     }
+    
+    if (!race.value) {
+      error.value = new Error('Race not found')
+    } else {
+      // Initialize qualifiers composable with the race ID
+      qualifiersComposable.value = useQualifiers(race.value.id)
+    }
+  } catch (err) {
+    console.error('Error fetching race data:', err)
+    error.value = err
   }
 }
 
 // Computed properties
+const completedQualifiers = computed(() => {
+  if (!qualifiers.value) return []
+  
+  // Only show completed qualifying runs with valid times
+  return qualifiers.value.filter(q => 
+    q.status === 'completed' && 
+    q.time && 
+    q.time > 0 && 
+    !isNaN(q.time)
+  )
+})
+
 const fastestTime = computed(() => {
   if (!qualifiers.value || qualifiers.value.length === 0) return null
 
-  const times = qualifiers.value.map((q) => Number.parseFloat(q.time))
-  const best = Math.min(...times)
+  // Filter out invalid times (0, null, NaN) and only include valid times
+  const validTimes = qualifiers.value
+    .map((q) => Number.parseFloat(q.time))
+    .filter((time) => time > 0 && !isNaN(time))
+  
+  if (validTimes.length === 0) return null
+  
+  const best = Math.min(...validTimes)
   return formatTime(best)
+})
+
+const slowestTime = computed(() => {
+  if (!qualifiers.value || qualifiers.value.length === 0) return null
+
+  // Filter out invalid times (0, null, NaN) and only include valid times
+  const validTimes = qualifiers.value
+    .map((q) => Number.parseFloat(q.time))
+    .filter((time) => time > 0 && !isNaN(time))
+  
+  if (validTimes.length === 0) return null
+  
+  const slowest = Math.max(...validTimes)
+  return formatTime(slowest)
 })
 
 const winners = computed(() => {
   // Get all completed brackets for this race by type
-  const raceBrackets = getBracketsForRace(route.params.id)
+  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
   const completedBrackets = raceBrackets.filter(
     (b) => b.track1_time && b.track2_time && b.track1_time !== b.track2_time
   )
@@ -996,7 +1286,7 @@ const winners = computed(() => {
 })
 
 const completedBracketsByType = computed(() => {
-  const raceBrackets = getBracketsForRace(route.params.id)
+  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
   const byType = { Fastest: 0, Slowest: 0 }
   raceBrackets.forEach((b) => {
     if (b.track1_time && b.track2_time && b.bracket_type) {
@@ -1007,7 +1297,7 @@ const completedBracketsByType = computed(() => {
 })
 
 const totalBracketsByType = computed(() => {
-  const raceBrackets = getBracketsForRace(route.params.id)
+  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
   const byType = { Fastest: 0, Slowest: 0 }
   raceBrackets.forEach((b) => {
     if (b.bracket_type) {
@@ -1022,7 +1312,7 @@ const tournamentResults = computed(() => {
 
   // Check each bracket type for tournament completion
   for (const bracketType of ['Fastest', 'Slowest']) {
-    const raceBrackets = getBracketsForRace(route.params.id)
+    const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
     const typeBrackets = raceBrackets.filter((b) => b.bracket_type === bracketType)
     const typeCompleted = completedBracketsByType.value[bracketType]
     const typeTotal = totalBracketsByType.value[bracketType]
@@ -1085,7 +1375,7 @@ const raceEvents = computed(() => {
   }
 
   // First bracket race
-  const raceBrackets = getBracketsForRace(route.params.id)
+  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
   if (raceBrackets.length > 0) {
     const firstBracket = raceBrackets.reduce((earliest, b) =>
       new Date(b.created_at) < new Date(earliest.created_at) ? b : earliest
@@ -1151,7 +1441,7 @@ const currentStep = computed(() => {
   if (completedTournaments.length > 0) return 4
 
   // Brackets phase - if any brackets exist
-  const raceBrackets = getBracketsForRace(route.params.id)
+  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
   if (raceBrackets.length > 0) return 3
 
   // Qualifying phase - if any qualifying times exist
@@ -1165,7 +1455,7 @@ const currentStep = computed(() => {
 })
 
 const getTournamentPlacings = (bracketType) => {
-  const raceBrackets = getBracketsForRace(route.params.id)
+  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
   const typeBrackets = raceBrackets
     .filter((b) => b.bracket_type === bracketType && b.track1_time && b.track2_time)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -1310,6 +1600,52 @@ const awardLeaderboards = computed(() => {
   return leaderboards
 })
 
+// Current heat data for display
+const currentHeatData = computed(() => {
+  // Debug logging
+  console.log('currentHeatData computed:', {
+    raceActive: race.value?.active,
+    raceId: race.value?.id,
+    currentRaceHeatId: currentRaceHeat.value?.id,
+    hasCurrentHeat: !!currentHeat.value,
+    currentHeat: currentHeat.value
+  })
+  
+  // Only show if this is the active race and there's a current heat
+  if (!race.value?.active || !currentHeat.value || !currentRaceHeat.value) return null
+  if (currentRaceHeat.value.id !== race.value.id) return null
+
+  return currentHeat.value
+})
+
+// Upcoming heats data for display
+const upcomingHeatsData = computed(() => {
+  // Only show if this is the active race and there are upcoming heats
+  if (!race.value?.active || !upcomingHeats.value.length || !currentRaceHeat.value) return []
+  if (currentRaceHeat.value.id !== race.value.id) return []
+
+  return upcomingHeats.value
+})
+
+// Check if upcoming heats have valid racer assignments
+const hasValidUpcomingHeats = computed(() => {
+  if (!upcomingHeatsData.value.length) return false
+  
+  // Check if any upcoming heat has valid heat_number and at least one racer assigned
+  return upcomingHeatsData.value.some(heat => 
+    heat.heat_number && // Must have a heat number (means heats were generated)
+    heat.racers && 
+    heat.racers.length > 0 &&
+    heat.racers.some(racer => 
+      racer && 
+      racer.racer_name && 
+      racer.racer_name !== 'TBD' &&
+      racer.racer_id && // Must have actual racer ID
+      racer.track_number // Must have track assignment
+    )
+  )
+})
+
 // Helper functions (formatTime is provided by useQualifiers composable)
 
 const formatEventTime = (dateString) => {
@@ -1342,6 +1678,19 @@ const getWinner = (bracket) => {
   }
 }
 
+// Helper function to find racer by track number
+const getTrackRacer = (racers, trackNumber) => {
+  if (!racers || !Array.isArray(racers)) return null
+  return racers.find(racer => racer.track_number === trackNumber) || null
+}
+
+// Helper function to get attempt count for a racer
+const getRacerAttemptCount = (racerId) => {
+  if (!qualifiers.value) return 0
+  return qualifiers.value.filter(q => q.racer_id === racerId).length
+}
+
+
 // Watch for filter changes to reset pagination
 watch(selectedPhotoRacer, () => {
   currentPhotoPage.value = 0
@@ -1360,14 +1709,17 @@ onMounted(async () => {
     await getRaceData()
   }
 
-  // Initialize all other composables
-  await Promise.all([
-    initializeQualifiers(),
-    initializeBrackets(),
-    initializeCheckins(),
-    initializeAwards({ raceId: route.params.id }),
-    initializePhotos()
-  ])
+  // Initialize all other composables (only after race is loaded)
+  if (race.value && qualifiersComposable.value) {
+    await Promise.all([
+      qualifiersComposable.value.initialize(),
+      initializeBrackets(),
+      initializeCheckins(),
+      initializeAwards({ raceId: race.value.id }),
+      initializePhotos(),
+      initializeHeats()
+    ])
+  }
 
   // Race data is now available, hide main loading
   raceDataLoading.value = false

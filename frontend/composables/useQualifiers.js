@@ -36,7 +36,7 @@ const useQualifiersState = (raceId) => {
 }
 
 const createQualifiersInstance = (raceId) => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
 
   // Reactive state using useState
   const state = useQualifiersState(raceId)
@@ -54,7 +54,7 @@ const createQualifiersInstance = (raceId) => {
     error.value = null
 
     try {
-      let query = $supabase.from('qualifiers').select(`
+      let query = supabase.from('qualifiers').select(`
           *,
           racer:racers(
             id,
@@ -110,7 +110,7 @@ const createQualifiersInstance = (raceId) => {
   // Add new qualifier time
   const addQualifier = async (racerId, targetRaceId, time, notes = null) => {
     try {
-      const { data, error: insertError } = await $supabase
+      const { data, error: insertError } = await supabase
         .from('qualifiers')
         .insert({
           racer_id: racerId,
@@ -152,7 +152,7 @@ const createQualifiersInstance = (raceId) => {
   // Update qualifier time
   const updateQualifier = async (qualifierId, time, notes = null) => {
     try {
-      const { data, error: updateError } = await $supabase
+      const { data, error: updateError } = await supabase
         .from('qualifiers')
         .update({
           time: Number(time),
@@ -194,7 +194,7 @@ const createQualifiersInstance = (raceId) => {
   // Delete qualifier
   const deleteQualifier = async (qualifierId) => {
     try {
-      const { error: deleteError } = await $supabase
+      const { error: deleteError } = await supabase
         .from('qualifiers')
         .delete()
         .eq('id', qualifierId)
@@ -229,7 +229,7 @@ const createQualifiersInstance = (raceId) => {
       case 'INSERT':
         // Fetch the full record with racer data
         try {
-          const { data: fullRecord, error } = await $supabase
+          const { data: fullRecord, error } = await supabase
             .from('qualifiers')
             .select(
               `
@@ -310,7 +310,7 @@ const createQualifiersInstance = (raceId) => {
     }
 
     // Create subscription without storing reference (no cleanup needed)
-    $supabase
+    supabase
       .channel(channelName)
       .on(
         'postgres_changes',

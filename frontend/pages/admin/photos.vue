@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <!-- Breadcrumb Navigation -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
@@ -24,9 +24,9 @@
 
           <div class="mt-4 md:mt-0 flex flex-wrap gap-3">
             <div class="flex items-center gap-2">
-              <Badge :value="`${pendingCount} Pending`" severity="warning" />
-              <Badge :value="`${approvedCount} Approved`" severity="success" />
-              <Badge :value="`${rejectedCount} Rejected`" severity="danger" />
+              <Badge :value="`${pendingCount} Pending`" class="bg-brand-gold text-black" />
+              <Badge :value="`${approvedCount} Approved`" class="bg-brand-green text-white" />
+              <Badge :value="`${rejectedCount} Rejected`" class="bg-red-500 text-white" />
             </div>
             <AdminMenu />
           </div>

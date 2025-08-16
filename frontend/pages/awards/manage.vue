@@ -1,20 +1,24 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Manage Awards</h1>
         <div class="flex gap-2">
           <NuxtLink to="/awards">
-            <Button label="Back to Awards" icon="pi pi-arrow-left" severity="secondary" outlined />
+            <Button class="btn-secondary">
+              <i class="pi pi-arrow-left mr-2" />
+              Back to Awards
+            </Button>
           </NuxtLink>
           <Button
-            label="Add Award Type"
-            icon="pi pi-plus"
-            severity="primary"
+            class="btn-primary"
             @click="showAddDefinitionDialog = true"
-          />
+          >
+            <i class="pi pi-plus mr-2" />
+            Add Award Type
+          </Button>
           <AdminMenu v-if="authStore.isRaceAdmin" :race-id="activeRace?.id" />
         </div>
       </div>
@@ -30,10 +34,10 @@
             <div
               v-for="assignment in currentAssignments"
               :key="assignment.id"
-              class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 rounded-lg"
+              class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-2 border-brand-green rounded-lg"
             >
               <div class="flex items-center space-x-4">
-                <i class="pi pi-trophy text-green-600 text-xl" />
+                <i class="pi pi-trophy text-brand-green text-xl" />
                 <div>
                   <div class="font-medium">{{ assignment.award_definition.name }}</div>
                   <div class="text-sm text-gray-600 dark:text-gray-300">
@@ -45,9 +49,8 @@
                 </div>
               </div>
               <Button
-                severity="danger"
                 size="small"
-                outlined
+                class="btn-secondary"
                 @click="removeAssignment(assignment.id)"
               >
                 <i class="pi pi-times mr-2" />
@@ -106,7 +109,7 @@
             <Button
               :disabled="!newAssignment.awardDefinitionId || !newAssignment.racerId || assigning"
               :loading="assigning"
-              severity="success"
+              class="btn-primary"
               @click="assignAwardToRacer"
             >
               <i v-if="!assigning" class="pi pi-plus mr-2" />
@@ -162,8 +165,8 @@
                   <i class="pi pi-trophy text-4xl text-gray-400 dark:text-gray-500" />
                 </div>
                 <div class="absolute top-2 right-2 flex gap-1">
-                  <Badge v-if="definition.voteable" value="Voteable" severity="info" />
-                  <Badge v-if="!definition.active" value="Inactive" severity="warning" />
+                  <Badge v-if="definition.voteable" value="Voteable" class="bg-brand-blue text-white" />
+                  <Badge v-if="!definition.active" value="Inactive" class="bg-gray-500 text-white" />
                 </div>
               </div>
             </template>
@@ -177,16 +180,14 @@
                   label="Edit"
                   icon="pi pi-pencil"
                   size="small"
-                  severity="info"
-                  outlined
+                  class="btn-secondary"
                   @click="editDefinition(definition)"
                 />
                 <Button
                   :label="definition.active ? 'Deactivate' : 'Activate'"
                   :icon="definition.active ? 'pi pi-times' : 'pi pi-check'"
                   size="small"
-                  :severity="definition.active ? 'danger' : 'success'"
-                  outlined
+                  :class="definition.active ? 'btn-secondary' : 'btn-primary'"
                   @click="toggleDefinitionActiveStatus(definition)"
                 />
               </div>
@@ -251,9 +252,8 @@
                 <Button
                   label="Remove Image"
                   icon="pi pi-times"
-                  severity="danger"
                   size="small"
-                  outlined
+                  class="btn-secondary"
                   @click="removeAwardImage"
                 />
               </div>
@@ -307,8 +307,7 @@
           <div class="flex justify-end space-x-3">
             <Button
               label="Cancel"
-              severity="secondary"
-              outlined
+              class="btn-secondary"
               @click="showAddDefinitionDialog = false"
             />
             <Button
@@ -316,7 +315,7 @@
               :loading="savingDefinition"
               :label="editingDefinition ? 'Update Award' : 'Create Award'"
               :icon="editingDefinition ? 'pi pi-pencil' : 'pi pi-plus'"
-              severity="primary"
+              class="btn-primary"
               @click="saveDefinition"
             />
           </div>
@@ -331,7 +330,7 @@ import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
 
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 const toast = useToast()
 
 // Navigation guard
@@ -568,11 +567,11 @@ const onAwardImageSelect = async (event) => {
     const fileExt = file.name.split('.').pop()
     const fileName = `award-${Date.now()}.${fileExt}`
 
-    const { error } = await $supabase.storage.from('race-images').upload(fileName, file)
+    const { error } = await supabase.storage.from('race-images').upload(fileName, file)
 
     if (error) throw error
 
-    const { data: urlData } = $supabase.storage.from('race-images').getPublicUrl(fileName)
+    const { data: urlData } = supabase.storage.from('race-images').getPublicUrl(fileName)
 
     definitionForm.value.image_url = urlData.publicUrl
 
@@ -704,16 +703,15 @@ useHead({
 }
 
 .awards-dialog :deep(.p-dialog-header) {
-  @apply bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-4 rounded-t-lg;
-  border-bottom: none;
+  @apply bg-white text-gray-900 px-6 py-4 rounded-t-lg border-b-2 border-gray-200;
 }
 
 .awards-dialog :deep(.p-dialog-title) {
-  @apply text-lg font-semibold text-white;
+  @apply text-lg font-semibold text-gray-900;
 }
 
 .awards-dialog :deep(.p-dialog-header-close) {
-  @apply text-white hover:bg-white hover:bg-opacity-20 rounded;
+  @apply text-gray-600 hover:bg-gray-100 rounded;
 }
 
 .awards-dialog :deep(.p-dialog-content) {

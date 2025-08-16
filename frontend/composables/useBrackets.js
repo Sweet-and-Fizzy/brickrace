@@ -36,7 +36,7 @@ const useBracketsState = () => {
 }
 
 export const useBrackets = () => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
   const authStore = useAuthStore()
   const notifications = useNotifications()
 
@@ -83,7 +83,7 @@ export const useBrackets = () => {
 
       // Save brackets to database
       const bracketPromises = bracketPairs.map((bracket) =>
-        $supabase.from('brackets').insert({
+        supabase.from('brackets').insert({
           race_id: raceId,
           round: bracket.round,
           bracket_number: bracket.bracket_number,
@@ -125,7 +125,7 @@ export const useBrackets = () => {
   // Get qualified racers sorted by qualifying time
   const getQualifiedRacers = async (raceId, limit) => {
     try {
-      const { data: qualifiers, error: qualifierError } = await $supabase
+      const { data: qualifiers, error: qualifierError } = await supabase
         .from('qualifiers')
         .select(
           `
@@ -238,7 +238,7 @@ export const useBrackets = () => {
     try {
       const timeField = track === 1 ? 'track1_time' : 'track2_time'
 
-      const { error } = await $supabase
+      const { error } = await supabase
         .from('brackets')
         .update({ [timeField]: time })
         .eq('id', bracketId)
@@ -309,7 +309,7 @@ export const useBrackets = () => {
       }
 
       // Update bracket with winner
-      const { error } = await $supabase
+      const { error } = await supabase
         .from('brackets')
         .update({
           winner_track: winnerTrack,
@@ -321,7 +321,7 @@ export const useBrackets = () => {
       if (error) throw error
 
       // Create winner record
-      await $supabase.from('winners').insert({
+      await supabase.from('winners').insert({
         race_id: bracket.race_id,
         bracket_id: bracket.id,
         racer_id: winnerRacerId,
@@ -389,7 +389,7 @@ export const useBrackets = () => {
 
       // Insert next round brackets
       if (nextBrackets.length > 0) {
-        const { error } = await $supabase.from('brackets').insert(nextBrackets)
+        const { error } = await supabase.from('brackets').insert(nextBrackets)
 
         if (error) throw error
 
@@ -405,7 +405,7 @@ export const useBrackets = () => {
   // Get winners from current round
   const getCurrentRoundWinners = async (raceId, round) => {
     try {
-      const { data, error } = await $supabase
+      const { data, error } = await supabase
         .from('winners')
         .select(
           `
@@ -436,7 +436,7 @@ export const useBrackets = () => {
     state.loading.value = true
 
     try {
-      const { data, error } = await $supabase
+      const { data, error } = await supabase
         .from('brackets')
         .select(
           `
@@ -510,10 +510,10 @@ export const useBrackets = () => {
 
     try {
       // Delete winners first (foreign key constraint)
-      await $supabase.from('winners').delete().eq('race_id', raceId)
+      await supabase.from('winners').delete().eq('race_id', raceId)
 
       // Delete brackets
-      const { error } = await $supabase.from('brackets').delete().eq('race_id', raceId)
+      const { error } = await supabase.from('brackets').delete().eq('race_id', raceId)
 
       if (error) throw error
 
@@ -553,7 +553,7 @@ export const useBrackets = () => {
     }
 
     // Subscribe to bracket changes for all races
-    state.channels.value.bracketsChannel = $supabase
+    state.channels.value.bracketsChannel = supabase
       .channel('global-brackets-realtime')
       .on(
         'postgres_changes',
@@ -683,7 +683,7 @@ export const useBrackets = () => {
     state.error.value = null
 
     try {
-      const { data: newBracket, error: createError } = await $supabase
+      const { data: newBracket, error: createError } = await supabase
         .from('brackets')
         .insert(bracketData)
         .select(
@@ -737,7 +737,7 @@ export const useBrackets = () => {
     state.error.value = null
 
     try {
-      const { data: updatedBracket, error: updateError } = await $supabase
+      const { data: updatedBracket, error: updateError } = await supabase
         .from('brackets')
         .update(updates)
         .eq('id', bracketId)
@@ -809,10 +809,10 @@ export const useBrackets = () => {
       const bracketNumber = bracket?.bracket_number || 'Unknown'
 
       // Delete related winner record first if it exists
-      await $supabase.from('winners').delete().eq('bracket_id', bracketId)
+      await supabase.from('winners').delete().eq('bracket_id', bracketId)
 
       // Delete the bracket
-      const { error: deleteError } = await $supabase.from('brackets').delete().eq('id', bracketId)
+      const { error: deleteError } = await supabase.from('brackets').delete().eq('id', bracketId)
 
       if (deleteError) throw deleteError
 

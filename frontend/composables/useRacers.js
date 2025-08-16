@@ -18,7 +18,7 @@ const useRacersState = () => {
 }
 
 export const useRacers = () => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
   const authStore = useAuthStore()
 
   // Get useState-based state
@@ -98,7 +98,7 @@ export const useRacers = () => {
   // Fetch voteable awards
   const fetchVoteableAwards = async () => {
     try {
-      const { data: awards, error: awardsError } = await $supabase
+      const { data: awards, error: awardsError } = await supabase
         .from('award_definitions')
         .select('id, name')
         .eq('voteable', true)
@@ -117,7 +117,7 @@ export const useRacers = () => {
   // Fetch vote counts for all racers
   const fetchVoteCounts = async () => {
     try {
-      const { data: voteCounts, error: voteError } = await $supabase
+      const { data: voteCounts, error: voteError } = await supabase
         .from('award_vote_counts')
         .select('*')
 
@@ -142,7 +142,7 @@ export const useRacers = () => {
 
     try {
       // Fetch racers with related data
-      const { data: racersData, error: racersError } = await $supabase
+      const { data: racersData, error: racersError } = await supabase
         .from('racers')
         .select(
           `
@@ -315,7 +315,7 @@ export const useRacers = () => {
     }
 
     // Subscribe to racers table changes
-    state.channels.value.racersChannel = $supabase
+    state.channels.value.racersChannel = supabase
       .channel('global-racers-realtime')
       .on(
         'postgres_changes',
@@ -329,7 +329,7 @@ export const useRacers = () => {
       .subscribe()
 
     // Subscribe to vote count changes
-    state.channels.value.votesChannel = $supabase
+    state.channels.value.votesChannel = supabase
       .channel('global-votes-realtime')
       .on(
         'postgres_changes',
@@ -345,7 +345,7 @@ export const useRacers = () => {
       .subscribe()
 
     // Subscribe to awards changes
-    state.channels.value.awardsChannel = $supabase
+    state.channels.value.awardsChannel = supabase
       .channel('global-awards-realtime')
       .on(
         'postgres_changes',
@@ -376,7 +376,7 @@ export const useRacers = () => {
   const fetchRacerDetails = async (racerId) => {
     try {
       // Fetch racer data first
-      const { data: racerData, error: racerError } = await $supabase
+      const { data: racerData, error: racerError } = await supabase
         .from('racers')
         .select('*')
         .eq('id', racerId)
@@ -387,7 +387,7 @@ export const useRacers = () => {
       // Fetch related data separately to avoid relationship ambiguity
       const [qualifiersData, awardsData, bracketsData, checkinsData] = await Promise.all([
         // Qualifiers
-        $supabase
+        supabase
           .from('qualifiers')
           .select(
             `
@@ -399,7 +399,7 @@ export const useRacers = () => {
           .order('created_at', { ascending: false }),
 
         // Awards
-        $supabase
+        supabase
           .from('awards')
           .select(
             `
@@ -412,7 +412,7 @@ export const useRacers = () => {
           .order('created_at', { ascending: false }),
 
         // Brackets (where this racer participated)
-        $supabase
+        supabase
           .from('brackets')
           .select(
             `
@@ -426,7 +426,7 @@ export const useRacers = () => {
           .order('created_at', { ascending: false }),
 
         // Checkins
-        $supabase
+        supabase
           .from('checkins')
           .select(
             `
@@ -514,7 +514,7 @@ export const useRacers = () => {
     state.error.value = null
 
     try {
-      const { data: updatedRacer, error: updateError } = await $supabase
+      const { data: updatedRacer, error: updateError } = await supabase
         .from('racers')
         .update({
           ...updates,
@@ -552,7 +552,7 @@ export const useRacers = () => {
   // Update racer image specifically
   const updateRacerImage = async (racerId, imageUrl) => {
     try {
-      const { data: updatedRacer, error: updateError } = await $supabase
+      const { data: updatedRacer, error: updateError } = await supabase
         .from('racers')
         .update({
           image_url: imageUrl,
@@ -588,7 +588,7 @@ export const useRacers = () => {
   // Update racer photos specifically
   const updateRacerPhotos = async (racerId, photos) => {
     try {
-      const { data: updatedRacer, error: updateError } = await $supabase
+      const { data: updatedRacer, error: updateError } = await supabase
         .from('racers')
         .update({
           photos: photos,

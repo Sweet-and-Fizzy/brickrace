@@ -31,14 +31,14 @@ const useAwardsState = () => {
 }
 
 export const useAwards = () => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
   const authStore = useAuthStore()
   const state = useAwardsState()
 
   // Initial data fetch
   const fetchAwardDefinitions = async (includeInactive = false) => {
     try {
-      let query = $supabase.from('award_definitions').select('*').order('name')
+      let query = supabase.from('award_definitions').select('*').order('name')
 
       // Only filter by active if not including inactive ones
       if (!includeInactive) {
@@ -58,7 +58,7 @@ export const useAwards = () => {
 
   const fetchAwards = async () => {
     try {
-      const { data: awardsData, error: awardsError } = await $supabase
+      const { data: awardsData, error: awardsError } = await supabase
         .from('awards')
         .select(
           `
@@ -80,7 +80,7 @@ export const useAwards = () => {
 
   const fetchVoteCounts = async (raceId = null) => {
     try {
-      let query = $supabase
+      let query = supabase
         .from('award_vote_counts')
         .select('*')
         .order('vote_count', { ascending: false })
@@ -113,7 +113,7 @@ export const useAwards = () => {
     if (!authStore.userId) return
 
     try {
-      const { data: userVotesData, error: votesError } = await $supabase
+      const { data: userVotesData, error: votesError } = await supabase
         .from('award_votes')
         .select('*')
         .eq('voter_id', authStore.userId)
@@ -142,7 +142,7 @@ export const useAwards = () => {
 
     try {
       // Use upsert to handle insert/update automatically
-      const { data, error: upsertError } = await $supabase
+      const { data, error: upsertError } = await supabase
         .from('award_votes')
         .upsert(
           {
@@ -187,7 +187,7 @@ export const useAwards = () => {
     }
 
     try {
-      const { error: deleteError } = await $supabase
+      const { error: deleteError } = await supabase
         .from('award_votes')
         .delete()
         .eq('voter_id', authStore.userId)
@@ -227,7 +227,7 @@ export const useAwards = () => {
     }
 
     try {
-      const { data, error: createError } = await $supabase
+      const { data, error: createError } = await supabase
         .from('award_definitions')
         .insert({ ...definitionData, active: true })
         .select()
@@ -253,7 +253,7 @@ export const useAwards = () => {
     }
 
     try {
-      const { data, error: updateError } = await $supabase
+      const { data, error: updateError } = await supabase
         .from('award_definitions')
         .update(updates)
         .eq('id', definitionId)
@@ -286,7 +286,7 @@ export const useAwards = () => {
       const definition = state.awardDefinitions.value.find((def) => def.id === definitionId)
       if (!definition) throw new Error('Award definition not found')
 
-      const { data, error: toggleError } = await $supabase
+      const { data, error: toggleError } = await supabase
         .from('award_definitions')
         .update({ active: !definition.active })
         .eq('id', definitionId)
@@ -316,7 +316,7 @@ export const useAwards = () => {
     }
 
     try {
-      const { data, error: assignError } = await $supabase
+      const { data, error: assignError } = await supabase
         .from('awards')
         .insert({
           racer_id: racerId,
@@ -354,7 +354,7 @@ export const useAwards = () => {
     }
 
     try {
-      const { error: removeError } = await $supabase.from('awards').delete().eq('id', awardId)
+      const { error: removeError } = await supabase.from('awards').delete().eq('id', awardId)
 
       if (removeError) throw removeError
     } catch (err) {
@@ -486,7 +486,7 @@ export const useAwards = () => {
       return
     }
     // Subscribe to awards changes
-    state.channels.value.awardsChannel = $supabase
+    state.channels.value.awardsChannel = supabase
       .channel('awards-realtime')
       .on(
         'postgres_changes',
@@ -500,7 +500,7 @@ export const useAwards = () => {
       .subscribe()
 
     // Subscribe to vote changes
-    state.channels.value.votesChannel = $supabase
+    state.channels.value.votesChannel = supabase
       .channel('votes-realtime')
       .on(
         'postgres_changes',

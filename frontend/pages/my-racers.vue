@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-8">
@@ -8,7 +8,7 @@
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">My Racers</h1>
         </div>
         <NuxtLink to="/racers/add">
-          <Button icon="pi pi-plus" label="Add New Racer" class="btn-brick px-4 py-2" />
+          <Button icon="pi pi-plus" class="btn-primary px-4 py-2"><span>Add New Racer</span></Button>
         </NuxtLink>
       </div>
 
@@ -20,7 +20,7 @@
       <!-- My Racers DataView -->
       <div
         v-else-if="myRacers.length"
-        class="bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 rounded-lg p-6"
+        class="bg-white dark:bg-gray-900 rounded-lg p-6"
       >
         <DataView
           :value="myRacers"
@@ -213,10 +213,9 @@
         <NuxtLink to="/racers/add">
           <Button
             icon="pi pi-plus"
-            label="Create Your First Racer"
-            class="btn-brick"
+            class="btn-primary"
             size="large"
-          />
+          ><span>Create Your First Racer</span></Button>
         </NuxtLink>
       </div>
     </div>

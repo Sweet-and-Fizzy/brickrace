@@ -21,7 +21,7 @@
           You don't have permission to edit this racer or it doesn't exist.
         </p>
         <NuxtLink to="/racers">
-          <Button label="Back to All Racers" icon="pi pi-arrow-left" class="btn-brick-secondary" />
+          <Button icon="pi pi-arrow-left" class="btn-secondary"><span>Back to All Racers</span></Button>
         </NuxtLink>
       </div>
 
@@ -242,10 +242,11 @@
                 <Button
                   type="submit"
                   :loading="loading"
-                  label="Update Racer"
                   icon="pi pi-save"
-                  class="btn-brick flex-1"
-                />
+                  class="btn-primary flex-1"
+                >
+                  <span>Update Racer</span>
+                </Button>
               </div>
             </form>
           </div>
@@ -268,7 +269,7 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 const $toast = useToast()
 
 // Use racers composable
@@ -511,14 +512,14 @@ const savePreviewedPhoto = async () => {
     const filePath = `racers/${authStore.userId}/${newFileName}`
 
     // Upload file to Supabase Storage
-    const { error: uploadError } = await $supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from('race-images')
       .upload(filePath, actualFile)
 
     if (uploadError) throw uploadError
 
     // Get public URL
-    const { data: urlData } = $supabase.storage.from('race-images').getPublicUrl(filePath)
+    const { data: urlData } = supabase.storage.from('race-images').getPublicUrl(filePath)
 
     if (!urlData.publicUrl) throw new Error('Failed to get public URL')
 

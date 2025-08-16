@@ -23,7 +23,7 @@ const useCheckinsState = () => {
 }
 
 export const useCheckins = () => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
   // Get useState-based state
   const state = useCheckinsState()
 
@@ -65,7 +65,7 @@ export const useCheckins = () => {
     error.value = null
 
     try {
-      let query = $supabase.from('checkins').select(`
+      let query = supabase.from('checkins').select(`
           *,
           race:races(
             id,
@@ -123,7 +123,7 @@ export const useCheckins = () => {
     error.value = null
 
     try {
-      const { data: racersData, error: racersError } = await $supabase
+      const { data: racersData, error: racersError } = await supabase
         .from('racers')
         .select('*')
         .order('racer_number', { ascending: true })
@@ -152,7 +152,7 @@ export const useCheckins = () => {
         return { success: false, error: 'Racer is already checked in' }
       }
 
-      const { data: newCheckin, error: insertError } = await $supabase
+      const { data: newCheckin, error: insertError } = await supabase
         .from('checkins')
         .insert({
           racer_id: racerId,
@@ -189,7 +189,7 @@ export const useCheckins = () => {
         return { success: false, error: 'Racer is not checked in' }
       }
 
-      const { error: deleteError } = await $supabase
+      const { error: deleteError } = await supabase
         .from('checkins')
         .delete()
         .eq('racer_id', racerId)
@@ -317,7 +317,7 @@ export const useCheckins = () => {
     }
 
     // Subscribe to checkins table changes
-    state.channels.value.checkinsChannel = $supabase
+    state.channels.value.checkinsChannel = supabase
       .channel('global-checkins-realtime')
       .on(
         'postgres_changes',
@@ -335,7 +335,7 @@ export const useCheckins = () => {
       })
 
     // Subscribe to racers table changes
-    state.channels.value.racersChannel = $supabase
+    state.channels.value.racersChannel = supabase
       .channel('global-racers-realtime')
       .on(
         'postgres_changes',

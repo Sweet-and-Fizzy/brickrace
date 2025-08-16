@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <!-- Header -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
@@ -8,7 +8,7 @@
         <div class="text-center">
           <div class="flex justify-center mb-6">
             <div
-              class="bg-gradient-to-r from-green-600 to-green-700 rounded-full w-16 h-16 flex items-center justify-center"
+              class="bg-brand-green rounded-full w-16 h-16 flex items-center justify-center"
             >
               <i class="pi pi-images text-2xl text-white" />
             </div>

@@ -191,7 +191,7 @@ const props = defineProps({
 const emit = defineEmits(['photo-uploaded', 'upload-complete'])
 
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 
 // State
 const fileUpload = ref(null)
@@ -312,17 +312,17 @@ const uploadSingleFile = async (file) => {
     const fileName = `general/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`
 
     // Upload to Supabase Storage
-    const { data: _uploadData, error: uploadError } = await $supabase.storage
+    const { data: _uploadData, error: uploadError } = await supabase.storage
       .from('race-images')
       .upload(fileName, file)
 
     if (uploadError) throw uploadError
 
     // Get public URL
-    const { data: urlData } = $supabase.storage.from('race-images').getPublicUrl(fileName)
+    const { data: urlData } = supabase.storage.from('race-images').getPublicUrl(fileName)
 
     // Save photo metadata to general_photos table
-    const { data: _photoData, error: photoError } = await $supabase
+    const { data: _photoData, error: photoError } = await supabase
       .from('general_photos')
       .insert({
         url: urlData.publicUrl,
@@ -355,7 +355,7 @@ const fetchRaceName = async () => {
   if (!props.raceId) return
 
   try {
-    const { data, error } = await $supabase
+    const { data, error } = await supabase
       .from('races')
       .select('name')
       .eq('id', props.raceId)

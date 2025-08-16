@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-8">
       <PageHeader title="All Racers" :actions="headerActions" />
@@ -386,7 +386,7 @@ const headerActions = computed(() => {
         label: 'Add Racer',
         icon: 'pi pi-plus',
         to: '/racers/add',
-        class: 'btn-brick'
+        class: 'btn-primary'
       }
     ]
   } else {

@@ -1,15 +1,11 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+    class="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
   >
     <div class="max-w-md w-full space-y-8">
       <div>
-        <div class="flex justify-center">
-          <img
-            src="~/assets/img/brick_race_logo.jpg"
-            alt="The The Great Holyoke Brick Race Logo"
-            class="h-20 w-auto object-contain rounded-lg"
-          />
+        <div class="text-center">
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">The Great Holyoke Brick Race</h1>
         </div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
           Sign in to your account
@@ -18,7 +14,7 @@
           Or
           <NuxtLink
             to="/register"
-            class="font-medium text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300"
+            class="font-medium text-brand-blue hover:text-brand-blue/80 dark:text-brand-blue dark:hover:text-brand-blue/80"
           >
             create a new account
           </NuxtLink>
@@ -32,13 +28,11 @@
             <div class="space-y-3">
               <Button
                 :loading="socialLoading === 'google'"
-                severity="secondary"
-                outlined
-                class="w-full"
+                class="w-full btn-secondary"
                 @click="handleSocialLogin('google')"
               >
                 <i class="pi pi-google mr-2" />
-                Continue with Google
+                <span>Continue with Google</span>
               </Button>
             </div>
 
@@ -102,16 +96,16 @@
                 <Button
                   type="submit"
                   :loading="loading"
-                  label="Sign in"
-                  class="w-full btn-brick"
-                  severity="primary"
-                />
+                  class="w-full btn-primary"
+                >
+                  <span>Sign in</span>
+                </Button>
               </div>
 
               <div class="text-center">
                 <NuxtLink
                   to="/forgot-password"
-                  class="text-sm text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300"
+                  class="text-sm text-brand-blue hover:text-brand-blue/80 dark:text-brand-blue dark:hover:text-brand-blue/80"
                 >
                   Forgot your password?
                 </NuxtLink>

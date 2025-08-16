@@ -1,13 +1,11 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <!-- Hero Section -->
-    <div class="bg-gradient-to-r from-orange-700 to-orange-900 text-white">
+    <div class="bg-white dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
-          <h1 class="text-4xl md:text-5xl font-bold mb-6">🏗️ Build Your Own Racer</h1>
-          <p class="text-xl md:text-2xl text-orange-100 max-w-4xl mx-auto">
+          <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">Build Your Own Racer</h1>
+          <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto">
             Ready to join the creative chaos? Learn everything you need to know about building your
             brick racer and joining our community of artists, engineers, and dreamers.
           </p>
@@ -23,7 +21,7 @@
             <h2
               class="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center gap-3"
             >
-              <i class="pi pi-question-circle text-green-600 dark:text-green-400" />
+              <i class="pi pi-question-circle text-brand-blue" />
               Frequently Asked Questions
             </h2>
           </div>
@@ -33,17 +31,17 @@
             <AccordionPanel value="0">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-users text-green-700 dark:text-green-400" />
-                  <span class="font-semibold">Who can enter?</span>
+                  <i class="pi pi-users text-brand-blue" />
+                  <span class="font-bold text-black">Who can enter?</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
                 <div class="space-y-4 text-gray-700 dark:text-gray-300">
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-green-100 dark:bg-green-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <span class="text-green-600 dark:text-green-400 font-bold text-sm">1</span>
+                      <span class="text-white font-bold text-sm">1</span>
                     </div>
                     <p class="leading-relaxed">
                       We invite all interested people, of any age and background – artists,
@@ -54,9 +52,9 @@
 
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-green-100 dark:bg-green-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <span class="text-green-600 dark:text-green-400 font-bold text-sm">2</span>
+                      <span class="text-white font-bold text-sm">2</span>
                     </div>
                     <p class="leading-relaxed">
                       You may enter as an individual or as part of a group with any number of
@@ -66,9 +64,9 @@
 
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-green-100 dark:bg-green-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <span class="text-green-600 dark:text-green-400 font-bold text-sm">3</span>
+                      <span class="text-white font-bold text-sm">3</span>
                     </div>
                     <p class="leading-relaxed">
                       Entrants do not have to be residents of Holyoke, Massachusetts to participate
@@ -85,17 +83,17 @@
             <AccordionPanel value="1">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-cog text-purple-600 dark:text-purple-400" />
-                  <span class="font-semibold">Racer Specifications</span>
+                  <i class="pi pi-cog text-brand-blue" />
+                  <span class="font-bold text-black">Racer Specifications</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
                 <div class="space-y-4 text-gray-700 dark:text-gray-300">
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <span class="text-purple-600 dark:text-purple-400 font-bold text-sm">1</span>
+                      <span class="text-white font-bold text-sm">1</span>
                     </div>
                     <p class="leading-relaxed">
                       Entrants must build a racer vehicle to transport a
@@ -108,9 +106,9 @@
 
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <span class="text-purple-600 dark:text-purple-400 font-bold text-sm">2</span>
+                      <span class="text-white font-bold text-sm">2</span>
                     </div>
                     <p class="leading-relaxed">
                       Since the racers will travel down an inclined plane using
@@ -121,9 +119,9 @@
 
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <span class="text-purple-600 dark:text-purple-400 font-bold text-sm">3</span>
+                      <span class="text-white font-bold text-sm">3</span>
                     </div>
                     <p class="leading-relaxed">
                       You may use <strong>any materials</strong> to build the racer including
@@ -135,9 +133,9 @@
 
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <span class="text-purple-600 dark:text-purple-400 font-bold text-sm">4</span>
+                      <span class="text-white font-bold text-sm">4</span>
                     </div>
                     <p class="leading-relaxed">
                       To fit on the track, the total size of the racer, including the brick, cannot
@@ -149,9 +147,9 @@
 
                   <div class="flex items-start gap-3">
                     <div
-                      class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                     >
-                      <span class="text-purple-600 dark:text-purple-400 font-bold text-sm">5</span>
+                      <span class="text-white font-bold text-sm">5</span>
                     </div>
                     <p class="leading-relaxed">
                       The total weight of the brick racer, including the brick and all materials
@@ -167,8 +165,8 @@
             <AccordionPanel value="2">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-play-circle text-indigo-600 dark:text-indigo-400" />
-                  <span class="font-semibold">How Does the Race Work?</span>
+                  <i class="pi pi-play-circle text-brand-green" />
+                  <span class="font-bold text-black">How Does the Race Work?</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
@@ -181,13 +179,13 @@
                   <div class="space-y-5">
                     <div class="flex items-start gap-4">
                       <div
-                        class="bg-green-100 dark:bg-green-900/30 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
+                        class="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
                       >
-                        <span class="text-green-700 dark:text-green-400 font-bold">1</span>
+                        <span class="text-white font-bold">1</span>
                       </div>
                       <div>
                         <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
-                          💻 Website Registration
+                          Website Registration
                         </h4>
                         <p class="leading-relaxed mb-3">
                           <strong>Before race day:</strong> Create an account on this website and
@@ -196,9 +194,9 @@
                           can check in on race day.
                         </p>
                         <div
-                          class="bg-green-100 dark:bg-green-900/20 border border-green-500 dark:border-green-600 rounded-lg p-3"
+                          class="bg-white border-2 border-brand-green rounded-lg p-3"
                         >
-                          <p class="text-sm text-green-800 dark:text-green-200">
+                          <p class="text-sm text-gray-900">
                             <i class="pi pi-info-circle mr-1" />
                             <strong>Important:</strong> You cannot participate in the race without
                             first registering your racer on this website.
@@ -209,13 +207,13 @@
 
                     <div class="flex items-start gap-4">
                       <div
-                        class="bg-indigo-100 dark:bg-indigo-900/30 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
+                        class="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
                       >
-                        <span class="text-indigo-600 dark:text-indigo-400 font-bold">2</span>
+                        <span class="text-white font-bold">2</span>
                       </div>
                       <div>
                         <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
-                          📝 Race Day Check-in
+                          Race Day Check-in
                         </h4>
                         <p class="leading-relaxed">
                           Arrive on race day with your completed brick racer and your website
@@ -228,13 +226,13 @@
 
                     <div class="flex items-start gap-4">
                       <div
-                        class="bg-indigo-100 dark:bg-indigo-900/30 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
+                        class="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
                       >
-                        <span class="text-indigo-600 dark:text-indigo-400 font-bold">3</span>
+                        <span class="text-white font-bold">3</span>
                       </div>
                       <div>
                         <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
-                          ⏱️ Qualifying Rounds
+                          Qualifying Rounds
                         </h4>
                         <p class="leading-relaxed">
                           Your racer will complete timed runs down the custom concrete track.
@@ -246,13 +244,13 @@
 
                     <div class="flex items-start gap-4">
                       <div
-                        class="bg-indigo-100 dark:bg-indigo-900/30 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
+                        class="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
                       >
-                        <span class="text-indigo-600 dark:text-indigo-400 font-bold">4</span>
+                        <span class="text-white font-bold">4</span>
                       </div>
                       <div>
                         <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
-                          🏆 Tournament Brackets
+                          Tournament Brackets
                         </h4>
                         <p class="leading-relaxed">
                           Based on qualifying times, racers are placed into elimination brackets.
@@ -264,13 +262,13 @@
 
                     <div class="flex items-start gap-4">
                       <div
-                        class="bg-indigo-100 dark:bg-indigo-900/30 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
+                        class="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
                       >
-                        <span class="text-indigo-600 dark:text-indigo-400 font-bold">5</span>
+                        <span class="text-white font-bold">5</span>
                       </div>
                       <div>
                         <h4 class="font-semibold text-gray-900 dark:text-white mb-2">
-                          🎉 Awards Ceremony
+                          Awards Ceremony
                         </h4>
                         <p class="leading-relaxed">
                           Custom trophies are awarded for fastest racers, most creative designs, and
@@ -288,8 +286,8 @@
             <AccordionPanel value="3">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-trophy text-yellow-600 dark:text-yellow-400" />
-                  <span class="font-semibold">Awards & Recognition</span>
+                  <i class="pi pi-trophy text-brand-gold" />
+                  <span class="font-bold text-black">Awards & Recognition</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
@@ -301,93 +299,93 @@
 
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div
-                      class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-5"
+                      class="bg-white border-2 border-brand-gold rounded-lg p-5"
                     >
                       <div class="flex items-center gap-3 mb-3">
                         <div
-                          class="bg-yellow-100 dark:bg-yellow-900/30 rounded-full w-10 h-10 flex items-center justify-center"
+                          class="bg-brand-gold rounded-full w-10 h-10 flex items-center justify-center"
                         >
-                          <i class="pi pi-bolt text-yellow-600 dark:text-yellow-400" />
+                          <i class="pi pi-bolt text-black" />
                         </div>
-                        <h4 class="font-semibold text-yellow-800 dark:text-yellow-200">
-                          Fastest Racers
+                        <h4 class="font-semibold text-gray-900">
+                          Fastest Racer
                         </h4>
                       </div>
-                      <p class="text-yellow-700 dark:text-yellow-300 text-sm leading-relaxed">
+                      <p class="text-gray-700 text-sm leading-relaxed">
                         Custom trophies awarded to the fastest racers based on qualifying times and
                         bracket tournament results.
                       </p>
                     </div>
 
                     <div
-                      class="bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-lg p-5"
+                      class="bg-white border-2 border-gray-300 rounded-lg p-5"
                     >
                       <div class="flex items-center gap-3 mb-3">
                         <div
-                          class="bg-cyan-100 dark:bg-cyan-900/30 rounded-full w-10 h-10 flex items-center justify-center"
+                          class="bg-gray-500 rounded-full w-10 h-10 flex items-center justify-center"
                         >
-                          <i class="pi pi-clock text-cyan-600 dark:text-cyan-400" />
+                          <i class="pi pi-clock text-white" />
                         </div>
-                        <h4 class="font-semibold text-cyan-800 dark:text-cyan-200">
-                          Slowest Racers
+                        <h4 class="font-semibold text-gray-900">
+                          Slowest Racer
                         </h4>
                       </div>
-                      <p class="text-cyan-700 dark:text-cyan-300 text-sm leading-relaxed">
+                      <p class="text-gray-700 text-sm leading-relaxed">
                         Celebrating the joy of participation - sometimes the most memorable racers
                         take their time!
                       </p>
                     </div>
 
                     <div
-                      class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-5"
+                      class="bg-white border-2 border-brand-blue rounded-lg p-5"
                     >
                       <div class="flex items-center gap-3 mb-3">
                         <div
-                          class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-10 h-10 flex items-center justify-center"
+                          class="bg-brand-blue rounded-full w-10 h-10 flex items-center justify-center"
                         >
-                          <i class="pi pi-palette text-purple-600 dark:text-purple-400" />
+                          <i class="pi pi-palette text-white" />
                         </div>
-                        <h4 class="font-semibold text-purple-800 dark:text-purple-200">
+                        <h4 class="font-semibold text-gray-900">
                           Most Creative
                         </h4>
                       </div>
-                      <p class="text-purple-700 dark:text-purple-300 text-sm leading-relaxed">
+                      <p class="text-gray-700 text-sm leading-relaxed">
                         Recognition for the most imaginative and artistic racer designs that
                         showcase exceptional creativity.
                       </p>
                     </div>
 
                     <div
-                      class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-5"
+                      class="bg-white border-2 border-red-500 rounded-lg p-5"
                     >
                       <div class="flex items-center gap-3 mb-3">
                         <div
-                          class="bg-red-100 dark:bg-red-900/30 rounded-full w-10 h-10 flex items-center justify-center"
+                          class="bg-red-500 rounded-full w-10 h-10 flex items-center justify-center"
                         >
-                          <i class="pi pi-exclamation-triangle text-red-600 dark:text-red-400" />
+                          <i class="pi pi-exclamation-triangle text-white" />
                         </div>
-                        <h4 class="font-semibold text-red-800 dark:text-red-200">Best Crash</h4>
+                        <h4 class="font-semibold text-gray-900">Best Crash</h4>
                       </div>
-                      <p class="text-red-700 dark:text-red-300 text-sm leading-relaxed">
+                      <p class="text-gray-700 text-sm leading-relaxed">
                         Sometimes awarded for the most spectacular or memorable crash during the
                         competition.
                       </p>
                     </div>
 
                     <div
-                      class="bg-green-100 dark:bg-green-900/20 border border-green-500 dark:border-green-600 rounded-lg p-5"
+                      class="bg-white border-2 border-brand-green rounded-lg p-5"
                     >
                       <div class="flex items-center gap-3 mb-3">
                         <div
-                          class="bg-green-100 dark:bg-green-900/30 rounded-full w-10 h-10 flex items-center justify-center"
+                          class="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center"
                         >
-                          <i class="pi pi-star text-green-700 dark:text-green-400" />
+                          <i class="pi pi-star text-white" />
                         </div>
-                        <h4 class="font-semibold text-green-800 dark:text-green-200">
+                        <h4 class="font-semibold text-gray-900">
                           Special Categories
                         </h4>
                       </div>
-                      <p class="text-green-800 dark:text-green-300 text-sm leading-relaxed">
+                      <p class="text-gray-700 text-sm leading-relaxed">
                         Additional awards may be given based on the year's entries and the judges'
                         discretion.
                       </p>
@@ -411,44 +409,40 @@
             <AccordionPanel value="4">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-map-marker text-orange-600 dark:text-orange-400" />
-                  <span class="font-semibold">Location & Venue</span>
+                  <i class="pi pi-map-marker text-brand-blue" />
+                  <span class="font-bold text-black">Location & Venue</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
                 <div class="space-y-6 text-gray-700 dark:text-gray-300">
                   <!-- Main Venue Info -->
                   <div
-                    class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-6"
+                    class="bg-white border-2 border-brand-blue rounded-lg p-6"
                   >
                     <div class="flex items-start gap-4">
                       <div
-                        class="bg-orange-100 dark:bg-orange-900/30 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0"
+                        class="bg-brand-blue rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0"
                       >
-                        <i class="pi pi-building text-orange-600 dark:text-orange-400 text-xl" />
+                        <i class="pi pi-building text-white text-xl" />
                       </div>
                       <div>
-                        <h4 class="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">
                           Paper City Studios
                         </h4>
-                        <p class="text-orange-700 dark:text-orange-300 mb-1">
+                        <p class="text-gray-700 mb-1">
                           <strong>80 Race Street</strong>
                         </p>
-                        <p class="text-orange-700 dark:text-orange-300 mb-3">
+                        <p class="text-gray-700 mb-3">
                           Holyoke, Massachusetts
                         </p>
-                        <p class="text-sm text-orange-600 dark:text-orange-400 mb-4">
+                        <p class="text-sm text-gray-600 mb-4">
                           The race takes place on the custom concrete track at this historic venue
                           on Race Street - a fitting location for our gravity-powered brick racing
                           competition!
                         </p>
                         <Button
                           size="small"
-                          severity="secondary"
-                          outlined
-                          icon="pi pi-map"
-                          label="View on Google Maps"
-                          class="text-orange-700 dark:text-orange-300 border-orange-300 dark:border-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                          class="btn-secondary"
                           @click="
                             () =>
                               window.open(
@@ -456,7 +450,10 @@
                                 '_blank'
                               )
                           "
-                        />
+                        >
+                          <i class="pi pi-map mr-2" />
+                          View on Google Maps
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -465,9 +462,9 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="flex items-start gap-3">
                       <div
-                        class="bg-green-100 dark:bg-green-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <i class="pi pi-car text-green-700 dark:text-green-400 text-sm" />
+                        <i class="pi pi-car text-white text-sm" />
                       </div>
                       <div>
                         <p class="font-medium text-gray-900 dark:text-white mb-1">Parking</p>
@@ -479,9 +476,9 @@
 
                     <div class="flex items-start gap-3">
                       <div
-                        class="bg-green-100 dark:bg-green-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <i class="pi pi-users text-green-600 dark:text-green-400 text-sm" />
+                        <i class="pi pi-users text-white text-sm" />
                       </div>
                       <div>
                         <p class="font-medium text-gray-900 dark:text-white mb-1">
@@ -495,10 +492,10 @@
 
                     <div class="flex items-start gap-3">
                       <div
-                        class="bg-yellow-100 dark:bg-yellow-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
                         <i
-                          class="pi pi-shopping-cart text-yellow-600 dark:text-yellow-400 text-sm"
+                          class="pi pi-shopping-cart text-white text-sm"
                         />
                       </div>
                       <div>
@@ -514,9 +511,9 @@
 
                     <div class="flex items-start gap-3">
                       <div
-                        class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <i class="pi pi-heart text-purple-600 dark:text-purple-400 text-sm" />
+                        <i class="pi pi-heart text-white text-sm" />
                       </div>
                       <div>
                         <p class="font-medium text-gray-900 dark:text-white mb-1">
@@ -535,12 +532,12 @@
         </div>
 
         <!-- Call to Action -->
-        <Card class="border-2 border-green-200 dark:border-green-800">
+        <Card class="border-2 border-brand-green">
           <template #content>
             <div class="text-center space-y-6">
               <div class="flex justify-center">
                 <div
-                  class="bg-gradient-to-r from-orange-700 to-orange-800 rounded-full w-16 h-16 flex items-center justify-center"
+                  class="bg-brand-green rounded-full w-16 h-16 flex items-center justify-center"
                 >
                   <i class="pi pi-car text-2xl text-white" />
                 </div>
@@ -557,14 +554,13 @@
               </div>
 
               <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="large" class="font-semibold" @click="navigateTo('/racers/add')">
+                <Button size="large" class="btn-primary font-semibold" @click="navigateTo('/racers/add')">
                   <i class="pi pi-plus mr-2" />
                   Register Your Racer
                 </Button>
                 <Button
                   size="large"
-                  severity="secondary"
-                  class="font-semibold"
+                  class="btn-secondary font-semibold"
                   @click="navigateTo('/races')"
                 >
                   <i class="pi pi-flag mr-2" />
@@ -572,9 +568,7 @@
                 </Button>
                 <Button
                   size="large"
-                  severity="secondary"
-                  outlined
-                  class="font-semibold"
+                  class="btn-secondary font-semibold"
                   @click="navigateTo('/about')"
                 >
                   <i class="pi pi-info-circle mr-2" />

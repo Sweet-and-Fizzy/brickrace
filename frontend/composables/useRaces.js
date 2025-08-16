@@ -8,7 +8,7 @@ const useRacesState = () => ({
 })
 
 export const useRaces = () => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
   const state = useRacesState()
 
   // Format date for display
@@ -69,7 +69,7 @@ export const useRaces = () => {
     state.error.value = null
 
     try {
-      const { data: racesData, error: racesError } = await $supabase
+      const { data: racesData, error: racesError } = await supabase
         .from('races')
         .select('*')
         .order('date', { ascending: false })
@@ -80,7 +80,7 @@ export const useRaces = () => {
 
       // Get checkin counts for each race
       for (const race of races) {
-        const { count } = await $supabase
+        const { count } = await supabase
           .from('checkins')
           .select('*', { count: 'exact', head: true })
           .eq('race_id', race.id)
@@ -99,10 +99,10 @@ export const useRaces = () => {
     }
   }
 
-  // Fetch single race with detailed data
+  // Fetch single race with detailed data by ID
   const fetchRaceById = async (raceId) => {
     try {
-      const { data: raceData, error: raceError } = await $supabase
+      const { data: raceData, error: raceError } = await supabase
         .from('races')
         .select(
           `
@@ -120,6 +120,31 @@ export const useRaces = () => {
     } catch (err) {
       // Keep essential error logging for production debugging
       console.error('Error fetching race:', err)
+      throw err
+    }
+  }
+
+  // Fetch single race with detailed data by slug
+  const fetchRaceBySlug = async (slug) => {
+    try {
+      const { data: raceData, error: raceError } = await supabase
+        .from('races')
+        .select(
+          `
+          *,
+          qualifiers(*),
+          brackets(*),
+          checkins(*)
+        `
+        )
+        .eq('slug', slug)
+        .single()
+
+      if (raceError) throw raceError
+      return raceData
+    } catch (err) {
+      // Keep essential error logging for production debugging
+      console.error('Error fetching race by slug:', err)
       throw err
     }
   }
@@ -162,7 +187,7 @@ export const useRaces = () => {
     if (process.env.NODE_ENV === 'development') {
       console.log('useRaces: Setting up subscriptions')
     }
-    state.racesChannel.value = $supabase
+    state.racesChannel.value = supabase
       .channel('races-realtime')
       .on(
         'postgres_changes',
@@ -239,13 +264,18 @@ export const useRaces = () => {
     return state.races.value.find((race) => race.id === raceId) || null
   }
 
+  // Get race by slug from cached data
+  const getRaceBySlug = (slug) => {
+    return state.races.value.find((race) => race.slug === slug) || null
+  }
+
   // Create new race (admin only)
   const createRace = async (raceData) => {
     state.loading.value = true
     state.error.value = null
 
     try {
-      const { data: newRace, error: createError } = await $supabase
+      const { data: newRace, error: createError } = await supabase
         .from('races')
         .insert(raceData)
         .select()
@@ -276,7 +306,7 @@ export const useRaces = () => {
     state.error.value = null
 
     try {
-      const { data: updatedRace, error: updateError } = await $supabase
+      const { data: updatedRace, error: updateError } = await supabase
         .from('races')
         .update(updates)
         .eq('id', raceId)
@@ -311,7 +341,7 @@ export const useRaces = () => {
 
     try {
       // First, deactivate all races
-      const { error: deactivateError } = await $supabase
+      const { error: deactivateError } = await supabase
         .from('races')
         .update({ active: false })
         .neq('id', raceId) // Deactivate all races except the one we're activating
@@ -319,7 +349,7 @@ export const useRaces = () => {
       if (deactivateError) throw deactivateError
 
       // Then activate the selected race
-      const { data: activatedRace, error: activateError } = await $supabase
+      const { data: activatedRace, error: activateError } = await supabase
         .from('races')
         .update({ active: true })
         .eq('id', raceId)
@@ -350,7 +380,7 @@ export const useRaces = () => {
     state.error.value = null
 
     try {
-      const { error: deleteError } = await $supabase.from('races').delete().eq('id', raceId)
+      const { error: deleteError } = await supabase.from('races').delete().eq('id', raceId)
 
       if (deleteError) throw deleteError
 
@@ -371,7 +401,7 @@ export const useRaces = () => {
   // Update race image
   const updateRaceImage = async (raceId, imageUrl) => {
     try {
-      const { data: updatedRace, error: updateError } = await $supabase
+      const { data: updatedRace, error: updateError } = await supabase
         .from('races')
         .update({ image_url: imageUrl })
         .eq('id', raceId)
@@ -410,7 +440,9 @@ export const useRaces = () => {
     initialize,
     fetchRaces,
     fetchRaceById,
+    fetchRaceBySlug,
     getRaceById,
+    getRaceBySlug,
     createRace,
     updateRace,
     setActiveRace,

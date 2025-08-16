@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-12 max-w-2xl">
       <!-- Header -->
@@ -72,17 +72,18 @@
               class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-600"
             >
               <NuxtLink to="/racers" class="flex-1">
-                <Button type="button" class="btn-brick-secondary w-full" label="Cancel" />
+                <Button type="button" class="btn-secondary w-full"><span>Cancel</span></Button>
               </NuxtLink>
 
               <Button
                 type="submit"
                 :loading="loading"
                 :disabled="!form.name || !authStore.isAuthenticated"
-                label="Create Racer"
                 icon="pi pi-plus"
-                class="btn-brick flex-1"
-              />
+                class="btn-primary flex-1"
+              >
+                <span>Create Racer</span>
+              </Button>
             </div>
           </form>
         </div>
@@ -163,9 +164,9 @@ const handleSubmit = async () => {
   try {
     // Create racer with Supabase
 
-    const { $supabase } = useNuxtApp()
+    const supabase = useSupabaseClient()
 
-    const { data, error } = await $supabase
+    const { data, error } = await supabase
       .from('racers')
       .insert([
         {

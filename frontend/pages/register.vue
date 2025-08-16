@@ -1,22 +1,18 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+    class="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
   >
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
-        <div class="flex justify-center">
-          <img
-            src="~/assets/img/brick_race_logo.jpg"
-            alt="The The Great Holyoke Brick Race Logo"
-            class="h-20 w-auto object-contain rounded-lg"
-          />
-        </div>
-        <h2 class="mt-6 text-3xl font-bold text-gray-900 dark:text-white">Create your account</h2>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          The Great Holyoke Brick Race
+        </h1>
+        <h2 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Create your account</h2>
         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Or
           <NuxtLink
             to="/login"
-            class="font-medium text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 transition-colors"
+            class="font-medium text-brand-blue hover:text-brand-blue/80 dark:text-brand-blue dark:hover:text-brand-blue/80 transition-colors"
           >
             sign in to existing account
           </NuxtLink>
@@ -26,12 +22,12 @@
       <!-- Email Confirmation Message -->
       <Card
         v-if="showConfirmation"
-        class="shadow-xl border-0 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800"
+        class="shadow-xl border-2 border-brand-green bg-white dark:bg-gray-800"
       >
         <template #content>
           <div class="text-center p-6">
             <div class="mb-4">
-              <i class="pi pi-envelope text-4xl text-green-600 dark:text-green-400" />
+              <i class="pi pi-envelope text-4xl text-brand-green" />
             </div>
             <h3 class="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
               Check Your Email!
@@ -184,10 +180,10 @@
                 <Button
                   type="submit"
                   :loading="loading"
-                  label="Create Account"
-                  class="w-full btn-brick"
-                  severity="primary"
-                />
+                  class="w-full btn-primary"
+                >
+                  <span>Create Account</span>
+                </Button>
               </div>
             </form>
           </div>

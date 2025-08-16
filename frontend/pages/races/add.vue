@@ -7,9 +7,9 @@
         <div class="flex items-center justify-between mb-8">
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create New Race</h1>
           <NuxtLink to="/races">
-            <Button class="btn-brick-secondary">
+            <Button class="btn-secondary">
               <i class="pi pi-arrow-left mr-2" />
-              Back to Races
+              <span>Back to Races</span>
             </Button>
           </NuxtLink>
         </div>
@@ -141,15 +141,16 @@
               <!-- Submit Button -->
               <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
                 <NuxtLink to="/races" class="flex-1">
-                  <Button type="button" class="btn-brick-secondary w-full"> Cancel </Button>
+                  <Button type="button" class="btn-secondary w-full"><span>Cancel</span></Button>
                 </NuxtLink>
                 <Button
                   type="submit"
                   :loading="loading"
                   icon="pi pi-plus"
-                  label="Create Race"
-                  class="btn-brick flex-1"
-                />
+                  class="btn-primary flex-1"
+                >
+                  <span>Create Race</span>
+                </Button>
               </div>
             </form>
           </div>
@@ -164,7 +165,7 @@ import { useAuthStore } from '~/stores/auth'
 
 // Auth and redirect check
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 
 // Use races composable for creating races
 const { createRace: createRaceComposable } = useRaces()
@@ -241,12 +242,12 @@ const handleImageUpload = async (event) => {
     const filePath = `races/${fileName}`
 
     // Upload to Supabase Storage
-    const { error } = await $supabase.storage.from('race-images').upload(filePath, file)
+    const { error } = await supabase.storage.from('race-images').upload(filePath, file)
 
     if (error) throw error
 
     // Get public URL
-    const { data: urlData } = $supabase.storage.from('race-images').getPublicUrl(filePath)
+    const { data: urlData } = supabase.storage.from('race-images').getPublicUrl(filePath)
 
     // Set the image URL in the form
     form.value.image_url = urlData.publicUrl
@@ -273,8 +274,8 @@ const createRace = async () => {
 
     const newRace = await createRaceComposable(raceData)
 
-    // Success - redirect to the new race
-    await navigateTo(`/races/${newRace.id}`)
+    // Success - redirect to the new race (database trigger generates slug)
+    await navigateTo(`/races/${newRace.slug || newRace.id}`)
   } catch (error) {
     console.error('Error creating race:', error)
 

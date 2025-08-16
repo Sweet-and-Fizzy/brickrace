@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <!-- Header -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
@@ -9,7 +9,7 @@
           <div class="text-center md:text-left">
             <div class="flex justify-center md:justify-start mb-6">
               <div
-                class="bg-gradient-to-r from-red-600 to-purple-600 rounded-full w-16 h-16 flex items-center justify-center"
+                class="bg-brand-blue rounded-full w-16 h-16 flex items-center justify-center"
               >
                 <i class="pi pi-shield text-2xl text-white" />
               </div>
@@ -249,7 +249,7 @@ definePageMeta({
 })
 
 const authStore = useAuthStore()
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 
 // State
 const pending = ref(true)
@@ -274,7 +274,7 @@ const racersCount = computed(() => stats.value.racers)
 const fetchStats = async () => {
   try {
     // Fetch race statistics
-    const { data: racesData, error: racesError } = await $supabase
+    const { data: racesData, error: racesError } = await supabase
       .from('races')
       .select('id, active')
 
@@ -284,7 +284,7 @@ const fetchStats = async () => {
     stats.value.activeRaces = racesData?.filter((race) => race.active)?.length || 0
 
     // Fetch racer count
-    const { data: racersData, error: racersError } = await $supabase
+    const { data: racersData, error: racersError } = await supabase
       .from('racers')
       .select('id', { count: 'exact' })
 
@@ -292,7 +292,7 @@ const fetchStats = async () => {
     stats.value.racers = racersData?.length || 0
 
     // Fetch awards count
-    const { data: awardsData, error: awardsError } = await $supabase
+    const { data: awardsData, error: awardsError } = await supabase
       .from('awards')
       .select('id', { count: 'exact' })
 
@@ -300,7 +300,7 @@ const fetchStats = async () => {
     stats.value.awards = awardsData?.length || 0
 
     // Fetch photo statistics from both racer photos and general photos
-    const { data: racersWithPhotos, error: photosError } = await $supabase
+    const { data: racersWithPhotos, error: photosError } = await supabase
       .from('racers')
       .select('photos')
       .not('photos', 'is', null)

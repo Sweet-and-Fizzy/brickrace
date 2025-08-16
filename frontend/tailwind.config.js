@@ -10,7 +10,17 @@ export default {
   ],
   darkMode: ['class', '.app-dark'],
   theme: {
-    extend: {}
+    extend: {
+      colors: {
+        'brand-blue': '#175bd3',
+        'brand-green': '#1e6863',
+        'brand-gold': '#ffc927'
+      },
+      fontFamily: {
+        'display': ['Impact', 'sans-serif'],
+        'body': ['Open Sans', 'sans-serif']
+      }
+    }
   },
   plugins: [
     require('@tailwindcss/forms')({

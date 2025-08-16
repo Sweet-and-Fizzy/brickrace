@@ -183,7 +183,7 @@ import { useCheckins } from '~/composables/useCheckins'
 const route = useRoute()
 const authStore = useAuthStore()
 const toast = useToast()
-const { $supabase } = useNuxtApp()
+const supabase = useSupabaseClient()
 
 // Use checkins composable
 const {
@@ -233,7 +233,7 @@ const clearSearch = () => {
 // Fetch race data
 const fetchRaceData = async () => {
   try {
-    const { data: raceData, error: raceError } = await $supabase
+    const { data: raceData, error: raceError } = await supabase
       .from('races')
       .select('*')
       .eq('id', route.params.id)

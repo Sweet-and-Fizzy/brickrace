@@ -2,7 +2,7 @@ import { ref, reactive, computed } from 'vue'
 import { useAuthStore } from '~/stores/auth'
 
 export const useAuth = () => {
-  const { $supabase } = useNuxtApp()
+  const supabase = useSupabaseClient()
   const authStore = useAuthStore()
   const $toast = useToast()
   const router = useRouter()
@@ -134,7 +134,7 @@ export const useAuth = () => {
     loading.value = true
 
     try {
-      const { data, error } = await $supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: loginForm.email,
         password: loginForm.password
       })
@@ -193,7 +193,7 @@ export const useAuth = () => {
     loading.value = true
 
     try {
-      const { error } = await $supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: registerForm.email,
         password: registerForm.password,
         options: {
@@ -256,7 +256,7 @@ export const useAuth = () => {
     loading.value = true
 
     try {
-      const { error } = await $supabase.auth.resetPasswordForEmail(forgotPasswordForm.email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordForm.email, {
         redirectTo: `${window.location.origin}/reset-password`
       })
 
@@ -308,7 +308,7 @@ export const useAuth = () => {
     loading.value = true
 
     try {
-      const { error } = await $supabase.auth.updateUser({
+      const { error } = await supabase.auth.updateUser({
         password: resetPasswordForm.password
       })
 
@@ -357,7 +357,7 @@ export const useAuth = () => {
     loading.value = true
 
     try {
-      const { error } = await $supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`
@@ -388,7 +388,7 @@ export const useAuth = () => {
     loading.value = true
 
     try {
-      const { error } = await $supabase.auth.signOut()
+      const { error } = await supabase.auth.signOut()
 
       if (error) throw error
 
