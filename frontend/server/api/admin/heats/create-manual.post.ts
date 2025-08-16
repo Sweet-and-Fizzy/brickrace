@@ -4,7 +4,7 @@ export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event)
   const body = await readBody(event)
   
-  const { race_id, heat_number, track1_racer_id, track2_racer_id, set_as_current } = body
+  const { race_id, heat_number: requestedHeatNumber, track1_racer_id, track2_racer_id, set_as_current } = body
 
   try {
     // Validate input
@@ -16,8 +16,11 @@ export default defineEventHandler(async (event) => {
       throw new Error('At least one racer must be assigned')
     }
 
+    // Determine final heat number
+    let heat_number: number
+    
     // Auto-increment heat number if not provided
-    if (!heat_number) {
+    if (!requestedHeatNumber) {
       const { data: maxHeatData, error: maxHeatError } = await client
         .from('qualifiers')
         .select('heat_number')
@@ -29,6 +32,8 @@ export default defineEventHandler(async (event) => {
 
       heat_number = (maxHeatData && maxHeatData.length > 0 ? maxHeatData[0].heat_number : 0) + 1
     } else {
+      heat_number = requestedHeatNumber
+      
       // Check if heat number already exists when manually specified
       const { data: existingHeat, error: checkError } = await client
         .from('qualifiers')
