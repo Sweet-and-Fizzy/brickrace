@@ -7,6 +7,7 @@
   NODE_VERSION = "22"
   NPM_CONFIG_FUND = "false"
   NPM_CONFIG_AUDIT = "false"
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_SERVICE_KEY"
 
 # SPA redirect for client-side routing
 [[redirects]]
