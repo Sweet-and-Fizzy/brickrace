@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
 
     // Only process upcoming heats if we have valid heat data
     // (heat_number and track_number should be set if heats were generated)
-    const validNextHeats = nextHeats?.filter(heat => 
+    const validNextHeats = nextHeats?.filter((heat: any) => 
       heat.heat_number && heat.track_number && heat.racer_name
     ) || []
 

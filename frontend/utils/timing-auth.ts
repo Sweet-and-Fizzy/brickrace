@@ -49,7 +49,7 @@ export async function validateTimingAuth(event: any): Promise<boolean> {
     return providedKey === expectedKey
     
   } catch (error) {
-    console.error('Timing system auth validation error:', error.message)
+    console.error('Timing system auth validation error:', error instanceof Error ? error.message : String(error))
     return false
   }
 }
