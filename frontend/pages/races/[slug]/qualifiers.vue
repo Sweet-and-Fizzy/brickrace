@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
+    class="min-h-screen bg-white dark:bg-gray-900"
   >
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
@@ -94,11 +94,11 @@
 
             <!-- Racers List -->
             <div class="space-y-4">
-              <div
+              <Card
                 v-for="racer in filteredCheckedInRacers"
                 :key="racer.id"
-                class="border rounded-lg p-4 bg-white dark:bg-gray-800 dark:border-gray-600"
               >
+                <template #content>
                 <!-- Racer Header -->
                 <div
                   class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
@@ -128,11 +128,19 @@
                       </p>
                     </div>
                   </div>
-                  <div class="text-left sm:text-right">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Best Time</p>
-                    <p class="text-lg font-bold text-blue-600 dark:text-blue-400">
-                      {{ getBestTime(racer.id) || 'No runs' }}
-                    </p>
+                  <div class="text-left sm:text-right space-y-2">
+                    <div>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">Fastest Time</p>
+                      <p class="text-lg font-bold text-green-600 dark:text-green-400">
+                        {{ getBestTime(racer.id) || 'No runs' }}
+                      </p>
+                    </div>
+                    <div>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">Slowest Time</p>
+                      <p class="text-lg font-bold text-red-600 dark:text-red-400">
+                        {{ getWorstTime(racer.id) || 'No runs' }}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -204,7 +212,8 @@
                     </div>
                   </div>
                 </div>
-              </div>
+                </template>
+              </Card>
             </div>
 
             <!-- No Racers Found -->
@@ -231,14 +240,14 @@
 
           <!-- Sidebar - Leaderboard -->
           <div class="space-y-6">
-            <!-- Current Standings -->
+            <!-- Fastest Times Standings -->
             <Card>
               <template #title>
                 <h3
                   class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
                 >
-                  <i class="pi pi-trophy" />
-                  Current Standings
+                  <i class="pi pi-trophy text-green-600" />
+                  Fastest Times
                 </h3>
               </template>
               <template #content>
@@ -308,6 +317,83 @@
               </template>
             </Card>
 
+            <!-- Slowest Times Standings -->
+            <Card>
+              <template #title>
+                <h3
+                  class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
+                >
+                  <i class="pi pi-trophy text-red-600" />
+                  Slowest Times
+                </h3>
+              </template>
+              <template #content>
+                <DataTable
+                  v-if="slowestLeaderboard.length > 0"
+                  :value="slowestLeaderboard"
+                  class="p-datatable-sm"
+                  :pt="{
+                    table: { style: 'min-width: 100%' },
+                    header: { class: 'border-none p-0' }
+                  }"
+                >
+                  <template #empty>
+                    <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                      <i class="pi pi-clock text-3xl mb-2" />
+                      <p>No qualifying times yet</p>
+                    </div>
+                  </template>
+
+                  <Column header="Pos" class="w-16">
+                    <template #body="{ index }">
+                      <div
+                        class="flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm"
+                        :class="{
+                          'bg-yellow-400 text-yellow-900': index === 0,
+                          'bg-gray-400 text-gray-900': index === 1,
+                          'bg-orange-400 text-orange-900': index === 2,
+                          'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200': index > 2
+                        }"
+                      >
+                        {{ index + 1 }}
+                      </div>
+                    </template>
+                  </Column>
+
+                  <Column header="Racer">
+                    <template #body="{ data }">
+                      <div>
+                        <p class="font-medium text-gray-900 dark:text-white">
+                          {{ data.racer_name }}
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                          #{{ data.racer_number }}
+                        </p>
+                      </div>
+                    </template>
+                  </Column>
+
+                  <Column header="Time" class="text-right">
+                    <template #body="{ data }">
+                      <div class="text-right">
+                        <p class="font-bold text-red-600 dark:text-red-400">
+                          {{ formatTime(data.slowest_time) }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                          {{ data.run_count }} runs
+                        </p>
+                      </div>
+                    </template>
+                  </Column>
+                </DataTable>
+
+                <div v-else class="text-center py-6 text-gray-500 dark:text-gray-400">
+                  <i class="pi pi-clock text-3xl mb-2" />
+                  <p>No qualifying times yet</p>
+                </div>
+              </template>
+            </Card>
+
             <!-- Quick Stats -->
             <Card>
               <template #title>Race Stats</template>
@@ -357,6 +443,7 @@
 import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
+import { isUUID } from '~/utils/slug-helpers'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -364,22 +451,25 @@ const toast = useToast()
 const confirm = useConfirm()
 
 // Use composables
-const { getRaceById, initialize: initializeRaces } = useRaces()
+const { getRaceById, getRaceBySlug, fetchRaceById, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
 
 const { getCheckinsForRace, racers: allRacers, initialize: initializeCheckins } = useCheckins()
 
-const {
-  qualifiers,
-  formatTime,
-  getQualifiersByRacer: getQualifiersByRacerComposable,
-  getBestTimeForRacer,
-  addQualifier,
-  deleteQualifier: deleteQualifierComposable,
-  initialize: initializeQualifiers
-} = useQualifiers(route.params.id)
+// Qualifiers composable - will be initialized after race loads
+const qualifiersComposable = ref(null)
+const qualifiers = computed(() => {
+  if (!qualifiersComposable.value) return []
+  return unref(qualifiersComposable.value.qualifiers) || []
+})
+const formatTime = (time) => qualifiersComposable.value?.formatTime(time) || 'N/A'
+const getQualifiersByRacerComposable = (racerId) => qualifiersComposable.value?.getQualifiersByRacer(racerId) || []
+const getBestTimeForRacer = (racerId) => qualifiersComposable.value?.getBestTimeForRacer(racerId) || null
+const addQualifier = (data) => qualifiersComposable.value?.addQualifier(data)
+const deleteQualifierComposable = (id) => qualifiersComposable.value?.deleteQualifier(id)
 
 // Reactive data
 const race = ref(null)
+const raceId = ref(null)
 const checkedInRacers = ref([])
 const pending = ref(true)
 const error = ref(null)
@@ -409,17 +499,21 @@ const filteredCheckedInRacers = computed(() => {
 })
 
 const leaderboard = computed(() => {
+  if (!qualifiersComposable.value || !qualifiers.value.length) return []
+  
   const racerBestTimes = {}
 
   // Calculate best time for each racer
   qualifiers.value.forEach((q) => {
-    if (!racerBestTimes[q.racer_id] || q.time < racerBestTimes[q.racer_id].best_time) {
-      racerBestTimes[q.racer_id] = {
-        racer_id: q.racer_id,
-        racer_name: q.racer_name,
-        racer_number: q.racer_number,
-        best_time: q.time,
-        run_count: 0
+    if (q.time && q.time > 0) { // Only consider valid times
+      if (!racerBestTimes[q.racer_id] || q.time < racerBestTimes[q.racer_id].best_time) {
+        racerBestTimes[q.racer_id] = {
+          racer_id: q.racer_id,
+          racer_name: q.racer_name,
+          racer_number: q.racer_number,
+          best_time: q.time,
+          run_count: 0
+        }
       }
     }
   })
@@ -436,15 +530,47 @@ const leaderboard = computed(() => {
     .slice(0, 10) // Top 10
 })
 
+const slowestLeaderboard = computed(() => {
+  if (!qualifiersComposable.value || !qualifiers.value.length) return []
+  
+  const racerSlowestTimes = {}
+
+  // Calculate slowest time for each racer
+  qualifiers.value.forEach((q) => {
+    if (q.time && q.time > 0) { // Only consider valid times
+      if (!racerSlowestTimes[q.racer_id] || q.time > racerSlowestTimes[q.racer_id].slowest_time) {
+        racerSlowestTimes[q.racer_id] = {
+          racer_id: q.racer_id,
+          racer_name: q.racer_name,
+          racer_number: q.racer_number,
+          slowest_time: q.time,
+          run_count: 0
+        }
+      }
+    }
+  })
+
+  // Count runs for each racer
+  qualifiers.value.forEach((q) => {
+    if (racerSlowestTimes[q.racer_id] && q.time && q.time > 0) {
+      racerSlowestTimes[q.racer_id].run_count++
+    }
+  })
+
+  return Object.values(racerSlowestTimes)
+    .sort((a, b) => b.slowest_time - a.slowest_time) // Sort by slowest time, slowest first
+    .slice(0, 10) // Top 10
+})
+
 const fastestTime = computed(() => {
   if (leaderboard.value.length === 0) return null
-  return formatTime(leaderboard.value[0].best_time)
+  return qualifiersComposable.value?.formatTime(leaderboard.value[0].best_time) || 'N/A'
 })
 
 const slowestTime = computed(() => {
   if (leaderboard.value.length === 0) return null
   const slowest = leaderboard.value[leaderboard.value.length - 1]
-  return formatTime(slowest.best_time)
+  return qualifiersComposable.value?.formatTime(slowest.best_time) || 'N/A'
 })
 
 // Helper functions
@@ -453,13 +579,27 @@ const clearSearch = () => {
 }
 
 const getRacerQualifiers = (racerId) => {
-  return getQualifiersByRacerComposable(racerId).sort((a, b) => a.time - b.time) // Sort by time, fastest first
+  if (!qualifiersComposable.value) return []
+  return qualifiersComposable.value.getQualifiersByRacer(racerId).sort((a, b) => a.time - b.time) // Sort by time, fastest first
 }
 
 const getBestTime = (racerId) => {
-  const bestTime = getBestTimeForRacer(racerId)
+  if (!qualifiersComposable.value) return null
+  const bestTime = qualifiersComposable.value.getBestTimeForRacer(racerId)
   if (!bestTime) return null
-  return formatTime(bestTime)
+  return qualifiersComposable.value.formatTime(bestTime)
+}
+
+const getWorstTime = (racerId) => {
+  if (!qualifiersComposable.value) return null
+  const racerQualifiers = qualifiersComposable.value.getQualifiersByRacer(racerId)
+  if (!racerQualifiers.length) return null
+  
+  const validTimes = racerQualifiers.filter(q => q.time && q.time > 0).map(q => q.time)
+  if (!validTimes.length) return null
+  
+  const worstTime = Math.max(...validTimes)
+  return qualifiersComposable.value.formatTime(worstTime)
 }
 
 // Fetch race data and checked-in racers using composables
@@ -468,17 +608,38 @@ const fetchData = async () => {
     // Initialize all composables
     await initializeRaces()
     await initializeCheckins()
-    await initializeQualifiers()
+    // Initialize qualifiers composable
+    if (qualifiersComposable.value) {
+      await qualifiersComposable.value.initialize()
+    }
 
     // Get race data from cached composable
-    const raceData = getRaceById(route.params.id)
+    const param = route.params.slug || route.params.id
+    let raceData = null
+    
+    // Check if it's a UUID (legacy support)
+    if (isUUID(param)) {
+      raceData = getRaceById(param)
+      if (!raceData) {
+        raceData = await fetchRaceById(param)
+      }
+    } else {
+      raceData = getRaceBySlug(param)
+      if (!raceData) {
+        raceData = await fetchRaceBySlug(param)
+      }
+    }
     if (!raceData) {
       throw new Error('Race not found')
     }
     race.value = raceData
+    raceId.value = raceData.id
+    
+    // Initialize qualifiers composable with the race ID
+    qualifiersComposable.value = useQualifiers(raceData.id)
 
     // Get checked-in racers from composable and combine with racer data
-    const raceCheckins = getCheckinsForRace(route.params.id)
+    const raceCheckins = getCheckinsForRace(raceData.id)
     checkedInRacers.value = raceCheckins.map((checkin) => {
       const racer = allRacers.value.find((r) => r.id === checkin.racer_id)
       return {
@@ -511,7 +672,7 @@ const addQualifyingTime = async (racer) => {
   try {
     await addQualifier({
       racer_id: racer.id,
-      race_id: route.params.id,
+      race_id: raceId.value,
       time: time
     })
 

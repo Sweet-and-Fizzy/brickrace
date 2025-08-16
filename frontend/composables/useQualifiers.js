@@ -377,8 +377,9 @@ const createQualifiersInstance = (raceId) => {
   // Get best time for racer
   const getBestTimeForRacer = (racerId) => {
     const racerQualifiers = getQualifiersByRacer(racerId)
-    if (racerQualifiers.length === 0) return null
-    return Math.min(...racerQualifiers.map((q) => q.time))
+    const validTimes = racerQualifiers.filter(q => q.time && q.time > 0).map(q => q.time)
+    if (validTimes.length === 0) return null
+    return Math.min(...validTimes)
   }
 
   return {

@@ -82,6 +82,14 @@
             Generate Additional Heats
           </button>
           <button
+            @click="showManualHeatDialog = true"
+            :disabled="loading"
+            class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
+          >
+            <i class="pi pi-plus mr-2" />
+            Create Manual Heat
+          </button>
+          <button
             v-if="!currentHeat && upcomingHeats.length > 0"
             @click="startNextHeat"
             :disabled="loading"
@@ -226,13 +234,20 @@
               <h4 class="font-medium text-gray-900 dark:text-white">
                 Heat #{{ heat.heat_number }}
               </h4>
-              <button
-                v-if="!currentHeat"
-                @click="startSpecificHeat(heat.heat_number)"
-                class="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Start This Heat
-              </button>
+              <div v-if="!currentHeat" class="flex gap-2">
+                <button
+                  @click="startSpecificHeat(heat.heat_number)"
+                  class="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Start This Heat
+                </button>
+                <button
+                  @click="setAsCurrentHeat(heat.heat_number)"
+                  class="text-sm px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  Set as Current
+                </button>
+              </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -267,12 +282,137 @@
           Manage Races →
         </NuxtLink>
       </div>
+
+      <!-- Manual Heat Creation Dialog -->
+      <Dialog 
+        v-model:visible="showManualHeatDialog" 
+        modal 
+        header="Create Manual Heat" 
+        :style="{ width: '50rem' }"
+        :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+      >
+        <div class="space-y-6">
+          <p class="text-gray-600 dark:text-gray-300">
+            Create a custom heat with specific racers. This is useful for creating special matchups or filling specific heat numbers.
+          </p>
+
+          <!-- Heat Number -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Heat Number
+            </label>
+            <InputNumber
+              v-model="manualHeat.heatNumber"
+              :min="1"
+              placeholder="Auto (next available)"
+              class="w-full"
+            />
+            <small class="text-gray-500 dark:text-gray-400">
+              Leave empty for auto-increment, or specify to fill gaps in heat numbering
+            </small>
+          </div>
+
+          <!-- Track 1 Racer -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Track 1 Racer
+            </label>
+            <Dropdown
+              v-model="manualHeat.track1Racer"
+              :options="availableRacers"
+              option-label="display_name"
+              option-value="id"
+              placeholder="Select racer for Track 1"
+              class="w-full"
+              filter
+            >
+              <template #option="{ option }">
+                <div class="flex items-center gap-3">
+                  <img 
+                    v-if="option.image_url" 
+                    :src="option.image_url" 
+                    :alt="option.name"
+                    class="w-8 h-8 rounded-full object-cover"
+                  >
+                  <div v-else class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                    <i class="pi pi-car text-gray-500 text-sm" />
+                  </div>
+                  <div>
+                    <div class="font-medium">{{ option.name }}</div>
+                    <div class="text-sm text-gray-500">#{{ option.racer_number }}</div>
+                  </div>
+                </div>
+              </template>
+            </Dropdown>
+          </div>
+
+          <!-- Track 2 Racer -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Track 2 Racer
+            </label>
+            <Dropdown
+              v-model="manualHeat.track2Racer"
+              :options="availableRacers"
+              option-label="display_name"
+              option-value="id"
+              placeholder="Select racer for Track 2"
+              class="w-full"
+              filter
+            >
+              <template #option="{ option }">
+                <div class="flex items-center gap-3">
+                  <img 
+                    v-if="option.image_url" 
+                    :src="option.image_url" 
+                    :alt="option.name"
+                    class="w-8 h-8 rounded-full object-cover"
+                  >
+                  <div v-else class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                    <i class="pi pi-car text-gray-500 text-sm" />
+                  </div>
+                  <div>
+                    <div class="font-medium">{{ option.name }}</div>
+                    <div class="text-sm text-gray-500">#{{ option.racer_number }}</div>
+                  </div>
+                </div>
+              </template>
+            </Dropdown>
+          </div>
+
+          <!-- Options -->
+          <div class="flex items-center gap-3">
+            <Checkbox
+              v-model="manualHeat.setAsCurrent"
+              binary
+              input-id="setAsCurrent"
+            />
+            <label for="setAsCurrent" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Set as current heat immediately
+            </label>
+          </div>
+        </div>
+
+        <template #footer>
+          <Button 
+            label="Cancel" 
+            severity="secondary" 
+            @click="showManualHeatDialog = false" 
+          />
+          <Button 
+            label="Create Heat" 
+            @click="createManualHeat"
+            :loading="loading"
+            :disabled="!manualHeat.track1Racer && !manualHeat.track2Racer"
+          />
+        </template>
+      </Dialog>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, watchEffect } from 'vue'
 import { useHeats } from '~/composables/useHeats'
 import { useNotifications } from '~/composables/useNotifications'
 
@@ -290,6 +430,14 @@ const track1Time = ref('')
 const track2Time = ref('')
 const qualifyingMode = ref('auto')
 const qualifyingStats = ref(null)
+const showManualHeatDialog = ref(false)
+const availableRacers = ref([])
+const manualHeat = ref({
+  heatNumber: null,
+  track1Racer: null,
+  track2Racer: null,
+  setAsCurrent: false
+})
 
 // Computed
 const { currentRace, currentHeat, upcomingHeats, loading, error } = heats
@@ -384,6 +532,66 @@ const fetchQualifyingStats = async () => {
   }
 }
 
+const fetchAvailableRacers = async () => {
+  if (!currentRace.value) return
+  
+  try {
+    const { data } = await $fetch(`/api/races/${currentRace.value.id}/checked-in-racers`)
+    availableRacers.value = data.map(racer => ({
+      ...racer,
+      display_name: `${racer.name} (#${racer.racer_number})`
+    }))
+  } catch (err) {
+    console.error('Failed to fetch available racers:', err)
+    showError('Failed to load available racers')
+  }
+}
+
+const createManualHeat = async () => {
+  try {
+    const response = await $fetch('/api/admin/heats/create-manual', {
+      method: 'POST',
+      body: {
+        race_id: currentRace.value.id,
+        heat_number: manualHeat.value.heatNumber, // Let server auto-increment if null
+        track1_racer_id: manualHeat.value.track1Racer,
+        track2_racer_id: manualHeat.value.track2Racer,
+        set_as_current: manualHeat.value.setAsCurrent
+      }
+    })
+
+    if (response.error) {
+      throw new Error(response.error)
+    }
+
+    showSuccess(`Manual heat #${response.data.heat_number} created successfully`)
+    
+    // Reset form
+    manualHeat.value = {
+      heatNumber: null,
+      track1Racer: null,
+      track2Racer: null,
+      setAsCurrent: false
+    }
+    showManualHeatDialog.value = false
+    
+    // Refresh data
+    await heats.fetchCurrentRaceData()
+  } catch (err) {
+    console.error('Failed to create manual heat:', err)
+    showError(err.message || 'Failed to create manual heat')
+  }
+}
+
+const setAsCurrentHeat = async (heatNumber) => {
+  try {
+    await heats.startHeat(heatNumber)
+    showSuccess(`Heat #${heatNumber} set as current`)
+  } catch (err) {
+    showError('Failed to set heat as current')
+  }
+}
+
 // Initialize
 onMounted(async () => {
   await heats.initialize()
@@ -397,6 +605,14 @@ onMounted(async () => {
   }
 
   await fetchQualifyingStats()
+  await fetchAvailableRacers()
+})
+
+// Watch for dialog opening to refresh racer list
+watch(showManualHeatDialog, async (newValue) => {
+  if (newValue) {
+    await fetchAvailableRacers()
+  }
 })
 
 // Watch for changes in qualifiers and races to update stats reactively

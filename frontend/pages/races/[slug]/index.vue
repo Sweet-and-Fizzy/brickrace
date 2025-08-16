@@ -143,7 +143,7 @@
           <img
             :src="race.image_url"
             :alt="race.name"
-            class="w-full h-64 md:h-96 object-cover rounded-lg shadow-sm"
+            class="w-full h-64 md:h-96 object-cover rounded-lg"
           />
         </div>
 
