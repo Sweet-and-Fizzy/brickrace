@@ -9,7 +9,7 @@
  */
 
 import { serverSupabaseClient } from '#supabase/server'
-import { requireTimingAuth, logTimingRequest } from '~/utils/timing-auth'
+import { requireTimingAuth, logTimingRequest } from '~/server/utils/timing-auth'
 
 export default defineEventHandler(async (event) => {
   // Validate JWT token

@@ -8,7 +8,7 @@
  * for the timing system to know what's happening
  */
 
-import { requireTimingAuth, logTimingRequest, createTimingSupabaseClient } from '~/utils/timing-auth'
+import { requireTimingAuth, logTimingRequest, createTimingSupabaseClient } from '~/server/utils/timing-auth'
 
 export default defineEventHandler(async (event) => {
   // Validate JWT token
