@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -59,7 +57,7 @@
               </div>
             </div>
             <div class="mt-4 md:mt-0">
-              <AdminMenu :race-id="raceId" />
+              <AdminMenu :race-id="race?.slug" />
             </div>
           </div>
         </div>
@@ -142,17 +140,46 @@
               Checked in at {{ getCheckinTime(racer.id) }}
             </div>
 
-            <!-- Action Button -->
-            <Button
-              :loading="processing === racer.id"
-              :severity="isCheckedIn(racer.id) ? 'danger' : 'success'"
-              class="w-full"
-              @click="toggleCheckin(racer)"
+            <!-- Withdrawal Status -->
+            <div 
+              v-if="isWithdrawn(racer.id)" 
+              class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-2 mb-3"
             >
-              <i v-if="isCheckedIn(racer.id)" class="pi pi-times mr-2" />
-              <i v-else class="pi pi-check mr-2" />
-              {{ isCheckedIn(racer.id) ? 'Check Out' : 'Check In' }}
-            </Button>
+              <div class="flex items-center text-red-700 dark:text-red-300">
+                <i class="pi pi-exclamation-triangle mr-2" />
+                <span class="text-sm font-medium">Withdrawn from race</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-2">
+              <!-- Check-in Button -->
+              <Button
+                :loading="processing === racer.id"
+                :severity="isCheckedIn(racer.id) ? 'danger' : 'success'"
+                :disabled="isWithdrawn(racer.id)"
+                class="w-full"
+                @click="toggleCheckin(racer)"
+              >
+                <i v-if="isCheckedIn(racer.id)" class="pi pi-times mr-2" />
+                <i v-else class="pi pi-check mr-2" />
+                {{ isCheckedIn(racer.id) ? 'Check Out' : 'Check In' }}
+              </Button>
+
+              <!-- Withdrawal Button (Admin or Racer Owner) -->
+              <Button
+                v-if="canUserWithdrawRacer(racer.id, race?.id)"
+                :loading="processingWithdrawal === racer.id"
+                :severity="isWithdrawn(racer.id) ? 'success' : 'warning'"
+                class="w-full"
+                outlined
+                @click="toggleWithdrawal(racer)"
+              >
+                <i v-if="isWithdrawn(racer.id)" class="pi pi-user-plus mr-2" />
+                <i v-else class="pi pi-user-minus mr-2" />
+                {{ isWithdrawn(racer.id) ? 'Reinstate' : 'Withdraw' }}
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -179,6 +206,7 @@
 import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import { useCheckins } from '~/composables/useCheckins'
+import { useRaces } from '~/composables/useRaces'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -196,17 +224,30 @@ const {
   filterRacers
 } = useCheckins()
 
+// Use races composable
+const { getRaceBySlug, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
+
+// Use racers composable for withdrawal functionality
+const { 
+  withdrawRacerFromRace, 
+  reinstateRacerToRace, 
+  isRacerWithdrawnFromRace,
+  canUserWithdrawRacer
+} = useRacers()
+
 // Local reactive data
 const race = ref(null)
 const pending = ref(true)
 const error = ref(null)
 const searchQuery = ref('')
+const withdrawnRacers = ref(new Set()) // Track withdrawn racers for this race
+const processingWithdrawal = ref(null) // Track which racer withdrawal is being processed
 
 // Breadcrumb navigation
 const breadcrumbItems = computed(() => [
   { label: 'Home', url: '/' },
   { label: 'Races', url: '/races' },
-  { label: race.value?.name || 'Race', url: `/races/${route.params.id}` },
+  { label: race.value?.name || 'Race', url: `/races/${route.params.slug}` },
   { label: 'Check-in' } // Current page, no navigation
 ])
 
@@ -214,32 +255,124 @@ const breadcrumbItems = computed(() => [
 const filteredRacers = computed(() => filterRacers(searchQuery.value))
 
 const checkedInCount = computed(() => {
-  return checkedInRacers.value.filter((c) => c.race_id === route.params.id).length
+  return checkedInRacers.value.filter((c) => c.race_id === race.value?.id).length
 })
 
 // Helper functions
 const isCheckedIn = (racerId) => {
-  return isCheckedInComposable(racerId, route.params.id)
+  return isCheckedInComposable(racerId, race.value?.id)
 }
 
 const getCheckinTime = (racerId) => {
-  return getCheckinTimeComposable(racerId, route.params.id)
+  return getCheckinTimeComposable(racerId, race.value?.id)
 }
 
 const clearSearch = () => {
   searchQuery.value = ''
 }
 
+// Check if racer is withdrawn from this race
+const isWithdrawn = (racerId) => {
+  return withdrawnRacers.value.has(racerId)
+}
+
+// Toggle withdrawal status for a racer
+const toggleWithdrawal = async (racer) => {
+  if (processingWithdrawal.value === racer.id) return
+
+  processingWithdrawal.value = racer.id
+
+  try {
+    const isCurrentlyWithdrawn = isWithdrawn(racer.id)
+    
+    if (isCurrentlyWithdrawn) {
+      // Reinstate racer
+      await reinstateRacerToRace(racer.id, race.value.id)
+      withdrawnRacers.value.delete(racer.id)
+      
+      toast.add({
+        severity: 'success',
+        summary: 'Racer Reinstated',
+        detail: `${racer.name} has been reinstated to the race`,
+        life: 3000
+      })
+    } else {
+      // Withdraw racer
+      const result = await withdrawRacerFromRace(racer.id, race.value.id, 'Withdrawn by race admin')
+      withdrawnRacers.value.add(racer.id)
+      
+      // Debug: Log the full result
+      console.log('Withdrawal result:', result)
+      
+      // Build detailed message about heat impact
+      let detailMessage = `${racer.name} has been withdrawn from the race`
+      if (result.heatChanges) {
+        const changes = result.heatChanges
+        console.log('Heat changes:', changes)
+        if (changes.scheduled_heats_removed > 0) {
+          detailMessage += `. Removed from ${changes.scheduled_heats_removed} scheduled heat(s)`
+        }
+        if (changes.completed_heats_preserved > 0) {
+          detailMessage += `. ${changes.completed_heats_preserved} completed result(s) preserved`
+        }
+      } else {
+        detailMessage += ` (No heat information returned)`
+      }
+      
+      toast.add({
+        severity: 'info',
+        summary: 'Racer Withdrawn',
+        detail: detailMessage,
+        life: 5000
+      })
+    }
+  } catch (err) {
+    console.error('Error updating racer withdrawal status:', err)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to update racer withdrawal status',
+      life: 5000
+    })
+  } finally {
+    processingWithdrawal.value = null
+  }
+}
+
+// Load withdrawal status for all racers
+const loadWithdrawalStatus = async () => {
+  if (!race.value) return
+
+  try {
+    const { data: raceWithdrawals, error } = await supabase
+      .from('race_withdrawals')
+      .select('racer_id')
+      .eq('race_id', race.value.id)
+
+    if (error) throw error
+
+    // Update local withdrawal tracking
+    withdrawnRacers.value = new Set((raceWithdrawals || []).map(w => w.racer_id))
+  } catch (err) {
+    console.error('Error loading withdrawal status:', err)
+  }
+}
+
 // Fetch race data
 const fetchRaceData = async () => {
   try {
-    const { data: raceData, error: raceError } = await supabase
-      .from('races')
-      .select('*')
-      .eq('id', route.params.id)
-      .single()
-
-    if (raceError) throw raceError
+    await initializeRaces()
+    
+    // Get race by slug
+    const slug = route.params.slug
+    let raceData = getRaceBySlug(slug)
+    if (!raceData) {
+      raceData = await fetchRaceBySlug(slug)
+    }
+    
+    if (!raceData) {
+      throw new Error('Race not found')
+    }
     race.value = raceData
   } catch (err) {
     console.error('Error fetching race data:', err)
@@ -252,7 +385,7 @@ const toggleCheckin = async (racer) => {
   if (processing.value) return
 
   try {
-    const result = await toggleCheckinComposable(racer.id, route.params.id)
+    const result = await toggleCheckinComposable(racer.id, race.value?.id)
 
     if (result.success) {
       const isCurrentlyCheckedIn = isCheckedIn(racer.id)
@@ -286,7 +419,8 @@ const toggleCheckin = async (racer) => {
 onMounted(async () => {
   await authStore.initAuth()
   await fetchRaceData()
-  await initialize(route.params.id)
+  await initialize(race.value?.id)
+  await loadWithdrawalStatus()
   pending.value = false
 })
 

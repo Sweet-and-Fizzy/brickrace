@@ -15,15 +15,24 @@ export interface Race {
 export interface Racer {
   id: string
   name: string
-  builder_name: string
-  builder_email?: string
-  description?: string
+  racer_number: number
+  weight?: number
+  team_members?: string
+  user_id: string
   image_url?: string
-  photos?: Photo[] | string[]
-  registration_number?: number
-  user_id?: string
+  photos?: string[]
+  videos?: string[]
   created_at: string
   updated_at: string
+}
+
+export interface RaceWithdrawal {
+  id: string
+  race_id: string
+  racer_id: string
+  withdrawn_at: string
+  withdrawn_by?: string
+  reason?: string
 }
 
 export interface Award {

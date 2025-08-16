@@ -173,7 +173,7 @@
                   :src="currentHeat.racers[0].racer_image_url"
                   :alt="currentHeat.racers[0].racer_name"
                   class="w-12 h-12 rounded-full object-cover"
-                />
+                >
                 <div>
                   <p class="font-medium">{{ currentHeat.racers[0].racer_name }}</p>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -187,7 +187,7 @@
                 step="0.01"
                 placeholder="Time (seconds)"
                 class="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-              />
+              >
             </div>
           </div>
 
@@ -201,7 +201,7 @@
                   :src="currentHeat.racers[1].racer_image_url"
                   :alt="currentHeat.racers[1].racer_name"
                   class="w-12 h-12 rounded-full object-cover"
-                />
+                >
                 <div>
                   <p class="font-medium">{{ currentHeat.racers[1].racer_name }}</p>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
@@ -215,7 +215,7 @@
                 step="0.01"
                 placeholder="Time (seconds)"
                 class="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
-              />
+              >
             </div>
           </div>
         </div>
@@ -285,7 +285,7 @@
                   :src="racer.racer_image_url"
                   :alt="racer.racer_name"
                   class="w-8 h-8 rounded-full object-cover"
-                />
+                >
                 <div>
                   <p class="text-sm font-medium">{{ racer.racer_name }}</p>
                   <p class="text-xs text-gray-600 dark:text-gray-400">#{{ racer.racer_number }}</p>
@@ -360,7 +360,7 @@
                     :src="option.image_url"
                     :alt="option.name"
                     class="w-8 h-8 rounded-full object-cover"
-                  />
+                  >
                   <div
                     v-else
                     class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center"
@@ -397,7 +397,7 @@
                     :src="option.image_url"
                     :alt="option.name"
                     class="w-8 h-8 rounded-full object-cover"
-                  />
+                  >
                   <div
                     v-else
                     class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center"

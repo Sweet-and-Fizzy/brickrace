@@ -159,7 +159,7 @@
                         :src="previewImage || form.image_url"
                         :alt="previewImage ? 'Photo preview' : 'Current main photo'"
                         class="max-w-xs max-h-48 mx-auto rounded-lg shadow-md object-cover"
-                      />
+                      >
                     </div>
 
                     <!-- Preview Action Buttons -->

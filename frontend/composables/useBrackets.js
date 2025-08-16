@@ -122,9 +122,20 @@ export const useBrackets = () => {
     }
   }
 
-  // Get qualified racers sorted by qualifying time
+  // Get qualified racers sorted by qualifying time (excluding withdrawn racers)
   const getQualifiedRacers = async (raceId, limit) => {
     try {
+      // First get withdrawn racers for this race
+      const { data: withdrawnRacers, error: withdrawalError } = await supabase
+        .from('race_withdrawals')
+        .select('racer_id')
+        .eq('race_id', raceId)
+
+      if (withdrawalError) throw withdrawalError
+
+      const withdrawnRacerIds = (withdrawnRacers || []).map(w => w.racer_id)
+
+      // Get qualifiers excluding withdrawn racers
       const { data: qualifiers, error: qualifierError } = await supabase
         .from('qualifiers')
         .select(
@@ -139,6 +150,7 @@ export const useBrackets = () => {
         `
         )
         .eq('race_id', raceId)
+        .not('racer_id', 'in', `(${withdrawnRacerIds.join(',') || 'null'})`)
         .order('time', { ascending: true })
         .limit(limit)
 

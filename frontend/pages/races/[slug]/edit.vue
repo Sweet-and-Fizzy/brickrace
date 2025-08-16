@@ -112,7 +112,7 @@
                   accept="image/*"
                   class="hidden"
                   @change="handleImageUpload"
-                />
+                >
 
                 <!-- Custom upload button -->
                 <Button
@@ -142,13 +142,13 @@
                   alt="Race preview"
                   class="max-w-xs rounded-lg shadow-md"
                   @error="form.image_url = ''"
-                />
+                >
               </div>
 
               <!-- Submit Button -->
               <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
                 <NuxtLink
-                  :to="`/races/${race?.slug || $route.params.slug || $route.params.id}`"
+                  :to="`/races/${race?.slug || $route.params.slug}`"
                   class="flex-1"
                 >
                   <Button
@@ -177,7 +177,6 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-import { isUUID } from '~/utils/slug-helpers'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -186,9 +185,7 @@ const $toast = useToast()
 
 // Use races composable
 const {
-  getRaceById,
   getRaceBySlug,
-  fetchRaceById,
   fetchRaceBySlug,
   updateRace: updateRaceComposable,
   initialize: initializeRaces
@@ -208,7 +205,7 @@ const fileInput = ref(null)
 const breadcrumbItems = computed(() => [
   { label: 'Home', url: '/' },
   { label: 'Races', url: '/races' },
-  { label: race.value?.name || 'Race', url: `/races/${route.params.slug || route.params.id}` },
+  { label: race.value?.name || 'Race', url: `/races/${route.params.slug}` },
   { label: 'Edit' } // Current page, no navigation
 ])
 
@@ -226,22 +223,11 @@ const fetchRace = async () => {
     // Initialize races composable if needed
     await initializeRaces()
 
-    const param = route.params.slug || route.params.id
-    let raceData = null
-
-    // Check if it's a UUID (legacy support)
-    if (isUUID(param)) {
-      // Get race from cached data
-      raceData = getRaceById(param)
-      if (!raceData) {
-        raceData = await fetchRaceById(param)
-      }
-    } else {
-      // Get race by slug
-      raceData = getRaceBySlug(param)
-      if (!raceData) {
-        raceData = await fetchRaceBySlug(param)
-      }
+    // Get race by slug
+    const slug = route.params.slug
+    let raceData = getRaceBySlug(slug)
+    if (!raceData) {
+      raceData = await fetchRaceBySlug(slug)
     }
 
     if (!raceData) {

@@ -443,7 +443,6 @@
 import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
-import { isUUID } from '~/utils/slug-helpers'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -452,9 +451,7 @@ const confirm = useConfirm()
 
 // Use composables
 const {
-  getRaceById,
   getRaceBySlug,
-  fetchRaceById,
   fetchRaceBySlug,
   initialize: initializeRaces
 } = useRaces()
@@ -489,7 +486,7 @@ const newTimes = ref({})
 const breadcrumbItems = computed(() => [
   { label: 'Home', url: '/' },
   { label: 'Races', url: '/races' },
-  { label: race.value?.name || 'Race', url: `/races/${route.params.id}` },
+  { label: race.value?.name || 'Race', url: `/races/${route.params.slug}` },
   { label: 'Qualifiers' } // Current page, no navigation
 ])
 
@@ -623,21 +620,11 @@ const fetchData = async () => {
       await qualifiersComposable.value.initialize()
     }
 
-    // Get race data from cached composable
-    const param = route.params.slug || route.params.id
-    let raceData = null
-
-    // Check if it's a UUID (legacy support)
-    if (isUUID(param)) {
-      raceData = getRaceById(param)
-      if (!raceData) {
-        raceData = await fetchRaceById(param)
-      }
-    } else {
-      raceData = getRaceBySlug(param)
-      if (!raceData) {
-        raceData = await fetchRaceBySlug(param)
-      }
+    // Get race data by slug
+    const slug = route.params.slug
+    let raceData = getRaceBySlug(slug)
+    if (!raceData) {
+      raceData = await fetchRaceBySlug(slug)
     }
     if (!raceData) {
       throw new Error('Race not found')

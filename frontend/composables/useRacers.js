@@ -627,6 +627,115 @@ export const useRacers = () => {
     return racers.value.filter((racer) => racer.user_id === authStore.userId)
   })
 
+  // Withdraw racer from specific race
+  const withdrawRacerFromRace = async (racerId, raceId, reason = null) => {
+    try {
+      const response = await $fetch(`/api/racers/${racerId}/withdraw`, {
+        method: 'PATCH',
+        body: { 
+          withdrawn: true, 
+          race_id: raceId,
+          reason
+        }
+      })
+
+      return response
+    } catch (err) {
+      console.error('Error withdrawing racer from race:', err)
+      throw err
+    }
+  }
+
+  // Reinstate racer to specific race
+  const reinstateRacerToRace = async (racerId, raceId) => {
+    try {
+      const response = await $fetch(`/api/racers/${racerId}/withdraw`, {
+        method: 'PATCH',
+        body: { 
+          withdrawn: false, 
+          race_id: raceId
+        }
+      })
+
+      return response
+    } catch (err) {
+      console.error('Error reinstating racer to race:', err)
+      throw err
+    }
+  }
+
+  // Get withdrawals for a specific race
+  const getRaceWithdrawals = async (raceId) => {
+    try {
+      const { data: withdrawals, error } = await supabase
+        .from('race_withdrawals')
+        .select(`
+          *,
+          racer:racers(id, name, racer_number, image_url),
+          withdrawn_by_user:auth.users(id, email)
+        `)
+        .eq('race_id', raceId)
+
+      if (error) throw error
+      return withdrawals || []
+    } catch (err) {
+      console.error('Error fetching race withdrawals:', err)
+      return []
+    }
+  }
+
+  // Check if racer is withdrawn from specific race
+  const isRacerWithdrawnFromRace = async (racerId, raceId) => {
+    try {
+      const { data, error } = await supabase
+        .from('race_withdrawals')
+        .select('id')
+        .eq('racer_id', racerId)
+        .eq('race_id', raceId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        throw error
+      }
+
+      return !!data
+    } catch (err) {
+      console.error('Error checking racer withdrawal status:', err)
+      return false
+    }
+  }
+
+  // Get active racers for a specific race (excluding withdrawn)
+  const getActiveRacersForRace = async (raceId) => {
+    try {
+      const { data: withdrawnRacerIds, error: withdrawalError } = await supabase
+        .from('race_withdrawals')
+        .select('racer_id')
+        .eq('race_id', raceId)
+
+      if (withdrawalError) throw withdrawalError
+
+      const withdrawnIds = (withdrawnRacerIds || []).map(w => w.racer_id)
+      
+      return racers.value.filter(racer => !withdrawnIds.includes(racer.id))
+    } catch (err) {
+      console.error('Error getting active racers for race:', err)
+      return racers.value // Return all racers if error
+    }
+  }
+
+  // Check if current user can withdraw/reinstate a specific racer
+  const canUserWithdrawRacer = (racerId, raceId) => {
+    if (!authStore.userId) return false
+    
+    // Race admins can withdraw any racer
+    if (authStore.isRaceAdmin) return true
+    
+    // Racer owners can withdraw their own racers
+    const racer = racers.value.find(r => r.id === racerId)
+    return racer && racer.user_id === authStore.userId
+  }
+
   return {
     // Data
     racers,
@@ -646,6 +755,14 @@ export const useRacers = () => {
     updateRacerPhotos,
     getAllRacerImages,
     getTimeRange,
-    getVoteCounts
+    getVoteCounts,
+    
+    // Race-specific withdrawal methods
+    withdrawRacerFromRace,
+    reinstateRacerToRace,
+    getRaceWithdrawals,
+    isRacerWithdrawnFromRace,
+    getActiveRacersForRace,
+    canUserWithdrawRacer
   }
 }

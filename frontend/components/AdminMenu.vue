@@ -1,8 +1,8 @@
 <template>
   <div class="relative">
     <Button severity="secondary" outlined :size="size" @click="showMenu = !showMenu">
-      <i class="pi pi-cog mr-2" />
-      Admin
+      <i class="pi pi-bars mr-2" />
+      Menu
       <i :class="showMenu ? 'pi pi-chevron-up' : 'pi pi-chevron-down'" class="ml-2" />
     </Button>
 
@@ -56,13 +56,20 @@
             Qualifiers
           </NuxtLink>
           <NuxtLink
+            :to="`/races/${raceId}/my-status`"
+            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <i class="pi pi-user mr-2 text-teal-600" />
+            My Status
+          </NuxtLink>
+          <NuxtLink
             :to="`/races/${raceId}/edit`"
             class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
           >
             <i class="pi pi-pencil mr-2 text-gray-600" />
             Edit Race
           </NuxtLink>
-          <hr class="my-2 border-gray-200 dark:border-gray-600" />
+          <hr class="my-2 border-gray-200 dark:border-gray-600" >
         </template>
 
         <!-- General admin items -->

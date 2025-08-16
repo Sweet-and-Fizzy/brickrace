@@ -195,7 +195,7 @@
                                 :src="slotProps.option.image_url"
                                 :alt="slotProps.option.name"
                                 class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-                              />
+                              >
                               <div
                                 v-else
                                 class="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-mono font-bold"
@@ -227,7 +227,7 @@
                               :src="getSelectedRacer(slotProps.value)?.image_url"
                               :alt="getSelectedRacer(slotProps.value)?.name"
                               class="w-6 h-6 rounded-full object-cover"
-                            />
+                            >
                             <div
                               v-else
                               class="w-6 h-6 rounded-full bg-red-600 text-white flex items-center justify-center text-xs font-mono font-bold"
@@ -338,7 +338,7 @@
                         :src="award.racer.image_url"
                         :alt="award.racer.name"
                         class="w-16 h-16 rounded-full object-cover border-2 border-yellow-400 dark:border-yellow-500"
-                      />
+                      >
                       <div
                         v-else
                         class="w-16 h-16 bg-yellow-600 text-white flex items-center justify-center text-sm font-bold border-2 border-yellow-400 dark:border-yellow-500 rounded-full"

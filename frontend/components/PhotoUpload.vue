@@ -34,7 +34,7 @@
                 :src="file.objectURL"
                 :alt="file.name"
                 class="w-full h-24 object-cover rounded-lg border"
-              />
+              >
               <div
                 class="absolute inset-0 bg-black bg-opacity-50 rounded-lg flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
               >

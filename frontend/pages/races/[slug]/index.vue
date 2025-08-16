@@ -96,7 +96,7 @@
           The race you're looking for doesn't exist or has been removed.
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          ID requested: {{ route.params.slug || route.params.id }}
+          Slug requested: {{ route.params.slug }}
         </p>
         <div class="space-x-4">
           <NuxtLink to="/races">
@@ -146,7 +146,7 @@
             :src="race.image_url"
             :alt="race.name"
             class="w-full h-64 md:h-96 object-cover rounded-lg"
-          />
+          >
         </div>
 
         <!-- Race Process Steps -->
@@ -494,8 +494,9 @@
                   >
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
-                        <div class="bg-brand-blue text-white rounded-full p-3 animate-pulse">
+                        <div class="bg-brand-blue text-white rounded-full p-3 relative">
                           <i class="pi pi-flag-fill text-2xl" />
+                          <div class="absolute inset-0 bg-brand-blue rounded-full animate-ping opacity-75"/>
                         </div>
                         <div>
                           <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -533,7 +534,7 @@
                             :src="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
                             :alt="getTrackRacer(currentHeatData.racers, 1).racer_name"
                             class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
-                          />
+                          >
                           <div
                             v-else
                             class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
@@ -579,7 +580,7 @@
                             :src="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
                             :alt="getTrackRacer(currentHeatData.racers, 2).racer_name"
                             class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
-                          />
+                          >
                           <div
                             v-else
                             class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
@@ -648,7 +649,7 @@
                             :src="getTrackRacer(heat.racers, 1).racer_image_url"
                             :alt="getTrackRacer(heat.racers, 1).racer_name"
                             class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
-                          />
+                          >
                           <div
                             v-else
                             class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
@@ -686,7 +687,7 @@
                             :src="getTrackRacer(heat.racers, 2).racer_image_url"
                             :alt="getTrackRacer(heat.racers, 2).racer_name"
                             class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
-                          />
+                          >
                           <div
                             v-else
                             class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
@@ -915,7 +916,7 @@
                         :src="checkin.racer_image_url"
                         :alt="checkin.racer_name"
                         class="w-12 h-12 object-cover rounded-full border-2 border-green-300"
-                      />
+                      >
                       <div
                         v-else
                         class="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-full border-2 border-green-300 flex items-center justify-center"
@@ -1095,14 +1096,13 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
-import { isUUID } from '~/utils/slug-helpers'
 
 const route = useRoute()
 const authStore = useAuthStore()
 
 // Use reactive composables for all data
 
-const { races, fetchRaceById, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
+const { races, getRaceBySlug, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
 
 // Race data - needs to be defined before other composables that depend on it
 const race = ref(null)
@@ -1182,25 +1182,14 @@ const breadcrumbItems = computed(() => [
 // Fetch race data from Supabase
 // Get race data from singleton composable (already loaded)
 const getRaceData = async () => {
-  const param = route.params.slug || route.params.id
+  const slug = route.params.slug
 
   try {
-    // Check if it's a UUID (legacy support)
-    if (isUUID(param)) {
-      // First try to get from already loaded races
-      race.value = races.value.find((r) => r.id === param) || null
-      // If not found, fetch specifically
-      if (!race.value) {
-        race.value = await fetchRaceById(param)
-      }
-    } else {
-      // It's a slug
-      // First try to get from already loaded races
-      race.value = races.value.find((r) => r.slug === param) || null
-      // If not found, fetch specifically
-      if (!race.value) {
-        race.value = await fetchRaceBySlug(param)
-      }
+    // Get race by slug
+    race.value = getRaceBySlug(slug)
+    // If not found, fetch specifically
+    if (!race.value) {
+      race.value = await fetchRaceBySlug(slug)
     }
 
     if (!race.value) {

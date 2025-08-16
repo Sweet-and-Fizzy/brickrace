@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -65,7 +63,7 @@
               </div>
             </div>
             <div class="mt-4 md:mt-0">
-              <AdminMenu :race-id="raceId" />
+              <AdminMenu :race-id="race?.slug || race?.id" />
             </div>
           </div>
         </div>
@@ -961,10 +959,10 @@ const authStore = useAuthStore()
 const supabase = useSupabaseClient()
 const toast = useToast()
 const confirm = useConfirm()
-const raceId = route.params.id
+const raceId = route.params.slug
 
 // Use singleton composables
-const { races, loading: racesLoading, initialize: initializeRaces, getRaceById } = useRaces()
+const { races, loading: racesLoading, initialize: initializeRaces, getRaceBySlug, fetchRaceBySlug } = useRaces()
 const {
   qualifiers,
   loading: qualifiersLoading,
@@ -977,11 +975,9 @@ const {
   initialize: initializeBrackets
 } = useBrackets()
 
-// Computed properties for this specific race
-const race = computed(() =>
-  getRaceById ? getRaceById(raceId) : races.value.find((r) => r.id === raceId)
-)
-const raceBrackets = computed(() => getBracketsForRace(raceId))
+// Reactive data
+const race = ref(null)
+const raceBrackets = computed(() => race.value ? getBracketsForRace(race.value.id) : [])
 const raceQualifiers = computed(() => qualifiers.value)
 const loading = computed(
   () => racesLoading.value || qualifiersLoading.value || bracketsLoading.value
@@ -1000,6 +996,7 @@ const editingTime = ref({})
 const breadcrumbItems = computed(() => [
   { label: 'Home', url: '/' },
   { label: 'Races', url: '/races' },
+  { label: race.value?.name || 'Race', url: `/races/${route.params.slug}` },
   { label: 'Brackets' } // Current page, no navigation
 ])
 
@@ -1455,7 +1452,22 @@ const initializeData = async () => {
     }
 
     // Initialize all composables
-    await Promise.all([initializeRaces(), initializeQualifiers(raceId), initializeBrackets()])
+    await initializeRaces()
+    await initializeBrackets()
+
+    // Get race data by slug
+    const slug = route.params.slug
+    let raceData = getRaceBySlug(slug)
+    if (!raceData) {
+      raceData = await fetchRaceBySlug(slug)
+    }
+    if (!raceData) {
+      throw new Error('Race not found')
+    }
+    race.value = raceData
+
+    // Initialize qualifiers for this specific race
+    await initializeQualifiers(raceData.id)
 
     if (process.env.NODE_ENV === 'development') {
       console.log('Brackets page: Data initialization complete')
@@ -1484,7 +1496,7 @@ const generateBrackets = async () => {
       const slowest = racersToUse.pop() // Last element (slowest)
 
       newBrackets.push({
-        race_id: route.params.id,
+        race_id: race.value.id,
         track1_racer_id: fastest.racer_id,
         track2_racer_id: slowest.racer_id,
         bracket_type: selectedBracketType.value
@@ -1563,7 +1575,7 @@ const generateNextRound = async () => {
       const slowest = availableWinners.pop() // Last element (slowest winning time)
 
       newBrackets.push({
-        race_id: raceId,
+        race_id: race.value.id,
         track1_racer_id: fastest.racer_id,
         track2_racer_id: slowest.racer_id,
         bracket_type: selectedBracketType.value
@@ -1619,7 +1631,7 @@ const clearBrackets = async () => {
         const { error: deleteError } = await supabase
           .from('brackets')
           .delete()
-          .eq('race_id', route.params.id)
+          .eq('race_id', race.value.id)
 
         if (deleteError) throw deleteError
 

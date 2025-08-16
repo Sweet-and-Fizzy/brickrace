@@ -59,7 +59,7 @@
                   :src="file.objectURL"
                   :alt="file.name"
                   class="w-12 h-12 object-cover rounded border"
-                />
+                >
                 <div class="flex-1">
                   <p class="font-medium text-gray-900 dark:text-white text-sm">{{ file.name }}</p>
                   <p class="text-xs text-gray-500 dark:text-gray-400">
