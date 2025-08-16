@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const client = await serverSupabaseClient(event)
-  
+
   // Check if user is race admin (match frontend auth store logic)
   const isAdmin = user.user_metadata?.isRaceAdmin || user.user_metadata?.isAdmin || false
   if (!isAdmin) {

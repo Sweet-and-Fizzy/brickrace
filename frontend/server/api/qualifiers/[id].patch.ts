@@ -34,7 +34,8 @@ export default defineEventHandler(async (event) => {
       .from('qualifiers')
       .update(updateData)
       .eq('id', qualifierId)
-      .select(`
+      .select(
+        `
         *,
         racer:racers(
           id,
@@ -42,7 +43,8 @@ export default defineEventHandler(async (event) => {
           racer_number,
           image_url
         )
-      `)
+      `
+      )
       .single()
 
     if (error) {

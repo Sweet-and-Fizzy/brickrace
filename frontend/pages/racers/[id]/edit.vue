@@ -21,7 +21,9 @@
           You don't have permission to edit this racer or it doesn't exist.
         </p>
         <NuxtLink to="/racers">
-          <Button icon="pi pi-arrow-left" class="btn-secondary"><span>Back to All Racers</span></Button>
+          <Button icon="pi pi-arrow-left" class="btn-secondary"
+            ><span>Back to All Racers</span></Button
+          >
         </NuxtLink>
       </div>
 

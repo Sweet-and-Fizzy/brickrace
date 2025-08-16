@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -94,124 +92,126 @@
 
             <!-- Racers List -->
             <div class="space-y-4">
-              <Card
-                v-for="racer in filteredCheckedInRacers"
-                :key="racer.id"
-              >
+              <Card v-for="racer in filteredCheckedInRacers" :key="racer.id">
                 <template #content>
-                <!-- Racer Header -->
-                <div
-                  class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
-                >
-                  <div class="flex items-center gap-3">
-                    <Image
-                      v-if="racer.image_url"
-                      :src="racer.image_url"
-                      :alt="racer.name"
-                      image-class="w-12 h-12 object-cover rounded-full border-2 border-gray-300"
-                      class="w-12 h-12"
-                      preview
-                    />
-                    <div
-                      v-else
-                      class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center"
-                    >
-                      <i class="pi pi-car text-gray-500 dark:text-gray-400" />
-                    </div>
-                    <div>
-                      <h3 class="font-semibold text-gray-900 dark:text-white">{{ racer.name }}</h3>
-                      <p class="text-sm text-gray-600 dark:text-gray-300">
-                        Racer #{{ racer.racer_number }}
-                      </p>
-                      <p v-if="racer.team_members" class="text-xs text-gray-500 dark:text-gray-400">
-                        Team: {{ racer.team_members }}
-                      </p>
-                    </div>
-                  </div>
-                  <div class="text-left sm:text-right space-y-2">
-                    <div>
-                      <p class="text-sm text-gray-500 dark:text-gray-400">Fastest Time</p>
-                      <p class="text-lg font-bold text-green-600 dark:text-green-400">
-                        {{ getBestTime(racer.id) || 'No runs' }}
-                      </p>
-                    </div>
-                    <div>
-                      <p class="text-sm text-gray-500 dark:text-gray-400">Slowest Time</p>
-                      <p class="text-lg font-bold text-red-600 dark:text-red-400">
-                        {{ getWorstTime(racer.id) || 'No runs' }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Add New Qualifying Time and Previous Runs -->
-                <div class="space-y-4">
-                  <!-- Add Time Section -->
-                  <div class="flex flex-col sm:flex-row sm:items-end gap-3">
-                    <div class="flex-shrink-0 sm:w-32">
-                      <label
-                        :for="`time-${racer.id}`"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                      >
-                        Time (sec)
-                      </label>
-                      <InputNumber
-                        :id="`time-${racer.id}`"
-                        v-model="newTimes[racer.id]"
-                        mode="decimal"
-                        :min-fraction-digits="0"
-                        :max-fraction-digits="3"
-                        :min="0"
-                        :step="0.001"
-                        placeholder="0.000"
-                        class="w-full"
-                        :input-style="{
-                          borderRadius: '0.375rem',
-                          padding: '0.5rem 0.75rem',
-                          width: '100%',
-                          maxWidth: '100%',
-                          boxSizing: 'border-box'
-                        }"
+                  <!-- Racer Header -->
+                  <div
+                    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4"
+                  >
+                    <div class="flex items-center gap-3">
+                      <Image
+                        v-if="racer.image_url"
+                        :src="racer.image_url"
+                        :alt="racer.name"
+                        image-class="w-12 h-12 object-cover rounded-full border-2 border-gray-300"
+                        class="w-12 h-12"
+                        preview
                       />
-                    </div>
-                    <Button
-                      :disabled="!newTimes[racer.id] || processing === `add-${racer.id}`"
-                      :loading="processing === `add-${racer.id}`"
-                      severity="info"
-                      class="w-full sm:w-auto"
-                      @click="addQualifyingTime(racer)"
-                    >
-                      <i class="pi pi-plus mr-2" />
-                      Add Time
-                    </Button>
-                  </div>
-
-                  <!-- Previous Runs -->
-                  <div v-if="getRacerQualifiers(racer.id).length > 0" class="w-full">
-                    <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Previous Runs:
-                    </h4>
-                    <div class="flex flex-wrap gap-2">
                       <div
-                        v-for="qualifier in getRacerQualifiers(racer.id)"
-                        :key="qualifier.id"
-                        class="flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-full text-sm text-blue-800 dark:text-blue-200"
+                        v-else
+                        class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center"
                       >
-                        <span class="font-medium">{{ formatTime(qualifier.time) }}</span>
-                        <Button
-                          v-tooltip.top="'Delete qualifying time'"
-                          :disabled="processing === qualifier.id"
-                          severity="danger"
-                          text
-                          rounded
-                          size="small"
-                          icon="pi pi-times"
-                          @click="deleteQualifier(qualifier.id, racer.name)"
-                        />
+                        <i class="pi pi-car text-gray-500 dark:text-gray-400" />
+                      </div>
+                      <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">
+                          {{ racer.name }}
+                        </h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                          Racer #{{ racer.racer_number }}
+                        </p>
+                        <p
+                          v-if="racer.team_members"
+                          class="text-xs text-gray-500 dark:text-gray-400"
+                        >
+                          Team: {{ racer.team_members }}
+                        </p>
+                      </div>
+                    </div>
+                    <div class="text-left sm:text-right space-y-2">
+                      <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Fastest Time</p>
+                        <p class="text-lg font-bold text-green-600 dark:text-green-400">
+                          {{ getBestTime(racer.id) || 'No runs' }}
+                        </p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400">Slowest Time</p>
+                        <p class="text-lg font-bold text-red-600 dark:text-red-400">
+                          {{ getWorstTime(racer.id) || 'No runs' }}
+                        </p>
                       </div>
                     </div>
                   </div>
-                </div>
+
+                  <!-- Add New Qualifying Time and Previous Runs -->
+                  <div class="space-y-4">
+                    <!-- Add Time Section -->
+                    <div class="flex flex-col sm:flex-row sm:items-end gap-3">
+                      <div class="flex-shrink-0 sm:w-32">
+                        <label
+                          :for="`time-${racer.id}`"
+                          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                        >
+                          Time (sec)
+                        </label>
+                        <InputNumber
+                          :id="`time-${racer.id}`"
+                          v-model="newTimes[racer.id]"
+                          mode="decimal"
+                          :min-fraction-digits="0"
+                          :max-fraction-digits="3"
+                          :min="0"
+                          :step="0.001"
+                          placeholder="0.000"
+                          class="w-full"
+                          :input-style="{
+                            borderRadius: '0.375rem',
+                            padding: '0.5rem 0.75rem',
+                            width: '100%',
+                            maxWidth: '100%',
+                            boxSizing: 'border-box'
+                          }"
+                        />
+                      </div>
+                      <Button
+                        :disabled="!newTimes[racer.id] || processing === `add-${racer.id}`"
+                        :loading="processing === `add-${racer.id}`"
+                        severity="info"
+                        class="w-full sm:w-auto"
+                        @click="addQualifyingTime(racer)"
+                      >
+                        <i class="pi pi-plus mr-2" />
+                        Add Time
+                      </Button>
+                    </div>
+
+                    <!-- Previous Runs -->
+                    <div v-if="getRacerQualifiers(racer.id).length > 0" class="w-full">
+                      <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Previous Runs:
+                      </h4>
+                      <div class="flex flex-wrap gap-2">
+                        <div
+                          v-for="qualifier in getRacerQualifiers(racer.id)"
+                          :key="qualifier.id"
+                          class="flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-full text-sm text-blue-800 dark:text-blue-200"
+                        >
+                          <span class="font-medium">{{ formatTime(qualifier.time) }}</span>
+                          <Button
+                            v-tooltip.top="'Delete qualifying time'"
+                            :disabled="processing === qualifier.id"
+                            severity="danger"
+                            text
+                            rounded
+                            size="small"
+                            icon="pi pi-times"
+                            @click="deleteQualifier(qualifier.id, racer.name)"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </template>
               </Card>
             </div>
@@ -451,7 +451,13 @@ const toast = useToast()
 const confirm = useConfirm()
 
 // Use composables
-const { getRaceById, getRaceBySlug, fetchRaceById, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
+const {
+  getRaceById,
+  getRaceBySlug,
+  fetchRaceById,
+  fetchRaceBySlug,
+  initialize: initializeRaces
+} = useRaces()
 
 const { getCheckinsForRace, racers: allRacers, initialize: initializeCheckins } = useCheckins()
 
@@ -462,8 +468,10 @@ const qualifiers = computed(() => {
   return unref(qualifiersComposable.value.qualifiers) || []
 })
 const formatTime = (time) => qualifiersComposable.value?.formatTime(time) || 'N/A'
-const getQualifiersByRacerComposable = (racerId) => qualifiersComposable.value?.getQualifiersByRacer(racerId) || []
-const getBestTimeForRacer = (racerId) => qualifiersComposable.value?.getBestTimeForRacer(racerId) || null
+const getQualifiersByRacerComposable = (racerId) =>
+  qualifiersComposable.value?.getQualifiersByRacer(racerId) || []
+const getBestTimeForRacer = (racerId) =>
+  qualifiersComposable.value?.getBestTimeForRacer(racerId) || null
 const addQualifier = (data) => qualifiersComposable.value?.addQualifier(data)
 const deleteQualifierComposable = (id) => qualifiersComposable.value?.deleteQualifier(id)
 
@@ -500,12 +508,13 @@ const filteredCheckedInRacers = computed(() => {
 
 const leaderboard = computed(() => {
   if (!qualifiersComposable.value || !qualifiers.value.length) return []
-  
+
   const racerBestTimes = {}
 
   // Calculate best time for each racer
   qualifiers.value.forEach((q) => {
-    if (q.time && q.time > 0) { // Only consider valid times
+    if (q.time && q.time > 0) {
+      // Only consider valid times
       if (!racerBestTimes[q.racer_id] || q.time < racerBestTimes[q.racer_id].best_time) {
         racerBestTimes[q.racer_id] = {
           racer_id: q.racer_id,
@@ -532,12 +541,13 @@ const leaderboard = computed(() => {
 
 const slowestLeaderboard = computed(() => {
   if (!qualifiersComposable.value || !qualifiers.value.length) return []
-  
+
   const racerSlowestTimes = {}
 
   // Calculate slowest time for each racer
   qualifiers.value.forEach((q) => {
-    if (q.time && q.time > 0) { // Only consider valid times
+    if (q.time && q.time > 0) {
+      // Only consider valid times
       if (!racerSlowestTimes[q.racer_id] || q.time > racerSlowestTimes[q.racer_id].slowest_time) {
         racerSlowestTimes[q.racer_id] = {
           racer_id: q.racer_id,
@@ -594,10 +604,10 @@ const getWorstTime = (racerId) => {
   if (!qualifiersComposable.value) return null
   const racerQualifiers = qualifiersComposable.value.getQualifiersByRacer(racerId)
   if (!racerQualifiers.length) return null
-  
-  const validTimes = racerQualifiers.filter(q => q.time && q.time > 0).map(q => q.time)
+
+  const validTimes = racerQualifiers.filter((q) => q.time && q.time > 0).map((q) => q.time)
   if (!validTimes.length) return null
-  
+
   const worstTime = Math.max(...validTimes)
   return qualifiersComposable.value.formatTime(worstTime)
 }
@@ -616,7 +626,7 @@ const fetchData = async () => {
     // Get race data from cached composable
     const param = route.params.slug || route.params.id
     let raceData = null
-    
+
     // Check if it's a UUID (legacy support)
     if (isUUID(param)) {
       raceData = getRaceById(param)
@@ -634,7 +644,7 @@ const fetchData = async () => {
     }
     race.value = raceData
     raceId.value = raceData.id
-    
+
     // Initialize qualifiers composable with the race ID
     qualifiersComposable.value = useQualifiers(raceData.id)
 

@@ -1,6 +1,6 @@
 export const useHeats = () => {
   const supabase = useSupabaseClient()
-  
+
   // State management
   const currentRace = useState('heats-current-race', () => null)
   const currentHeat = useState('heats-current-heat', () => null)
@@ -15,7 +15,7 @@ export const useHeats = () => {
 
     try {
       const response = await $fetch('/api/races/current')
-      
+
       if (response.error) {
         throw new Error(response.error)
       }
@@ -23,7 +23,7 @@ export const useHeats = () => {
       currentRace.value = response.data.race
       currentHeat.value = response.data.currentHeat
       upcomingHeats.value = response.data.upcomingHeats
-      
+
       return response.data
     } catch (err) {
       console.error('Error fetching current race data:', err)
@@ -119,8 +119,7 @@ export const useHeats = () => {
   // Start a specific heat
   const startHeat = async (heatNumber) => {
     try {
-      const { error } = await supabase
-        .rpc('start_heat', { heat_num: heatNumber })
+      const { error } = await supabase.rpc('start_heat', { heat_num: heatNumber })
 
       if (error) throw error
 
@@ -163,7 +162,7 @@ export const useHeats = () => {
       .subscribe()
 
     // Cleanup on component unmount
-    if (process.client) {
+    if (import.meta.client) {
       onUnmounted(() => {
         channel.unsubscribe()
       })

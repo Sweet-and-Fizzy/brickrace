@@ -1,16 +1,12 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <!-- Header -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="text-center md:text-left">
             <div class="flex justify-center md:justify-start mb-6">
-              <div
-                class="bg-brand-blue rounded-full w-16 h-16 flex items-center justify-center"
-              >
+              <div class="bg-brand-blue rounded-full w-16 h-16 flex items-center justify-center">
                 <i class="pi pi-shield text-2xl text-white" />
               </div>
             </div>
@@ -274,9 +270,7 @@ const racersCount = computed(() => stats.value.racers)
 const fetchStats = async () => {
   try {
     // Fetch race statistics
-    const { data: racesData, error: racesError } = await supabase
-      .from('races')
-      .select('id, active')
+    const { data: racesData, error: racesError } = await supabase.from('races').select('id, active')
 
     if (racesError) throw racesError
 

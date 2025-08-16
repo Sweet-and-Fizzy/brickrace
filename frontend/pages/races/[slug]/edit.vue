@@ -147,7 +147,10 @@
 
               <!-- Submit Button -->
               <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                <NuxtLink :to="`/races/${race?.slug || $route.params.slug || $route.params.id}`" class="flex-1">
+                <NuxtLink
+                  :to="`/races/${race?.slug || $route.params.slug || $route.params.id}`"
+                  class="flex-1"
+                >
                   <Button
                     type="button"
                     severity="secondary"
@@ -182,7 +185,14 @@ const supabase = useSupabaseClient()
 const $toast = useToast()
 
 // Use races composable
-const { getRaceById, getRaceBySlug, fetchRaceById, fetchRaceBySlug, updateRace: updateRaceComposable, initialize: initializeRaces } = useRaces()
+const {
+  getRaceById,
+  getRaceBySlug,
+  fetchRaceById,
+  fetchRaceBySlug,
+  updateRace: updateRaceComposable,
+  initialize: initializeRaces
+} = useRaces()
 
 // State
 const race = ref(null)
@@ -218,7 +228,7 @@ const fetchRace = async () => {
 
     const param = route.params.slug || route.params.id
     let raceData = null
-    
+
     // Check if it's a UUID (legacy support)
     if (isUUID(param)) {
       // Get race from cached data

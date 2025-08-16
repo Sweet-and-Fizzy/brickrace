@@ -17,8 +17,8 @@ export default {
         'brand-gold': '#ffc927'
       },
       fontFamily: {
-        'display': ['Impact', 'sans-serif'],
-        'body': ['Open Sans', 'sans-serif']
+        display: ['Impact', 'sans-serif'],
+        body: ['Open Sans', 'sans-serif']
       }
     }
   },

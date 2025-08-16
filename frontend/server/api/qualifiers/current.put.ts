@@ -15,12 +15,11 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Complete the heat with the provided times
-    const { error } = await client
-      .rpc('complete_heat', {
-        heat_num: heat_number,
-        track1_time: track1_time || null,
-        track2_time: track2_time || null
-      })
+    const { error } = await client.rpc('complete_heat', {
+      heat_num: heat_number,
+      track1_time: track1_time || null,
+      track2_time: track2_time || null
+    })
 
     if (error) {
       throw error

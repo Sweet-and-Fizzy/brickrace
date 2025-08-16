@@ -15,11 +15,7 @@
           <i v-if="action.icon" :class="action.icon + ' mr-2'" />
           {{ action.label }}
         </Button>
-        <Button
-          v-else
-          :class="action.class || 'btn-primary'"
-          @click="action.onClick"
-        >
+        <Button v-else :class="action.class || 'btn-primary'" @click="action.onClick">
           <i v-if="action.icon" :class="action.icon + ' mr-2'" />
           {{ action.label }}
         </Button>

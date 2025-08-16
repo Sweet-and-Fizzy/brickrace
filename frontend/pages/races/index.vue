@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <PageHeader title="All Races" :actions="headerActions" />
 
@@ -22,8 +20,7 @@
           :key="race.id"
           class="hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-gray-800/50 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-300 relative overflow-hidden cursor-pointer group"
           :class="{
-            'ring-2 ring-brand-green bg-white dark:bg-gray-800 hover:ring-brand-green':
-              race.active,
+            'ring-2 ring-brand-green bg-white dark:bg-gray-800 hover:ring-brand-green': race.active,
             'border border-gray-300 dark:border-gray-600 hover:border-brand-blue dark:hover:border-brand-blue':
               !race.active
           }"

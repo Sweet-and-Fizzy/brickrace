@@ -8,7 +8,8 @@ export default defineEventHandler(async (event) => {
     // Get checked-in racers for this race
     const { data: checkins, error: checkinsError } = await client
       .from('checkins')
-      .select(`
+      .select(
+        `
         racer_id,
         racers (
           id,
@@ -16,13 +17,14 @@ export default defineEventHandler(async (event) => {
           racer_number,
           image_url
         )
-      `)
+      `
+      )
       .eq('race_id', raceId)
 
     if (checkinsError) throw checkinsError
 
     // Transform the data to flatten racer information
-    const racers = checkins.map(checkin => ({
+    const racers = checkins.map((checkin) => ({
       id: checkin.racers.id,
       name: checkin.racers.name,
       racer_number: checkin.racers.racer_number,

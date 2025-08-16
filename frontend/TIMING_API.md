@@ -22,11 +22,13 @@ openssl rand -base64 32
 ## Endpoints
 
 ### 1. Get Race Status
+
 **GET** `/api/timing/status`
 
 Returns current race information, active heat, and upcoming heats.
 
 **Response:**
+
 ```json
 {
   "race": {
@@ -47,7 +49,7 @@ Returns current race information, active heat, and upcoming heats.
       },
       {
         "track_number": 2,
-        "racer_id": "uuid", 
+        "racer_id": "uuid",
         "racer_name": "Thunder Runner",
         "racer_number": 15,
         "current_time": null
@@ -65,18 +67,21 @@ Returns current race information, active heat, and upcoming heats.
 ```
 
 ### 2. Generate Heats
+
 **POST** `/api/timing/generate-heats`
 
 Creates heat assignments for all checked-in racers.
 
 **Request:**
+
 ```json
 {
-  "race_id": "uuid"  // Optional, defaults to active race
+  "race_id": "uuid" // Optional, defaults to active race
 }
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -88,11 +93,13 @@ Creates heat assignments for all checked-in racers.
 ```
 
 ### 3. Start Heat
+
 **POST** `/api/timing/start-heat`
 
 Marks a heat as "in progress" and ready for timing.
 
 **Request:**
+
 ```json
 {
   "heat_number": 3
@@ -100,10 +107,11 @@ Marks a heat as "in progress" and ready for timing.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
-  "message": "Heat 3 started successfully", 
+  "message": "Heat 3 started successfully",
   "heat_number": 3,
   "race": {
     "id": "uuid",
@@ -113,21 +121,24 @@ Marks a heat as "in progress" and ready for timing.
 ```
 
 ### 4. Record Times
+
 **POST** `/api/timing/record-times`
 
 Records times for a completed heat and optionally advances to next heat.
 
 **Request:**
+
 ```json
 {
   "heat_number": 3,
-  "track1_time": 3.456,      // seconds (optional)
-  "track2_time": 3.789,      // seconds (optional)
-  "auto_advance": true       // auto-start next heat (default: true)
+  "track1_time": 3.456, // seconds (optional)
+  "track2_time": 3.789, // seconds (optional)
+  "auto_advance": true // auto-start next heat (default: true)
 }
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -161,8 +172,8 @@ if not status['current_heat'] and not status['upcoming_heats']:
     print("Heats generated")
 
 # 3. Start first heat
-requests.post(f"{API_BASE}/start-heat", 
-              json={"heat_number": 1}, 
+requests.post(f"{API_BASE}/start-heat",
+              json={"heat_number": 1},
               headers=headers)
 print("Heat 1 started")
 
@@ -185,12 +196,14 @@ print(f"Heat 1 completed. Next heat: {result['next_heat_number']}")
 ## Error Handling
 
 All endpoints return standard HTTP status codes:
+
 - `200` - Success
 - `400` - Bad request (missing/invalid parameters)
 - `401` - Unauthorized (missing/invalid API key)
 - `500` - Server error
 
 Error responses include a message:
+
 ```json
 {
   "statusCode": 400,
@@ -201,6 +214,7 @@ Error responses include a message:
 ## Logging
 
 All timing system requests are logged with:
+
 - Timestamp
 - IP address
 - Action performed

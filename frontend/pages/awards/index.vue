@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <PageHeader title="Awards" :actions="headerActions" />
 
@@ -11,9 +9,7 @@
           <template #content>
             <div class="flex items-center justify-between">
               <div>
-                <h3
-                  class="text-2xl font-bold text-gray-900 dark:text-white mb-1"
-                >
+                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                   {{ activeRace.name }}
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 font-medium">
@@ -28,12 +24,8 @@
                 </p>
               </div>
               <div class="text-right">
-                <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">
-                  Total Awards
-                </div>
-                <div
-                  class="text-3xl font-bold text-brand-blue"
-                >
+                <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Awards</div>
+                <div class="text-3xl font-bold text-brand-blue">
                   {{ voteableAwards.length + filteredAssignedAwards.length }}
                 </div>
               </div>
@@ -125,11 +117,7 @@
       <div v-if="selectedRace">
         <!-- Voteable Awards -->
         <div v-if="voteableAwards.length" class="mb-12">
-          <h2
-            class="text-3xl font-bold text-gray-900 dark:text-white mb-8"
-          >
-            Vote for Awards
-          </h2>
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Vote for Awards</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card
               v-for="award in voteableAwards"
@@ -166,9 +154,7 @@
 
               <template #title>
                 <div class="px-6 pt-6">
-                  <h3
-                    class="text-xl font-bold text-gray-900 dark:text-white"
-                  >
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                     {{ award.name }}
                   </h3>
                 </div>
@@ -185,9 +171,7 @@
                 <div class="px-6 pb-6">
                   <div v-if="authStore.user && activeRace">
                     <div v-if="racers.length > 0">
-                      <label
-                        class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3"
-                      >
+                      <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
                         Cast Your Vote:
                       </label>
                       <Select
@@ -293,11 +277,7 @@
 
         <!-- Current Winners / Assigned Awards -->
         <div v-if="filteredAssignedAwards.length">
-          <h2
-            class="text-3xl font-bold text-gray-900 dark:text-white mb-8"
-          >
-            Award Winners
-          </h2>
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Award Winners</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card
               v-for="award in filteredAssignedAwards"
@@ -340,9 +320,7 @@
 
               <template #title>
                 <div class="px-6 pt-6">
-                  <h3
-                    class="text-xl font-bold text-gray-900 dark:text-white"
-                  >
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                     {{ award.award_definition?.name }}
                   </h3>
                 </div>
@@ -380,9 +358,7 @@
                       >
                         {{ award.racer.name }}
                       </p>
-                      <p
-                        class="text-sm font-bold text-yellow-700 dark:text-yellow-300 mt-1"
-                      >
+                      <p class="text-sm font-bold text-yellow-700 dark:text-yellow-300 mt-1">
                         Racer #{{ award.racer.racer_number || 'N/A' }}
                       </p>
                     </div>
@@ -411,11 +387,7 @@
 
         <!-- Vote Results -->
         <div v-if="voteableAwards.length" class="mt-12">
-          <h2
-            class="text-3xl font-bold text-gray-900 dark:text-white mb-8"
-          >
-            Vote Results
-          </h2>
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Vote Results</h2>
           <div class="space-y-8">
             <Card
               v-for="award in voteableAwards"
@@ -435,9 +407,7 @@
                   >
                     <i class="pi pi-chart-bar text-sm" />
                   </div>
-                  <h3
-                    class="text-xl font-bold text-gray-900 dark:text-white"
-                  >
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">
                     {{ award.name }}
                   </h3>
                 </div>
@@ -463,9 +433,7 @@
                             'bg-gray-200 text-gray-700': index > 2
                           }"
                         >
-                          {{
-                            index + 1
-                          }}
+                          {{ index + 1 }}
                         </div>
                       </template>
                     </Column>
@@ -475,7 +443,7 @@
                         <NuxtLink
                           :to="`/racers/${data.racer_id}`"
                           class="font-bold hover:text-brand-blue hover:underline transition-colors duration-200"
-                          >
+                        >
                           {{ data.racer_name }}
                         </NuxtLink>
                       </template>
@@ -500,11 +468,7 @@
       <!-- No Active Race -->
       <div v-else class="text-center py-12">
         <i class="pi pi-trophy text-6xl text-brand-gold mb-4" />
-        <h3
-          class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2"
-        >
-          No Active Race
-        </h3>
+        <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">No Active Race</h3>
         <p class="text-gray-500">Check back later for voting opportunities!</p>
       </div>
     </div>

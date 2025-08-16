@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -135,7 +133,11 @@
           </div>
 
           <!-- Admin Controls -->
-          <AdminMenu v-if="authStore.isRaceAdmin" :race-id="race.slug || race.id" class="mt-4 md:mt-0" />
+          <AdminMenu
+            v-if="authStore.isRaceAdmin"
+            :race-id="race.slug || race.id"
+            class="mt-4 md:mt-0"
+          />
         </div>
 
         <!-- Race Image -->
@@ -166,9 +168,7 @@
             <!-- Mobile: Vertical Timeline -->
             <div class="block md:hidden">
               <!-- Current Step Highlight -->
-              <div
-                class="bg-white border-2 border-brand-blue rounded-lg p-4 mb-4"
-              >
+              <div class="bg-white border-2 border-brand-blue rounded-lg p-4 mb-4">
                 <div class="flex items-center gap-3">
                   <div
                     class="w-10 h-10 bg-brand-blue text-white rounded-full flex items-center justify-center"
@@ -489,7 +489,9 @@
               <!-- Current Heat Hero Section -->
               <Card v-if="currentHeatData" class="border-4 border-brand-blue shadow-xl mb-4">
                 <template #content>
-                  <div class="bg-gradient-to-r from-brand-blue/10 to-brand-green/10 -m-6 p-6 rounded-t-lg">
+                  <div
+                    class="bg-gradient-to-r from-brand-blue/10 to-brand-green/10 -m-6 p-6 rounded-t-lg"
+                  >
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
                         <div class="bg-brand-blue text-white rounded-full p-3 animate-pulse">
@@ -505,7 +507,9 @@
                         </div>
                       </div>
                       <div class="flex items-center gap-2">
-                        <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse">
+                        <span
+                          class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse"
+                        >
                           LIVE
                         </span>
                       </div>
@@ -514,11 +518,16 @@
                     <!-- Current Heat Racers -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                       <!-- Track 1 -->
-                      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-brand-blue">
+                      <div
+                        class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-brand-blue"
+                      >
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-sm font-bold text-brand-blue">TRACK 1</span>
                         </div>
-                        <div v-if="getTrackRacer(currentHeatData.racers, 1)" class="flex items-center gap-3">
+                        <div
+                          v-if="getTrackRacer(currentHeatData.racers, 1)"
+                          class="flex items-center gap-3"
+                        >
                           <img
                             v-if="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
                             :src="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
@@ -542,7 +551,9 @@
                               #{{ getTrackRacer(currentHeatData.racers, 1).racer_number }}
                             </p>
                             <div v-if="getTrackRacer(currentHeatData.racers, 1).time" class="mt-2">
-                              <span class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm font-bold">
+                              <span
+                                class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm font-bold"
+                              >
                                 {{ formatTime(getTrackRacer(currentHeatData.racers, 1).time) }}
                               </span>
                             </div>
@@ -559,7 +570,10 @@
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-sm font-bold text-red-500">TRACK 2</span>
                         </div>
-                        <div v-if="getTrackRacer(currentHeatData.racers, 2)" class="flex items-center gap-3">
+                        <div
+                          v-if="getTrackRacer(currentHeatData.racers, 2)"
+                          class="flex items-center gap-3"
+                        >
                           <img
                             v-if="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
                             :src="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
@@ -583,7 +597,9 @@
                               #{{ getTrackRacer(currentHeatData.racers, 2).racer_number }}
                             </p>
                             <div v-if="getTrackRacer(currentHeatData.racers, 2).time" class="mt-2">
-                              <span class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm font-bold">
+                              <span
+                                class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm font-bold"
+                              >
                                 {{ formatTime(getTrackRacer(currentHeatData.racers, 2).time) }}
                               </span>
                             </div>
@@ -611,14 +627,18 @@
                       <h3 class="font-bold text-lg text-gray-900 dark:text-white">
                         Heat {{ heat.heat_number }}
                       </h3>
-                      <span class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm">
+                      <span
+                        class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm"
+                      >
                         On Deck
                       </span>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <!-- Track 1 -->
-                      <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600">
+                      <div
+                        class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600"
+                      >
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-xs font-bold text-brand-blue">TRACK 1</span>
                         </div>
@@ -654,7 +674,9 @@
                       </div>
 
                       <!-- Track 2 -->
-                      <div class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600">
+                      <div
+                        class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600"
+                      >
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-xs font-bold text-red-500">TRACK 2</span>
                         </div>
@@ -745,7 +767,8 @@
                           {{ slotProps.data.racer_name }}
                         </NuxtLink>
                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          Heat {{ slotProps.data.heat_number }} • Track {{ slotProps.data.track_number }}
+                          Heat {{ slotProps.data.heat_number }} • Track
+                          {{ slotProps.data.track_number }}
                         </div>
                       </div>
                     </template>
@@ -759,18 +782,13 @@
                   </Column>
                   <Column field="created_at" header="Completed">
                     <template #body="slotProps">
-                      <span 
-                        v-if="slotProps.data.created_at" 
+                      <span
+                        v-if="slotProps.data.created_at"
                         class="text-sm text-gray-600 dark:text-gray-300"
                       >
                         {{ new Date(slotProps.data.created_at).toLocaleTimeString() }}
                       </span>
-                      <span 
-                        v-else 
-                        class="text-sm text-gray-400 italic"
-                      >
-                        Not completed
-                      </span>
+                      <span v-else class="text-sm text-gray-400 italic"> Not completed </span>
                     </template>
                   </Column>
                 </DataTable>
@@ -1109,7 +1127,7 @@ const { voteableAwards, getAwardLeaderboard, initialize: initializeAwards } = us
 const { getPhotosByRace, allPhotos, initialize: initializePhotos } = usePhotos()
 
 // Heat management for current/upcoming heats
-const { 
+const {
   currentRace: currentRaceHeat,
   currentHeat,
   upcomingHeats,
@@ -1165,7 +1183,7 @@ const breadcrumbItems = computed(() => [
 // Get race data from singleton composable (already loaded)
 const getRaceData = async () => {
   const param = route.params.slug || route.params.id
-  
+
   try {
     // Check if it's a UUID (legacy support)
     if (isUUID(param)) {
@@ -1184,7 +1202,7 @@ const getRaceData = async () => {
         race.value = await fetchRaceBySlug(param)
       }
     }
-    
+
     if (!race.value) {
       error.value = new Error('Race not found')
     } else {
@@ -1200,21 +1218,18 @@ const getRaceData = async () => {
 // Computed properties
 const completedQualifiers = computed(() => {
   if (!qualifiers.value) return []
-  
+
   // Only show completed qualifying runs with valid times
-  return qualifiers.value.filter(q => 
-    q.status === 'completed' && 
-    q.time && 
-    q.time > 0 && 
-    !isNaN(q.time)
+  return qualifiers.value.filter(
+    (q) => q.status === 'completed' && q.time && q.time > 0 && !isNaN(q.time)
   )
 })
 
 const sortedQualifiers = computed(() => {
   if (!completedQualifiers.value.length) return []
-  
+
   const sorted = [...completedQualifiers.value]
-  
+
   if (qualifiersSortOption.value === 'heat') {
     // Sort by heat number, then by track number
     return sorted.sort((a, b) => {
@@ -1239,9 +1254,9 @@ const fastestTime = computed(() => {
   const validTimes = qualifiers.value
     .map((q) => Number.parseFloat(q.time))
     .filter((time) => time > 0 && !isNaN(time))
-  
+
   if (validTimes.length === 0) return null
-  
+
   const best = Math.min(...validTimes)
   return formatTime(best)
 })
@@ -1253,9 +1268,9 @@ const slowestTime = computed(() => {
   const validTimes = qualifiers.value
     .map((q) => Number.parseFloat(q.time))
     .filter((time) => time > 0 && !isNaN(time))
-  
+
   if (validTimes.length === 0) return null
-  
+
   const slowest = Math.max(...validTimes)
   return formatTime(slowest)
 })
@@ -1655,7 +1670,7 @@ const currentHeatData = computed(() => {
     hasCurrentHeat: !!currentHeat.value,
     currentHeat: currentHeat.value
   })
-  
+
   // Only show if this is the active race and there's a current heat
   if (!race.value?.active || !currentHeat.value || !currentRaceHeat.value) return null
   if (currentRaceHeat.value.id !== race.value.id) return null
@@ -1675,19 +1690,21 @@ const upcomingHeatsData = computed(() => {
 // Check if upcoming heats have valid racer assignments
 const hasValidUpcomingHeats = computed(() => {
   if (!upcomingHeatsData.value.length) return false
-  
+
   // Check if any upcoming heat has valid heat_number and at least one racer assigned
-  return upcomingHeatsData.value.some(heat => 
-    heat.heat_number && // Must have a heat number (means heats were generated)
-    heat.racers && 
-    heat.racers.length > 0 &&
-    heat.racers.some(racer => 
-      racer && 
-      racer.racer_name && 
-      racer.racer_name !== 'TBD' &&
-      racer.racer_id && // Must have actual racer ID
-      racer.track_number // Must have track assignment
-    )
+  return upcomingHeatsData.value.some(
+    (heat) =>
+      heat.heat_number && // Must have a heat number (means heats were generated)
+      heat.racers &&
+      heat.racers.length > 0 &&
+      heat.racers.some(
+        (racer) =>
+          racer &&
+          racer.racer_name &&
+          racer.racer_name !== 'TBD' &&
+          racer.racer_id && // Must have actual racer ID
+          racer.track_number // Must have track assignment
+      )
   )
 })
 
@@ -1726,15 +1743,14 @@ const getWinner = (bracket) => {
 // Helper function to find racer by track number
 const getTrackRacer = (racers, trackNumber) => {
   if (!racers || !Array.isArray(racers)) return null
-  return racers.find(racer => racer.track_number === trackNumber) || null
+  return racers.find((racer) => racer.track_number === trackNumber) || null
 }
 
 // Helper function to get attempt count for a racer
 const getRacerAttemptCount = (racerId) => {
   if (!qualifiers.value) return 0
-  return qualifiers.value.filter(q => q.racer_id === racerId).length
+  return qualifiers.value.filter((q) => q.racer_id === racerId).length
 }
-
 
 // Watch for filter changes to reset pagination
 watch(selectedPhotoRacer, () => {

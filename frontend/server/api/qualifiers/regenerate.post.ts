@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
         .select('id')
         .eq('active', true)
         .single()
-      
+
       if (!activeRace) {
         throw new Error('No active race found')
       }
@@ -40,10 +40,9 @@ export default defineEventHandler(async (event) => {
     }
 
     // Regenerate qualifiers
-    const { error } = await client
-      .rpc('generate_qualifier_heats', {
-        target_race_id: targetRaceId
-      })
+    const { error } = await client.rpc('generate_qualifier_heats', {
+      target_race_id: targetRaceId
+    })
 
     if (error) {
       throw error
@@ -52,7 +51,8 @@ export default defineEventHandler(async (event) => {
     // Get the newly generated qualifiers
     const { data: qualifiers } = await client
       .from('qualifiers')
-      .select(`
+      .select(
+        `
         *,
         racer:racers(
           id,
@@ -60,7 +60,8 @@ export default defineEventHandler(async (event) => {
           racer_number,
           image_url
         )
-      `)
+      `
+      )
       .eq('race_id', targetRaceId)
       .eq('status', 'scheduled')
       .order('scheduled_order')

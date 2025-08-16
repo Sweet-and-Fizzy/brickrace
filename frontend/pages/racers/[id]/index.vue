@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -52,36 +50,115 @@
           <!-- Main Content -->
           <div class="lg:col-span-2 space-y-6">
             <!-- Photo Gallery -->
-            <Card v-if="allRacerPhotos.length > 0 && allRacerPhotos[0]?.url" class="overflow-hidden" :pt="{ body: { class: 'p-0' }, content: { class: 'p-0' } }">
+            <Card
+              v-if="allRacerPhotos.length > 0 && allRacerPhotos[0]?.url"
+              class="overflow-hidden"
+              :pt="{ body: { class: 'p-0' }, content: { class: 'p-0' } }"
+            >
               <template #content>
-              <!-- Main Image Display -->
-              <div
-                class="relative w-full h-64 md:h-96 cursor-pointer group"
-                @click="openRacerGallery(0)"
-              >
-                <Image
-                  :src="allRacerPhotos[0]?.url"
-                  :alt="racer.name"
-                  image-class="w-full h-64 md:h-96 object-cover group-hover:scale-105 transition-transform duration-300"
-                  class="w-full h-64 md:h-96"
-                  :preview="false"
-                />
-
-                <!-- Hover Overlay -->
+                <!-- Main Image Display -->
                 <div
-                  class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center"
+                  class="relative w-full h-64 md:h-96 cursor-pointer group"
+                  @click="openRacerGallery(0)"
                 >
+                  <Image
+                    :src="allRacerPhotos[0]?.url"
+                    :alt="racer.name"
+                    image-class="w-full h-64 md:h-96 object-cover group-hover:scale-105 transition-transform duration-300"
+                    class="w-full h-64 md:h-96"
+                    :preview="false"
+                  />
+
+                  <!-- Hover Overlay -->
                   <div
-                    class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center"
+                    class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center"
                   >
-                    <i class="pi pi-search-plus text-3xl mb-2" />
-                    <p class="text-sm font-medium">
-                      View Gallery ({{ allRacerPhotos.length }} photos)
-                    </p>
+                    <div
+                      class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center"
+                    >
+                      <i class="pi pi-search-plus text-3xl mb-2" />
+                      <p class="text-sm font-medium">
+                        View Gallery ({{ allRacerPhotos.length }} photos)
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Name Tag Badge -->
+                  <div
+                    class="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-orange-600 text-white px-4 py-2 text-lg font-bold border-2 border-red-400 shadow-lg"
+                    style="
+                      border-radius: 12px 12px 12px 0;
+                      font-family: 'Inter', sans-serif;
+                      letter-spacing: 0.05em;
+                      box-shadow:
+                        0 4px 8px rgba(220, 38, 38, 0.3),
+                        0 0 0 1px rgba(220, 38, 38, 0.1);
+                      min-width: 50px;
+                      text-align: center;
+                    "
+                  >
+                    #{{ racer.racer_number }}
+                  </div>
+
+                  <!-- Photo Count Badge -->
+                  <div
+                    v-if="allRacerPhotos.length > 1"
+                    class="absolute bottom-4 left-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm font-medium"
+                  >
+                    <i class="pi pi-images mr-1" />
+                    {{ allRacerPhotos.length }} photos
                   </div>
                 </div>
 
-                <!-- Name Tag Badge -->
+                <!-- Thumbnail Strip (if more than 1 photo) -->
+                <div v-if="allRacerPhotos.length > 1" class="p-4 bg-gray-50 dark:bg-gray-700">
+                  <div class="flex gap-2 overflow-x-auto">
+                    <div
+                      v-for="(photo, index) in allRacerPhotos.slice(1, 6)"
+                      :key="index + 1"
+                      class="flex-shrink-0 cursor-pointer group"
+                      @click="openRacerGallery(index + 1)"
+                    >
+                      <Image
+                        :src="photo.url"
+                        :alt="`${racer.name} photo ${index + 2}`"
+                        image-class="w-16 h-16 object-cover rounded border-2 border-transparent group-hover:border-blue-400 transition-colors"
+                        class="w-16 h-16"
+                        :preview="false"
+                      />
+                    </div>
+                    <div
+                      v-if="allRacerPhotos.length > 6"
+                      class="flex-shrink-0 w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded border-2 border-dashed border-gray-300 dark:border-gray-500 flex items-center justify-center cursor-pointer hover:border-blue-400 transition-colors"
+                      @click="openRacerGallery(6)"
+                    >
+                      <span class="text-xs font-medium text-gray-600 dark:text-gray-400"
+                        >+{{ allRacerPhotos.length - 6 }}</span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </Card>
+
+            <!-- No Photos State -->
+            <Card
+              v-else
+              class="overflow-hidden"
+              :pt="{ body: { class: 'p-0' }, content: { class: 'p-0' } }"
+            >
+              <template #content>
+                <div
+                  class="w-full h-64 md:h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                >
+                  <div class="text-center">
+                    <i class="pi pi-car text-6xl text-gray-400 dark:text-gray-500 mb-4" />
+                    <p class="text-gray-500 dark:text-gray-300 font-medium">{{ racer.name }}</p>
+                    <p class="text-gray-400 dark:text-gray-400 text-sm mt-1">No photos uploaded</p>
+                  </div>
+                </div>
+
+                <!-- ID Badge -->
                 <div
                   class="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-orange-600 text-white px-4 py-2 text-lg font-bold border-2 border-red-400 shadow-lg"
                   style="
@@ -97,77 +174,6 @@
                 >
                   #{{ racer.racer_number }}
                 </div>
-
-                <!-- Photo Count Badge -->
-                <div
-                  v-if="allRacerPhotos.length > 1"
-                  class="absolute bottom-4 left-4 bg-black bg-opacity-60 text-white px-3 py-1 rounded-lg text-sm font-medium"
-                >
-                  <i class="pi pi-images mr-1" />
-                  {{ allRacerPhotos.length }} photos
-                </div>
-              </div>
-
-              <!-- Thumbnail Strip (if more than 1 photo) -->
-              <div v-if="allRacerPhotos.length > 1" class="p-4 bg-gray-50 dark:bg-gray-700">
-                <div class="flex gap-2 overflow-x-auto">
-                  <div
-                    v-for="(photo, index) in allRacerPhotos.slice(1, 6)"
-                    :key="index + 1"
-                    class="flex-shrink-0 cursor-pointer group"
-                    @click="openRacerGallery(index + 1)"
-                  >
-                    <Image
-                      :src="photo.url"
-                      :alt="`${racer.name} photo ${index + 2}`"
-                      image-class="w-16 h-16 object-cover rounded border-2 border-transparent group-hover:border-blue-400 transition-colors"
-                      class="w-16 h-16"
-                      :preview="false"
-                    />
-                  </div>
-                  <div
-                    v-if="allRacerPhotos.length > 6"
-                    class="flex-shrink-0 w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded border-2 border-dashed border-gray-300 dark:border-gray-500 flex items-center justify-center cursor-pointer hover:border-blue-400 transition-colors"
-                    @click="openRacerGallery(6)"
-                  >
-                    <span class="text-xs font-medium text-gray-600 dark:text-gray-400"
-                      >+{{ allRacerPhotos.length - 6 }}</span
-                    >
-                  </div>
-                </div>
-              </div>
-              </template>
-            </Card>
-
-            <!-- No Photos State -->
-            <Card v-else class="overflow-hidden" :pt="{ body: { class: 'p-0' }, content: { class: 'p-0' } }">
-              <template #content>
-              <div
-                class="w-full h-64 md:h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
-              >
-                <div class="text-center">
-                  <i class="pi pi-car text-6xl text-gray-400 dark:text-gray-500 mb-4" />
-                  <p class="text-gray-500 dark:text-gray-300 font-medium">{{ racer.name }}</p>
-                  <p class="text-gray-400 dark:text-gray-400 text-sm mt-1">No photos uploaded</p>
-                </div>
-              </div>
-
-              <!-- ID Badge -->
-              <div
-                class="absolute top-4 right-4 bg-gradient-to-br from-red-500 to-orange-600 text-white px-4 py-2 text-lg font-bold border-2 border-red-400 shadow-lg"
-                style="
-                  border-radius: 12px 12px 12px 0;
-                  font-family: 'Inter', sans-serif;
-                  letter-spacing: 0.05em;
-                  box-shadow:
-                    0 4px 8px rgba(220, 38, 38, 0.3),
-                    0 0 0 1px rgba(220, 38, 38, 0.1);
-                  min-width: 50px;
-                  text-align: center;
-                "
-              >
-                #{{ racer.racer_number }}
-              </div>
               </template>
             </Card>
 
@@ -712,11 +718,8 @@ const loadRacer = async () => {
 const racerQualifiers = computed(() => {
   if (!allQualifiers.value || !route.params.id) return []
   // Filter for this racer and only completed qualifiers with valid times
-  const filtered = allQualifiers.value.filter((q) => 
-    q.racer_id === route.params.id && 
-    q.status === 'completed' && 
-    q.time && 
-    q.time > 0
+  const filtered = allQualifiers.value.filter(
+    (q) => q.racer_id === route.params.id && q.status === 'completed' && q.time && q.time > 0
   )
   if (process.env.NODE_ENV === 'development') {
     console.log(
@@ -757,10 +760,10 @@ const fastestTime = computed(() => {
   if (!qualifiers || qualifiers.length === 0) return null
 
   const times = qualifiers
-    .filter(q => q.time && q.time > 0)
+    .filter((q) => q.time && q.time > 0)
     .map((q) => Number.parseFloat(q.time))
     .filter((t) => !Number.isNaN(t) && t > 0)
-  
+
   if (times.length === 0) return null
 
   const fastest = Math.min(...times)
@@ -772,10 +775,10 @@ const slowestTime = computed(() => {
   if (!qualifiers || qualifiers.length === 0) return null
 
   const times = qualifiers
-    .filter(q => q.time && q.time > 0)
+    .filter((q) => q.time && q.time > 0)
     .map((q) => Number.parseFloat(q.time))
     .filter((t) => !Number.isNaN(t) && t > 0)
-  
+
   if (times.length === 0) return null
 
   const slowest = Math.max(...times)

@@ -28,12 +28,12 @@ export function isUUID(str: string): boolean {
  */
 export async function getRaceFromRoute(route: any, useRaces: any) {
   const param = route.params.slug || route.params.id
-  
+
   // If it's a UUID, fetch by ID (legacy support)
   if (isUUID(param)) {
     return await useRaces.fetchRaceById(param)
   }
-  
+
   // Otherwise, fetch by slug
   return await useRaces.fetchRaceBySlug(param)
 }

@@ -5,7 +5,9 @@
     <div class="max-w-md w-full space-y-8">
       <div>
         <div class="text-center">
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">The Great Holyoke Brick Race</h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            The Great Holyoke Brick Race
+          </h1>
         </div>
         <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
           Sign in to your account
@@ -93,11 +95,7 @@
               </div>
 
               <div>
-                <Button
-                  type="submit"
-                  :loading="loading"
-                  class="w-full btn-primary"
-                >
+                <Button type="submit" :loading="loading" class="w-full btn-primary">
                   <span>Sign in</span>
                 </Button>
               </div>

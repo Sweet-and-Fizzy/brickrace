@@ -1,15 +1,11 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <!-- Header -->
     <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="text-center">
           <div class="flex justify-center mb-6">
-            <div
-              class="bg-brand-green rounded-full w-16 h-16 flex items-center justify-center"
-            >
+            <div class="bg-brand-green rounded-full w-16 h-16 flex items-center justify-center">
               <i class="pi pi-images text-2xl text-white" />
             </div>
           </div>

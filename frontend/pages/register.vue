@@ -177,11 +177,7 @@
               </Message>
 
               <div>
-                <Button
-                  type="submit"
-                  :loading="loading"
-                  class="w-full btn-primary"
-                >
+                <Button type="submit" :loading="loading" class="w-full btn-primary">
                   <span>Create Account</span>
                 </Button>
               </div>

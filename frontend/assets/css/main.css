@@ -76,16 +76,16 @@
     letter-spacing: 0.02em;
     border-radius: 0;
   }
-  
+
   .skew-button > * {
     transform: skewX(8deg);
   }
-  
+
   .skew-button:hover {
     transform: skewX(-8deg);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-  
+
   .skew-button:active {
     transform: skewX(-8deg);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
@@ -185,16 +185,16 @@
   .app-dark .btn-secondary:active {
     box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15);
   }
-  
+
   /* Brand color variations */
   .btn-brand-blue {
     @apply bg-brand-blue text-white hover:opacity-90;
   }
-  
+
   .btn-brand-green {
     @apply bg-brand-green text-white hover:opacity-90;
   }
-  
+
   .btn-brand-gold {
     @apply bg-brand-gold text-black hover:opacity-90;
   }
@@ -214,19 +214,18 @@
   }
 
   /* Card styling using data attributes - this works! */
-  [data-pc-name="card"] {
+  [data-pc-name='card'] {
     border: 2px solid black !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     transition: box-shadow 0.2s ease-in-out !important;
   }
 
-  [data-pc-name="card"]:hover {
+  [data-pc-name='card']:hover {
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.15) !important;
   }
 
-  .app-dark [data-pc-name="card"] {
+  .app-dark [data-pc-name='card'] {
     border-color: white !important;
   }
-
 }

@@ -1,10 +1,7 @@
 <template>
   <div class="min-h-screen bg-white dark:bg-gray-900">
     <!-- Featured Race (Hero Section) -->
-    <div
-      v-if="activeRace && !pending"
-      class="bg-white dark:bg-gray-900"
-    >
+    <div v-if="activeRace && !pending" class="bg-white dark:bg-gray-900">
       <!-- Race Image at Very Top -->
       <div class="w-full mb-8">
         <Image
@@ -24,7 +21,9 @@
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center mb-12">
-          <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-6">
+          <h1
+            class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-6"
+          >
             {{ activeRace.name }}
           </h1>
           <p class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8">
@@ -41,62 +40,78 @@
 
         <!-- Race Info and Stats -->
         <div class="space-y-6 mb-12">
-            <!-- Countdown Timer -->
-            <div
-              class="text-center mb-6 p-8 bg-white dark:bg-gray-800 rounded-2xl border-2 border-brand-gold shadow-lg"
+          <!-- Countdown Timer -->
+          <div
+            class="text-center mb-6 p-8 bg-white dark:bg-gray-800 rounded-2xl border-2 border-brand-gold shadow-lg"
+          >
+            <h3
+              class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-6 animate-pulse"
             >
-              <h3 class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-6 animate-pulse">⚡ RACE COUNTDOWN ⚡</h3>
-              <div v-if="countdown.isActive" class="grid grid-cols-4 gap-6">
-                <div class="text-center transform hover:scale-105 transition-transform">
-                  <div
-                    class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg animate-bounce"
-                  >
-                    {{ countdown.days }}
-                  </div>
-                  <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">DAYS</div>
+              ⚡ RACE COUNTDOWN ⚡
+            </h3>
+            <div v-if="countdown.isActive" class="grid grid-cols-4 gap-6">
+              <div class="text-center transform hover:scale-105 transition-transform">
+                <div
+                  class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg animate-bounce"
+                >
+                  {{ countdown.days }}
                 </div>
-                <div class="text-center transform hover:scale-105 transition-transform">
-                  <div class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg">
-                    {{ countdown.hours }}
-                  </div>
-                  <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">HOURS</div>
-                </div>
-                <div class="text-center transform hover:scale-105 transition-transform">
-                  <div class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg">
-                    {{ countdown.minutes }}
-                  </div>
-                  <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">MINUTES</div>
-                </div>
-                <div class="text-center transform hover:scale-105 transition-transform">
-                  <div
-                    class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg animate-pulse"
-                  >
-                    {{ countdown.seconds }}
-                  </div>
-                  <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">SECONDS</div>
+                <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">
+                  DAYS
                 </div>
               </div>
-              <div v-else class="text-4xl font-black text-gray-900 dark:text-white animate-bounce">
-                🚀 RACE DAY IS HERE! 🚀
+              <div class="text-center transform hover:scale-105 transition-transform">
+                <div
+                  class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg"
+                >
+                  {{ countdown.hours }}
+                </div>
+                <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">
+                  HOURS
+                </div>
+              </div>
+              <div class="text-center transform hover:scale-105 transition-transform">
+                <div
+                  class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg"
+                >
+                  {{ countdown.minutes }}
+                </div>
+                <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">
+                  MINUTES
+                </div>
+              </div>
+              <div class="text-center transform hover:scale-105 transition-transform">
+                <div
+                  class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg animate-pulse"
+                >
+                  {{ countdown.seconds }}
+                </div>
+                <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">
+                  SECONDS
+                </div>
               </div>
             </div>
+            <div v-else class="text-4xl font-black text-gray-900 dark:text-white animate-bounce">
+              🚀 RACE DAY IS HERE! 🚀
+            </div>
+          </div>
 
-            <div v-if="(activeRace.checkinCount || 0) > 0" class="flex justify-center">
-              <div
-                class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-600 min-w-[200px]"
-              >
-                <div class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-1">
-                  {{ activeRace.checkinCount || 0 }}
-                </div>
-                <div class="text-sm text-gray-700 dark:text-gray-300">Racers Checked In</div>
+          <div v-if="(activeRace.checkinCount || 0) > 0" class="flex justify-center">
+            <div
+              class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-600 min-w-[200px]"
+            >
+              <div class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-1">
+                {{ activeRace.checkinCount || 0 }}
               </div>
+              <div class="text-sm text-gray-700 dark:text-gray-300">Racers Checked In</div>
             </div>
+          </div>
 
-            <div class="text-center">
-              <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                Custom gravity-powered vehicles competing for speed, creativity, and artistry
-              </p>
-            </div>
+          <div class="text-center">
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+              Custom gravity-powered vehicles competing for speed, creativity, and artistry
+            </p>
+          </div>
         </div>
 
         <div class="flex justify-center">
@@ -121,27 +136,15 @@
             Custom gravity-powered vehicles competing for speed, creativity, and artistry
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              size="large"
-              class="btn-primary"
-              @click="navigateTo('/races')"
-            >
+            <Button size="large" class="btn-primary" @click="navigateTo('/races')">
               <i class="pi pi-flag mr-2" />
               <span>View Races</span>
             </Button>
-            <Button
-              size="large"
-              class="btn-secondary"
-              @click="navigateTo('/racers')"
-            >
+            <Button size="large" class="btn-secondary" @click="navigateTo('/racers')">
               <i class="pi pi-car mr-2" />
               <span>Browse Vehicles</span>
             </Button>
-            <Button
-              size="large"
-              class="btn-secondary"
-              @click="navigateTo('/about')"
-            >
+            <Button size="large" class="btn-secondary" @click="navigateTo('/about')">
               <i class="pi pi-info-circle mr-2" />
               Learn More
             </Button>
@@ -162,7 +165,9 @@
               class="h-32 md:h-40 w-auto object-contain rounded-lg"
             />
           </div>
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4">
+          <h2
+            class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4"
+          >
             The Great Holyoke Brick Race
           </h2>
           <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
@@ -184,7 +189,9 @@
                 </div>
 
                 <div class="flex-1">
-                  <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4">
+                  <h2
+                    class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4"
+                  >
                     Discover Our History
                   </h2>
                   <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
@@ -198,7 +205,11 @@
                   </p>
                 </div>
 
-                <Button size="large" class="btn-primary font-semibold" @click="navigateTo('/about')">
+                <Button
+                  size="large"
+                  class="btn-primary font-semibold"
+                  @click="navigateTo('/about')"
+                >
                   <i class="pi pi-book mr-2" />
                   <span>Read Our History</span>
                 </Button>
@@ -219,7 +230,9 @@
                 </div>
 
                 <div class="flex-1">
-                  <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4">
+                  <h2
+                    class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4"
+                  >
                     Build Your Own Racer
                   </h2>
                   <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
@@ -249,13 +262,12 @@
     </div>
 
     <!-- Featured Photos -->
-    <div
-      v-if="!pending && featuredPhotos.length > 0"
-      class="py-16 bg-white dark:bg-gray-900"
-    >
+    <div v-if="!pending && featuredPhotos.length > 0" class="py-16 bg-white dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4">Featured Photos</h2>
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4">
+            Featured Photos
+          </h2>
           <p class="text-lg text-gray-600 dark:text-gray-400">
             Highlights from our creative racing community
           </p>
@@ -322,19 +334,13 @@
         <div class="text-center mt-12 space-y-6">
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <NuxtLink to="/gallery">
-              <Button
-                size="large"
-                class="btn-secondary"
-              >
+              <Button size="large" class="btn-secondary">
                 <i class="pi pi-images mr-2" />
                 View Photo Gallery
               </Button>
             </NuxtLink>
             <NuxtLink to="/my-photos">
-              <Button
-                size="large"
-                class="btn-secondary"
-              >
+              <Button size="large" class="btn-secondary">
                 <i class="pi pi-upload mr-2" />
                 Share Your Photos
               </Button>
@@ -380,12 +386,11 @@
     </Galleria>
 
     <!-- Past Races -->
-    <div
-      v-if="!pending && pastRaces.length > 0"
-      class="py-16 bg-white dark:bg-gray-900"
-    >
+    <div v-if="!pending && pastRaces.length > 0" class="py-16 bg-white dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-gray-900 dark:text-white">
+        <h2
+          class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-gray-900 dark:text-white"
+        >
           Past Races
         </h2>
 
@@ -427,10 +432,7 @@
 
         <div class="text-center mt-8">
           <NuxtLink to="/races">
-            <Button
-              class="btn-secondary"
-              >View All Races</Button
-            >
+            <Button class="btn-secondary">View All Races</Button>
           </NuxtLink>
         </div>
       </div>

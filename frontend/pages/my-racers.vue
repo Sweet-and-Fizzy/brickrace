@@ -1,14 +1,14 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-8">
         <div>
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">My Racers</h1>
         </div>
         <NuxtLink to="/racers/add">
-          <Button icon="pi pi-plus" class="btn-primary px-4 py-2"><span>Add New Racer</span></Button>
+          <Button icon="pi pi-plus" class="btn-primary px-4 py-2"
+            ><span>Add New Racer</span></Button
+          >
         </NuxtLink>
       </div>
 
@@ -18,10 +18,7 @@
       </div>
 
       <!-- My Racers DataView -->
-      <div
-        v-else-if="myRacers.length"
-        class="bg-white dark:bg-gray-900 rounded-lg p-6"
-      >
+      <div v-else-if="myRacers.length" class="bg-white dark:bg-gray-900 rounded-lg p-6">
         <DataView
           :value="myRacers"
           layout="grid"
@@ -211,11 +208,9 @@
           Create your first custom gravity-powered vehicle to join the competition!
         </p>
         <NuxtLink to="/racers/add">
-          <Button
-            icon="pi pi-plus"
-            class="btn-primary"
-            size="large"
-          ><span>Create Your First Racer</span></Button>
+          <Button icon="pi pi-plus" class="btn-primary" size="large"
+            ><span>Create Your First Racer</span></Button
+          >
         </NuxtLink>
       </div>
     </div>

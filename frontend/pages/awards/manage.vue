@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Manage Awards</h1>
@@ -12,10 +10,7 @@
               Back to Awards
             </Button>
           </NuxtLink>
-          <Button
-            class="btn-primary"
-            @click="showAddDefinitionDialog = true"
-          >
+          <Button class="btn-primary" @click="showAddDefinitionDialog = true">
             <i class="pi pi-plus mr-2" />
             Add Award Type
           </Button>
@@ -48,11 +43,7 @@
                   </div>
                 </div>
               </div>
-              <Button
-                size="small"
-                class="btn-secondary"
-                @click="removeAssignment(assignment.id)"
-              >
+              <Button size="small" class="btn-secondary" @click="removeAssignment(assignment.id)">
                 <i class="pi pi-times mr-2" />
                 Remove
               </Button>
@@ -165,8 +156,16 @@
                   <i class="pi pi-trophy text-4xl text-gray-400 dark:text-gray-500" />
                 </div>
                 <div class="absolute top-2 right-2 flex gap-1">
-                  <Badge v-if="definition.voteable" value="Voteable" class="bg-brand-blue text-white" />
-                  <Badge v-if="!definition.active" value="Inactive" class="bg-gray-500 text-white" />
+                  <Badge
+                    v-if="definition.voteable"
+                    value="Voteable"
+                    class="bg-brand-blue text-white"
+                  />
+                  <Badge
+                    v-if="!definition.active"
+                    value="Inactive"
+                    class="bg-gray-500 text-white"
+                  />
                 </div>
               </div>
             </template>
@@ -305,11 +304,7 @@
         </div>
         <template #footer>
           <div class="flex justify-end space-x-3">
-            <Button
-              label="Cancel"
-              class="btn-secondary"
-              @click="showAddDefinitionDialog = false"
-            />
+            <Button label="Cancel" class="btn-secondary" @click="showAddDefinitionDialog = false" />
             <Button
               :disabled="!definitionForm.name"
               :loading="savingDefinition"

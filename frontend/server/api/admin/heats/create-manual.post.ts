@@ -3,8 +3,14 @@ import { serverSupabaseClient } from '#supabase/server'
 export default defineEventHandler(async (event) => {
   const client = await serverSupabaseClient(event)
   const body = await readBody(event)
-  
-  const { race_id, heat_number: requestedHeatNumber, track1_racer_id, track2_racer_id, set_as_current } = body
+
+  const {
+    race_id,
+    heat_number: requestedHeatNumber,
+    track1_racer_id,
+    track2_racer_id,
+    set_as_current
+  } = body
 
   try {
     // Validate input
@@ -18,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
     // Determine final heat number
     let heat_number: number
-    
+
     // Auto-increment heat number if not provided
     if (!requestedHeatNumber) {
       const { data: maxHeatData, error: maxHeatError } = await client
@@ -33,7 +39,7 @@ export default defineEventHandler(async (event) => {
       heat_number = (maxHeatData && maxHeatData.length > 0 ? maxHeatData[0].heat_number : 0) + 1
     } else {
       heat_number = requestedHeatNumber
-      
+
       // Check if heat number already exists when manually specified
       const { data: existingHeat, error: checkError } = await client
         .from('qualifiers')
@@ -63,7 +69,7 @@ export default defineEventHandler(async (event) => {
 
     // Create qualifier entries for the heat
     const qualifiers = []
-    
+
     if (track1_racer_id) {
       qualifiers.push({
         racer_id: track1_racer_id,
@@ -102,8 +108,7 @@ export default defineEventHandler(async (event) => {
     // Insert the new qualifiers
     const { data: insertedQualifiers, error: insertError } = await client
       .from('qualifiers')
-      .insert(qualifiers)
-      .select(`
+      .insert(qualifiers).select(`
         *,
         racer:racers(
           id,
