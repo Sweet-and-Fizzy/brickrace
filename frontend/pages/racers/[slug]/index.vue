@@ -19,7 +19,7 @@
           The racer you're looking for doesn't exist or has been removed.
         </p>
         <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          ID requested: {{ route.params.id }}
+          Slug requested: {{ route.params.slug }}
         </p>
         <div class="space-x-4">
           <NuxtLink to="/racers">
@@ -37,7 +37,7 @@
           </div>
 
           <div class="flex gap-2 mt-4 md:mt-0">
-            <NuxtLink v-if="canEdit" :to="`/racers/${racer.id}/edit`">
+            <NuxtLink v-if="canEdit" :to="`/racers/${racer.slug}/edit`">
               <Button class="btn-secondary">
                 <i class="pi pi-pencil mr-2" />
                 <span>Edit Racer</span>
@@ -615,7 +615,7 @@ import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
 const authStore = useAuthStore()
-const racerId = route.params.id
+const racerSlug = route.params.slug
 
 const racer = ref(null)
 const pending = ref(true)
@@ -623,8 +623,8 @@ const error = ref(null)
 
 // Use composables for data and caching
 const {
-  getRacerById,
-  fetchRacerDetails,
+  getRacerBySlug,
+  fetchRacerDetailsBySlug,
   isDetailedDataFresh,
   initialize: initializeRacers
 } = useRacers()
@@ -667,16 +667,16 @@ const loadRacer = async () => {
     error.value = null
 
     // Check if we have any cached data to show immediately
-    const cachedRacer = getRacerById(racerId)
+    const cachedRacer = getRacerBySlug(racerSlug)
     if (cachedRacer) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('useRacers: Using cached data for racer:', racerId)
+        console.log('useRacers: Using cached data for racer:', racerSlug)
       }
       racer.value = cachedRacer
       pending.value = false
 
       // If data is fresh, we're done
-      if (isDetailedDataFresh(racerId)) {
+      if (isDetailedDataFresh(cachedRacer.id)) {
         if (process.env.NODE_ENV === 'development') {
           console.log('useRacers: Cached data is fresh, no need to refetch')
         }
@@ -688,7 +688,7 @@ const loadRacer = async () => {
         console.log('useRacers: Cached data is stale, fetching fresh data in background')
       }
       try {
-        racer.value = await fetchRacerDetails(racerId)
+        racer.value = await fetchRacerDetailsBySlug(racerSlug)
       } catch (fetchErr) {
         if (process.env.NODE_ENV === 'development') {
           console.warn('Failed to fetch fresh data, keeping cached data:', fetchErr)
@@ -700,9 +700,9 @@ const loadRacer = async () => {
     // No cached data, show loading and fetch
     pending.value = true
     if (process.env.NODE_ENV === 'development') {
-      console.log('useRacers: No cached data, fetching fresh data for racer:', racerId)
+      console.log('useRacers: No cached data, fetching fresh data for racer:', racerSlug)
     }
-    racer.value = await fetchRacerDetails(racerId)
+    racer.value = await fetchRacerDetailsBySlug(racerSlug)
   } catch (err) {
     // Keep essential error logging for production debugging
     console.error('Error loading racer:', err)
@@ -716,17 +716,17 @@ const loadRacer = async () => {
 
 // Get live qualifiers for this racer
 const racerQualifiers = computed(() => {
-  if (!allQualifiers.value || !route.params.id) return []
+  if (!allQualifiers.value || !racer.value) return []
   // Filter for this racer and only completed qualifiers with valid times
   const filtered = allQualifiers.value.filter(
-    (q) => q.racer_id === route.params.id && q.status === 'completed' && q.time && q.time > 0
+    (q) => q.racer_id === racer.value.id && q.status === 'completed' && q.time && q.time > 0
   )
   if (process.env.NODE_ENV === 'development') {
     console.log(
       'Racer detail: Total qualifiers:',
       allQualifiers.value.length,
       'For racer:',
-      route.params.id,
+      racer.value?.id,
       'Filtered:',
       filtered.length
     )
@@ -852,14 +852,14 @@ const totalVotes = computed(() => {
 
 // Get live checkins for this racer
 const racerCheckins = computed(() => {
-  if (!allCheckins.value || !route.params.id) return []
-  const filtered = allCheckins.value.filter((c) => c.racer_id === route.params.id)
+  if (!allCheckins.value || !racer.value) return []
+  const filtered = allCheckins.value.filter((c) => c.racer_id === racer.value.id)
   if (process.env.NODE_ENV === 'development') {
     console.log(
       'Racer detail: Total checkins:',
       allCheckins.value.length,
       'For racer:',
-      route.params.id,
+      racer.value?.id,
       'Filtered:',
       filtered.length
     )

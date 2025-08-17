@@ -7,12 +7,12 @@
           <NuxtLink to="/awards">
             <Button class="btn-secondary">
               <i class="pi pi-arrow-left mr-2" />
-              Back to Awards
+              <span>Back to Awards</span>
             </Button>
           </NuxtLink>
           <Button class="btn-primary" @click="showAddDefinitionDialog = true">
             <i class="pi pi-plus mr-2" />
-            Add Award Type
+            <span>Add Award Type</span>
           </Button>
           <AdminMenu v-if="authStore.isRaceAdmin" :race-id="activeRace?.id" />
         </div>
@@ -45,7 +45,7 @@
               </div>
               <Button size="small" class="btn-secondary" @click="removeAssignment(assignment.id)">
                 <i class="pi pi-times mr-2" />
-                Remove
+                <span>Remove</span>
               </Button>
             </div>
           </div>
@@ -104,7 +104,7 @@
               @click="assignAwardToRacer"
             >
               <i v-if="!assigning" class="pi pi-plus mr-2" />
-              {{ assigning ? 'Assigning...' : 'Assign Award' }}
+              <span>{{ assigning ? 'Assigning...' : 'Assign Award' }}</span>
             </Button>
           </div>
         </Panel>
@@ -176,19 +176,21 @@
             <template #footer>
               <div class="flex justify-between">
                 <Button
-                  label="Edit"
-                  icon="pi pi-pencil"
                   size="small"
                   class="btn-secondary"
                   @click="editDefinition(definition)"
-                />
+                >
+                  <i class="pi pi-pencil mr-2" />
+                  <span>Edit</span>
+                </Button>
                 <Button
-                  :label="definition.active ? 'Deactivate' : 'Activate'"
-                  :icon="definition.active ? 'pi pi-times' : 'pi pi-check'"
                   size="small"
                   :class="definition.active ? 'btn-secondary' : 'btn-primary'"
                   @click="toggleDefinitionActiveStatus(definition)"
-                />
+                >
+                  <i :class="definition.active ? 'pi pi-times mr-2' : 'pi pi-check mr-2'" />
+                  <span>{{ definition.active ? 'Deactivate' : 'Activate' }}</span>
+                </Button>
               </div>
             </template>
           </Card>

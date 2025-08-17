@@ -292,12 +292,11 @@
                           class="bg-gradient-to-br from-gray-200 to-gray-300 border-2 border-gray-400 rounded-xl p-4 shadow-lg mb-2"
                         >
                           <div class="text-4xl mb-2">🥈</div>
-                          <NuxtLink
-                            :to="`/racers/${result.second.racer_id}`"
+                          <RacerLink
+                            :racer-id="result.second.racer_id"
+                            :racer-name="result.second.racer_name"
                             class="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200"
-                          >
-                            {{ result.second.racer_name }}
-                          </NuxtLink>
+                          />
                           <div
                             class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-sm font-semibold"
                           >
@@ -320,12 +319,11 @@
                           class="bg-gradient-to-br from-yellow-200 to-orange-200 border-2 border-yellow-400 rounded-xl p-6 shadow-2xl mb-2"
                         >
                           <div class="text-6xl mb-3">🏆</div>
-                          <NuxtLink
-                            :to="`/racers/${result.first.racer_id}`"
+                          <RacerLink
+                            :racer-id="result.first.racer_id"
+                            :racer-name="result.first.racer_name"
                             class="text-2xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
-                          >
-                            {{ result.first.racer_name }}
-                          </NuxtLink>
+                          />
                           <div
                             class="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-lg font-bold mb-2"
                           >
@@ -355,12 +353,11 @@
                           class="bg-gradient-to-br from-orange-200 to-orange-300 border-2 border-orange-400 rounded-xl p-4 shadow-lg mb-2"
                         >
                           <div class="text-4xl mb-2">🥉</div>
-                          <NuxtLink
-                            :to="`/racers/${result.third.racer_id}`"
+                          <RacerLink
+                            :racer-id="result.third.racer_id"
+                            :racer-name="result.third.racer_name"
                             class="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200"
-                          >
-                            {{ result.third.racer_name }}
-                          </NuxtLink>
+                          />
                           <div
                             class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-2 py-1 rounded text-sm font-semibold"
                           >
@@ -877,12 +874,11 @@
                               Track 1
                             </div>
                             <div v-if="bracket.track1_racer_name">
-                              <NuxtLink
-                                :to="`/racers/${bracket.track1_racer_id}`"
+                              <RacerLink
+                                :racer-id="bracket.track1_racer_id"
+                                :racer-name="bracket.track1_racer_name"
                                 class="font-bold text-xl text-gray-900 hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
-                              >
-                                {{ bracket.track1_racer_name }}
-                              </NuxtLink>
+                              />
                               <div
                                 class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                               >
@@ -1030,12 +1026,11 @@
                               Track 2
                             </div>
                             <div v-if="bracket.track2_racer_name">
-                              <NuxtLink
-                                :to="`/racers/${bracket.track2_racer_id}`"
+                              <RacerLink
+                                :racer-id="bracket.track2_racer_id"
+                                :racer-name="bracket.track2_racer_name"
                                 class="font-bold text-xl text-gray-900 hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
-                              >
-                                {{ bracket.track2_racer_name }}
-                              </NuxtLink>
+                              />
                               <div
                                 class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                               >

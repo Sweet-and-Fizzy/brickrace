@@ -90,21 +90,6 @@
                 </div>
               </div>
 
-              <!-- Admin Controls -->
-              <div
-                v-if="authStore.isRaceAdmin && !race.active"
-                class="pt-2 border-t border-gray-200 dark:border-gray-700"
-              >
-                <Button
-                  :loading="settingActive === race.id"
-                  size="small"
-                  class="btn-secondary relative z-20 w-full"
-                  @click.stop="setActiveRace(race.id)"
-                >
-                  <i class="pi pi-play mr-1" />
-                  Set as Active
-                </Button>
-              </div>
             </div>
           </template>
         </Card>
@@ -138,7 +123,6 @@ const {
 
 // Use the composable's loading state instead of managing our own
 // const pending = ref(true) - removed
-const settingActive = ref(null)
 
 // Header actions
 const headerActions = computed(() => {
@@ -168,19 +152,7 @@ const navigateToRace = (race, event) => {
   navigateTo(`/races/${route}`)
 }
 
-// Set active race using composable
-const setActiveRace = async (raceId) => {
-  settingActive.value = raceId
 
-  try {
-    await setActiveRaceComposable(raceId)
-    // The composable handles updating local state and real-time subscriptions
-  } catch (error) {
-    console.error('Error setting active race:', error)
-  } finally {
-    settingActive.value = null
-  }
-}
 
 // Initialize auth and data - let composable handle everything
 onMounted(async () => {

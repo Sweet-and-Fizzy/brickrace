@@ -14,7 +14,7 @@
                 </h3>
                 <p class="text-gray-600 dark:text-gray-400 font-medium">
                   {{
-                    new Date(activeRace.date).toLocaleDateString('en-US', {
+                    new Date(activeRace.race_datetime).toLocaleDateString('en-US', {
                       weekday: 'long',
                       year: 'numeric',
                       month: 'long',
@@ -249,14 +249,15 @@
                       <Button
                         :disabled="!votes[award.id] || submittingVotes[award.id]"
                         :loading="submittingVotes[award.id]"
+                        icon="pi pi-check"
                         class="btn-primary w-full font-bold"
                         @click="handleVoteSubmission(award.id)"
                       >
-                        {{
+                        <span>{{
                           hasUserVotedForAward(award.id, activeRace?.id)
                             ? 'Update Vote'
                             : 'Submit Vote'
-                        }}
+                        }}</span>
                       </Button>
                     </div>
                     <div v-else class="text-center text-gray-500 py-6">
@@ -327,8 +328,9 @@
               </template>
               <template #subtitle>
                 <div class="px-6 pb-4">
-                  <NuxtLink
-                    :to="`/racers/${award.racer.id}`"
+                  <RacerLink
+                    :racer-id="award.racer.id"
+                    :racer-slug="award.racer.slug"
                     class="flex items-center gap-4 p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all duration-200 border border-yellow-300 dark:border-yellow-600"
                   >
                     <!-- Racer Photo -->
@@ -367,7 +369,7 @@
                     <div class="flex-shrink-0">
                       <i class="pi pi-external-link text-yellow-600 dark:text-yellow-400" />
                     </div>
-                  </NuxtLink>
+                  </RacerLink>
                 </div>
               </template>
 
@@ -440,12 +442,11 @@
 
                     <Column field="racer_name" header="Racer" sortable>
                       <template #body="{ data }">
-                        <NuxtLink
-                          :to="`/racers/${data.racer_id}`"
+                        <RacerLink
+                          :racer-id="data.racer_id"
+                          :racer-name="data.racer_name"
                           class="font-bold hover:text-brand-blue hover:underline transition-colors duration-200"
-                        >
-                          {{ data.racer_name }}
-                        </NuxtLink>
+                        />
                       </template>
                     </Column>
 
@@ -622,7 +623,7 @@ const fetchActiveRace = async () => {
     const supabase = useSupabaseClient()
     const { data, error } = await supabase
       .from('races')
-      .select('id, name, date, active')
+      .select('id, name, race_datetime, active')
       .eq('active', true)
       .single()
 

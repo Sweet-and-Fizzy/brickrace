@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
-  >
+  <div class="min-h-screen bg-white dark:bg-gray-900">
     <div class="container mx-auto px-4 py-12 max-w-2xl">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -21,9 +19,9 @@
           You don't have permission to edit this racer or it doesn't exist.
         </p>
         <NuxtLink to="/racers">
-          <Button icon="pi pi-arrow-left" class="btn-secondary"
-            ><span>Back to All Racers</span></Button
-          >
+          <Button icon="pi pi-arrow-left" class="btn-secondary">
+            <span>Back to All Racers</span>
+          </Button>
         </NuxtLink>
       </div>
 
@@ -32,7 +30,7 @@
         <!-- Header -->
         <div class="text-center mb-12">
           <div
-            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-600 to-green-700 rounded-full mb-6"
+            class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-full mb-6"
           >
             <i class="pi pi-pencil text-2xl text-white" />
           </div>
@@ -43,89 +41,80 @@
         </div>
 
         <!-- Form Card -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 overflow-hidden"
-        >
-          <div class="p-8">
-            <form class="space-y-6" @submit.prevent="handleSubmit">
-              <!-- Basic Information Panel -->
-              <Panel header="Basic Information" toggleable>
-                <div class="space-y-6">
-                  <!-- Name Input -->
-                  <div>
-                    <label
-                      for="name"
-                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Racer Name
-                    </label>
-                    <InputText
-                      id="name"
-                      v-model="form.name"
-                      placeholder="Enter racer name"
-                      :invalid="!!errors.name"
-                      class="w-full"
-                    />
-                    <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
-                  </div>
+        <Card>
+          <template #content>
+            <form class="space-y-8" @submit.prevent="handleSubmit">
+              <!-- Name Input -->
+              <div>
+                <label
+                  for="name"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Racer Name *
+                </label>
+                <InputText
+                  id="name"
+                  v-model="form.name"
+                  placeholder="Enter racer name"
+                  :invalid="!!errors.name"
+                  class="w-full"
+                />
+                <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
+              </div>
 
-                  <!-- About this Racer Input -->
-                  <div>
-                    <label
-                      for="team_members"
-                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      About this racer
-                    </label>
-                    <Textarea
-                      id="team_members"
-                      v-model="form.team_members"
-                      placeholder="Tell us who created this racer and any other information you would like to share..."
-                      class="w-full"
-                      rows="3"
-                      auto-resize
-                    />
-                    <p class="mt-2 text-sm text-gray-500">
-                      Tell us who created this racer and any other information you would like to
-                      share.
-                    </p>
-                  </div>
-                </div>
-              </Panel>
+              <!-- About this Racer Input -->
+              <div>
+                <label
+                  for="team_members"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  About this racer
+                </label>
+                <Textarea
+                  id="team_members"
+                  v-model="form.team_members"
+                  placeholder="Tell us who created this racer and any other information you would like to share..."
+                  class="w-full"
+                  rows="3"
+                  auto-resize
+                />
+                <p class="mt-2 text-sm text-gray-500">
+                  Tell us who created this racer and any other information you would like to
+                  share.
+                </p>
+              </div>
 
-              <!-- Technical Specifications Panel -->
-              <Panel header="Technical Specifications" toggleable>
-                <div class="space-y-6">
-                  <!-- Weight Input -->
-                  <div>
-                    <label
-                      for="weight"
-                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
-                      Weight (pounds)
-                    </label>
-                    <InputNumber
-                      id="weight"
-                      v-model="form.weight"
-                      placeholder="Enter weight in pounds"
-                      :invalid="!!errors.weight"
-                      :min="0"
-                      :max-fraction-digits="2"
-                      suffix=" lbs"
-                      class="w-full"
-                    />
-                    <p v-if="errors.weight" class="mt-1 text-sm text-red-600">
-                      {{ errors.weight }}
-                    </p>
-                    <p class="mt-2 text-sm text-gray-500">
-                      Optional: Weight helps track performance metrics. Maximum weight is 15 lbs.
-                    </p>
-                  </div>
-                </div>
-              </Panel>
+              <!-- Weight Input -->
+              <div>
+                <label
+                  for="weight"
+                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Weight (pounds)
+                </label>
+                <InputNumber
+                  id="weight"
+                  v-model="form.weight"
+                  placeholder="Enter weight in pounds"
+                  :invalid="!!errors.weight"
+                  :min="0"
+                  :max-fraction-digits="2"
+                  suffix=" lbs"
+                  class="w-full"
+                />
+                <p v-if="errors.weight" class="mt-1 text-sm text-red-600">
+                  {{ errors.weight }}
+                </p>
+                <p class="mt-2 text-sm text-gray-500">
+                  Optional: Weight helps track performance metrics. Maximum weight is 15 lbs.
+                </p>
+              </div>
 
-              <!-- Main Racer Photo Panel -->
-              <Panel header="Main Racer Photo" toggleable>
+              <!-- Main Racer Photo -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                  Main Racer Photo
+                </label>
                 <div class="space-y-4">
                   <!-- Current Photo or Preview -->
                   <div v-if="previewImage || form.image_url" class="text-center">
@@ -167,7 +156,7 @@
                       <Button
                         icon="pi pi-check"
                         label="Save Photo"
-                        severity="success"
+                        class="btn-primary"
                         size="small"
                         :loading="uploadingMainPhoto"
                         @click="savePreviewedPhoto"
@@ -175,7 +164,7 @@
                       <Button
                         icon="pi pi-times"
                         label="Cancel"
-                        severity="secondary"
+                        class="btn-secondary"
                         size="small"
                         @click="cancelPreview"
                       />
@@ -198,10 +187,13 @@
                     </p>
                   </div>
                 </div>
-              </Panel>
+              </div>
 
-              <!-- Photo Gallery Panel -->
-              <Panel header="Additional Photos" toggleable>
+              <!-- Additional Photos -->
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Additional Photos
+                </label>
                 <div class="mb-4">
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                     Upload additional photos of your racer for the gallery section.
@@ -219,7 +211,7 @@
                   @photos-reordered="onPhotosReordered"
                   @featured-changed="onFeaturedChanged"
                 />
-              </Panel>
+              </div>
 
               <!-- Error Message -->
               <div v-if="errors.general" class="rounded-md bg-red-50 p-4">
@@ -235,9 +227,9 @@
 
               <!-- Action Buttons -->
               <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                <NuxtLink :to="`/racers/${racer.id}`" class="flex-1">
-                  <Button type="button" severity="secondary" outlined class="w-full">
-                    Cancel
+                <NuxtLink :to="`/racers/${racer.slug}`" class="flex-1">
+                  <Button type="button" class="btn-secondary w-full">
+                    <span>Cancel</span>
                   </Button>
                 </NuxtLink>
 
@@ -251,8 +243,8 @@
                 </Button>
               </div>
             </form>
-          </div>
-        </div>
+          </template>
+        </Card>
       </div>
     </div>
 
@@ -276,8 +268,8 @@ const $toast = useToast()
 
 // Use racers composable
 const {
-  getRacerById,
-  fetchRacerDetails,
+  getRacerBySlug,
+  fetchRacerDetailsBySlug,
   updateRacer: updateRacerComposable,
   updateRacerImage,
   updateRacerPhotos,
@@ -298,7 +290,7 @@ const uploadingMainPhoto = ref(false)
 const breadcrumbItems = computed(() => [
   { label: 'Home', url: '/' },
   { label: 'Racers', url: '/racers' },
-  { label: racer.value?.name || 'Racer', url: `/racers/${route.params.id}` },
+  { label: racer.value?.name || 'Racer', url: `/racers/${route.params.slug}` },
   { label: 'Edit' } // Current page, no navigation
 ])
 
@@ -323,11 +315,11 @@ const fetchRacer = async () => {
     await initializeRacers()
 
     // Try to get racer from cache first
-    let racerData = getRacerById(route.params.id)
+    let racerData = getRacerBySlug(route.params.slug)
 
     // If not in cache or incomplete, fetch detailed data
     if (!racerData) {
-      racerData = await fetchRacerDetails(route.params.id)
+      racerData = await fetchRacerDetailsBySlug(route.params.slug)
     }
 
     if (!racerData) {
@@ -396,7 +388,7 @@ const handleSubmit = async () => {
       updateData.weight = Number.parseFloat(form.weight) * 453.592
     }
 
-    await updateRacerComposable(route.params.id, updateData)
+    await updateRacerComposable(racer.value.id, updateData)
 
     // Show success toast
     $toast.add({
@@ -408,7 +400,7 @@ const handleSubmit = async () => {
 
     // Redirect to racer detail page
     setTimeout(() => {
-      router.push(`/racers/${route.params.id}`)
+      router.push(`/racers/${racer.value.slug}`)
     }, 1000)
   } catch (error) {
     console.error('Error updating racer:', error)

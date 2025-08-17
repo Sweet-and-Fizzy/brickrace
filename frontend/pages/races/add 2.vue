@@ -232,6 +232,18 @@ const loading = ref(false)
 const uploading = ref(false)
 const uploadError = ref('')
 
+// Clean non-breaking space characters from editor content
+const cleanNbspChars = () => {
+  if (form.value.description) {
+    // Replace all forms of non-breaking spaces
+    const cleaned = form.value.description
+      .replace(/\u00A0/g, ' ')  // Unicode non-breaking space
+      .replace(/&nbsp;/g, ' ')  // HTML entity
+      .replace(/&#160;/g, ' ')  // Numeric entity
+    
+    form.value.description = cleaned
+  }
+}
 
 // Form validation
 const validateForm = () => {

@@ -1,0 +1,158 @@
+/* Critical button style overrides - must load after PrimeVue */
+@layer overrides {
+  /* Force our button styles on all devices and build environments */
+  .btn-primary,
+  .btn-primary:active,
+  .btn-primary:focus,
+  .btn-primary:hover,
+  .btn-primary:visited,
+  .btn-primary[data-pc-name="button"],
+  .btn-primary[data-pc-section="root"],
+  button.btn-primary,
+  .p-button.btn-primary {
+    background-color: black !important;
+    color: white !important;
+    border: 2px solid transparent !important;
+    border-radius: 0 !important;
+    transform: skewX(-8deg) !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+  }
+
+  .btn-secondary,
+  .btn-secondary:active,
+  .btn-secondary:focus,
+  .btn-secondary:hover,
+  .btn-secondary:visited,
+  .btn-secondary[data-pc-name="button"],
+  .btn-secondary[data-pc-section="root"],
+  button.btn-secondary,
+  .p-button.btn-secondary {
+    background-color: transparent !important;
+    color: black !important;
+    border: 2px solid black !important;
+    border-radius: 0 !important;
+    transform: skewX(-8deg) !important;
+    font-family: 'Open Sans', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 0.5rem 1rem !important;
+  }
+
+  /* Dark mode overrides */
+  .app-dark .btn-primary,
+  .app-dark .btn-primary:active,
+  .app-dark .btn-primary:focus,
+  .app-dark .btn-primary:hover,
+  .app-dark .btn-primary:visited,
+  .app-dark .btn-primary[data-pc-name="button"],
+  .app-dark button.btn-primary,
+  .app-dark .p-button.btn-primary {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid transparent !important;
+  }
+
+  .app-dark .btn-secondary,
+  .app-dark .btn-secondary:active,
+  .app-dark .btn-secondary:focus,
+  .app-dark .btn-secondary:hover,
+  .app-dark .btn-secondary:visited,
+  .app-dark .btn-secondary[data-pc-name="button"],
+  .app-dark button.btn-secondary,
+  .app-dark .p-button.btn-secondary {
+    border: 2px solid white !important;
+    background-color: transparent !important;
+    color: white !important;
+  }
+
+  /* Hover states with high specificity */
+  .btn-primary:hover,
+  .btn-primary:hover[data-pc-name="button"],
+  .btn-primary:hover[data-pc-section="root"],
+  button.btn-primary:hover,
+  .p-button.btn-primary:hover {
+    background-color: transparent !important;
+    color: black !important;
+    border: 2px solid black !important;
+    transform: skewX(-8deg) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .btn-secondary:hover,
+  .btn-secondary:hover[data-pc-name="button"],
+  .btn-secondary:hover[data-pc-section="root"],
+  button.btn-secondary:hover,
+  .p-button.btn-secondary:hover {
+    background-color: black !important;
+    color: white !important;
+    border: 2px solid black !important;
+    transform: skewX(-8deg) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  /* Dark mode hover states */
+  .app-dark .btn-primary:hover,
+  .app-dark .btn-primary:hover[data-pc-name="button"],
+  .app-dark button.btn-primary:hover,
+  .app-dark .p-button.btn-primary:hover {
+    background-color: transparent !important;
+    color: white !important;
+    border: 2px solid white !important;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .app-dark .btn-secondary:hover,
+  .app-dark .btn-secondary:hover[data-pc-name="button"],
+  .app-dark button.btn-secondary:hover,
+  .app-dark .p-button.btn-secondary:hover {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid white !important;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15) !important;
+  }
+
+  /* Child element unskewing */
+  .btn-primary > *,
+  .btn-secondary > *,
+  .btn-primary [data-pc-section="label"],
+  .btn-secondary [data-pc-section="label"] {
+    transform: skewX(8deg) !important;
+    display: inline-block !important;
+  }
+
+  /* Mobile-specific overrides */
+  @media (max-width: 768px) {
+    .btn-primary,
+    button.btn-primary,
+    .p-button.btn-primary {
+      background-color: black !important;
+      color: white !important;
+      border: 2px solid transparent !important;
+      border-radius: 0 !important;
+      transform: skewX(-8deg) !important;
+    }
+
+    .btn-secondary,
+    button.btn-secondary,
+    .p-button.btn-secondary {
+      background-color: transparent !important;
+      color: black !important;
+      border: 2px solid black !important;
+      border-radius: 0 !important;
+      transform: skewX(-8deg) !important;
+    }
+
+    .app-dark .btn-primary,
+    .app-dark button.btn-primary {
+      background-color: white !important;
+      color: black !important;
+    }
+
+    .app-dark .btn-secondary,
+    .app-dark button.btn-secondary {
+      border: 2px solid white !important;
+      color: white !important;
+    }
+  }
+}

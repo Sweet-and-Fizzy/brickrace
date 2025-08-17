@@ -74,11 +74,11 @@ export default defineNuxtConfig({
         'Galleria',
         'TabMenu',
         'SplitButton',
-        'Paginator'
+        'Paginator',
       ]
     }
   },
-  css: ['primeicons/primeicons.css', '~/assets/css/main.css'],
+  css: ['primeicons/primeicons.css', '~/assets/css/main.css', '~/assets/css/button-overrides.css'],
   supabase: {
     url: process.env.SUPABASE_URL,
     key: process.env.SUPABASE_ANON_KEY,

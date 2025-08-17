@@ -93,7 +93,7 @@
 
   /* New primary button style - black parallelogram with white text */
   .btn-primary {
-    @apply relative inline-block px-6 py-3 font-semibold text-white bg-black transition-all duration-200;
+    @apply relative inline-block px-4 py-2 font-semibold text-white bg-black transition-all duration-200;
     transform: skewX(-8deg);
     font-family: 'Open Sans', sans-serif;
     letter-spacing: 0.02em;
@@ -141,7 +141,7 @@
 
   /* Secondary button style - outline parallelogram */
   .btn-secondary {
-    @apply relative inline-block px-6 py-3 font-semibold text-black bg-transparent transition-all duration-200;
+    @apply relative inline-block px-4 py-2 font-semibold text-black bg-transparent transition-all duration-200;
     transform: skewX(-8deg);
     font-family: 'Open Sans', sans-serif;
     letter-spacing: 0.02em;
@@ -202,15 +202,100 @@
   /* Override PrimeVue inline styles that cause border changes */
   .btn-primary,
   .btn-primary:active,
-  .btn-primary:focus {
+  .btn-primary:focus,
+  .btn-primary:visited,
+  .btn-primary[data-pc-name="button"],
+  button.btn-primary {
     border: 2px solid transparent !important;
+    border-radius: 0 !important;
+    background-color: black !important;
+    color: white !important;
+    transform: skewX(-8deg) !important;
   }
 
   .btn-secondary,
   .btn-secondary:hover,
   .btn-secondary:active,
-  .btn-secondary:focus {
+  .btn-secondary:focus,
+  .btn-secondary:visited,
+  .btn-secondary[data-pc-name="button"],
+  button.btn-secondary {
     border: 2px solid black !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    color: black !important;
+    transform: skewX(-8deg) !important;
+  }
+
+  /* Dark mode overrides */
+  .app-dark .btn-primary,
+  .app-dark .btn-primary:active,
+  .app-dark .btn-primary:focus,
+  .app-dark .btn-primary:visited,
+  .app-dark .btn-primary[data-pc-name="button"],
+  .app-dark button.btn-primary {
+    background-color: white !important;
+    color: black !important;
+    border: 2px solid transparent !important;
+  }
+
+  .app-dark .btn-secondary,
+  .app-dark .btn-secondary:active, 
+  .app-dark .btn-secondary:focus,
+  .app-dark .btn-secondary:visited,
+  .app-dark .btn-secondary[data-pc-name="button"],
+  .app-dark button.btn-secondary {
+    border: 2px solid white !important;
+    background-color: transparent !important;
+    color: white !important;
+  }
+
+  /* Ensure child elements are properly unskewed */
+  .btn-primary > *,
+  .btn-secondary > * {
+    transform: skewX(8deg) !important;
+    display: inline-block !important;
+  }
+
+  /* Force override any PrimeVue theme styles on mobile */
+  @media (max-width: 768px) {
+    .btn-primary,
+    .btn-primary:active,
+    .btn-primary:focus,
+    .btn-primary:hover,
+    .btn-primary[data-pc-name="button"],
+    button.btn-primary {
+      background-color: black !important;
+      color: white !important;
+      border: 2px solid transparent !important;
+      border-radius: 0 !important;
+      transform: skewX(-8deg) !important;
+    }
+
+    .btn-secondary,
+    .btn-secondary:active,
+    .btn-secondary:focus,
+    .btn-secondary:hover,
+    .btn-secondary[data-pc-name="button"],
+    button.btn-secondary {
+      background-color: transparent !important;
+      color: black !important;
+      border: 2px solid black !important;
+      border-radius: 0 !important;
+      transform: skewX(-8deg) !important;
+    }
+
+    .app-dark .btn-primary,
+    .app-dark button.btn-primary {
+      background-color: white !important;
+      color: black !important;
+    }
+
+    .app-dark .btn-secondary,
+    .app-dark button.btn-secondary {
+      border: 2px solid white !important;
+      color: white !important;
+    }
   }
 
   /* Card styling using data attributes - this works! */

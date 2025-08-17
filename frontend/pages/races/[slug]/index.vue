@@ -116,25 +116,35 @@
             <div class="mb-2">
               <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ race.name }}</h1>
             </div>
-            <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
-              <span>{{
-                race.race_datetime 
-                  ? new Date(race.race_datetime).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    }) + ' at ' + new Date(race.race_datetime).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true
-                    })
-                  : 'Date TBD'
-              }}</span>
-              <span v-if="!race.active" class="text-amber-600 dark:text-amber-400 font-medium">
-                <i class="pi pi-info-circle mr-1" />
-                Read-only view
-              </span>
+            <div class="flex flex-col gap-2 text-gray-600 dark:text-gray-300">
+              <div class="flex items-center gap-4">
+                <span>{{
+                  race.race_datetime 
+                    ? new Date(race.race_datetime).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      }) + ' from ' + new Date(race.race_datetime).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      })
+                    : 'Date TBD'
+                }}{{
+                  race.end_time 
+                    ? ' - ' + new Date(race.end_time).toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                      })
+                    : ''
+                }}</span>
+                <span v-if="!race.active" class="text-amber-600 dark:text-amber-400 font-medium">
+                  <i class="pi pi-info-circle mr-1" />
+                  Read-only view
+                </span>
+              </div>
             </div>
           </div>
 
@@ -154,6 +164,7 @@
             class="w-full h-64 md:h-96 object-cover rounded-lg"
           >
         </div>
+
 
         <!-- Race Process Steps -->
         <Card class="mb-8">
@@ -240,6 +251,20 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Main Content -->
           <div class="lg:col-span-2 space-y-6">
+            <!-- Race Description - Show at top of left column before checkins start -->
+            <div v-if="race.description && checkins.length === 0">
+              <Card>
+                <template #title>
+                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">About This Race</h2>
+                </template>
+                <template #content>
+                  <div 
+                    class="prose prose-gray dark:prose-invert"
+                    v-html="race.description"
+                  />
+                </template>
+              </Card>
+            </div>
             <!-- Tournament Results Podium -->
             <Card v-if="tournamentResults.Fastest || tournamentResults.Slowest">
               <template #title>
@@ -263,12 +288,11 @@
                           class="bg-gradient-to-br from-gray-200 to-gray-300 border border-gray-400 rounded-lg p-2 shadow-md mb-1"
                         >
                           <div class="text-2xl mb-1">🥈</div>
-                          <NuxtLink
-                            :to="`/racers/${result.second.racer_id}`"
+                          <RacerLink
+                            :racer-id="result.second.racer_id"
+                            :racer-name="result.second.racer_name"
                             class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
-                          >
-                            {{ result.second.racer_name }}
-                          </NuxtLink>
+                          />
                           <div
                             class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-1 py-0.5 rounded text-xs font-semibold"
                           >
@@ -291,12 +315,11 @@
                           class="bg-gradient-to-br from-yellow-200 to-orange-200 border border-yellow-400 rounded-lg p-3 shadow-xl mb-1"
                         >
                           <div class="text-3xl mb-1">🏆</div>
-                          <NuxtLink
-                            :to="`/racers/${result.first.racer_id}`"
+                          <RacerLink
+                            :racer-id="result.first.racer_id"
+                            :racer-name="result.first.racer_name"
                             class="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
-                          >
-                            {{ result.first.racer_name }}
-                          </NuxtLink>
+                          />
                           <div
                             class="bg-yellow-200 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-0.5 rounded-full text-sm font-bold mb-1"
                           >
@@ -326,12 +349,11 @@
                           class="bg-gradient-to-br from-orange-200 to-orange-300 border border-orange-400 rounded-lg p-2 shadow-md mb-1"
                         >
                           <div class="text-2xl mb-1">🥉</div>
-                          <NuxtLink
-                            :to="`/racers/${result.third.racer_id}`"
+                          <RacerLink
+                            :racer-id="result.third.racer_id"
+                            :racer-name="result.third.racer_name"
                             class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
-                          >
-                            {{ result.third.racer_name }}
-                          </NuxtLink>
+                          />
                           <div
                             class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-1 py-0.5 rounded text-xs font-semibold"
                           >
@@ -398,12 +420,11 @@
                         <div class="text-center">
                           <p class="text-sm font-medium text-brand-blue mb-2">Track 1</p>
                           <div v-if="bracket.track1_racer_name">
-                            <NuxtLink
-                              :to="`/racers/${bracket.track1_racer_id}`"
+                            <RacerLink
+                              :racer-id="bracket.track1_racer_id"
+                              :racer-name="bracket.track1_racer_name"
                               class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block"
-                            >
-                              {{ bracket.track1_racer_name }}
-                            </NuxtLink>
+                            />
                             <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
                               #{{ bracket.track1_racer_number }}
                             </p>
@@ -441,12 +462,11 @@
                         <div class="text-center">
                           <p class="text-sm font-medium text-red-600 mb-2">Track 2</p>
                           <div v-if="bracket.track2_racer_name">
-                            <NuxtLink
-                              :to="`/racers/${bracket.track2_racer_id}`"
+                            <RacerLink
+                              :racer-id="bracket.track2_racer_id"
+                              :racer-name="bracket.track2_racer_name"
                               class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block"
-                            >
-                              {{ bracket.track2_racer_name }}
-                            </NuxtLink>
+                            />
                             <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
                               #{{ bracket.track2_racer_number }}
                             </p>
@@ -562,12 +582,11 @@
                             <i class="pi pi-car text-2xl text-gray-400" />
                           </div>
                           <div class="flex-1">
-                            <NuxtLink
-                              :to="`/racers/${getTrackRacer(currentHeatData.racers, 1).racer_id}`"
+                            <RacerLink
+                              :racer-id="getTrackRacer(currentHeatData.racers, 1).racer_id"
+                              :racer-name="getTrackRacer(currentHeatData.racers, 1).racer_name"
                               class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
-                            >
-                              {{ getTrackRacer(currentHeatData.racers, 1).racer_name }}
-                            </NuxtLink>
+                            />
                             <p class="text-sm text-gray-600 dark:text-gray-400">
                               #{{ getTrackRacer(currentHeatData.racers, 1).racer_number }}
                             </p>
@@ -614,12 +633,11 @@
                             <i class="pi pi-car text-2xl text-gray-400" />
                           </div>
                           <div class="flex-1">
-                            <NuxtLink
-                              :to="`/racers/${getTrackRacer(currentHeatData.racers, 2).racer_id}`"
+                            <RacerLink
+                              :racer-id="getTrackRacer(currentHeatData.racers, 2).racer_id"
+                              :racer-name="getTrackRacer(currentHeatData.racers, 2).racer_name"
                               class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
-                            >
-                              {{ getTrackRacer(currentHeatData.racers, 2).racer_name }}
-                            </NuxtLink>
+                            />
                             <p class="text-sm text-gray-600 dark:text-gray-400">
                               #{{ getTrackRacer(currentHeatData.racers, 2).racer_number }}
                             </p>
@@ -689,12 +707,11 @@
                             <i class="pi pi-car text-gray-400" />
                           </div>
                           <div class="flex-1">
-                            <NuxtLink
-                              :to="`/racers/${getTrackRacer(heat.racers, 1).racer_id}`"
+                            <RacerLink
+                              :racer-id="getTrackRacer(heat.racers, 1).racer_id"
+                              :racer-name="getTrackRacer(heat.racers, 1).racer_name"
                               class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
-                            >
-                              {{ getTrackRacer(heat.racers, 1).racer_name }}
-                            </NuxtLink>
+                            />
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                               #{{ getTrackRacer(heat.racers, 1).racer_number }}
                             </p>
@@ -727,12 +744,11 @@
                             <i class="pi pi-car text-gray-400" />
                           </div>
                           <div class="flex-1">
-                            <NuxtLink
-                              :to="`/racers/${getTrackRacer(heat.racers, 2).racer_id}`"
+                            <RacerLink
+                              :racer-id="getTrackRacer(heat.racers, 2).racer_id"
+                              :racer-name="getTrackRacer(heat.racers, 2).racer_name"
                               class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
-                            >
-                              {{ getTrackRacer(heat.racers, 2).racer_name }}
-                            </NuxtLink>
+                            />
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                               #{{ getTrackRacer(heat.racers, 2).racer_number }}
                             </p>
@@ -793,12 +809,11 @@
                   <Column field="racer_name" header="Racer">
                     <template #body="slotProps">
                       <div>
-                        <NuxtLink
-                          :to="`/racers/${slotProps.data.racer_id}`"
+                        <RacerLink
+                          :racer-id="slotProps.data.racer_id"
+                          :racer-name="slotProps.data.racer_name"
                           class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
-                        >
-                          {{ slotProps.data.racer_name }}
-                        </NuxtLink>
+                        />
                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                           Heat {{ slotProps.data.heat_number }} • Track
                           {{ slotProps.data.track_number }}
@@ -903,12 +918,11 @@
                             </span>
                           </div>
                           <div class="flex-1 min-w-0">
-                            <NuxtLink
-                              :to="`/racers/${leader.racer_id}`"
+                            <RacerLink
+                              :racer-id="leader.racer_id"
+                              :racer-name="leader.racer_name"
                               class="text-sm font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
-                            >
-                              {{ leader.racer_name }}
-                            </NuxtLink>
+                            />
                             <p class="text-xs text-gray-500 dark:text-gray-400">
                               {{ leader.vote_count }} vote{{ leader.vote_count !== 1 ? 's' : '' }}
                             </p>
@@ -936,10 +950,10 @@
               </template>
               <template #content>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  <NuxtLink
+                  <RacerLink
                     v-for="checkin in checkins"
                     :key="checkin.id"
-                    :to="`/racers/${checkin.racer_id}`"
+                    :racer-id="checkin.racer_id"
                     class="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200"
                   >
                     <div class="relative">
@@ -968,7 +982,7 @@
                         {{ new Date(checkin.time).toLocaleTimeString() }}
                       </p>
                     </div>
-                  </NuxtLink>
+                  </RacerLink>
                 </div>
               </template>
             </Card>
@@ -1119,6 +1133,21 @@
                 </Timeline>
               </template>
             </Card>
+
+            <!-- Race Description - Show at bottom of right column after checkins start -->
+            <div v-if="race.description && checkins.length > 0">
+              <Card>
+                <template #title>
+                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">About This Race</h2>
+                </template>
+                <template #content>
+                  <div 
+                    class="prose prose-gray dark:prose-invert"
+                    v-html="race.description"
+                  />
+                </template>
+              </Card>
+            </div>
           </div>
         </div>
       </div>

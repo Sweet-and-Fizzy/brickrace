@@ -5,7 +5,7 @@
       <div class="text-center mb-12">
         <div class="flex flex-col items-center gap-4">
           <div class="flex items-center">
-            <span class="site-name text-2xl font-bold">The Great Holyoke Brick Race</span>
+            <span class="site-name text-2xl font-bold">the great holyoke brick race</span>
           </div>
           <p class="text-gray-300 max-w-2xl text-lg">
             A celebration of creativity, engineering, and friendly competition where custom
@@ -162,7 +162,7 @@
 
       <!-- Bottom Bar -->
       <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
-        <p class="mb-4">&copy; {{ new Date().getFullYear() }} The Great Holyoke Brick Race</p>
+        <p class="mb-4">&copy; {{ new Date().getFullYear() }} the great holyoke brick race</p>
         <p>
           Built with
           <i class="pi pi-heart-fill text-red-400" /> by

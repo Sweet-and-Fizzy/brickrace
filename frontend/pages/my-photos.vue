@@ -116,13 +116,13 @@
                   </div>
 
                   <div class="flex gap-2">
-                    <NuxtLink :to="`/racers/${racer.id}`" class="flex-1">
+                    <NuxtLink :to="`/racers/${racer.slug}`" class="flex-1">
                       <Button text size="small" class="w-full">
                         <i class="pi pi-eye mr-1" />
                         View Gallery
                       </Button>
                     </NuxtLink>
-                    <NuxtLink :to="`/racers/${racer.id}/edit`" class="flex-1">
+                    <NuxtLink :to="`/racers/${racer.slug}/edit`" class="flex-1">
                       <Button severity="secondary" text size="small" class="w-full">
                         <i class="pi pi-pencil mr-1" />
                         Manage Photos
@@ -272,7 +272,7 @@
             v-for="racer in myRacers"
             :key="racer.id"
             class="border rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
-            @click="navigateToRacerEdit(racer.id)"
+            @click="navigateToRacerEdit(racer)"
           >
             <div class="flex items-center gap-3">
               <Image
@@ -496,9 +496,9 @@ const fetchData = async () => {
   }
 }
 
-const navigateToRacerEdit = (racerId) => {
+const navigateToRacerEdit = (racer) => {
   showRacerUpload.value = false
-  navigateTo(`/racers/${racerId}/edit`)
+  navigateTo(`/racers/${racer.slug}/edit`)
 }
 
 const editGeneralPhoto = (photo) => {

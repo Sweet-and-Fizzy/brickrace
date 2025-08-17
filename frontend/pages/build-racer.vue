@@ -2,6 +2,15 @@
   <div class="min-h-screen bg-white dark:bg-gray-900">
     <!-- Hero Section -->
     <div class="bg-white dark:bg-gray-900">
+      <!-- Hero Image -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <img
+          src="~/assets/img/building_brickracer.jpg"
+          alt="Building a Brick Racer"
+          class="w-full h-64 md:h-80 lg:h-96 object-contain rounded-lg"
+        />
+      </div>
+      
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
@@ -18,17 +27,17 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <!-- FAQ Section -->
       <div class="mb-16">
-        <div class="mb-8">
-          <div class="text-center mb-8">
-            <h2
-              class="text-3xl font-bold text-gray-900 dark:text-white flex items-center justify-center gap-3"
-            >
-              <i class="pi pi-question-circle text-brand-blue" />
-              Frequently Asked Questions
-            </h2>
-          </div>
+        <div class="text-center mb-8">
+          <h2
+            class="text-3xl font-bold text-gray-900 dark:text-white text-center"
+          >
+            Frequently Asked Questions
+          </h2>
+        </div>
 
-          <Accordion :value="['0']" multiple>
+        <Card>
+          <template #content>
+            <Accordion :value="['0']" multiple>
             <!-- Who can enter? -->
             <AccordionPanel value="0">
               <AccordionHeader>
@@ -192,7 +201,8 @@
                         <p class="leading-relaxed mb-3">
                           <strong>Before race day:</strong> Create an account on this website and
                           register your racer. Upload a photo, provide your racer details, and get
-                          your unique racer number assigned. This step must be completed before you
+                          your unique racer number assigned. You can edit your racer information 
+                          anytime before the race. This step must be completed before you
                           can check in on race day.
                         </p>
                         <div class="bg-white border-2 border-brand-green rounded-lg p-3">
@@ -219,7 +229,7 @@
                           Arrive on race day with your completed brick racer and your website
                           registration. Race officials will verify your racer meets specifications,
                           confirm your registration details, and officially check you in for the
-                          event.
+                          event. You can also view your check-in status in real-time on this website.
                         </p>
                       </div>
                     </div>
@@ -235,9 +245,11 @@
                           Qualifying Rounds
                         </h4>
                         <p class="leading-relaxed">
-                          Your racer will complete timed runs down the custom concrete track.
-                          Officials record your times, and your best qualifying time determines your
-                          starting position for the main competition brackets.
+                          Your racer will complete multiple timed runs down the custom concrete track
+                          in organized heats. Officials record your times precisely using electronic
+                          timing systems, and your best qualifying time determines your starting 
+                          position for the main competition brackets. You can view live results 
+                          on this website throughout the day.
                         </p>
                       </div>
                     </div>
@@ -253,9 +265,10 @@
                           Tournament Brackets
                         </h4>
                         <p class="leading-relaxed">
-                          Based on qualifying times, racers are placed into elimination brackets.
-                          Head-to-head races determine winners who advance through the rounds until
-                          champions are crowned in each category.
+                          Based on qualifying times, racers are placed into double-elimination 
+                          tournament brackets. Head-to-head races determine winners who advance 
+                          through the rounds until champions are crowned in each category. 
+                          Follow the bracket progression live on this website as the tournament unfolds.
                         </p>
                       </div>
                     </div>
@@ -387,8 +400,60 @@
               </AccordionContent>
             </AccordionPanel>
 
+            <!-- What if I need to withdraw? -->
+            <AccordionPanel value="5">
+              <AccordionHeader>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-user-minus text-red-500" />
+                  <span class="font-bold text-black">What if I need to withdraw?</span>
+                </div>
+              </AccordionHeader>
+              <AccordionContent>
+                <div class="space-y-4 text-gray-700 dark:text-gray-300">
+                  <div class="flex items-start gap-3">
+                    <div
+                      class="bg-red-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                    >
+                      <span class="text-white font-bold text-sm">1</span>
+                    </div>
+                    <p class="leading-relaxed">
+                      If you need to withdraw your racer from the competition, you can do so at any time
+                      through your racer profile page on this website, or race officials can help you
+                      withdraw on race day.
+                    </p>
+                  </div>
+
+                  <div class="flex items-start gap-3">
+                    <div
+                      class="bg-red-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                    >
+                      <span class="text-white font-bold text-sm">2</span>
+                    </div>
+                    <p class="leading-relaxed">
+                      If you withdraw before qualifying runs, your racer will simply not participate.
+                      If you withdraw after qualifying but before brackets, your bracket position
+                      will be adjusted automatically.
+                    </p>
+                  </div>
+
+                  <div class="flex items-start gap-3">
+                    <div
+                      class="bg-red-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                    >
+                      <span class="text-white font-bold text-sm">3</span>
+                    </div>
+                    <p class="leading-relaxed">
+                      Any qualifying times you achieved before withdrawal will be preserved in the
+                      race history. You can also be reinstated if you change your mind (before
+                      tournament brackets begin).
+                    </p>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionPanel>
+
             <!-- Location & Venue -->
-            <AccordionPanel value="4">
+            <AccordionPanel value="6">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
                   <i class="pi pi-map-marker text-brand-blue" />
@@ -503,9 +568,12 @@
               </AccordionContent>
             </AccordionPanel>
           </Accordion>
-        </div>
+          </template>
+        </Card>
+      </div>
 
-        <!-- Call to Action -->
+      <!-- Call to Action -->
+      <div>
         <Card class="border-2 border-brand-green">
           <template #content>
             <div class="text-center space-y-6">
@@ -525,7 +593,7 @@
                 </p>
               </div>
 
-              <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <div class="flex justify-center">
                 <Button
                   size="large"
                   class="btn-primary font-semibold"
@@ -533,22 +601,6 @@
                 >
                   <i class="pi pi-plus mr-2" />
                   Register Your Racer
-                </Button>
-                <Button
-                  size="large"
-                  class="btn-secondary font-semibold"
-                  @click="navigateTo('/races')"
-                >
-                  <i class="pi pi-flag mr-2" />
-                  View Current Races
-                </Button>
-                <Button
-                  size="large"
-                  class="btn-secondary font-semibold"
-                  @click="navigateTo('/about')"
-                >
-                  <i class="pi pi-info-circle mr-2" />
-                  Learn More About the Race
                 </Button>
               </div>
             </div>

@@ -25,6 +25,7 @@ export default {
   plugins: [
     require('@tailwindcss/forms')({
       strategy: 'class' // Only apply to elements with 'form-input' class
-    })
+    }),
+    require('@tailwindcss/typography')
   ]
 }

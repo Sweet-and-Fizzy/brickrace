@@ -481,21 +481,38 @@ export const useRacers = () => {
     }
   }
 
-  // Get racer by ID with caching support
-  const getRacerById = (racerId) => {
-    // First check detailed cache
-    if (state.detailedRacers.value.has(racerId)) {
-      const cached = state.detailedRacers.value.get(racerId)
-      return cached
-    }
-
-    // Fallback to basic racer data
-    const basicRacer = racers.value.find((r) => r.id === racerId)
+  // Get racer by slug
+  const getRacerBySlug = (slug) => {
+    // Check basic racer data first
+    const basicRacer = racers.value.find((r) => r.slug === slug)
     if (basicRacer) {
+      // Check if we have detailed cache for this racer
+      if (state.detailedRacers.value.has(basicRacer.id)) {
+        return state.detailedRacers.value.get(basicRacer.id)
+      }
       return basicRacer
     }
-
     return null
+  }
+
+  // Fetch racer details by slug
+  const fetchRacerDetailsBySlug = async (slug) => {
+    try {
+      // First fetch the racer by slug to get the ID
+      const { data: racerData, error: racerError } = await supabase
+        .from('racers')
+        .select('*')
+        .eq('slug', slug)
+        .single()
+
+      if (racerError) throw racerError
+
+      // Then use the existing fetchRacerDetails method
+      return await fetchRacerDetails(racerData.id)
+    } catch (err) {
+      console.error('Error fetching racer by slug:', err)
+      throw err
+    }
   }
 
   // Check if detailed data is cached and fresh (within 5 minutes)
@@ -748,7 +765,8 @@ export const useRacers = () => {
     initialize,
     fetchRacers,
     fetchRacerDetails,
-    getRacerById,
+    fetchRacerDetailsBySlug,
+    getRacerBySlug,
     isDetailedDataFresh,
     updateRacer,
     updateRacerImage,

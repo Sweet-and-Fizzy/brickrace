@@ -2,6 +2,15 @@
   <div class="min-h-screen bg-white dark:bg-gray-900">
     <!-- Hero Section -->
     <div class="bg-white dark:bg-gray-900">
+      <!-- Hero Image -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <img
+          src="~/assets/img/brickrace_art.jpg"
+          alt="The Great Holyoke Brick Race Artwork"
+          class="w-full h-64 md:h-80 lg:h-96 object-contain rounded-lg"
+        />
+      </div>
+      
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
@@ -51,6 +60,32 @@
           </template>
         </Card>
 
+        <!-- Featured Video -->
+        <Card class="mb-8">
+          <template #title>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+              <i class="pi pi-play text-brand-red" />
+              Watch the Action
+            </h2>
+          </template>
+          <template #content>
+            <div class="aspect-video">
+              <iframe
+                src="https://player.vimeo.com/video/213777258?badge=0&autopause=0&player_id=0&app_id=58479"
+                width="100%"
+                height="100%"
+                frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
+                class="rounded-lg"
+                title="The Great Holyoke Brick Race"
+              ></iframe>
+            </div>
+            <p class="text-gray-600 dark:text-gray-400 text-sm mt-4 text-center">
+              Experience the excitement and creativity of The Great Holyoke Brick Race
+            </p>
+          </template>
+        </Card>
+
         <!-- History Timeline -->
         <Card>
           <template #title>
@@ -60,29 +95,65 @@
             </h2>
           </template>
           <template #content>
-            <Timeline :value="raceHistory" class="w-full">
-              <template #marker="{ item }">
-                <div
-                  class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg"
-                  :class="item.color"
+            <!-- Custom Responsive Timeline -->
+            <div class="relative">
+              <!-- Timeline Line -->
+              <div class="absolute left-4 md:left-1/2 md:-ml-0.5 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
+              
+              <!-- Timeline Items -->
+              <div class="space-y-8">
+                <div 
+                  v-for="(item, index) in raceHistory" 
+                  :key="index"
+                  class="relative flex flex-col md:flex-row md:items-center"
                 >
-                  <i :class="item.icon" />
+                  <!-- Mobile Layout: Marker + Content stacked -->
+                  <div class="md:hidden flex items-start space-x-4">
+                    <!-- Marker -->
+                    <div
+                      class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg flex-shrink-0"
+                      :class="item.color"
+                    >
+                      <i :class="item.icon" />
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="flex-1 pb-6">
+                      <div class="mb-2">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">{{ item.year }}</h3>
+                      </div>
+                      <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-lg mb-2">
+                        {{ item.title }}
+                      </h4>
+                      <p class="text-gray-600 dark:text-gray-400">{{ item.description }}</p>
+                    </div>
+                  </div>
+
+                  <!-- Desktop Layout: Alternating sides -->
+                  <div class="hidden md:flex md:w-full" :class="index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'">
+                    <!-- Content side -->
+                    <div class="md:w-1/2 md:px-6" :class="index % 2 === 0 ? 'md:text-right md:pr-8' : 'md:text-left md:pl-8'">
+                      <div class="mb-2">
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ item.year }}</h3>
+                      </div>
+                      <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-lg mb-2">
+                        {{ item.title }}
+                      </h4>
+                      <p class="text-gray-600 dark:text-gray-400">{{ item.description }}</p>
+                    </div>
+                    
+                    <!-- Marker -->
+                    <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg flex-shrink-0"
+                         :class="item.color">
+                      <i :class="item.icon" />
+                    </div>
+                    
+                    <!-- Empty space on opposite side -->
+                    <div class="md:w-1/2"></div>
+                  </div>
                 </div>
-              </template>
-              <template #opposite="{ item }">
-                <div class="pr-4 text-right">
-                  <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ item.year }}</h3>
-                </div>
-              </template>
-              <template #content="{ item }">
-                <div class="ml-4 space-y-2 pb-6">
-                  <h4 class="font-semibold text-gray-800 dark:text-gray-200 text-lg">
-                    {{ item.title }}
-                  </h4>
-                  <p class="text-gray-600 dark:text-gray-400">{{ item.description }}</p>
-                </div>
-              </template>
-            </Timeline>
+              </div>
+            </div>
           </template>
         </Card>
       </div>

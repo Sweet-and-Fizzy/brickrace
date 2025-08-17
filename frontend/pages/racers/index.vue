@@ -159,7 +159,7 @@
                 :key="racer.id"
                 class="cursor-pointer"
               >
-                <NuxtLink :to="`/racers/${racer.id}`" class="block">
+                <NuxtLink :to="`/racers/${racer.slug}`" class="block">
                   <Card
                     class="group hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer border-2 border-gray-100 dark:border-gray-700 hover:border-red-400 dark:hover:border-red-500 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 h-full relative"
                     style="box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05)"
@@ -571,7 +571,7 @@ const searchRacers = (event) => {
 
 const onRacerSelect = (event) => {
   // Navigate to the selected racer
-  navigateTo(`/racers/${event.value.id}`)
+  navigateTo(`/racers/${event.value.slug}`)
 }
 
 const clearSearch = () => {

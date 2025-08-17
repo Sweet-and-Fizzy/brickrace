@@ -26,16 +26,37 @@
           >
             {{ activeRace.name }}
           </h1>
-          <p class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8">
-            {{
-              new Date(activeRace.race_datetime || activeRace.date).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })
-            }}
-          </p>
+          <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8 text-center">
+            <p>
+              {{
+                activeRace.race_datetime 
+                  ? new Date(activeRace.race_datetime).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })
+                  : 'Date TBD'
+              }}
+            </p>
+            <p v-if="activeRace.race_datetime" class="text-lg md:text-xl">
+              {{
+                new Date(activeRace.race_datetime).toLocaleTimeString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                })
+              }}{{
+                activeRace.end_time 
+                  ? ' - ' + new Date(activeRace.end_time).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                    })
+                  : ''
+              }}
+            </p>
+          </div>
         </div>
 
         <!-- Race Info and Stats -->
@@ -96,15 +117,19 @@
             </div>
           </div>
 
-          <div v-if="(activeRace.checkinCount || 0) > 0" class="flex justify-center">
-            <div
-              class="text-center p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-300 dark:border-gray-600 min-w-[200px]"
-            >
-              <div class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-1">
-                {{ activeRace.checkinCount || 0 }}
-              </div>
-              <div class="text-sm text-gray-700 dark:text-gray-300">Racers Checked In</div>
-            </div>
+          <div v-if="(activeRace.checkinCount || 0) > 0" class="flex justify-center mt-8">
+            <Card class="text-center min-w-[250px] shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <template #content>
+                <div class="py-4">
+                  <div class="text-4xl font-black text-gray-900 dark:text-white mb-2">
+                    {{ activeRace.checkinCount || 0 }}
+                  </div>
+                  <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">
+                    Racers Checked In
+                  </div>
+                </div>
+              </template>
+            </Card>
           </div>
 
           <div class="text-center">
@@ -180,11 +205,13 @@
           <Card class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full">
             <template #content>
               <div class="text-center space-y-6 h-full flex flex-col">
-                <div class="flex justify-center">
-                  <div
-                    class="bg-brand-blue rounded-full w-16 h-16 flex items-center justify-center"
-                  >
-                    <i class="pi pi-clock text-2xl text-white" />
+                <div class="flex justify-center mb-6">
+                  <div class="w-full max-w-sm">
+                    <img
+                      src="~/assets/img/brickrace_art.jpg"
+                      alt="The Great Holyoke Brick Race Artwork"
+                      class="w-full h-48 object-cover rounded-lg"
+                    />
                   </div>
                 </div>
 
@@ -205,14 +232,16 @@
                   </p>
                 </div>
 
-                <Button
-                  size="large"
-                  class="btn-primary font-semibold"
-                  @click="navigateTo('/about')"
-                >
-                  <i class="pi pi-book mr-2" />
-                  <span>Read Our History</span>
-                </Button>
+                <div class="inline-block">
+                  <Button
+                    size="large"
+                    class="btn-primary font-semibold"
+                    @click="navigateTo('/about')"
+                  >
+                    <i class="pi pi-book mr-2" />
+                    <span>Read Our History</span>
+                  </Button>
+                </div>
               </div>
             </template>
           </Card>
@@ -221,11 +250,13 @@
           <Card class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full">
             <template #content>
               <div class="text-center space-y-6 h-full flex flex-col">
-                <div class="flex justify-center">
-                  <div
-                    class="bg-brand-green rounded-full w-16 h-16 flex items-center justify-center"
-                  >
-                    <i class="pi pi-wrench text-2xl text-white" />
+                <div class="flex justify-center mb-6">
+                  <div class="w-full max-w-sm">
+                    <img
+                      src="~/assets/img/building_brickracer.jpg"
+                      alt="Building a Brick Racer"
+                      class="w-full h-48 object-cover rounded-lg"
+                    />
                   </div>
                 </div>
 
@@ -246,14 +277,16 @@
                   </p>
                 </div>
 
-                <Button
-                  size="large"
-                  class="btn-secondary font-semibold"
-                  @click="navigateTo('/build-racer')"
-                >
-                  <i class="pi pi-car mr-2" />
-                  Get Started Building
-                </Button>
+                <div class="inline-block">
+                  <Button
+                    size="large"
+                    class="btn-secondary font-semibold"
+                    @click="navigateTo('/build-racer')"
+                  >
+                    <i class="pi pi-car mr-2" />
+                    Get Started Building
+                  </Button>
+                </div>
               </div>
             </template>
           </Card>
@@ -262,100 +295,47 @@
     </div>
 
     <!-- Featured Photos -->
-    <div v-if="!pending && featuredPhotos.length > 0" class="py-16 bg-white dark:bg-gray-900">
+    <div v-if="!pending && featuredPhotos.length > 0" class="py-16 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4">
+          <h2 class="text-3xl font-bold text-white mb-4">
             Featured Photos
           </h2>
-          <p class="text-lg text-gray-600 dark:text-gray-400">
+          <p class="text-lg text-gray-300">
             Highlights from our creative racing community
           </p>
         </div>
-
-        <!-- Galleria Component -->
-        <div class="flex justify-center">
-          <div class="w-full max-w-3xl">
-            <Galleria
-              :value="featuredGalleryImages"
-              :responsive-options="galleryResponsiveOptions"
-              :num-visible="4"
-              :show-thumbnails="true"
-              :show-indicators="false"
-              :circular="true"
-              :auto-play="true"
-              :transition-interval="5000"
-              container-style="width: 100%"
-              thumbnails-position="bottom"
-            >
-              <template #item="{ item }">
-                <div
-                  class="relative cursor-pointer group"
-                  @click="
-                    openFeaturedGallery(
-                      featuredPhotos.findIndex((p) => p && p.url === item.itemImageSrc)
-                    )
-                  "
-                >
-                  <img
-                    :src="item.itemImageSrc"
-                    :alt="item.alt"
-                    class="w-full h-96 object-cover rounded-lg shadow-lg"
-                  >
-
-                  <!-- Click to expand hint -->
-                  <div
-                    class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center rounded-lg"
-                  >
-                    <div
-                      class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-gray-900 dark:text-white text-center"
-                    >
-                      <i class="pi pi-search-plus text-2xl mb-2" />
-                      <p class="text-sm font-medium">Click to view gallery</p>
-                    </div>
-                  </div>
-                </div>
-              </template>
-
-              <template #thumbnail="{ item }">
-                <div class="p-2">
-                  <img
-                    :src="item.thumbnailImageSrc"
-                    :alt="item.alt"
-                    class="w-20 h-16 object-cover rounded border-2 border-transparent hover:border-green-600 dark:hover:border-green-400 transition-colors cursor-pointer"
-                  >
-                </div>
-              </template>
-            </Galleria>
-          </div>
-        </div>
+        
+        <BeautifulSlideshow 
+          :images="featuredPhotos" 
+          @slide-click="openFeaturedGallery"
+        />
 
         <!-- View More Links -->
         <div class="text-center mt-12 space-y-6">
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <NuxtLink to="/gallery">
-              <Button size="large" class="btn-secondary">
-                <i class="pi pi-images mr-2" />
-                View Photo Gallery
-              </Button>
-            </NuxtLink>
-            <NuxtLink to="/my-photos">
-              <Button size="large" class="btn-secondary">
-                <i class="pi pi-upload mr-2" />
-                Share Your Photos
-              </Button>
-            </NuxtLink>
+            <Button 
+              size="large" 
+              class="gallery-button"
+              @click="navigateTo('/gallery')"
+            >
+              <i class="pi pi-images mr-2" />
+              View Photo Gallery
+            </Button>
+            <Button 
+              size="large" 
+              class="gallery-button"
+              @click="navigateTo('/my-photos')"
+            >
+              <i class="pi pi-upload mr-2" />
+              Share Your Photos
+            </Button>
           </div>
 
-          <div
-            class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 max-w-2xl mx-auto"
-          >
-            <p class="text-sm text-gray-700 dark:text-gray-300">
-              <i class="pi pi-info-circle mr-2" />
-              Have photos from races or events? Help build our community gallery by uploading and
-              sharing your shots!
-            </p>
-          </div>
+          <p class="text-sm text-gray-200 max-w-2xl mx-auto">
+            Have photos from races or events? Help build our community gallery by uploading and
+            sharing your shots!
+          </p>
         </div>
       </div>
     </div>
@@ -416,7 +396,7 @@
             <template #title>{{ race.name }}</template>
 
             <template #subtitle>
-              {{ new Date(race.race_datetime || race.date).toLocaleDateString() }}
+              {{ new Date(race.race_datetime).toLocaleDateString() }}
             </template>
 
             <template #footer>
@@ -508,7 +488,7 @@ const pastRaces = recentPastRaces
 // Countdown timer logic
 const updateCountdown = () => {
   // Use race_datetime if available, otherwise fall back to date
-  const raceDateTime = activeRace.value?.race_datetime || activeRace.value?.date
+  const raceDateTime = activeRace.value?.race_datetime
   if (!raceDateTime) {
     countdown.value.isActive = false
     return
@@ -565,23 +545,6 @@ watch(
   { immediate: true }
 )
 
-// Hero background style using featured photo
-const heroBackgroundStyle = computed(() => {
-  const heroPhoto = featuredPhotos.value[0]?.url
-  if (heroPhoto) {
-    return {
-      backgroundImage: `url(${heroPhoto})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    }
-  }
-
-  // Fallback to a subtle gradient if no featured photo
-  return {
-    background: 'linear-gradient(135deg, #c53030 0%, #9c1c1c 100%)'
-  }
-})
 
 // Featured photos computed properties
 const featuredGalleryImages = computed(() => {
@@ -616,3 +579,43 @@ useHead({
   ]
 })
 </script>
+
+<style scoped>
+/* High specificity gallery buttons for dark background */
+:deep(.gallery-button),
+:deep(.gallery-button:active),
+:deep(.gallery-button:focus),
+:deep(.gallery-button:visited),
+:deep(.gallery-button[data-pc-name="button"]),
+:deep(button.gallery-button),
+:deep(.p-button.gallery-button) {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 0 !important;
+  backdrop-filter: blur(10px) !important;
+  transform: skewX(-8deg) !important;
+  font-family: 'Open Sans', sans-serif !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  transition: all 0.3s ease !important;
+}
+
+:deep(.gallery-button:hover),
+:deep(.gallery-button:hover[data-pc-name="button"]),
+:deep(button.gallery-button:hover),
+:deep(.p-button.gallery-button:hover) {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  transform: skewX(-8deg) translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Unskew child elements */
+:deep(.gallery-button > *),
+:deep(.gallery-button [data-pc-section="label"]) {
+  transform: none !important;
+  display: inline-block !important;
+}
+</style>

@@ -4,10 +4,7 @@
   >
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          The Great Holyoke Brick Race
-        </h1>
-        <h2 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Create your account</h2>
+        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Create your account</h2>
         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Or
           <NuxtLink

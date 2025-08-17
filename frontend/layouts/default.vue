@@ -4,7 +4,7 @@
     <Drawer v-model:visible="sidebarVisible" class="w-80" position="right">
       <template #header>
         <div class="flex items-center">
-          <span class="font-bold text-lg">The Great Holyoke Brick Race</span>
+          <span class="font-bold text-lg">the great holyoke brick race</span>
         </div>
       </template>
 
@@ -88,7 +88,7 @@
               <!-- Logo -->
               <NuxtLink to="/" class="flex items-center">
                 <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
-                  The Great Holyoke Brick Race
+                  the great holyoke brick race
                 </span>
               </NuxtLink>
 
@@ -149,20 +149,19 @@
 
                 <!-- Auth buttons or user menu -->
                 <template v-if="!authStore.isAuthenticated">
-                  <NuxtLink to="/login">
-                    <Button
-                      v-tooltip.bottom="'Login'"
-                      severity="secondary"
-                      text
-                      icon="pi pi-sign-in"
-                    />
+                  <NuxtLink 
+                    to="/login" 
+                    class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1 text-sm flex items-center"
+                  >
+                    <i class="pi pi-sign-in mr-2" />
+                    <span>Login</span>
                   </NuxtLink>
-                  <NuxtLink to="/register">
-                    <Button
-                      v-tooltip.bottom="'Register'"
-                      class="btn-secondary text-sm"
-                      icon="pi pi-user-plus"
-                    />
+                  <NuxtLink 
+                    to="/register" 
+                    class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-2 py-1 text-sm flex items-center"
+                  >
+                    <i class="pi pi-user-plus mr-2" />
+                    <span>Register</span>
                   </NuxtLink>
                 </template>
                 <template v-else>
@@ -202,7 +201,7 @@
               <template #start>
                 <NuxtLink to="/" class="flex items-center mr-8">
                   <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
-                    The Great Holyoke Brick Race
+                    the great holyoke brick race
                   </span>
                 </NuxtLink>
               </template>
@@ -247,20 +246,19 @@
 
                   <!-- Auth Section for non-authenticated users -->
                   <template v-if="!authStore.isAuthenticated">
-                    <NuxtLink to="/login">
-                      <Button
-                        v-tooltip.bottom="'Login'"
-                        severity="secondary"
-                        text
-                        icon="pi pi-sign-in"
-                      />
+                    <NuxtLink 
+                      to="/login" 
+                      class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 text-sm flex items-center"
+                    >
+                      <i class="pi pi-sign-in mr-2" />
+                      <span>Login</span>
                     </NuxtLink>
-                    <NuxtLink to="/register">
-                      <Button
-                        v-tooltip.bottom="'Register'"
-                        class="btn-secondary"
-                        icon="pi pi-user-plus"
-                      />
+                    <NuxtLink 
+                      to="/register" 
+                      class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors px-3 py-2 text-sm flex items-center"
+                    >
+                      <i class="pi pi-user-plus mr-2" />
+                      <span>Register</span>
                     </NuxtLink>
                   </template>
                 </div>
@@ -272,7 +270,7 @@
           <div class="md:hidden flex items-center justify-between w-full">
             <NuxtLink to="/" class="flex items-center">
               <span class="site-name text-xl font-bold text-gray-900 dark:text-white">
-                The Great Holyoke Brick Race
+                the great holyoke brick race
               </span>
             </NuxtLink>
 
