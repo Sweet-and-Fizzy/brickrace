@@ -118,12 +118,18 @@
             </div>
             <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
               <span>{{
-                new Date(race.date).toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })
+                race.race_datetime 
+                  ? new Date(race.race_datetime).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    }) + ' at ' + new Date(race.race_datetime).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true
+                    })
+                  : 'Date TBD'
               }}</span>
               <span v-if="!race.active" class="text-amber-600 dark:text-amber-400 font-medium">
                 <i class="pi pi-info-circle mr-1" />
@@ -487,32 +493,46 @@
             <!-- Dynamic Heat Display (Shows during active qualifying) -->
             <div v-if="(currentHeatData || hasValidUpcomingHeats) && race.active" class="mb-8">
               <!-- Current Heat Hero Section -->
-              <Card v-if="currentHeatData" class="border-4 border-brand-blue shadow-xl mb-4">
+              <Card v-if="currentHeatData" class="border-4 shadow-xl mb-4" 
+                    :class="showCompletedHeatResults ? 'border-green-500' : 'border-brand-blue'">
                 <template #content>
                   <div
-                    class="bg-gradient-to-r from-brand-blue/10 to-brand-green/10 -m-6 p-6 rounded-t-lg"
+                    class="-m-6 p-6 rounded-t-lg"
+                    :class="showCompletedHeatResults 
+                      ? 'bg-gradient-to-r from-green-500/10 to-blue-500/10' 
+                      : 'bg-gradient-to-r from-brand-blue/10 to-brand-green/10'"
                   >
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
-                        <div class="bg-brand-blue text-white rounded-full p-3 relative">
-                          <i class="pi pi-flag-fill text-2xl" />
-                          <div class="absolute inset-0 bg-brand-blue rounded-full animate-ping opacity-75"/>
+                        <div class="text-white rounded-full p-3 relative"
+                             :class="showCompletedHeatResults ? 'bg-green-500' : 'bg-brand-blue'">
+                          <i class="text-2xl" 
+                             :class="showCompletedHeatResults ? 'pi pi-check-circle' : 'pi pi-flag-fill'" />
+                          <div v-if="!showCompletedHeatResults" class="absolute inset-0 bg-brand-blue rounded-full animate-ping opacity-75"/>
                         </div>
                         <div>
                           <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                            Heat {{ currentHeatData.heat_number }} - NOW RACING
+                            Heat {{ currentHeatData.heat_number }} - {{ showCompletedHeatResults ? 'RESULTS' : 'NOW RACING' }}
                           </h2>
                           <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Qualifying Round • Live Timing
+                            {{ showCompletedHeatResults ? 'Qualifying Complete • Times Posted' : 'Qualifying Round • Live Timing' }}
                           </p>
                         </div>
                       </div>
                       <div class="flex items-center gap-2">
                         <span
-                          class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold animate-pulse"
+                          class="px-3 py-1 rounded-full text-sm font-bold"
+                          :class="showCompletedHeatResults 
+                            ? 'bg-green-500 text-white' 
+                            : 'bg-red-500 text-white animate-pulse'"
                         >
-                          LIVE
+                          {{ showCompletedHeatResults ? 'COMPLETE' : 'LIVE' }}
                         </span>
+                        <div v-if="showCompletedHeatResults" class="text-right">
+                          <p class="text-xs text-gray-500 dark:text-gray-400">
+                            Next heat starting soon...
+                          </p>
+                        </div>
                       </div>
                     </div>
 
@@ -553,10 +573,16 @@
                             </p>
                             <div v-if="getTrackRacer(currentHeatData.racers, 1).time" class="mt-2">
                               <span
-                                class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm font-bold"
+                                class="px-2 py-1 rounded font-bold"
+                                :class="showCompletedHeatResults 
+                                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-lg' 
+                                  : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm'"
                               >
                                 {{ formatTime(getTrackRacer(currentHeatData.racers, 1).time) }}
                               </span>
+                              <div v-if="showCompletedHeatResults" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Final Time
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -599,10 +625,16 @@
                             </p>
                             <div v-if="getTrackRacer(currentHeatData.racers, 2).time" class="mt-2">
                               <span
-                                class="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-2 py-1 rounded text-sm font-bold"
+                                class="px-2 py-1 rounded font-bold"
+                                :class="showCompletedHeatResults 
+                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 text-lg' 
+                                  : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm'"
                               >
                                 {{ formatTime(getTrackRacer(currentHeatData.racers, 2).time) }}
                               </span>
+                              <div v-if="showCompletedHeatResults" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Final Time
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1133,7 +1165,9 @@ const {
   upcomingHeats,
   loading: heatsLoading,
   initialize: initializeHeats,
-  fetchCurrentRaceData
+  fetchCurrentRaceData,
+  recentlyCompletedHeat,
+  showCompletedHeatResults
 } = useHeats()
 
 // Local state
@@ -1657,10 +1691,19 @@ const currentHeatData = computed(() => {
     raceId: race.value?.id,
     currentRaceHeatId: currentRaceHeat.value?.id,
     hasCurrentHeat: !!currentHeat.value,
-    currentHeat: currentHeat.value
+    currentHeat: currentHeat.value,
+    showCompletedResults: showCompletedHeatResults.value,
+    recentlyCompleted: recentlyCompletedHeat.value
   })
 
-  // Only show if this is the active race and there's a current heat
+  // If we should show completed heat results, prioritize that
+  if (race.value?.active && showCompletedHeatResults.value && recentlyCompletedHeat.value) {
+    if (!currentRaceHeat.value || currentRaceHeat.value.id === race.value.id) {
+      return recentlyCompletedHeat.value
+    }
+  }
+
+  // Otherwise, show current active heat as before
   if (!race.value?.active || !currentHeat.value || !currentRaceHeat.value) return null
   if (currentRaceHeat.value.id !== race.value.id) return null
 

@@ -20,14 +20,9 @@ export const useRaces = () => {
     })
   }
 
-  // Format date for input fields
-  const formatDateForInput = (dateString) => {
-    return new Date(dateString).toISOString().split('T')[0]
-  }
-
-  // Get race date
+  // Get race datetime
   const getRaceDateTime = (race) => {
-    return race.date
+    return race.race_datetime
   }
 
   // Format race datetime for display
@@ -50,14 +45,14 @@ export const useRaces = () => {
 
   // Check if race is upcoming
   const isUpcoming = (race) => {
-    const raceDateTime = race.race_datetime || race.date
+    const raceDateTime = race.race_datetime
     return raceDateTime ? new Date(raceDateTime) > new Date() : false
   }
 
   // Check if race is today
   const isToday = (race) => {
     const today = new Date()
-    const raceDateTime = race.race_datetime || race.date
+    const raceDateTime = race.race_datetime
     if (!raceDateTime) return false
     const raceDate = new Date(raceDateTime)
     return today.toDateString() === raceDate.toDateString()
@@ -72,7 +67,7 @@ export const useRaces = () => {
       const { data: racesData, error: racesError } = await supabase
         .from('races')
         .select('*')
-        .order('date', { ascending: false })
+        .order('race_datetime', { ascending: false })
 
       if (racesError) throw racesError
 
@@ -449,7 +444,6 @@ export const useRaces = () => {
     deleteRace,
     updateRaceImage,
     formatDate,
-    formatDateForInput,
     getRaceDateTime,
     formatRaceDateTime,
     isUpcoming,

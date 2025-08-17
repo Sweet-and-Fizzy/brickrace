@@ -26,7 +26,7 @@
           }"
           tabindex="0"
           role="button"
-          :aria-label="`View details for ${race.name} race on ${new Date(race.date).toLocaleDateString()}`"
+          :aria-label="`View details for ${race.name} race on ${race.race_datetime ? new Date(race.race_datetime).toLocaleDateString() : 'TBD'}`"
           @click="navigateToRace(race, $event)"
           @keydown.enter="navigateToRace(race, $event)"
           @keydown.space.prevent="navigateToRace(race, $event)"

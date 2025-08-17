@@ -266,9 +266,28 @@ const createRace = async () => {
   loading.value = true
 
   try {
+    // Combine date and time into datetime field
+    let raceDateTime = null
+    if (form.value.date && form.value.time) {
+      const date = new Date(form.value.date)
+      const time = new Date(form.value.time)
+      
+      // Create combined datetime in local timezone
+      const combined = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        time.getHours(),
+        time.getMinutes(),
+        time.getSeconds()
+      )
+      
+      raceDateTime = combined.toISOString()
+    }
+    
     const raceData = {
       name: form.value.name.trim(),
-      date: form.value.date ? new Date(form.value.date).toISOString().split('T')[0] : null,
+      race_datetime: raceDateTime,
       image_url: form.value.image_url?.trim() || null
     }
 

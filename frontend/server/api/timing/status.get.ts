@@ -57,8 +57,8 @@ export default defineEventHandler(async (event) => {
       .eq('status', 'in_progress')
       .order('track_number')
 
-    // Get next few heats
-    const { data: upcomingHeats } = await client.rpc('get_next_heats', { heat_count: 5 })
+    // Get next 2 heats (in addition to current heat)
+    const { data: upcomingHeats } = await client.rpc('get_next_heats', { heat_count: 2 })
 
     // Format current heat data
     const currentHeatFormatted =
@@ -120,7 +120,7 @@ export default defineEventHandler(async (event) => {
       race: {
         id: activeRace.id,
         name: activeRace.name,
-        date: activeRace.date
+        date: activeRace.race_datetime
       },
       current_heat: currentHeatFormatted,
       upcoming_heats: upcomingHeatsFormatted,

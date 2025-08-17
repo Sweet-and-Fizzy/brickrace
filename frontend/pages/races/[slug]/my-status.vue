@@ -30,12 +30,12 @@
           </h1>
           <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
             <span>{{
-              new Date(race.date).toLocaleDateString('en-US', {
+              race.race_datetime ? new Date(race.race_datetime).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
-              })
+              }) : 'Date TBD'
             }}</span>
             <span class="font-semibold text-blue-600 dark:text-blue-400"
               >{{ myRacersInRace.length }} of your racers</span

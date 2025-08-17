@@ -8,7 +8,7 @@
           v-if="activeRace.image_url"
           :src="activeRace.image_url"
           :alt="activeRace.name"
-          image-class="w-full h-64 md:h-80 object-cover"
+          image-class="w-full h-64 md:h-80 object-contain"
           class="w-full h-64 md:h-80"
         />
         <div
@@ -28,7 +28,7 @@
           </h1>
           <p class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8">
             {{
-              new Date(activeRace.date).toLocaleDateString('en-US', {
+              new Date(activeRace.race_datetime || activeRace.date).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
@@ -416,7 +416,7 @@
             <template #title>{{ race.name }}</template>
 
             <template #subtitle>
-              {{ new Date(race.date).toLocaleDateString() }}
+              {{ new Date(race.race_datetime || race.date).toLocaleDateString() }}
             </template>
 
             <template #footer>
