@@ -8,7 +8,7 @@
           src="~/assets/img/building_brickracer.jpg"
           alt="Building a Brick Racer"
           class="w-full h-64 md:h-80 lg:h-96 object-contain rounded-lg"
-        />
+        >
       </div>
       
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

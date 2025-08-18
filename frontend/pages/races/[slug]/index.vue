@@ -513,7 +513,8 @@
             <!-- Dynamic Heat Display (Shows during active qualifying) -->
             <div v-if="(currentHeatData || hasValidUpcomingHeats) && race.active" class="mb-8">
               <!-- Current Heat Hero Section -->
-              <Card v-if="currentHeatData" class="border-4 shadow-xl mb-4" 
+              <Card
+v-if="currentHeatData" class="border-4 shadow-xl mb-4" 
                     :class="showCompletedHeatResults ? 'border-green-500' : 'border-brand-blue'">
                 <template #content>
                   <div
@@ -524,9 +525,11 @@
                   >
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
-                        <div class="text-white rounded-full p-3 relative"
+                        <div
+class="text-white rounded-full p-3 relative"
                              :class="showCompletedHeatResults ? 'bg-green-500' : 'bg-brand-blue'">
-                          <i class="text-2xl" 
+                          <i
+class="text-2xl" 
                              :class="showCompletedHeatResults ? 'pi pi-check-circle' : 'pi pi-flag-fill'" />
                           <div v-if="!showCompletedHeatResults" class="absolute inset-0 bg-brand-blue rounded-full animate-ping opacity-75"/>
                         </div>

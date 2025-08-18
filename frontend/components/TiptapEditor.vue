@@ -4,46 +4,46 @@
     <div class="border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-2 flex gap-1 flex-wrap">
       <button
         type="button"
-        @click="editor?.chain().focus().toggleBold().run()"
         :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('bold') }"
         class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 font-bold"
         title="Bold"
+        @click="editor?.chain().focus().toggleBold().run()"
       >
         B
       </button>
       <button
         type="button"
-        @click="editor?.chain().focus().toggleItalic().run()"
         :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('italic') }"
         class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 italic"
         title="Italic"
+        @click="editor?.chain().focus().toggleItalic().run()"
       >
         I
       </button>
       <button
         type="button"
-        @click="editor?.chain().focus().toggleBulletList().run()"
         :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('bulletList') }"
         class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
         title="Bullet List"
+        @click="editor?.chain().focus().toggleBulletList().run()"
       >
         <i class="pi pi-list" />
       </button>
       <button
         type="button"
-        @click="editor?.chain().focus().toggleOrderedList().run()"
         :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('orderedList') }"
         class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
         title="Numbered List"
+        @click="editor?.chain().focus().toggleOrderedList().run()"
       >
         1.
       </button>
       <button
         type="button"
-        @click="toggleLink"
         :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('link') }"
         class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
         title="Link"
+        @click="toggleLink"
       >
         <i class="pi pi-link" />
       </button>

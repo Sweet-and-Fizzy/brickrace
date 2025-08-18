@@ -9,7 +9,7 @@
           Or
           <NuxtLink
             to="/login"
-            class="font-medium text-brand-blue hover:text-brand-blue/80 dark:text-brand-blue dark:hover:text-brand-blue/80 transition-colors"
+            class="font-medium text-brand-blue hover:text-brand-blue/80 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
           >
             sign in to existing account
           </NuxtLink>

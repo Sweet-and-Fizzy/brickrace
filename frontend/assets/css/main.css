@@ -13,6 +13,15 @@
     --brand-gold: #ffc927;
   }
 
+  /* Dark mode color overrides for better readability */
+  .dark\:text-brand-blue-light {
+    color: #60A5FA; /* blue-400 */
+  }
+
+  .dark\:hover\:text-brand-blue-light:hover {
+    color: #93C5FD; /* blue-300 */
+  }
+
   /* Set Open Sans as the default body font */
   body {
     font-family: 'Open Sans', sans-serif;
@@ -65,6 +74,17 @@
     font-family: 'Open Sans', sans-serif;
     font-weight: 700;
     letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  /* Better dark mode blue text for readability */
+  .dark .text-brand-blue {
+    color: #60A5FA !important; /* blue-400 - more readable on dark backgrounds */
+  }
+
+  .dark .hover\:text-brand-blue\/80:hover {
+    color: #93C5FD !important; /* blue-300 */
   }
 }
 
@@ -122,12 +142,12 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
-  /* Dark mode hover: outline with white border */
+  /* Dark mode hover: outline with gray border */
   .app-dark .btn-primary:hover {
     background-color: transparent !important;
     color: white !important;
-    border: 2px solid white !important;
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    border: 2px solid #9CA3AF !important; /* border-gray-400 */
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
   }
 
   .btn-primary:active {
@@ -150,10 +170,11 @@
     outline: none;
   }
 
-  /* Dark mode: white border and text */
+  /* Dark mode: gray border and light text */
   .app-dark .btn-secondary {
-    @apply text-white bg-transparent;
-    border: 2px solid white !important;
+    @apply bg-transparent;
+    color: #E5E7EB !important; /* text-gray-200 */
+    border: 2px solid #6B7280 !important; /* border-gray-500 */
   }
 
   .btn-secondary > span,
@@ -169,12 +190,12 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
-  /* Dark mode hover: white background with black text */
+  /* Dark mode hover: gray background with light text */
   .app-dark .btn-secondary:hover {
-    background-color: white !important;
-    color: black !important;
-    border: 2px solid white !important;
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+    background-color: #374151 !important; /* bg-gray-700 */
+    color: white !important;
+    border: 2px solid #6B7280 !important; /* border-gray-500 */
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
   }
 
   .btn-secondary:active {
@@ -245,9 +266,9 @@
   .app-dark .btn-secondary:visited,
   .app-dark .btn-secondary[data-pc-name="button"],
   .app-dark button.btn-secondary {
-    border: 2px solid white !important;
+    border: 2px solid #6B7280 !important; /* border-gray-500 */
     background-color: transparent !important;
-    color: white !important;
+    color: #E5E7EB !important; /* text-gray-200 */
   }
 
   /* Ensure child elements are properly unskewed */
@@ -293,8 +314,8 @@
 
     .app-dark .btn-secondary,
     .app-dark button.btn-secondary {
-      border: 2px solid white !important;
-      color: white !important;
+      border: 2px solid #6B7280 !important; /* border-gray-500 */
+      color: #E5E7EB !important; /* text-gray-200 */
     }
   }
 
@@ -304,13 +325,20 @@
     border-radius: 0 !important;
     box-shadow: none !important;
     transition: box-shadow 0.2s ease-in-out !important;
+    background-color: white !important;
   }
 
   [data-pc-name='card']:hover {
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.15) !important;
   }
 
+  /* Dark mode card styling with better contrast */
   .app-dark [data-pc-name='card'] {
-    border-color: white !important;
+    background-color: #1F2937 !important; /* bg-gray-800 */
+    border-color: #374151 !important; /* border-gray-700 */
+  }
+
+  .app-dark [data-pc-name='card']:hover {
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.3) !important;
   }
 }

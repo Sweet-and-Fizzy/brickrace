@@ -8,7 +8,7 @@
           src="~/assets/img/brickrace_art.jpg"
           alt="The Great Holyoke Brick Race Artwork"
           class="w-full h-64 md:h-80 lg:h-96 object-contain rounded-lg"
-        />
+        >
       </div>
       
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -78,7 +78,7 @@
                 allow="autoplay; fullscreen; picture-in-picture; clipboard-write"
                 class="rounded-lg"
                 title="The Great Holyoke Brick Race"
-              ></iframe>
+              />
             </div>
             <p class="text-gray-600 dark:text-gray-400 text-sm mt-4 text-center">
               Experience the excitement and creativity of The Great Holyoke Brick Race
@@ -98,7 +98,7 @@
             <!-- Custom Responsive Timeline -->
             <div class="relative">
               <!-- Timeline Line -->
-              <div class="absolute left-4 md:left-1/2 md:-ml-0.5 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
+              <div class="absolute left-4 md:left-1/2 md:-ml-0.5 top-0 bottom-0 w-0.5 bg-gray-300 dark:bg-gray-600"/>
               
               <!-- Timeline Items -->
               <div class="space-y-8">
@@ -143,13 +143,14 @@
                     </div>
                     
                     <!-- Marker -->
-                    <div class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg flex-shrink-0"
+                    <div
+class="relative z-10 w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg flex-shrink-0"
                          :class="item.color">
                       <i :class="item.icon" />
                     </div>
                     
                     <!-- Empty space on opposite side -->
-                    <div class="md:w-1/2"></div>
+                    <div class="md:w-1/2"/>
                   </div>
                 </div>
               </div>

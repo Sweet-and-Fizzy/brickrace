@@ -22,7 +22,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center mb-12">
           <h1
-            class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-6"
+            class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-6 tracking-wide"
           >
             {{ activeRace.name }}
           </h1>
@@ -156,7 +156,7 @@
     <div v-else-if="!pending" class="bg-white dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div class="text-center">
-          <h1 class="text-4xl md:text-6xl font-bold mb-6">🏁 The Great Holyoke Brick Race</h1>
+          <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-wide">🏁 The Great Holyoke Brick Race</h1>
           <p class="text-xl md:text-2xl mb-8 text-gray-600 dark:text-gray-400">
             Custom gravity-powered vehicles competing for speed, creativity, and artistry
           </p>
@@ -191,7 +191,7 @@
             >
           </div>
           <h2
-            class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4"
+            class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4 tracking-wide"
           >
             The Great Holyoke Brick Race
           </h2>
@@ -211,13 +211,13 @@
                       src="~/assets/img/brickrace_art.jpg"
                       alt="The Great Holyoke Brick Race Artwork"
                       class="w-full h-48 object-cover rounded-lg"
-                    />
+                    >
                   </div>
                 </div>
 
                 <div class="flex-1">
                   <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4"
+                    class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4 tracking-wide"
                   >
                     Discover Our History
                   </h2>
@@ -235,11 +235,11 @@
                 <div class="inline-block">
                   <Button
                     size="large"
-                    class="btn-primary font-semibold"
+                    class="btn-secondary font-semibold"
                     @click="navigateTo('/about')"
                   >
                     <i class="pi pi-book mr-2" />
-                    <span>Read Our History</span>
+                    <span>Discover Our History</span>
                   </Button>
                 </div>
               </div>
@@ -256,13 +256,13 @@
                       src="~/assets/img/building_brickracer.jpg"
                       alt="Building a Brick Racer"
                       class="w-full h-48 object-cover rounded-lg"
-                    />
+                    >
                   </div>
                 </div>
 
                 <div class="flex-1">
                   <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4"
+                    class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4 tracking-wide"
                   >
                     Build Your Own Racer
                   </h2>
@@ -284,7 +284,7 @@
                     @click="navigateTo('/build-racer')"
                   >
                     <i class="pi pi-car mr-2" />
-                    Get Started Building
+                    Get Started
                   </Button>
                 </div>
               </div>
@@ -298,7 +298,7 @@
     <div v-if="!pending && featuredPhotos.length > 0" class="py-16 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-white mb-4">
+          <h2 class="text-3xl font-bold text-white mb-4 tracking-wide">
             Featured Photos
           </h2>
           <p class="text-lg text-gray-300">
@@ -369,7 +369,7 @@
     <div v-if="!pending && pastRaces.length > 0" class="py-16 bg-white dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2
-          class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-gray-900 dark:text-white"
+          class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-gray-900 dark:text-white tracking-wide"
         >
           Past Races
         </h2>
@@ -421,7 +421,7 @@
     <!-- Social Media Section -->
     <div class="py-16 bg-white dark:bg-gray-900">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6">Stay Connected</h2>
+        <h2 class="text-3xl md:text-4xl font-bold mb-6 tracking-wide">Stay Connected</h2>
         <p class="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
           Follow along for race updates, behind-the-scenes content, and inspiration from our amazing
           community of builders and racers!

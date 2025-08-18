@@ -11,7 +11,7 @@
           Or
           <NuxtLink
             to="/register"
-            class="font-medium text-brand-blue hover:text-brand-blue/80 dark:text-brand-blue dark:hover:text-brand-blue/80"
+            class="font-medium text-brand-blue hover:text-brand-blue/80 dark:text-blue-400 dark:hover:text-blue-300"
           >
             create a new account
           </NuxtLink>
@@ -98,7 +98,7 @@
               <div class="text-center">
                 <NuxtLink
                   to="/forgot-password"
-                  class="text-sm text-brand-blue hover:text-brand-blue/80 dark:text-brand-blue dark:hover:text-brand-blue/80"
+                  class="text-sm text-brand-blue hover:text-brand-blue/80 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                   Forgot your password?
                 </NuxtLink>
