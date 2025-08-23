@@ -116,20 +116,13 @@
                   text
                   @click="navigateTo('/about')"
                 />
-                <!-- Racers & Vehicles Section -->
+                <!-- Racers Section -->
                 <Button
                   v-tooltip.bottom="'Browse Racers'"
                   icon="pi pi-car"
                   severity="secondary"
                   text
                   @click="navigateTo('/racers')"
-                />
-                <Button
-                  v-tooltip.bottom="'Frequently Asked Questions'"
-                  icon="pi pi-question-circle"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/build-racer')"
                 />
                 <!-- Community Section -->
                 <Button
@@ -139,9 +132,18 @@
                   text
                   @click="navigateTo('/gallery')"
                 />
-
-                <!-- Dark Mode Toggle -->
+                <!-- FAQ Section -->
                 <Button
+                  v-tooltip.bottom="'FAQ'"
+                  icon="pi pi-question-circle"
+                  severity="secondary"
+                  text
+                  @click="navigateTo('/faq')"
+                />
+
+                <!-- Dark Mode Toggle (only for unauthenticated users) -->
+                <Button
+                  v-if="!authStore.isAuthenticated"
                   v-tooltip.bottom="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
                   :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
                   severity="secondary"
@@ -210,8 +212,9 @@
 
               <template #end>
                 <div class="flex items-center space-x-2">
-                  <!-- Dark Mode Toggle -->
+                  <!-- Dark Mode Toggle (only for unauthenticated users) -->
                   <Button
+                    v-if="!authStore.isAuthenticated"
                     v-tooltip.bottom="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
                     :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
                     severity="secondary"
@@ -241,7 +244,7 @@
                         class: 'text-gray-600 dark:text-gray-300'
                       },
                       submenu: {
-                        class: 'z-50'
+                        class: 'z-50 right-0'
                       }
                     }"
                   />
@@ -349,18 +352,24 @@ const menuItems = computed(() => [
         icon: 'pi pi-car',
         command: () => navigateTo('/racers')
       },
-      {
-        label: 'Frequently Asked Questions',
-        icon: 'pi pi-question-circle',
-        command: () => navigateTo('/build-racer')
-      },
       ...(authStore.isAuthenticated ? [
         {
-          label: 'Add Your Racer',
-          icon: 'pi pi-plus',
-          command: () => navigateTo('/racers/add')
+          label: 'My Racers',
+          icon: 'pi pi-user',
+          command: () => navigateTo('/my-racers')
         }
-      ] : [])
+      ] : []),
+      {
+        label: 'Add Your Racer',
+        icon: 'pi pi-plus',
+        command: () => {
+          if (authStore.isAuthenticated) {
+            navigateTo('/racers/add')
+          } else {
+            navigateTo('/login?redirect=/racers/add')
+          }
+        }
+      }
     ]
   },
   {
@@ -380,6 +389,11 @@ const menuItems = computed(() => [
         }
       ] : [])
     ]
+  },
+  {
+    label: 'FAQ',
+    icon: 'pi pi-question-circle',
+    command: () => navigateTo('/faq')
   }
 ])
 
@@ -390,20 +404,6 @@ const userMenuItemsIconsOnly = computed(() =>
         {
           icon: 'pi pi-user',
           items: [
-            {
-              label: 'My Racers',
-              icon: 'pi pi-car',
-              command: () => {
-                handleNavigation('/my-racers')
-              }
-            },
-            {
-              label: 'My Photos',
-              icon: 'pi pi-images',
-              command: () => {
-                handleNavigation('/my-photos')
-              }
-            },
             ...(authStore.isRaceAdmin
               ? [
                   {
@@ -417,6 +417,13 @@ const userMenuItemsIconsOnly = computed(() =>
               : []),
             {
               separator: true
+            },
+            {
+              label: isDark.value ? 'Light Mode' : 'Dark Mode',
+              icon: isDark.value ? 'pi pi-sun' : 'pi pi-moon',
+              command: () => {
+                toggleDarkMode()
+              }
             },
             {
               label: 'Logout',
@@ -458,42 +465,44 @@ const sidebarMenuItems = computed(() => [
     icon: 'pi pi-clock',
     command: () => navigateTo('/about')
   },
-  // Racers & Vehicles Section
+  // Racers Section
   {
     label: 'Browse Racers',
     icon: 'pi pi-car',
     command: () => navigateTo('/racers')
   },
-  {
-    label: 'Frequently Asked Questions',
-    icon: 'pi pi-question-circle',
-    command: () => navigateTo('/build-racer')
-  },
   ...(authStore.isAuthenticated ? [
     {
-      label: 'Add Your Racer',
-      icon: 'pi pi-plus',
-      command: () => navigateTo('/racers/add')
+      label: 'My Racers',
+      icon: 'pi pi-user',
+      command: () => navigateTo('/my-racers')
     }
   ] : []),
+  {
+    label: 'Add Your Racer',
+    icon: 'pi pi-plus',
+    command: () => {
+      if (authStore.isAuthenticated) {
+        navigateTo('/racers/add')
+      } else {
+        navigateTo('/login?redirect=/racers/add')
+      }
+    }
+  },
   // Community Section
   {
     label: 'Photo Gallery',
     icon: 'pi pi-images',
     command: () => navigateTo('/gallery')
   },
+  // FAQ Section
+  {
+    label: 'FAQ',
+    icon: 'pi pi-question-circle',
+    command: () => navigateTo('/faq')
+  },
   ...(authStore.isAuthenticated
     ? [
-        {
-          label: 'My Photos',
-          icon: 'pi pi-images',
-          command: () => navigateTo('/my-photos')
-        },
-        {
-          label: 'My Racers',
-          icon: 'pi pi-user',
-          command: () => navigateTo('/my-racers')
-        },
         ...(authStore.isRaceAdmin
           ? [
               {

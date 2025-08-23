@@ -18,7 +18,7 @@
             the great holyoke brick race
           </h2>
           <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Where performance art meets sport, custom gravity-powered vehicles compete for speed, creativity, and artistry in the first brick race of its kind.
+            Where performance art meets sport in the first brick race of its kind.
           </p>
         </div>
       </div>
@@ -137,7 +137,7 @@
         <div class="space-y-6 mb-12">
           <!-- Countdown Timer -->
           <div
-            class="text-center mb-6 p-8 bg-white dark:bg-gray-800 rounded-2xl border-2 border-brand-gold shadow-lg"
+            class="text-center mb-6 p-8 bg-white dark:bg-gray-800 border-2 border-brand-gold shadow-lg"
           >
             <h3
               class="text-2xl font-bold text-gray-900 dark:text-white mb-6"
@@ -191,23 +191,6 @@
             </div>
           </div>
 
-          <div v-if="(activeRace.checkinCount || 0) > 0" class="flex justify-center mt-8">
-            <Card class="text-center min-w-[250px] shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <template #content>
-                <div class="py-4">
-                  <div class="text-4xl font-black text-gray-900 dark:text-white mb-2">
-                    {{ activeRace.checkinCount || 0 }}
-                  </div>
-                  <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">
-                    Racers Checked In
-                  </div>
-                </div>
-              </template>
-            </Card>
-          </div>
-
-          <div class="text-center">
-          </div>
         </div>
 
         <div class="flex justify-center">
@@ -291,7 +274,7 @@
                     @click="navigateTo('/about')"
                   >
                     <i class="pi pi-book mr-2" />
-                    <span>Discover Our History</span>
+                    <span>Our Story</span>
                   </Button>
                 </div>
               </div>
@@ -333,7 +316,7 @@
                   <Button
                     size="large"
                     class="btn-secondary font-semibold"
-                    @click="navigateTo('/build-racer')"
+                    @click="navigateTo('/faq')"
                   >
                     <i class="pi pi-car mr-2" />
                     Get Started

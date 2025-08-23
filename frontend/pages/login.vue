@@ -116,6 +116,10 @@ import { useAuthStore } from '~/stores/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
+
+// Get redirect parameter from query
+const redirectTo = route.query.redirect || '/'
 
 const form = reactive({
   email: '',
@@ -158,8 +162,8 @@ const handleLogin = async () => {
       password: form.password
     })
 
-    // Redirect to home page after successful login
-    await router.push('/')
+    // Redirect to intended page after successful login
+    await router.push(redirectTo)
   } catch (error) {
     // Keep essential error logging for production debugging
     console.error('Login error:', error)
@@ -202,7 +206,7 @@ const handleSocialLogin = async (provider) => {
 onMounted(() => {
   authStore.initAuth()
   if (authStore.isAuthenticated) {
-    router.push('/')
+    router.push(redirectTo)
   }
 })
 

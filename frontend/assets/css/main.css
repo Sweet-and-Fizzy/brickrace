@@ -22,6 +22,24 @@
     color: #93C5FD; /* blue-300 */
   }
 
+  /* PrimeVue Accordion dark mode CSS variables - use the correct app-dark class */
+  .app-dark,
+  html.app-dark,
+  [data-theme=dark] {
+    --p-accordion-header-background: #1f2937;
+    --p-accordion-header-color: #ffffff;
+    --p-accordion-header-border-color: #4b5563;
+    --p-accordion-header-hover-background: #374151;
+    --p-accordion-header-hover-color: #ffffff;
+    --p-accordion-header-active-background: #1f2937;
+    --p-accordion-header-active-color: #ffffff;
+    --p-accordion-header-active-hover-background: #374151;
+    --p-accordion-header-active-hover-color: #ffffff;
+    --p-accordion-content-background: #1f2937;
+    --p-accordion-content-color: #d1d5db;
+    --p-accordion-content-border-color: #4b5563;
+  }
+
   /* Set Open Sans as the default body font */
   body {
     font-family: 'Open Sans', sans-serif;

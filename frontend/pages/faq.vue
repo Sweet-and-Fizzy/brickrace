@@ -14,27 +14,19 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
-            Build Your Own Racer
+            Frequently Asked Questions
           </h1>
           <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto">
-            Ready to join the creative chaos? Learn everything you need to know about building your
-            brick racer and joining our community of artists, engineers, and dreamers.
+            Everything you need to know about The Great Holyoke Brick Race - from building your
+            racer to race day logistics and awards.
           </p>
         </div>
       </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-16">
       <!-- FAQ Section -->
       <div class="mb-16">
-        <div class="text-center mb-8">
-          <h2
-            class="text-3xl font-bold text-gray-900 dark:text-white text-center"
-          >
-            Frequently Asked Questions
-          </h2>
-        </div>
-
         <Card>
           <template #content>
             <Accordion :value="['0']" multiple>
@@ -43,7 +35,7 @@
               <AccordionHeader>
                 <div class="flex items-center gap-2">
                   <i class="pi pi-users text-brand-blue" />
-                  <span class="font-bold text-black">Who can enter?</span>
+                  <span class="font-bold text-gray-900 dark:text-white">Who can enter?</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
@@ -95,7 +87,7 @@
               <AccordionHeader>
                 <div class="flex items-center gap-2">
                   <i class="pi pi-cog text-brand-blue" />
-                  <span class="font-bold text-black">Racer Specifications</span>
+                  <span class="font-bold text-gray-900 dark:text-white">Racer Specifications</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
@@ -177,7 +169,7 @@
               <AccordionHeader>
                 <div class="flex items-center gap-2">
                   <i class="pi pi-play-circle text-brand-green" />
-                  <span class="font-bold text-black">How Does the Race Work?</span>
+                  <span class="font-bold text-gray-900 dark:text-white">How Does the Race Work?</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
@@ -205,8 +197,8 @@
                           anytime before the race. This step must be completed before you
                           can check in on race day.
                         </p>
-                        <div class="bg-white border-2 border-brand-green rounded-lg p-3">
-                          <p class="text-sm text-gray-900">
+                        <div class="bg-white dark:bg-gray-800 border-2 border-brand-green rounded-lg p-3">
+                          <p class="text-sm text-gray-900 dark:text-white">
                             <i class="pi pi-info-circle mr-1" />
                             <strong>Important:</strong> You cannot participate in the race without
                             first registering your racer on this website.
@@ -300,7 +292,7 @@
               <AccordionHeader>
                 <div class="flex items-center gap-2">
                   <i class="pi pi-trophy text-brand-gold" />
-                  <span class="font-bold text-black">Awards & Recognition</span>
+                  <span class="font-bold text-gray-900 dark:text-white">Awards & Recognition</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
@@ -311,76 +303,76 @@
                   </p>
 
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white border-2 border-brand-gold rounded-lg p-5">
+                    <div class="bg-white dark:bg-gray-800 border-2 border-brand-gold rounded-lg p-5">
                       <div class="flex items-center gap-3 mb-3">
                         <div
                           class="bg-brand-gold rounded-full w-10 h-10 flex items-center justify-center"
                         >
-                          <i class="pi pi-bolt text-black" />
+                          <i class="pi pi-bolt text-gray-900 dark:text-white" />
                         </div>
-                        <h4 class="font-semibold text-gray-900">Fastest Racer</h4>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Fastest Racer</h4>
                       </div>
-                      <p class="text-gray-700 text-sm leading-relaxed">
+                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                         Custom trophies awarded to the fastest racers based on qualifying times and
                         bracket tournament results.
                       </p>
                     </div>
 
-                    <div class="bg-white border-2 border-gray-300 rounded-lg p-5">
+                    <div class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg p-5">
                       <div class="flex items-center gap-3 mb-3">
                         <div
                           class="bg-gray-500 rounded-full w-10 h-10 flex items-center justify-center"
                         >
                           <i class="pi pi-clock text-white" />
                         </div>
-                        <h4 class="font-semibold text-gray-900">Slowest Racer</h4>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Slowest Racer</h4>
                       </div>
-                      <p class="text-gray-700 text-sm leading-relaxed">
+                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                         Celebrating the joy of participation - sometimes the most memorable racers
                         take their time!
                       </p>
                     </div>
 
-                    <div class="bg-white border-2 border-brand-blue rounded-lg p-5">
+                    <div class="bg-white dark:bg-gray-800 border-2 border-brand-blue rounded-lg p-5">
                       <div class="flex items-center gap-3 mb-3">
                         <div
                           class="bg-brand-blue rounded-full w-10 h-10 flex items-center justify-center"
                         >
                           <i class="pi pi-palette text-white" />
                         </div>
-                        <h4 class="font-semibold text-gray-900">Most Creative</h4>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Most Creative</h4>
                       </div>
-                      <p class="text-gray-700 text-sm leading-relaxed">
+                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                         Recognition for the most imaginative and artistic racer designs that
                         showcase exceptional creativity.
                       </p>
                     </div>
 
-                    <div class="bg-white border-2 border-red-500 rounded-lg p-5">
+                    <div class="bg-white dark:bg-gray-800 border-2 border-red-500 rounded-lg p-5">
                       <div class="flex items-center gap-3 mb-3">
                         <div
                           class="bg-red-500 rounded-full w-10 h-10 flex items-center justify-center"
                         >
                           <i class="pi pi-exclamation-triangle text-white" />
                         </div>
-                        <h4 class="font-semibold text-gray-900">Best Crash</h4>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Best Crash</h4>
                       </div>
-                      <p class="text-gray-700 text-sm leading-relaxed">
+                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                         Sometimes awarded for the most spectacular or memorable crash during the
                         competition.
                       </p>
                     </div>
 
-                    <div class="bg-white border-2 border-brand-green rounded-lg p-5">
+                    <div class="bg-white dark:bg-gray-800 border-2 border-brand-green rounded-lg p-5">
                       <div class="flex items-center gap-3 mb-3">
                         <div
                           class="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center"
                         >
                           <i class="pi pi-star text-white" />
                         </div>
-                        <h4 class="font-semibold text-gray-900">Special Categories</h4>
+                        <h4 class="font-semibold text-gray-900 dark:text-white">Special Categories</h4>
                       </div>
-                      <p class="text-gray-700 text-sm leading-relaxed">
+                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                         Additional awards may be given based on the year's entries and the judges'
                         discretion.
                       </p>
@@ -405,7 +397,7 @@
               <AccordionHeader>
                 <div class="flex items-center gap-2">
                   <i class="pi pi-user-minus text-red-500" />
-                  <span class="font-bold text-black">What if I need to withdraw?</span>
+                  <span class="font-bold text-gray-900 dark:text-white">What if I need to withdraw?</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
@@ -457,13 +449,13 @@
               <AccordionHeader>
                 <div class="flex items-center gap-2">
                   <i class="pi pi-map-marker text-brand-blue" />
-                  <span class="font-bold text-black">Location & Venue</span>
+                  <span class="font-bold text-gray-900 dark:text-white">Location & Venue</span>
                 </div>
               </AccordionHeader>
               <AccordionContent>
                 <div class="space-y-6 text-gray-700 dark:text-gray-300">
                   <!-- Main Venue Info -->
-                  <div class="bg-white border-2 border-brand-blue rounded-lg p-6">
+                  <div class="bg-white dark:bg-gray-800 border-2 border-brand-blue rounded-lg p-6">
                     <div class="flex items-start gap-4">
                       <div
                         class="bg-brand-blue rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0"
@@ -471,12 +463,12 @@
                         <i class="pi pi-building text-white text-xl" />
                       </div>
                       <div>
-                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Paper City Studios</h4>
-                        <p class="text-gray-700 mb-1">
+                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Paper City Studios</h4>
+                        <p class="text-gray-700 dark:text-gray-300 mb-1">
                           <strong>80 Race Street</strong>
                         </p>
-                        <p class="text-gray-700 mb-3">Holyoke, Massachusetts</p>
-                        <p class="text-sm text-gray-600 mb-4">
+                        <p class="text-gray-700 dark:text-gray-300 mb-3">Holyoke, Massachusetts</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
                           The race takes place on the custom concrete track at this historic venue
                           on Race Street - a fitting location for our gravity-powered brick racing
                           competition!
@@ -613,13 +605,16 @@
 
 <script setup>
 useHead({
-  title: 'Build Your Own Racer - The Great Holyoke Brick Race',
+  title: 'Frequently Asked Questions - The Great Holyoke Brick Race',
   meta: [
     {
       name: 'description',
       content:
-        'Learn how to build your own brick racer and join The Great Holyoke Brick Race. Open to all ages and backgrounds worldwide.'
+        'Get answers to frequently asked questions about The Great Holyoke Brick Race - racer specifications, race day process, awards, and more.'
     }
   ]
 })
 </script>
+
+
+
