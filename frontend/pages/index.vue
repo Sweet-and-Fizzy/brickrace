@@ -95,8 +95,7 @@
                   >
                     About This Race
                   </h2>
-                  <div v-if="activeRace.description" class="text-gray-700 dark:text-gray-300 leading-relaxed prose prose-gray dark:prose-invert max-w-none text-left" v-html="activeRace.description">
-                  </div>
+                  <div v-if="activeRace.description" class="text-gray-700 dark:text-gray-300 leading-relaxed prose prose-gray dark:prose-invert max-w-none text-left" v-html="activeRace.description" />
                   <p v-else class="text-gray-600 dark:text-gray-400 italic">
                     Race description coming soon...
                   </p>
@@ -125,7 +124,7 @@
                       loading="lazy"
                       referrerpolicy="no-referrer-when-downgrade"
                       class="w-full h-[300px]"
-                    ></iframe>
+                    />
                   </div>
                 </div>
               </div>
@@ -454,7 +453,7 @@
     </div>
 
     <!-- Section Divider -->
-    <div class="border-t border-gray-200 dark:border-gray-700"></div>
+    <div class="border-t border-gray-200 dark:border-gray-700" />
 
     <!-- Social Media Section -->
     <div class="py-16 bg-white dark:bg-gray-900">
@@ -595,11 +594,6 @@ const featuredGalleryImages = computed(() => {
     }))
 })
 
-const galleryResponsiveOptions = ref([
-  { breakpoint: '1024px', numVisible: 5 },
-  { breakpoint: '768px', numVisible: 3 },
-  { breakpoint: '560px', numVisible: 1 }
-])
 
 const openFeaturedGallery = (index) => {
   activeFeaturedIndex.value = index
