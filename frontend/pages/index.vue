@@ -252,16 +252,10 @@
                   <h2
                     class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
                   >
-                    Discover Our History
+                    What is a Brick Race?
                   </h2>
                   <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                    Learn about the unique story behind The Great Holyoke Brick Race - from its
-                    conception by local artists in 2010 to becoming the first brick race of its kind
-                    in the country.
-                  </p>
-                  <p class="text-gray-600 dark:text-gray-400 mb-6">
-                    Explore 14 years of creative racing history, memorable designs, and the
-                    community spirit that makes this event special.
+                    As the name implies, a "Brick Race" involves designing and building a brick racecar that is cleverly mounted on wheels and raced down an inclined track using only gravity to cross the finish line. Our Brick Race will emphasize creativity and the sculptural quality of the racecars as well as making the fastest machine to cross the finish line first.
                   </p>
                 </div>
 
