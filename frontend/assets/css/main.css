@@ -187,6 +187,18 @@
     color: #f9fafb !important;
     border: none !important;
   }
+
+  /* Remove border from navigation MenuBar */
+  .p-menubar {
+    border: none !important;
+    background: transparent !important;
+  }
+
+  /* Dark mode MenuBar background */
+  .app-dark .p-menubar {
+    background: transparent !important;
+    border: none !important;
+  }
   /* Skew button wrapper for parallelogram effect */
   .skew-button {
     transform: skewX(-8deg);
