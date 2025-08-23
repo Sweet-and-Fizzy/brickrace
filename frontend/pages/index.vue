@@ -594,12 +594,52 @@ const openFeaturedGallery = (index) => {
 }
 
 useHead({
-  title: 'The Great Holyoke Brick Race - Competing for speed, creativity, and artistry',
+  title: 'Home',
   meta: [
     {
       name: 'description',
       content:
-        'The first brick race of its kind in the country. 14 years of creative racing history, memorable designs, and community spirit. Open to all ages worldwide - artists, engineers, tinkerers, and dreamers welcome!'
+        'The first brick race of its kind in the country. Design and build gravity-powered brick racers to compete for speed, creativity, and artistry. Join our 14-year tradition of creative racing in Holyoke, MA!'
+    },
+    {
+      property: 'og:title',
+      content: 'The Great Holyoke Brick Race - Where Performance Art Meets Sport'
+    },
+    {
+      property: 'og:description',
+      content: 'Design and build gravity-powered brick racers. Compete for speed, creativity, and artistry in this unique community event. Open to all ages and backgrounds!'
+    },
+    {
+      property: 'og:type',
+      content: 'website'
+    }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Event',
+        name: 'The Great Holyoke Brick Race',
+        description: 'Annual gravity-powered brick racing competition emphasizing creativity and engineering',
+        location: {
+          '@type': 'Place',
+          name: 'Paper City Studios',
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: '80 Race Street',
+            addressLocality: 'Holyoke',
+            addressRegion: 'MA',
+            postalCode: '01040',
+            addressCountry: 'US'
+          }
+        },
+        organizer: {
+          '@type': 'Organization',
+          name: 'The Great Holyoke Brick Race',
+          url: 'https://thegreatholyokebrickrace.com'
+        }
+      })
     }
   ]
 })
