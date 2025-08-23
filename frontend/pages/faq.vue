@@ -306,12 +306,12 @@
                   <div v-if="awardsLoading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div v-for="i in 4" :key="i" class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-lg p-5 animate-pulse">
                       <div class="flex items-center gap-3 mb-3">
-                        <div class="bg-gray-300 dark:bg-gray-600 rounded-full w-10 h-10"></div>
-                        <div class="h-5 bg-gray-300 dark:bg-gray-600 rounded w-24"></div>
+                        <div class="bg-gray-300 dark:bg-gray-600 rounded-full w-10 h-10"/>
+                        <div class="h-5 bg-gray-300 dark:bg-gray-600 rounded w-24"/>
                       </div>
                       <div class="space-y-2">
-                        <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
-                        <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                        <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full"/>
+                        <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"/>
                       </div>
                     </div>
                   </div>
@@ -334,7 +334,7 @@
                             :alt="award.name"
                             class="w-16 h-16 object-cover rounded-lg border-2"
                             :class="getBorderColor(award.icon)"
-                          />
+                          >
                           <div
                             v-else
                             class="rounded-full w-12 h-12 flex items-center justify-center bg-yellow-500"
@@ -612,7 +612,7 @@
 // Fetch awards data
 const { awardDefinitions: awards, loading: awardsLoading, initialize } = useAwards()
 
-// Helper functions for dynamic styling based on award icons
+// Helper function for dynamic border styling based on award icons
 const getBorderColor = (icon) => {
   const colorMap = {
     'pi-bolt': 'border-yellow-400',
@@ -625,24 +625,6 @@ const getBorderColor = (icon) => {
     'pi-thumbs-up': 'border-blue-500'
   }
   return colorMap[icon] || 'border-gray-300 dark:border-gray-600'
-}
-
-const getIconBgColor = (icon) => {
-  const colorMap = {
-    'pi-bolt': 'bg-yellow-500',
-    'pi-clock': 'bg-gray-500',
-    'pi-palette': 'bg-purple-500',
-    'pi-exclamation-triangle': 'bg-red-500',
-    'pi-star': 'bg-green-500',
-    'pi-trophy': 'bg-yellow-500',
-    'pi-heart': 'bg-pink-500',
-    'pi-thumbs-up': 'bg-blue-500'
-  }
-  return colorMap[icon] || 'bg-gray-500'
-}
-
-const getIconTextColor = (icon) => {
-  return 'text-white'
 }
 
 // Fetch awards on mount

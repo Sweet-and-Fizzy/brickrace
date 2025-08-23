@@ -174,23 +174,9 @@
 </template>
 
 <script setup>
-import { useAuthStore } from '~/stores/auth'
-
-// Get auth state for conditional rendering
-const authStore = useAuthStore()
-
 // Get races data for active race
 const { activeRace } = useRaces()
 
-const isAuthenticated = computed(() => authStore.isAuthenticated)
-const isRaceAdmin = computed(() => authStore.isRaceAdmin)
-
-// Handle logout
-const handleLogout = async () => {
-  try {
-    await authStore.logout()
-  } catch (error) {
-    console.error('Logout error:', error)
-  }
-}
+// Footer doesn't need these since Account section was removed
+// Authentication is handled in the main navigation
 </script>

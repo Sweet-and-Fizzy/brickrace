@@ -201,10 +201,10 @@
                     <span>{{ definition.active ? 'Deactivate' : 'Activate' }}</span>
                   </Button>
                   <Button
+                    v-tooltip.top="'Delete award type'"
                     size="small"
                     class="btn-secondary"
                     @click="confirmDeleteDefinition(definition)"
-                    v-tooltip.top="'Delete award type'"
                   >
                     <i class="pi pi-trash" />
                   </Button>
