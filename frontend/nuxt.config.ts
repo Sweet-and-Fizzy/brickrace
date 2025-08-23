@@ -17,6 +17,41 @@ export default defineNuxtConfig({
     global: true
   },
 
+  // Router configuration for scroll behavior
+  router: {
+    options: {
+      scrollBehaviorType: 'smooth'
+    }
+  },
+
+  // App configuration
+  app: {
+    // Enable scroll position restoration
+    keepalive: true,
+    // Custom scroll behavior
+    router: {
+      options: {
+        scrollBehavior(to, from, savedPosition) {
+          // If there's a saved position (back/forward navigation), restore it
+          if (savedPosition) {
+            return savedPosition
+          }
+          
+          // If navigating to a hash (anchor), scroll to it
+          if (to.hash) {
+            return {
+              el: to.hash,
+              behavior: 'smooth'
+            }
+          }
+          
+          // Otherwise scroll to top
+          return { top: 0, behavior: 'smooth' }
+        }
+      }
+    }
+  },
+
   // Netlify deployment configuration
   nitro: {
     preset: 'netlify'
