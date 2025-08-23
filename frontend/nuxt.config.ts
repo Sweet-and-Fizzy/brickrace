@@ -47,7 +47,7 @@ export default defineNuxtConfig({
         { property: 'og:url', content: 'https://thegreatholyokebrickrace.com/' },
         { property: 'og:title', content: 'The Great Holyoke Brick Race' },
         { property: 'og:description', content: 'Where performance art meets sport. Join our creative community of builders racing gravity-powered brick vehicles down an inclined track!' },
-        { property: 'og:image', content: 'https://thegreatholyokebrickrace.com/og-image.jpg' },
+        { property: 'og:image', content: '/og-image.jpg' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
         { property: 'og:locale', content: 'en_US' },
@@ -58,7 +58,7 @@ export default defineNuxtConfig({
         { name: 'twitter:url', content: 'https://thegreatholyokebrickrace.com/' },
         { name: 'twitter:title', content: 'The Great Holyoke Brick Race' },
         { name: 'twitter:description', content: 'Where performance art meets sport. Join our creative community of builders racing gravity-powered brick vehicles!' },
-        { name: 'twitter:image', content: 'https://thegreatholyokebrickrace.com/og-image.jpg' },
+        { name: 'twitter:image', content: '/og-image.jpg' },
         
         // Additional SEO
         { name: 'robots', content: 'index, follow' },
