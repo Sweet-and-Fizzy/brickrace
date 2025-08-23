@@ -58,11 +58,11 @@
               <span>Browse Racers</span>
             </NuxtLink>
             <NuxtLink
-              to="/build-racer"
+              to="/faq"
               class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
-              <i class="pi pi-wrench text-gray-300" />
-              <span>Build a Racer</span>
+              <i class="pi pi-question-circle text-gray-300" />
+              <span>FAQ</span>
             </NuxtLink>
             <NuxtLink
               to="/gallery"
