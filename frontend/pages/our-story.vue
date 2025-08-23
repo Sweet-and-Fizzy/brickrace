@@ -200,7 +200,7 @@ const raceHistory = [
 ]
 
 useHead({
-  title: 'About - The Great Holyoke Brick Race',
+  title: 'Our Story - The Great Holyoke Brick Race',
   meta: [
     {
       name: 'description',

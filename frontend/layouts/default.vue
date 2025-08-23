@@ -122,7 +122,7 @@
                   icon="pi pi-clock"
                   severity="secondary"
                   text
-                  @click="navigateTo('/about')"
+                  @click="navigateTo('/our-story')"
                 />
                 <!-- Racers Section -->
                 <Button
@@ -376,7 +376,7 @@ const menuItems = computed(() => [
       {
         label: 'Race History',
         icon: 'pi pi-clock',
-        command: () => navigateTo('/about')
+        command: () => navigateTo('/our-story')
       }
     ]
   },
@@ -500,7 +500,7 @@ const sidebarMenuItems = computed(() => [
   {
     label: 'Race History',
     icon: 'pi pi-clock',
-    command: () => navigateTo('/about')
+    command: () => navigateTo('/our-story')
   },
   // Racers Section
   {

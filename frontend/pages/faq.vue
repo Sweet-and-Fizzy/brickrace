@@ -616,5 +616,7 @@ useHead({
 })
 </script>
 
-
+<style scoped>
+/* Styles moved to main.css */
+</style>
 

@@ -222,7 +222,7 @@
               <i class="pi pi-car mr-2" />
               <span>Browse Vehicles</span>
             </Button>
-            <Button size="large" class="btn-secondary" @click="navigateTo('/about')">
+            <Button size="large" class="btn-secondary" @click="navigateTo('/our-story')">
               <i class="pi pi-info-circle mr-2" />
               Learn More
             </Button>
@@ -270,7 +270,7 @@
                   <Button
                     size="large"
                     class="btn-secondary font-semibold"
-                    @click="navigateTo('/about')"
+                    @click="navigateTo('/our-story')"
                   >
                     <i class="pi pi-book mr-2" />
                     <span>Our Story</span>

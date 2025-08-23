@@ -30,7 +30,7 @@
               <span>Current Races</span>
             </NuxtLink>
             <NuxtLink
-              to="/about"
+              to="/our-story"
               class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
               <i class="pi pi-clock text-gray-300" />
