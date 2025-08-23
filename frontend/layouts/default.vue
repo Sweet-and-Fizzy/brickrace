@@ -1,7 +1,15 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     <!-- Mobile Drawer -->
-    <Drawer v-model:visible="sidebarVisible" class="w-80" position="right">
+    <Drawer 
+      v-model:visible="sidebarVisible" 
+      position="right"
+      :pt="{
+        root: {
+          style: 'width: 24rem'
+        }
+      }"
+    >
       <template #header>
         <div class="flex items-center">
           <span class="font-bold text-lg">the great holyoke brick race</span>
@@ -124,6 +132,27 @@
                   text
                   @click="navigateTo('/racers')"
                 />
+                <Button
+                  v-if="authStore.isAuthenticated"
+                  v-tooltip.bottom="'My Racers'"
+                  icon="pi pi-user"
+                  severity="secondary"
+                  text
+                  @click="navigateTo('/my-racers')"
+                />
+                <Button
+                  v-tooltip.bottom="'Add Your Racer'"
+                  icon="pi pi-plus"
+                  severity="secondary"
+                  text
+                  @click="() => {
+                    if (authStore.isAuthenticated) {
+                      navigateTo('/racers/add')
+                    } else {
+                      navigateTo('/login?redirect=/racers/add')
+                    }
+                  }"
+                />
                 <!-- Community Section -->
                 <Button
                   v-tooltip.bottom="'Photo Gallery'"
@@ -131,6 +160,14 @@
                   severity="secondary"
                   text
                   @click="navigateTo('/gallery')"
+                />
+                <Button
+                  v-if="authStore.isAuthenticated"
+                  v-tooltip.bottom="'My Photos'"
+                  icon="pi pi-images"
+                  severity="secondary"
+                  text
+                  @click="navigateTo('/my-photos')"
                 />
                 <!-- FAQ Section -->
                 <Button
@@ -170,11 +207,11 @@
                 </template>
                 <template v-else>
                   <Button
-                    v-tooltip.bottom="'My Account'"
-                    icon="pi pi-user"
+                    v-tooltip.bottom="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+                    :icon="isDark ? 'pi pi-sun' : 'pi pi-moon'"
                     severity="secondary"
                     text
-                    @click="navigateTo('/my-racers')"
+                    @click="toggleDarkMode"
                   />
                 </template>
               </div>
