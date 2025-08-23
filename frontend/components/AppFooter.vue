@@ -20,27 +20,27 @@
       >
         <!-- Racing & Events -->
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-brand-gold">Racing & Events</h3>
+          <h3 class="text-lg font-semibold text-white">Racing & Events</h3>
           <nav class="space-y-2">
             <NuxtLink
               to="/races"
-              class="block text-gray-300 hover:text-brand-gold transition-colors flex items-center gap-2"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
-              <i class="pi pi-flag text-brand-gold" />
+              <i class="pi pi-flag text-gray-300" />
               <span>Current Races</span>
             </NuxtLink>
             <NuxtLink
               to="/about"
-              class="block text-gray-300 hover:text-brand-gold transition-colors flex items-center gap-2"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
-              <i class="pi pi-clock text-brand-gold" />
+              <i class="pi pi-clock text-gray-300" />
               <span>Race History</span>
             </NuxtLink>
             <NuxtLink
               to="/awards"
-              class="block text-gray-300 hover:text-brand-gold transition-colors flex items-center gap-2"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
-              <i class="pi pi-trophy text-brand-gold" />
+              <i class="pi pi-trophy text-gray-300" />
               <span>Awards & Winners</span>
             </NuxtLink>
           </nav>
@@ -48,27 +48,27 @@
 
         <!-- Racers & Building -->
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-brand-blue">Racers & Building</h3>
+          <h3 class="text-lg font-semibold text-white">Racers & Building</h3>
           <nav class="space-y-2">
             <NuxtLink
               to="/racers"
-              class="block text-gray-300 hover:text-brand-blue transition-colors flex items-center gap-2"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
-              <i class="pi pi-car text-brand-blue" />
+              <i class="pi pi-car text-gray-300" />
               <span>Browse Racers</span>
             </NuxtLink>
             <NuxtLink
               to="/build-racer"
-              class="block text-gray-300 hover:text-brand-blue transition-colors flex items-center gap-2"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
-              <i class="pi pi-wrench text-brand-blue" />
+              <i class="pi pi-wrench text-gray-300" />
               <span>Build a Racer</span>
             </NuxtLink>
             <NuxtLink
               to="/gallery"
-              class="block text-gray-300 hover:text-brand-blue transition-colors flex items-center gap-2"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
-              <i class="pi pi-images text-brand-blue" />
+              <i class="pi pi-images text-gray-300" />
               <span>Photo Gallery</span>
             </NuxtLink>
           </nav>
@@ -76,29 +76,29 @@
 
         <!-- Account & Community -->
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-brand-green">Account & Community</h3>
+          <h3 class="text-lg font-semibold text-white">Account & Community</h3>
           <nav class="space-y-2">
             <template v-if="isAuthenticated">
               <NuxtLink
                 to="/my-racers"
-                class="block text-gray-300 hover:text-brand-green transition-colors flex items-center gap-2"
+                class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
               >
-                <i class="pi pi-user text-brand-green" />
+                <i class="pi pi-user text-gray-300" />
                 <span>My Racers</span>
               </NuxtLink>
               <NuxtLink
                 to="/my-photos"
-                class="block text-gray-300 hover:text-brand-green transition-colors flex items-center gap-2"
+                class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
               >
-                <i class="pi pi-images text-brand-green" />
+                <i class="pi pi-images text-gray-300" />
                 <span>My Photos</span>
               </NuxtLink>
               <template v-if="isRaceAdmin">
                 <NuxtLink
                   to="/admin"
-                  class="block text-gray-300 hover:text-brand-green transition-colors flex items-center gap-2"
+                  class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
                 >
-                  <i class="pi pi-shield text-brand-green" />
+                  <i class="pi pi-shield text-gray-300" />
                   <span>Admin Dashboard</span>
                 </NuxtLink>
               </template>
@@ -106,16 +106,16 @@
             <template v-else>
               <NuxtLink
                 to="/login"
-                class="block text-gray-300 hover:text-brand-green transition-colors flex items-center gap-2"
+                class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
               >
-                <i class="pi pi-sign-in text-brand-green" />
+                <i class="pi pi-sign-in text-gray-300" />
                 <span>Login</span>
               </NuxtLink>
               <NuxtLink
                 to="/register"
-                class="block text-gray-300 hover:text-brand-green transition-colors flex items-center gap-2"
+                class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
               >
-                <i class="pi pi-user-plus text-brand-green" />
+                <i class="pi pi-user-plus text-gray-300" />
                 <span>Register</span>
               </NuxtLink>
             </template>
@@ -124,14 +124,14 @@
 
         <!-- Connect & Contact -->
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-brand-blue">Connect & Contact</h3>
+          <h3 class="text-lg font-semibold text-white">Connect & Contact</h3>
           <div class="space-y-2">
             <!-- Email -->
             <a
               href="mailto:thegreatholyokebrickrace@gmail.com"
-              class="flex items-center gap-2 text-gray-300 hover:text-brand-blue transition-colors"
+              class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
             >
-              <i class="pi pi-envelope text-brand-blue" />
+              <i class="pi pi-envelope text-gray-300" />
               <span>Email Us</span>
             </a>
 
@@ -140,9 +140,9 @@
               href="https://www.facebook.com/HolyokeBrickRace"
               target="_blank"
               rel="noopener noreferrer"
-              class="flex items-center gap-2 text-gray-300 hover:text-brand-blue transition-colors"
+              class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
             >
-              <i class="pi pi-facebook text-brand-blue" />
+              <i class="pi pi-facebook text-gray-300" />
               <span>Facebook</span>
             </a>
 
@@ -151,9 +151,9 @@
               href="https://www.instagram.com/thegreatholyokebrickrace"
               target="_blank"
               rel="noopener noreferrer"
-              class="flex items-center gap-2 text-gray-300 hover:text-brand-blue transition-colors"
+              class="flex items-center gap-2 text-gray-300 hover:text-white transition-colors"
             >
-              <i class="pi pi-instagram text-blue-400" />
+              <i class="pi pi-instagram text-gray-300" />
               <span>Instagram</span>
             </a>
           </div>

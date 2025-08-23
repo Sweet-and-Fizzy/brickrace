@@ -1,5 +1,29 @@
 <template>
   <div class="min-h-screen bg-white dark:bg-gray-900">
+    <!-- Header Section -->
+    <div class="py-16 bg-white dark:bg-gray-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Logo and Title -->
+        <div class="text-center mb-12">
+          <div class="flex justify-center mb-6">
+            <img
+              src="~/assets/img/brick_race_logo.jpg"
+              alt="The Great Holyoke Brick Race Logo"
+              class="h-32 md:h-40 w-auto object-contain rounded-lg"
+            >
+          </div>
+          <h2
+            class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
+          >
+            the great holyoke brick race
+          </h2>
+          <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Where performance art meets sport, custom gravity-powered vehicles compete for speed, creativity, and artistry in the first brick race of its kind.
+          </p>
+        </div>
+      </div>
+    </div>
+
     <!-- Featured Race (Hero Section) -->
     <div v-if="activeRace && !pending" class="bg-white dark:bg-gray-900">
       <!-- Race Image at Very Top -->
@@ -22,7 +46,7 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center mb-12">
           <h1
-            class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-6 tracking-wide"
+            class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 tracking-wide"
           >
             {{ activeRace.name }}
           </h1>
@@ -59,6 +83,56 @@
           </div>
         </div>
 
+        <!-- Race Description and Map Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <!-- Race Description -->
+          <Card class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full">
+            <template #content>
+              <div class="text-center space-y-6 h-full flex flex-col">
+                <div class="flex-1">
+                  <h2
+                    class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
+                  >
+                    About This Race
+                  </h2>
+                  <div v-if="activeRace.description" class="text-gray-700 dark:text-gray-300 leading-relaxed prose prose-gray dark:prose-invert max-w-none text-left" v-html="activeRace.description">
+                  </div>
+                  <p v-else class="text-gray-600 dark:text-gray-400 italic">
+                    Race description coming soon...
+                  </p>
+                </div>
+              </div>
+            </template>
+          </Card>
+
+          <!-- Google Maps -->
+          <Card class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full">
+            <template #content>
+              <div class="text-center space-y-6 h-full flex flex-col">
+                <div class="flex-1">
+                  <h2
+                    class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
+                  >
+                    Location
+                  </h2>
+                  <div class="bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg">
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2938.8234567890123!2d-72.6098765!3d42.2087654!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89e6e74f8a8b8c8d%3A0x1234567890abcdef!2s80%20Race%20St%2C%20Holyoke%2C%20MA%2001040!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus&q=80+Race+St,+Holyoke,+MA"
+                      width="100%"
+                      height="300"
+                      style="border:0;"
+                      allowfullscreen=""
+                      loading="lazy"
+                      referrerpolicy="no-referrer-when-downgrade"
+                      class="w-full h-[300px]"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </Card>
+        </div>
+
         <!-- Race Info and Stats -->
         <div class="space-y-6 mb-12">
           <!-- Countdown Timer -->
@@ -66,7 +140,7 @@
             class="text-center mb-6 p-8 bg-white dark:bg-gray-800 rounded-2xl border-2 border-brand-gold shadow-lg"
           >
             <h3
-              class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-6 animate-pulse"
+              class="text-2xl font-bold text-gray-900 dark:text-white mb-6"
             >
               ⚡ RACE COUNTDOWN ⚡
             </h3>
@@ -133,9 +207,6 @@
           </div>
 
           <div class="text-center">
-            <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
-              Custom gravity-powered vehicles competing for speed, creativity, and artistry
-            </p>
           </div>
         </div>
 
@@ -158,7 +229,7 @@
         <div class="text-center">
           <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-wide">🏁 The Great Holyoke Brick Race</h1>
           <p class="text-xl md:text-2xl mb-8 text-gray-600 dark:text-gray-400">
-            Custom gravity-powered vehicles competing for speed, creativity, and artistry
+            Join our community of creative builders and racers!
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button size="large" class="btn-primary" @click="navigateTo('/races')">
@@ -178,28 +249,9 @@
       </div>
     </div>
 
-    <!-- Call to Action Section -->
-    <div class="py-16 bg-white dark:bg-gray-900">
+    <!-- Call to Action Cards -->
+    <div v-if="!pending" class="py-16 bg-white dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Logo and Title -->
-        <div class="text-center mb-12">
-          <div class="flex justify-center mb-6">
-            <img
-              src="~/assets/img/brick_race_logo.jpg"
-              alt="The Great Holyoke Brick Race Logo"
-              class="h-32 md:h-40 w-auto object-contain rounded-lg"
-            >
-          </div>
-          <h2
-            class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4 tracking-wide"
-          >
-            The Great Holyoke Brick Race
-          </h2>
-          <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Where performance art meets sport in the first brick race of its kind
-          </p>
-        </div>
-
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Learn About Our History -->
           <Card class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full">
@@ -217,7 +269,7 @@
 
                 <div class="flex-1">
                   <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4 tracking-wide"
+                    class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
                   >
                     Discover Our History
                   </h2>
@@ -262,7 +314,7 @@
 
                 <div class="flex-1">
                   <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-gray-900 dark:text-white mb-4 tracking-wide"
+                    class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
                   >
                     Build Your Own Racer
                   </h2>
@@ -369,7 +421,7 @@
     <div v-if="!pending && pastRaces.length > 0" class="py-16 bg-white dark:bg-gray-900">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2
-          class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-gray-900 dark:text-white tracking-wide"
+          class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white tracking-wide"
         >
           Past Races
         </h2>
@@ -418,10 +470,13 @@
       </div>
     </div>
 
+    <!-- Section Divider -->
+    <div class="border-t border-gray-200 dark:border-gray-700"></div>
+
     <!-- Social Media Section -->
     <div class="py-16 bg-white dark:bg-gray-900">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6 tracking-wide">Stay Connected</h2>
+        <h2 class="text-3xl md:text-4xl font-bold mb-6 tracking-wide text-gray-900 dark:text-white">Stay Connected</h2>
         <p class="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
           Follow along for race updates, behind-the-scenes content, and inspiration from our amazing
           community of builders and racers!
@@ -433,10 +488,10 @@
             href="https://www.facebook.com/HolyokeBrickRace"
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 px-6 py-3 rounded-lg"
+            class="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white hover:text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-8 py-4 rounded-lg cursor-pointer border-2 border-transparent hover:border-blue-300"
           >
             <i class="pi pi-facebook text-2xl" />
-            <span class="font-semibold">Facebook</span>
+            <span class="font-semibold text-lg">Facebook</span>
           </a>
 
           <!-- Instagram -->
@@ -444,19 +499,19 @@
             href="https://www.instagram.com/thegreatholyokebrickrace"
             target="_blank"
             rel="noopener noreferrer"
-            class="flex items-center gap-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 px-6 py-3 rounded-lg"
+            class="flex items-center gap-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white hover:text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-8 py-4 rounded-lg cursor-pointer border-2 border-transparent hover:border-pink-300"
           >
             <i class="pi pi-instagram text-2xl" />
-            <span class="font-semibold">Instagram</span>
+            <span class="font-semibold text-lg">Instagram</span>
           </a>
 
           <!-- Email -->
           <a
             href="mailto:thegreatholyokebrickrace@gmail.com"
-            class="flex items-center gap-3 bg-white bg-opacity-20 hover:bg-opacity-30 transition-all duration-300 px-6 py-3 rounded-lg"
+            class="flex items-center gap-3 bg-gray-600 hover:bg-gray-700 text-white hover:text-white shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 px-8 py-4 rounded-lg cursor-pointer border-2 border-transparent hover:border-gray-300"
           >
             <i class="pi pi-envelope text-2xl" />
-            <span class="font-semibold">Email</span>
+            <span class="font-semibold text-lg">Email</span>
           </a>
         </div>
       </div>

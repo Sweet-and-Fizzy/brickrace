@@ -94,48 +94,50 @@
 
               <!-- Navigation Icons -->
               <div class="flex items-center space-x-1">
-                <!-- Main nav icons -->
+                <!-- Racing Section -->
                 <Button
-                  v-tooltip.bottom="'About'"
-                  icon="pi pi-info-circle"
+                  v-tooltip.bottom="'View Races'"
+                  icon="pi pi-flag"
                   severity="secondary"
                   text
-                  @click="navigateTo('/about')"
+                  @click="navigateTo('/races')"
                 />
                 <Button
-                  v-tooltip.bottom="'Build a Racer'"
-                  icon="pi pi-wrench"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/build-racer')"
-                />
-                <Button
-                  v-tooltip.bottom="'Gallery'"
-                  icon="pi pi-images"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/gallery')"
-                />
-                <Button
-                  v-tooltip.bottom="'Awards'"
+                  v-tooltip.bottom="'Race Awards'"
                   icon="pi pi-trophy"
                   severity="secondary"
                   text
                   @click="navigateTo('/awards')"
                 />
                 <Button
-                  v-tooltip.bottom="'Racers'"
+                  v-tooltip.bottom="'Race History'"
+                  icon="pi pi-clock"
+                  severity="secondary"
+                  text
+                  @click="navigateTo('/about')"
+                />
+                <!-- Racers & Vehicles Section -->
+                <Button
+                  v-tooltip.bottom="'Browse Racers'"
                   icon="pi pi-car"
                   severity="secondary"
                   text
                   @click="navigateTo('/racers')"
                 />
                 <Button
-                  v-tooltip.bottom="'Races'"
-                  icon="pi pi-flag"
+                  v-tooltip.bottom="'Frequently Asked Questions'"
+                  icon="pi pi-question-circle"
                   severity="secondary"
                   text
-                  @click="navigateTo('/races')"
+                  @click="navigateTo('/build-racer')"
+                />
+                <!-- Community Section -->
+                <Button
+                  v-tooltip.bottom="'Photo Gallery'"
+                  icon="pi pi-images"
+                  severity="secondary"
+                  text
+                  @click="navigateTo('/gallery')"
                 />
 
                 <!-- Dark Mode Toggle -->
@@ -318,18 +320,18 @@ const sidebarVisible = ref(false)
 // Menu items for desktop (full text)
 const menuItems = computed(() => [
   {
-    label: 'About',
-    icon: 'pi pi-info-circle',
+    label: 'Races',
+    icon: 'pi pi-flag',
     items: [
       {
-        label: 'Build a Racer',
-        icon: 'pi pi-wrench',
-        command: () => navigateTo('/build-racer')
+        label: 'View Races',
+        icon: 'pi pi-flag',
+        command: () => navigateTo('/races')
       },
       {
-        label: 'Gallery',
-        icon: 'pi pi-images',
-        command: () => navigateTo('/gallery')
+        label: 'Race Awards',
+        icon: 'pi pi-trophy',
+        command: () => navigateTo('/awards')
       },
       {
         label: 'Race History',
@@ -339,19 +341,45 @@ const menuItems = computed(() => [
     ]
   },
   {
-    label: 'Awards',
-    icon: 'pi pi-trophy',
-    command: () => navigateTo('/awards')
-  },
-  {
     label: 'Racers',
     icon: 'pi pi-car',
-    command: () => navigateTo('/racers')
+    items: [
+      {
+        label: 'Browse Racers',
+        icon: 'pi pi-car',
+        command: () => navigateTo('/racers')
+      },
+      {
+        label: 'Frequently Asked Questions',
+        icon: 'pi pi-question-circle',
+        command: () => navigateTo('/build-racer')
+      },
+      ...(authStore.isAuthenticated ? [
+        {
+          label: 'Add Your Racer',
+          icon: 'pi pi-plus',
+          command: () => navigateTo('/racers/add')
+        }
+      ] : [])
+    ]
   },
   {
-    label: 'Races',
-    icon: 'pi pi-flag',
-    command: () => navigateTo('/races')
+    label: 'Community',
+    icon: 'pi pi-users',
+    items: [
+      {
+        label: 'Photo Gallery',
+        icon: 'pi pi-images',
+        command: () => navigateTo('/gallery')
+      },
+      ...(authStore.isAuthenticated ? [
+        {
+          label: 'My Photos',
+          icon: 'pi pi-images',
+          command: () => navigateTo('/my-photos')
+        }
+      ] : [])
+    ]
   }
 ])
 
@@ -414,47 +442,57 @@ const sidebarMenuItems = computed(() => [
     icon: 'pi pi-home',
     command: () => navigateTo('/')
   },
+  // Racing Section
+  {
+    label: 'View Races',
+    icon: 'pi pi-flag',
+    command: () => navigateTo('/races')
+  },
+  {
+    label: 'Race Awards',
+    icon: 'pi pi-trophy',
+    command: () => navigateTo('/awards')
+  },
   {
     label: 'Race History',
     icon: 'pi pi-clock',
     command: () => navigateTo('/about')
   },
+  // Racers & Vehicles Section
   {
-    label: 'Build a Racer',
-    icon: 'pi pi-wrench',
-    command: () => navigateTo('/build-racer')
-  },
-  {
-    label: 'Gallery',
-    icon: 'pi pi-images',
-    command: () => navigateTo('/gallery')
-  },
-  {
-    label: 'Awards',
-    icon: 'pi pi-trophy',
-    command: () => navigateTo('/awards')
-  },
-  {
-    label: 'Racers',
+    label: 'Browse Racers',
     icon: 'pi pi-car',
     command: () => navigateTo('/racers')
   },
   {
-    label: 'Races',
-    icon: 'pi pi-flag',
-    command: () => navigateTo('/races')
+    label: 'Frequently Asked Questions',
+    icon: 'pi pi-question-circle',
+    command: () => navigateTo('/build-racer')
+  },
+  ...(authStore.isAuthenticated ? [
+    {
+      label: 'Add Your Racer',
+      icon: 'pi pi-plus',
+      command: () => navigateTo('/racers/add')
+    }
+  ] : []),
+  // Community Section
+  {
+    label: 'Photo Gallery',
+    icon: 'pi pi-images',
+    command: () => navigateTo('/gallery')
   },
   ...(authStore.isAuthenticated
     ? [
         {
-          label: 'My Racers',
-          icon: 'pi pi-user',
-          command: () => navigateTo('/my-racers')
-        },
-        {
           label: 'My Photos',
           icon: 'pi pi-images',
           command: () => navigateTo('/my-photos')
+        },
+        {
+          label: 'My Racers',
+          icon: 'pi pi-user',
+          command: () => navigateTo('/my-racers')
         },
         ...(authStore.isRaceAdmin
           ? [

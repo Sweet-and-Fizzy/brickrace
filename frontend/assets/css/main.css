@@ -36,6 +36,12 @@
     font-weight: 400;
     letter-spacing: 0.02em;
   }
+  
+  /* Ensure headings respect Tailwind color classes in dark mode */
+  .dark h1,
+  .dark h2 {
+    color: inherit;
+  }
 
   /* Open Sans for smaller headers */
   h3,
