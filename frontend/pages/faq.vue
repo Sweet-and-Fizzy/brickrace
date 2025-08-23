@@ -34,7 +34,7 @@
             <AccordionPanel value="0">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-users text-brand-blue" />
+                  <i class="pi pi-users text-purple-600 dark:text-purple-400" />
                   <span class="font-bold text-gray-900 dark:text-white">Who can enter?</span>
                 </div>
               </AccordionHeader>
@@ -86,7 +86,7 @@
             <AccordionPanel value="1">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-cog text-brand-blue" />
+                  <i class="pi pi-cog text-gray-600 dark:text-gray-400" />
                   <span class="font-bold text-gray-900 dark:text-white">Racer Specifications</span>
                 </div>
               </AccordionHeader>
@@ -168,7 +168,7 @@
             <AccordionPanel value="2">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-play-circle text-brand-green" />
+                  <i class="pi pi-play-circle text-green-600 dark:text-green-400" />
                   <span class="font-bold text-gray-900 dark:text-white">How Does the Race Work?</span>
                 </div>
               </AccordionHeader>
@@ -291,7 +291,7 @@
             <AccordionPanel value="3">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-trophy text-brand-gold" />
+                  <i class="pi pi-trophy text-yellow-600 dark:text-yellow-400" />
                   <span class="font-bold text-gray-900 dark:text-white">Awards & Recognition</span>
                 </div>
               </AccordionHeader>
@@ -302,92 +302,97 @@
                     trophies:
                   </p>
 
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white dark:bg-gray-800 border-2 border-brand-gold rounded-lg p-5">
+                  <!-- Loading State -->
+                  <div v-if="awardsLoading" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div v-for="i in 4" :key="i" class="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 rounded-lg p-5 animate-pulse">
                       <div class="flex items-center gap-3 mb-3">
-                        <div
-                          class="bg-brand-gold rounded-full w-10 h-10 flex items-center justify-center"
-                        >
-                          <i class="pi pi-bolt text-gray-900 dark:text-white" />
-                        </div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white">Fastest Racer</h4>
+                        <div class="bg-gray-300 dark:bg-gray-600 rounded-full w-10 h-10"></div>
+                        <div class="h-5 bg-gray-300 dark:bg-gray-600 rounded w-24"></div>
                       </div>
-                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                        Custom trophies awarded to the fastest racers based on qualifying times and
-                        bracket tournament results.
-                      </p>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 rounded-lg p-5">
-                      <div class="flex items-center gap-3 mb-3">
-                        <div
-                          class="bg-gray-500 rounded-full w-10 h-10 flex items-center justify-center"
-                        >
-                          <i class="pi pi-clock text-white" />
-                        </div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white">Slowest Racer</h4>
+                      <div class="space-y-2">
+                        <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                        <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
                       </div>
-                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                        Celebrating the joy of participation - sometimes the most memorable racers
-                        take their time!
-                      </p>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 border-2 border-brand-blue rounded-lg p-5">
-                      <div class="flex items-center gap-3 mb-3">
-                        <div
-                          class="bg-brand-blue rounded-full w-10 h-10 flex items-center justify-center"
-                        >
-                          <i class="pi pi-palette text-white" />
-                        </div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white">Most Creative</h4>
-                      </div>
-                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                        Recognition for the most imaginative and artistic racer designs that
-                        showcase exceptional creativity.
-                      </p>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 border-2 border-red-500 rounded-lg p-5">
-                      <div class="flex items-center gap-3 mb-3">
-                        <div
-                          class="bg-red-500 rounded-full w-10 h-10 flex items-center justify-center"
-                        >
-                          <i class="pi pi-exclamation-triangle text-white" />
-                        </div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white">Best Crash</h4>
-                      </div>
-                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                        Sometimes awarded for the most spectacular or memorable crash during the
-                        competition.
-                      </p>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 border-2 border-brand-green rounded-lg p-5">
-                      <div class="flex items-center gap-3 mb-3">
-                        <div
-                          class="bg-brand-green rounded-full w-10 h-10 flex items-center justify-center"
-                        >
-                          <i class="pi pi-star text-white" />
-                        </div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white">Special Categories</h4>
-                      </div>
-                      <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
-                        Additional awards may be given based on the year's entries and the judges'
-                        discretion.
-                      </p>
                     </div>
                   </div>
 
-                  <div
-                    class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mt-6"
-                  >
-                    <p class="text-sm text-gray-600 dark:text-gray-400 italic text-center">
-                      Remember: The race emphasizes fun, creativity, and the sculptural quality of
-                      the race cars as much as speed. It's "performance art meets sport" –
-                      everyone's a winner in this celebration of imagination!
+                  <!-- Dynamic Awards -->
+                  <div v-else-if="awards.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div 
+                      v-for="award in awards" 
+                      :key="award.id"
+                      class="bg-white dark:bg-gray-800 border-2 rounded-lg p-5"
+                      :class="getBorderColor(award.icon)"
+                    >
+                      <!-- Award Header with Icon/Image and Title -->
+                      <div class="flex items-start gap-4 mb-3">
+                        <!-- Award Image or Icon -->
+                        <div class="flex-shrink-0">
+                          <img 
+                            v-if="award.image_url"
+                            :src="award.image_url"
+                            :alt="award.name"
+                            class="w-16 h-16 object-cover rounded-lg border-2"
+                            :class="getBorderColor(award.icon)"
+                          />
+                          <div
+                            v-else
+                            class="rounded-full w-12 h-12 flex items-center justify-center bg-yellow-500"
+                          >
+                            <i class="pi pi-trophy text-white text-lg" />
+                          </div>
+                        </div>
+                        
+                        <!-- Award Title and Description -->
+                        <div class="flex-1">
+                          <h4 class="font-semibold text-gray-900 dark:text-white mb-2">{{ award.name }}</h4>
+                          <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                            {{ award.description }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Fallback message -->
+                  <div v-else class="text-center py-8">
+                    <i class="pi pi-trophy text-4xl text-gray-400 dark:text-gray-600 mb-4" />
+                    <p class="text-gray-600 dark:text-gray-400">
+                      Award categories will be announced closer to race day.
                     </p>
                   </div>
+
+                  <!-- Voting Information -->
+                  <div v-if="awards.length > 0" class="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-lg p-6 mt-6">
+                    <div class="flex items-start gap-4">
+                      <div class="bg-blue-500 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                        <i class="pi pi-users text-white text-lg" />
+                      </div>
+                      <div class="flex-1">
+                        <h4 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
+                          Community Voting
+                        </h4>
+                        <p class="text-blue-800 dark:text-blue-200 leading-relaxed mb-4">
+                          Many of these awards are decided by community voting! After racers are registered and photos are uploaded, 
+                          anyone can visit our awards page to vote for their favorites in categories like Most Creative, Best Design, 
+                          and other special awards. Your vote helps celebrate the amazing creativity and craftsmanship of our participants.
+                        </p>
+                        <Button
+                          class="btn-primary"
+                          @click="navigateTo('/awards')"
+                        >
+                          <i class="pi pi-trophy mr-2" />
+                          View Awards & Vote
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p class="text-gray-600 dark:text-gray-300 text-left mt-6">
+                    Remember: The race emphasizes fun, creativity, and the sculptural quality of
+                    the race cars as much as speed. It's "performance art meets sport" –
+                    everyone's a winner in this celebration of imagination!
+                  </p>
                 </div>
               </AccordionContent>
             </AccordionPanel>
@@ -448,7 +453,7 @@
             <AccordionPanel value="6">
               <AccordionHeader>
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-map-marker text-brand-blue" />
+                  <i class="pi pi-map-marker text-blue-600 dark:text-blue-400" />
                   <span class="font-bold text-gray-900 dark:text-white">Location & Venue</span>
                 </div>
               </AccordionHeader>
@@ -604,6 +609,47 @@
 </template>
 
 <script setup>
+// Fetch awards data
+const { awardDefinitions: awards, loading: awardsLoading, initialize } = useAwards()
+
+// Helper functions for dynamic styling based on award icons
+const getBorderColor = (icon) => {
+  const colorMap = {
+    'pi-bolt': 'border-yellow-400',
+    'pi-clock': 'border-gray-400 dark:border-gray-600',
+    'pi-palette': 'border-purple-400',
+    'pi-exclamation-triangle': 'border-red-500',
+    'pi-star': 'border-green-500',
+    'pi-trophy': 'border-yellow-400',
+    'pi-heart': 'border-pink-500',
+    'pi-thumbs-up': 'border-blue-500'
+  }
+  return colorMap[icon] || 'border-gray-300 dark:border-gray-600'
+}
+
+const getIconBgColor = (icon) => {
+  const colorMap = {
+    'pi-bolt': 'bg-yellow-500',
+    'pi-clock': 'bg-gray-500',
+    'pi-palette': 'bg-purple-500',
+    'pi-exclamation-triangle': 'bg-red-500',
+    'pi-star': 'bg-green-500',
+    'pi-trophy': 'bg-yellow-500',
+    'pi-heart': 'bg-pink-500',
+    'pi-thumbs-up': 'bg-blue-500'
+  }
+  return colorMap[icon] || 'bg-gray-500'
+}
+
+const getIconTextColor = (icon) => {
+  return 'text-white'
+}
+
+// Fetch awards on mount
+onMounted(async () => {
+  await initialize()
+})
+
 useHead({
   title: 'Frequently Asked Questions - The Great Holyoke Brick Race',
   meta: [

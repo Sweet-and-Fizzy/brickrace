@@ -25,7 +25,7 @@
               </div>
               <div class="text-right">
                 <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Awards</div>
-                <div class="text-3xl font-bold text-brand-blue">
+                <div class="text-3xl font-bold text-gray-900 dark:text-white">
                   {{ voteableAwards.length + filteredAssignedAwards.length }}
                 </div>
               </div>
@@ -122,7 +122,7 @@
             <Card
               v-for="award in voteableAwards"
               :key="award.id"
-              class="hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border-2 border-gray-200 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
+              class="hover:shadow-lg hover:scale-[1.01] transition-all duration-200 border-2 border-gray-200 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
               style="
                 box-shadow:
                   0 4px 12px rgba(0, 0, 0, 0.1),

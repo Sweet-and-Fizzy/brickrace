@@ -344,7 +344,7 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Track 1 Racer
             </label>
-            <Dropdown
+            <Select
               v-model="manualHeat.track1Racer"
               :options="availableRacers"
               option-label="display_name"
@@ -373,7 +373,7 @@
                   </div>
                 </div>
               </template>
-            </Dropdown>
+            </Select>
           </div>
 
           <!-- Track 2 Racer -->
@@ -381,7 +381,7 @@
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Track 2 Racer
             </label>
-            <Dropdown
+            <Select
               v-model="manualHeat.track2Racer"
               :options="availableRacers"
               option-label="display_name"
@@ -410,7 +410,7 @@
                   </div>
                 </div>
               </template>
-            </Dropdown>
+            </Select>
           </div>
 
           <!-- Options -->

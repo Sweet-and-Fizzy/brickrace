@@ -61,7 +61,7 @@
           <template #title>
             <div class="px-4 pt-4">
               <h3
-                class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-brand-blue dark:group-hover:text-brand-blue transition-colors duration-300"
+                class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-brand-blue dark:group-hover:text-gray-200 transition-colors duration-300"
               >
                 {{ race.name }}
               </h3>
@@ -85,7 +85,7 @@
                 </div>
                 <div class="text-right">
                   <i
-                    class="pi pi-arrow-right text-gray-400 dark:text-gray-500 group-hover:text-brand-blue group-hover:translate-x-1 transition-all duration-300"
+                    class="pi pi-arrow-right text-gray-600 dark:text-white group-hover:text-brand-blue dark:group-hover:text-gray-200 group-hover:translate-x-1 transition-all duration-300"
                   />
                 </div>
               </div>

@@ -45,19 +45,19 @@
             <div
               class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-600"
             >
-              <NuxtLink to="/racers" class="flex-1">
-                <Button type="button" class="btn-secondary w-full"><span>Cancel</span></Button>
-              </NuxtLink>
-
               <Button
                 type="submit"
                 :loading="loading"
                 :disabled="!form.name || !authStore.isAuthenticated"
                 icon="pi pi-plus"
-                class="btn-primary flex-1"
+                class="btn-primary w-full"
               >
                 <span>Create Racer</span>
               </Button>
+
+              <NuxtLink to="/racers" class="w-full">
+                <Button type="button" class="btn-secondary w-full"><span>Cancel</span></Button>
+              </NuxtLink>
             </div>
           </form>
         </template>
@@ -68,9 +68,9 @@
         <p class="text-gray-500 dark:text-gray-400 text-sm">
           Need help? Check out our
           <NuxtLink
-            to="/build-racer"
+            to="/faq"
             class="text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 font-medium"
-            >building guidelines</NuxtLink
+            >FAQ</NuxtLink
           >
           for competition requirements, race process, awards, and other frequently asked questions.
         </p>

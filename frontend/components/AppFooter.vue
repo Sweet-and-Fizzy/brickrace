@@ -16,39 +16,48 @@
 
       <!-- Menu Sections Row -->
       <div
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-md sm:max-w-2xl lg:max-w-5xl mx-auto"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-md sm:max-w-2xl lg:max-w-4xl mx-auto"
       >
-        <!-- Racing & Events -->
+        <!-- Races -->
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-white">Racing & Events</h3>
+          <h3 class="text-lg font-semibold text-white">Races</h3>
           <nav class="space-y-2">
+            <!-- Current race if there's an active one -->
+            <NuxtLink
+              v-if="activeRace"
+              :to="`/races/${activeRace.slug || activeRace.id}`"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+            >
+              <i class="pi pi-play-circle text-gray-300" />
+              <span>{{ activeRace.name }}</span>
+            </NuxtLink>
             <NuxtLink
               to="/races"
               class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
               <i class="pi pi-flag text-gray-300" />
-              <span>Current Races</span>
-            </NuxtLink>
-            <NuxtLink
-              to="/our-story"
-              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
-            >
-              <i class="pi pi-clock text-gray-300" />
-              <span>Race History</span>
+              <span>All Races</span>
             </NuxtLink>
             <NuxtLink
               to="/awards"
               class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
               <i class="pi pi-trophy text-gray-300" />
-              <span>Awards & Winners</span>
+              <span>Awards</span>
+            </NuxtLink>
+            <NuxtLink
+              to="/our-story"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+            >
+              <i class="pi pi-clock text-gray-300" />
+              <span>Our History</span>
             </NuxtLink>
           </nav>
         </div>
 
-        <!-- Racers & Building -->
+        <!-- Racers -->
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-white">Racers & Building</h3>
+          <h3 class="text-lg font-semibold text-white">Racers</h3>
           <nav class="space-y-2">
             <NuxtLink
               to="/racers"
@@ -57,27 +66,6 @@
               <i class="pi pi-car text-gray-300" />
               <span>Browse Racers</span>
             </NuxtLink>
-            <NuxtLink
-              to="/faq"
-              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
-            >
-              <i class="pi pi-question-circle text-gray-300" />
-              <span>FAQ</span>
-            </NuxtLink>
-            <NuxtLink
-              to="/gallery"
-              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
-            >
-              <i class="pi pi-images text-gray-300" />
-              <span>Photo Gallery</span>
-            </NuxtLink>
-          </nav>
-        </div>
-
-        <!-- Account & Community -->
-        <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-white">Account & Community</h3>
-          <nav class="space-y-2">
             <template v-if="isAuthenticated">
               <NuxtLink
                 to="/my-racers"
@@ -86,6 +74,29 @@
                 <i class="pi pi-user text-gray-300" />
                 <span>My Racers</span>
               </NuxtLink>
+            </template>
+            <NuxtLink
+              :to="isAuthenticated ? '/racers/add' : '/login?redirect=/racers/add'"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+            >
+              <i class="pi pi-plus text-gray-300" />
+              <span>Add Your Racer</span>
+            </NuxtLink>
+          </nav>
+        </div>
+
+        <!-- Community & Help -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-semibold text-white">Community & Help</h3>
+          <nav class="space-y-2">
+            <NuxtLink
+              to="/gallery"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+            >
+              <i class="pi pi-images text-gray-300" />
+              <span>Photo Gallery</span>
+            </NuxtLink>
+            <template v-if="isAuthenticated">
               <NuxtLink
                 to="/my-photos"
                 class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
@@ -93,32 +104,14 @@
                 <i class="pi pi-images text-gray-300" />
                 <span>My Photos</span>
               </NuxtLink>
-              <template v-if="isRaceAdmin">
-                <NuxtLink
-                  to="/admin"
-                  class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
-                >
-                  <i class="pi pi-shield text-gray-300" />
-                  <span>Admin Dashboard</span>
-                </NuxtLink>
-              </template>
             </template>
-            <template v-else>
-              <NuxtLink
-                to="/login"
-                class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
-              >
-                <i class="pi pi-sign-in text-gray-300" />
-                <span>Login</span>
-              </NuxtLink>
-              <NuxtLink
-                to="/register"
-                class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
-              >
-                <i class="pi pi-user-plus text-gray-300" />
-                <span>Register</span>
-              </NuxtLink>
-            </template>
+            <NuxtLink
+              to="/faq"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+            >
+              <i class="pi pi-question-circle text-gray-300" />
+              <span>FAQ</span>
+            </NuxtLink>
           </nav>
         </div>
 
@@ -186,6 +179,18 @@ import { useAuthStore } from '~/stores/auth'
 // Get auth state for conditional rendering
 const authStore = useAuthStore()
 
+// Get races data for active race
+const { activeRace } = useRaces()
+
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isRaceAdmin = computed(() => authStore.isRaceAdmin)
+
+// Handle logout
+const handleLogout = async () => {
+  try {
+    await authStore.logout()
+  } catch (error) {
+    console.error('Logout error:', error)
+  }
+}
 </script>

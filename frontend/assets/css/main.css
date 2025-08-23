@@ -64,7 +64,7 @@
   h2 {
     font-family: Impact, sans-serif;
     font-weight: 400;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.05em;
   }
   
   /* Ensure headings respect Tailwind color classes in dark mode */
@@ -80,7 +80,7 @@
   h6 {
     font-family: 'Open Sans', sans-serif;
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.02em;
   }
 
   /* Specific styles for different header levels */
@@ -125,6 +125,68 @@
 }
 
 @layer components {
+  /* Dark mode datatable thead styling - higher specificity */
+  html.app-dark .custom-datatable .p-datatable-thead > tr > th,
+  body.app-dark .custom-datatable .p-datatable-thead > tr > th,
+  .app-dark body .custom-datatable .p-datatable-thead > tr > th {
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
+    border-bottom: 2px solid #374151 !important;
+    font-weight: 600 !important;
+  }
+
+  /* Dark mode datatable hover styling - all rows go to gray-600 */
+  html.app-dark .custom-datatable .p-datatable-tbody > tr:hover,
+  body.app-dark .custom-datatable .p-datatable-tbody > tr:hover,
+  .app-dark body .custom-datatable .p-datatable-tbody > tr:hover {
+    background-color: #4b5563 !important;
+    color: #f9fafb !important;
+  }
+
+  /* Dark mode pagination controls - match card background */
+  html.app-dark .p-paginator,
+  body.app-dark .p-paginator,
+  .app-dark body .p-paginator {
+    background-color: #1f2937 !important;
+    border: none !important;
+    border-radius: 0.5rem !important;
+  }
+
+  html.app-dark .p-paginator .p-paginator-page,
+  html.app-dark .p-paginator .p-paginator-first,
+  html.app-dark .p-paginator .p-paginator-prev,
+  html.app-dark .p-paginator .p-paginator-next,
+  html.app-dark .p-paginator .p-paginator-last,
+  body.app-dark .p-paginator .p-paginator-page,
+  body.app-dark .p-paginator .p-paginator-first,
+  body.app-dark .p-paginator .p-paginator-prev,
+  body.app-dark .p-paginator .p-paginator-next,
+  body.app-dark .p-paginator .p-paginator-last {
+    background-color: transparent !important;
+    color: #f9fafb !important;
+    border: none !important;
+  }
+
+  html.app-dark .p-paginator .p-paginator-page:hover,
+  html.app-dark .p-paginator .p-paginator-first:hover,
+  html.app-dark .p-paginator .p-paginator-prev:hover,
+  html.app-dark .p-paginator .p-paginator-next:hover,
+  html.app-dark .p-paginator .p-paginator-last:hover,
+  body.app-dark .p-paginator .p-paginator-page:hover,
+  body.app-dark .p-paginator .p-paginator-first:hover,
+  body.app-dark .p-paginator .p-paginator-prev:hover,
+  body.app-dark .p-paginator .p-paginator-next:hover,
+  body.app-dark .p-paginator .p-paginator-last:hover {
+    background-color: #374151 !important;
+    color: #f9fafb !important;
+  }
+
+  html.app-dark .p-paginator .p-paginator-page-selected,
+  body.app-dark .p-paginator .p-paginator-page-selected {
+    background-color: #4b5563 !important;
+    color: #f9fafb !important;
+    border: none !important;
+  }
   /* Skew button wrapper for parallelogram effect */
   .skew-button {
     transform: skewX(-8deg);
@@ -321,12 +383,16 @@
     .btn-primary:focus,
     .btn-primary:hover,
     .btn-primary[data-pc-name="button"],
-    button.btn-primary {
+    button.btn-primary,
+    .p-button.btn-primary {
       background-color: black !important;
       color: white !important;
       border: 2px solid transparent !important;
       border-radius: 0 !important;
       transform: skewX(-8deg) !important;
+      padding: 0.75rem 1.5rem !important;
+      white-space: nowrap !important;
+      overflow: visible !important;
     }
 
     .btn-secondary,
@@ -334,24 +400,40 @@
     .btn-secondary:focus,
     .btn-secondary:hover,
     .btn-secondary[data-pc-name="button"],
-    button.btn-secondary {
+    button.btn-secondary,
+    .p-button.btn-secondary {
       background-color: transparent !important;
       color: black !important;
       border: 2px solid black !important;
       border-radius: 0 !important;
       transform: skewX(-8deg) !important;
+      padding: 0.75rem 1.5rem !important;
+      white-space: nowrap !important;
+      overflow: visible !important;
     }
 
     .app-dark .btn-primary,
-    .app-dark button.btn-primary {
+    .app-dark .btn-primary:active,
+    .app-dark .btn-primary:focus,
+    .app-dark .btn-primary:hover,
+    .app-dark .btn-primary[data-pc-name="button"],
+    .app-dark button.btn-primary,
+    .app-dark .p-button.btn-primary {
       background-color: white !important;
       color: black !important;
+      border: 2px solid transparent !important;
     }
 
     .app-dark .btn-secondary,
-    .app-dark button.btn-secondary {
+    .app-dark .btn-secondary:active,
+    .app-dark .btn-secondary:focus,
+    .app-dark .btn-secondary:hover,
+    .app-dark .btn-secondary[data-pc-name="button"],
+    .app-dark button.btn-secondary,
+    .app-dark .p-button.btn-secondary {
       border: 2px solid #6B7280 !important; /* border-gray-500 */
       color: #E5E7EB !important; /* text-gray-200 */
+      background-color: transparent !important;
     }
   }
 

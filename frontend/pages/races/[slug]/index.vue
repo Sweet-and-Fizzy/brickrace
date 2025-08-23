@@ -185,10 +185,10 @@
             <!-- Mobile: Vertical Timeline -->
             <div class="block md:hidden">
               <!-- Current Step Highlight -->
-              <div class="bg-white border-2 border-brand-blue rounded-lg p-4 mb-4">
+              <div class="bg-white border-2 border-brand-blue dark:border-blue-400 rounded-lg p-4 mb-4">
                 <div class="flex items-center gap-3">
                   <div
-                    class="w-10 h-10 bg-brand-blue text-white rounded-full flex items-center justify-center"
+                    class="w-10 h-10 bg-brand-blue dark:bg-blue-400 text-white rounded-full flex items-center justify-center"
                   >
                     <i :class="raceSteps[currentStep]?.icon" />
                   </div>
@@ -209,7 +209,7 @@
                 </div>
                 <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div
-                    class="bg-brand-blue h-2 rounded-full transition-all duration-300"
+                    class="bg-brand-blue dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
                     :style="{ width: `${((currentStep + 1) / raceSteps.length) * 100}%` }"
                   />
                 </div>
@@ -291,7 +291,7 @@
                           <RacerLink
                             :racer-id="result.second.racer_id"
                             :racer-name="result.second.racer_name"
-                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
+                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
                             class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-1 py-0.5 rounded text-xs font-semibold"
@@ -318,14 +318,14 @@
                           <RacerLink
                             :racer-id="result.first.racer_id"
                             :racer-name="result.first.racer_name"
-                            class="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
+                            class="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
                             class="bg-yellow-200 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-0.5 rounded-full text-sm font-bold mb-1"
                           >
                             #{{ result.first.racer_number }}
                           </div>
-                          <div class="text-sm font-bold text-brand-blue">
+                          <div class="text-sm font-bold text-brand-blue dark:text-blue-400">
                             {{ formatTime(result.first.winning_time) }}
                           </div>
                           <div class="mt-1">
@@ -352,7 +352,7 @@
                           <RacerLink
                             :racer-id="result.third.racer_id"
                             :racer-name="result.third.racer_name"
-                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
+                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
                             class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-1 py-0.5 rounded text-xs font-semibold"
@@ -418,12 +418,12 @@
                         class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600"
                       >
                         <div class="text-center">
-                          <p class="text-sm font-medium text-brand-blue mb-2">Track 1</p>
+                          <p class="text-sm font-medium text-brand-blue dark:text-blue-400 mb-2">Track 1</p>
                           <div v-if="bracket.track1_racer_name">
                             <RacerLink
                               :racer-id="bracket.track1_racer_id"
                               :racer-name="bracket.track1_racer_name"
-                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block"
+                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block"
                             />
                             <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
                               #{{ bracket.track1_racer_number }}
@@ -432,7 +432,7 @@
                               v-if="bracket.track1_time"
                               class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2"
                             >
-                              <p class="text-lg font-bold text-brand-blue">
+                              <p class="text-lg font-bold text-brand-blue dark:text-blue-400">
                                 {{ formatTime(bracket.track1_time) }}
                               </p>
                             </div>
@@ -465,7 +465,7 @@
                             <RacerLink
                               :racer-id="bracket.track2_racer_id"
                               :racer-name="bracket.track2_racer_name"
-                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block"
+                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block"
                             />
                             <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
                               #{{ bracket.track2_racer_number }}
@@ -515,7 +515,7 @@
               <!-- Current Heat Hero Section -->
               <Card
 v-if="currentHeatData" class="border-4 shadow-xl mb-4" 
-                    :class="showCompletedHeatResults ? 'border-green-500' : 'border-brand-blue'">
+                    :class="showCompletedHeatResults ? 'border-green-500' : 'border-brand-blue dark:border-blue-400'">
                 <template #content>
                   <div
                     class="-m-6 p-6 rounded-t-lg"
@@ -526,12 +526,12 @@ v-if="currentHeatData" class="border-4 shadow-xl mb-4"
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
                         <div
-class="text-white rounded-full p-3 relative"
-                             :class="showCompletedHeatResults ? 'bg-green-500' : 'bg-brand-blue'">
+class="text-white rounded-full p-2 relative w-10 h-10 flex items-center justify-center"
+                             :class="showCompletedHeatResults ? 'bg-green-500' : 'bg-brand-blue dark:bg-blue-400'">
                           <i
-class="text-2xl" 
+class="text-sm" 
                              :class="showCompletedHeatResults ? 'pi pi-check-circle' : 'pi pi-flag-fill'" />
-                          <div v-if="!showCompletedHeatResults" class="absolute inset-0 bg-brand-blue rounded-full animate-ping opacity-75"/>
+                          <div v-if="!showCompletedHeatResults" class="absolute inset-0 bg-brand-blue dark:bg-blue-400 rounded-full animate-ping opacity-75"/>
                         </div>
                         <div>
                           <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
@@ -563,10 +563,10 @@ class="text-2xl"
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                       <!-- Track 1 -->
                       <div
-                        class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-brand-blue"
+                        class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-brand-blue dark:border-blue-400"
                       >
                         <div class="flex items-center justify-between mb-3">
-                          <span class="text-sm font-bold text-brand-blue">TRACK 1</span>
+                          <span class="text-sm font-bold text-brand-blue dark:text-blue-400">TRACK 1</span>
                         </div>
                         <div
                           v-if="getTrackRacer(currentHeatData.racers, 1)"
@@ -694,7 +694,7 @@ class="text-2xl"
                         class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600"
                       >
                         <div class="flex items-center justify-between mb-3">
-                          <span class="text-xs font-bold text-brand-blue">TRACK 1</span>
+                          <span class="text-xs font-bold text-brand-blue dark:text-blue-400">TRACK 1</span>
                         </div>
                         <div v-if="getTrackRacer(heat.racers, 1)" class="flex items-center gap-3">
                           <img
@@ -783,7 +783,7 @@ class="text-2xl"
                     <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
                       Sort by:
                     </label>
-                    <Dropdown
+                    <Select
                       v-model="qualifiersSortOption"
                       :options="sortOptions"
                       option-label="label"
@@ -886,7 +886,7 @@ class="text-2xl"
                           <h3 class="font-bold text-gray-900 dark:text-white">{{ award.name }}</h3>
                           <NuxtLink
                             to="/awards"
-                            class="text-brand-blue hover:text-blue-800 text-sm font-medium"
+                            class="text-brand-blue dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                           >
                             Vote Now →
                           </NuxtLink>
@@ -973,7 +973,7 @@ class="text-2xl"
                         <i class="pi pi-car text-gray-500 dark:text-gray-300" />
                       </div>
                       <i
-                        class="pi pi-check-circle text-green-600 text-sm absolute -bottom-1 -right-1 bg-white rounded-full"
+                        class="pi pi-check-circle text-green-600 dark:text-green-400 text-sm absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 rounded-full w-5 h-5 flex items-center justify-center"
                       />
                     </div>
                     <div class="flex-1">
@@ -1878,7 +1878,7 @@ useHead({
 }
 
 :deep(.custom-datatable .p-datatable-tbody > tr:hover) {
-  background-color: #f8fafc !important;
+  background-color: #f3f4f6 !important;
 }
 
 :deep(.custom-datatable .p-datatable-striped .p-datatable-tbody > tr:nth-child(odd)) {
@@ -1900,10 +1900,6 @@ useHead({
   border-bottom: 1px solid #374151 !important;
 }
 
-:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover) {
-  background-color: #ffffff !important;
-  color: #1f2937 !important;
-}
 
 /* Target the specific RacerLink anchor elements with maximum specificity */
 :deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a.font-medium.dark\:text-white.hover\:text-brand-blue),
@@ -1912,7 +1908,7 @@ useHead({
 :deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a),
 :deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover .text-brand-blue),
 :deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover .dark\:text-blue-400) {
-  color: #1f2937 !important;
+  color: #93c5fd !important;
 }
 
 :deep(.app-dark .custom-datatable .p-datatable-striped .p-datatable-tbody > tr:nth-child(odd)) {

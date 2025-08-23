@@ -113,18 +113,18 @@
                   @click="navigateTo(`/races/${activeRace.slug || activeRace.id}`)"
                 />
                 <Button
+                  v-tooltip.bottom="'Awards'"
+                  icon="pi pi-trophy"
+                  severity="secondary"
+                  text
+                  @click="navigateTo('/awards')"
+                />
+                <Button
                   v-tooltip.bottom="'All Races'"
                   icon="pi pi-flag"
                   severity="secondary"
                   text
                   @click="navigateTo('/races')"
-                />
-                <Button
-                  v-tooltip.bottom="'Race Awards'"
-                  icon="pi pi-trophy"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/awards')"
                 />
                 <Button
                   v-tooltip.bottom="'Our History'"
@@ -397,14 +397,14 @@ const menuItems = computed(() => [
         command: () => navigateTo(`/races/${activeRace.value.slug || activeRace.value.id}`)
       }] : []),
       {
+        label: 'Awards',
+        icon: 'pi pi-trophy',
+        command: () => navigateTo('/awards')
+      },
+      {
         label: 'All Races',
         icon: 'pi pi-flag',
         command: () => navigateTo('/races')
-      },
-      {
-        label: 'Race Awards',
-        icon: 'pi pi-trophy',
-        command: () => navigateTo('/awards')
       },
       {
         label: 'Our History',
@@ -527,14 +527,14 @@ const sidebarMenuItems = computed(() => [
     command: () => navigateTo(`/races/${activeRace.value.slug || activeRace.value.id}`)
   }] : []),
   {
+    label: 'Awards',
+    icon: 'pi pi-trophy',
+    command: () => navigateTo('/awards')
+  },
+  {
     label: 'All Races',
     icon: 'pi pi-flag',
     command: () => navigateTo('/races')
-  },
-  {
-    label: 'Race Awards',
-    icon: 'pi pi-trophy',
-    command: () => navigateTo('/awards')
   },
   {
     label: 'Our History',
