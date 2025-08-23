@@ -11,6 +11,11 @@
     --brand-blue: #175bd3;
     --brand-green: #1e6863;
     --brand-gold: #ffc927;
+    
+    /* Override PrimeVue MenuBar variables */
+    --p-menubar-border-color: transparent;
+    --p-menubar-border-width: 0;
+    --p-menubar-background: transparent;
   }
 
   /* Dark mode color overrides for better readability */
@@ -188,16 +193,33 @@
     border: none !important;
   }
 
-  /* Remove border from navigation MenuBar */
-  .p-menubar {
+  /* Remove border from navigation MenuBar - all states */
+  .p-menubar,
+  .p-menubar[data-pc-name="menubar"],
+  [data-pc-name="menubar"],
+  .p-component.p-menubar {
     border: none !important;
+    border-width: 0 !important;
     background: transparent !important;
+    box-shadow: none !important;
   }
 
   /* Dark mode MenuBar background */
-  .app-dark .p-menubar {
+  .app-dark .p-menubar,
+  .app-dark .p-menubar[data-pc-name="menubar"],
+  .app-dark [data-pc-name="menubar"],
+  .app-dark .p-component.p-menubar {
     background: transparent !important;
     border: none !important;
+    border-width: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  /* Also target the root menu element */
+  .p-menubar-root,
+  .p-menubar .p-menubar-root {
+    border: none !important;
+    background: transparent !important;
   }
   /* Skew button wrapper for parallelogram effect */
   .skew-button {
