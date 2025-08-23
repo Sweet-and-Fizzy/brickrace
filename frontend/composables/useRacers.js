@@ -531,6 +531,22 @@ export const useRacers = () => {
     state.error.value = null
 
     try {
+      // First check if the user can update this racer
+      const { data: existingRacer, error: checkError } = await supabase
+        .from('racers')
+        .select('id, user_id')
+        .eq('id', racerId)
+        .single()
+
+      if (checkError) {
+        throw new Error(`Racer not found or access denied: ${checkError.message}`)
+      }
+
+      // Check permissions: user owns racer or is admin
+      if (existingRacer.user_id !== authStore.userId && !authStore.isRaceAdmin) {
+        throw new Error('You do not have permission to update this racer')
+      }
+
       const { data: updatedRacer, error: updateError } = await supabase
         .from('racers')
         .update({
@@ -539,23 +555,29 @@ export const useRacers = () => {
         })
         .eq('id', racerId)
         .select()
-        .single()
 
       if (updateError) throw updateError
+
+      // Check if any rows were affected
+      if (!updatedRacer || updatedRacer.length === 0) {
+        throw new Error('Update failed - no rows were modified. This may be due to database permissions.')
+      }
+
+      const racer = updatedRacer[0]
 
       // Update local state - both basic racers and detailed cache
       const basicIndex = state.racers.value.findIndex((r) => r.id === racerId)
       if (basicIndex !== -1) {
-        state.racers.value[basicIndex] = { ...state.racers.value[basicIndex], ...updatedRacer }
+        state.racers.value[basicIndex] = { ...state.racers.value[basicIndex], ...racer }
       }
 
       // Update detailed cache if it exists
       if (state.detailedRacers.value.has(racerId)) {
         const detailed = state.detailedRacers.value.get(racerId)
-        state.detailedRacers.value.set(racerId, { ...detailed, ...updatedRacer })
+        state.detailedRacers.value.set(racerId, { ...detailed, ...racer })
       }
 
-      return updatedRacer
+      return racer
     } catch (err) {
       // Keep essential error logging for production debugging
       console.error('Error updating racer:', err)

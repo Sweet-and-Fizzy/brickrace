@@ -804,7 +804,7 @@ class="text-2xl"
                 >
                   <Column field="racer_number" header="#" style="width: 60px">
                     <template #body="slotProps">
-                      <span class="font-semibold text-brand-blue"
+                      <span class="font-semibold text-brand-blue dark:text-blue-400"
                         >#{{ slotProps.data.racer_number }}</span
                       >
                     </template>
@@ -826,7 +826,7 @@ class="text-2xl"
                   </Column>
                   <Column field="time" header="Time">
                     <template #body="slotProps">
-                      <span class="font-bold text-lg text-brand-blue">{{
+                      <span class="font-bold text-lg text-brand-blue dark:text-blue-400">{{
                         formatTime(slotProps.data.time)
                       }}</span>
                     </template>
@@ -1890,25 +1890,36 @@ useHead({
 }
 
 /* Dark mode DataTable styling */
-:deep(.dark .custom-datatable .p-datatable-thead > tr > th) {
+:deep(.app-dark .custom-datatable .p-datatable-thead > tr > th) {
   background-color: #1f2937 !important;
   color: #f9fafb !important;
   border-bottom: 2px solid #374151 !important;
 }
 
-:deep(.dark .custom-datatable .p-datatable-tbody > tr > td) {
+:deep(.app-dark .custom-datatable .p-datatable-tbody > tr > td) {
   border-bottom: 1px solid #374151 !important;
 }
 
-:deep(.dark .custom-datatable .p-datatable-tbody > tr:hover) {
-  background-color: #374151 !important;
+:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover) {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
 }
 
-:deep(.dark .custom-datatable .p-datatable-striped .p-datatable-tbody > tr:nth-child(odd)) {
+/* Target the specific RacerLink anchor elements with maximum specificity */
+:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a.font-medium.dark\:text-white.hover\:text-brand-blue),
+:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a.font-medium.dark\:text-white),
+:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a.font-medium),
+:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a),
+:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover .text-brand-blue),
+:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover .dark\:text-blue-400) {
+  color: #1f2937 !important;
+}
+
+:deep(.app-dark .custom-datatable .p-datatable-striped .p-datatable-tbody > tr:nth-child(odd)) {
   background-color: #1f2937 !important;
 }
 
-:deep(.dark .custom-datatable .p-datatable-striped .p-datatable-tbody > tr:nth-child(even)) {
-  background-color: #111827 !important;
+:deep(.app-dark .custom-datatable .p-datatable-striped .p-datatable-tbody > tr:nth-child(even)) {
+  background-color: #374151 !important;
 }
 </style>

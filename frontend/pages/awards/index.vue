@@ -249,15 +249,15 @@
                       <Button
                         :disabled="!votes[award.id] || submittingVotes[award.id]"
                         :loading="submittingVotes[award.id]"
-                        icon="pi pi-check"
                         class="btn-primary w-full font-bold"
                         @click="handleVoteSubmission(award.id)"
                       >
-                        <span>{{
+                        <i class="pi pi-check mr-2" />
+                        {{
                           hasUserVotedForAward(award.id, activeRace?.id)
                             ? 'Update Vote'
                             : 'Submit Vote'
-                        }}</span>
+                        }}
                       </Button>
                     </div>
                     <div v-else class="text-center text-gray-500 py-6">

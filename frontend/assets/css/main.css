@@ -38,6 +38,18 @@
     --p-accordion-content-background: #1f2937;
     --p-accordion-content-color: #d1d5db;
     --p-accordion-content-border-color: #4b5563;
+    
+    /* PrimeVue DataTable dark mode CSS variables */
+    --p-datatable-header-cell-background: #1f2937;
+    --p-datatable-header-cell-color: #f9fafb;
+    --p-datatable-header-cell-border-color: #374151;
+    --p-datatable-row-background: #1f2937;
+    --p-datatable-row-color: #f9fafb;
+    --p-datatable-row-border-color: #374151;
+    --p-datatable-row-hover-background: #374151;
+    --p-datatable-row-hover-color: #f9fafb;
+    --p-datatable-striped-row-background: #374151;
+    --p-datatable-striped-row-color: #f9fafb;
   }
 
   /* Set Open Sans as the default body font */

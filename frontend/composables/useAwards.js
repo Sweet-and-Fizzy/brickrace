@@ -309,6 +309,31 @@ export const useAwards = () => {
     }
   }
 
+  // Delete award definition (admin only)
+  const deleteAwardDefinition = async (definitionId) => {
+    if (!authStore.isRaceAdmin) {
+      throw new Error('Only administrators can delete award definitions')
+    }
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('award_definitions')
+        .delete()
+        .eq('id', definitionId)
+
+      if (deleteError) throw deleteError
+
+      // Remove from local state
+      state.awardDefinitions.value = state.awardDefinitions.value.filter((def) => def.id !== definitionId)
+
+      return true
+    } catch (err) {
+      // Keep essential error logging for production debugging
+      console.error('Error deleting award definition:', err)
+      throw err
+    }
+  }
+
   // Assign an award (admin only)
   const assignAward = async (racerId, awardDefinitionId, raceId = null, notes = null) => {
     if (!authStore.isRaceAdmin) {
@@ -673,6 +698,7 @@ export const useAwards = () => {
     createAwardDefinition,
     updateAwardDefinition,
     toggleAwardDefinitionActive,
+    deleteAwardDefinition,
     submitVote,
     removeVote,
     toggleVote,

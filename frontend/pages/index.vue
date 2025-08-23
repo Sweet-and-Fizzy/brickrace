@@ -37,7 +37,7 @@
         />
         <div
           v-else
-          class="w-full h-64 md:h-80 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+          class="w-full h-64 md:h-80 bg-gray-200 dark:bg-gray-800 flex items-center justify-center"
         >
           <i class="pi pi-flag text-6xl text-gray-400 dark:text-gray-500" />
         </div>
@@ -114,11 +114,10 @@
                   >
                     Location
                   </h2>
-                  <div class="bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden shadow-lg">
+                  <div class="bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg">
                     <iframe
                       src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2938.8234567890123!2d-72.6098765!3d42.2087654!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89e6e74f8a8b8c8d%3A0x1234567890abcdef!2s80%20Race%20St%2C%20Holyoke%2C%20MA%2001040!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus&q=80+Race+St,+Holyoke,+MA"
                       width="100%"
-                      height="300"
                       style="border:0;"
                       allowfullscreen=""
                       loading="lazy"
@@ -421,7 +420,7 @@
               />
               <div
                 v-else
-                class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                class="w-full h-48 bg-gray-200 dark:bg-gray-800 flex items-center justify-center"
               >
                 <i class="pi pi-flag text-4xl text-gray-400 dark:text-gray-500" />
               </div>

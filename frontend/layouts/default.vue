@@ -103,8 +103,17 @@
               <!-- Navigation Icons -->
               <div class="flex items-center space-x-1">
                 <!-- Racing Section -->
+                <!-- Current race button if there's an active race -->
                 <Button
-                  v-tooltip.bottom="'View Races'"
+                  v-if="activeRace"
+                  v-tooltip.bottom="activeRace.name"
+                  icon="pi pi-play-circle"
+                  severity="secondary"
+                  text
+                  @click="navigateTo(`/races/${activeRace.slug || activeRace.id}`)"
+                />
+                <Button
+                  v-tooltip.bottom="'All Races'"
                   icon="pi pi-flag"
                   severity="secondary"
                   text
@@ -118,7 +127,7 @@
                   @click="navigateTo('/awards')"
                 />
                 <Button
-                  v-tooltip.bottom="'Race History'"
+                  v-tooltip.bottom="'Our History'"
                   icon="pi pi-clock"
                   severity="secondary"
                   text
@@ -270,18 +279,33 @@
                     :model="userMenuItemsIconsOnly"
                     class="border-0 bg-transparent p-0 relative z-50"
                     :pt="{
+                      root: {
+                        class: 'border-0',
+                        style: 'border: none !important;'
+                      },
+                      menu: {
+                        class: 'border-0',
+                        style: 'border: none !important;'
+                      },
+                      menubar: {
+                        class: 'border-0',
+                        style: 'border: none !important;'
+                      },
                       menuitem: {
                         class:
-                          'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700'
+                          'text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 border-0',
+                        style: 'border: none !important;'
                       },
                       itemLink: {
-                        class: 'text-gray-900 dark:text-white flex items-center'
+                        class: 'text-gray-900 dark:text-white flex items-center border-0',
+                        style: 'border: none !important;'
                       },
                       itemIcon: {
                         class: 'text-gray-600 dark:text-gray-300'
                       },
                       submenu: {
-                        class: 'z-50 right-0'
+                        class: 'z-50 right-0 border-0',
+                        style: 'border: none !important;'
                       }
                     }"
                   />
@@ -354,6 +378,9 @@ const router = useRouter()
 // Dark mode functionality
 const { isDark, toggleDarkMode, initDarkMode, watchSystemTheme } = useDarkMode()
 
+// Races data for active race in navigation
+const { activeRace } = useRaces()
+
 // Sidebar state
 const sidebarVisible = ref(false)
 
@@ -363,8 +390,14 @@ const menuItems = computed(() => [
     label: 'Races',
     icon: 'pi pi-flag',
     items: [
+      // Add current race if there's an active one
+      ...(activeRace.value ? [{
+        label: activeRace.value.name,
+        icon: 'pi pi-play-circle',
+        command: () => navigateTo(`/races/${activeRace.value.slug || activeRace.value.id}`)
+      }] : []),
       {
-        label: 'View Races',
+        label: 'All Races',
         icon: 'pi pi-flag',
         command: () => navigateTo('/races')
       },
@@ -374,7 +407,7 @@ const menuItems = computed(() => [
         command: () => navigateTo('/awards')
       },
       {
-        label: 'Race History',
+        label: 'Our History',
         icon: 'pi pi-clock',
         command: () => navigateTo('/our-story')
       }
@@ -487,8 +520,14 @@ const sidebarMenuItems = computed(() => [
     command: () => navigateTo('/')
   },
   // Racing Section
+  // Add current race if there's an active one
+  ...(activeRace.value ? [{
+    label: activeRace.value.name,
+    icon: 'pi pi-play-circle',
+    command: () => navigateTo(`/races/${activeRace.value.slug || activeRace.value.id}`)
+  }] : []),
   {
-    label: 'View Races',
+    label: 'All Races',
     icon: 'pi pi-flag',
     command: () => navigateTo('/races')
   },
@@ -498,7 +537,7 @@ const sidebarMenuItems = computed(() => [
     command: () => navigateTo('/awards')
   },
   {
-    label: 'Race History',
+    label: 'Our History',
     icon: 'pi pi-clock',
     command: () => navigateTo('/our-story')
   },

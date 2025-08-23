@@ -121,6 +121,12 @@
     display: inline-block !important;
   }
 
+  /* Ensure proper spacing between icons and text */
+  .btn-primary i.mr-2,
+  .btn-secondary i.mr-2 {
+    margin-right: 0.5rem !important;
+  }
+
   /* Mobile-specific overrides */
   @media (max-width: 768px) {
     .btn-primary,

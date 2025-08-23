@@ -12,7 +12,7 @@
           </NuxtLink>
           <Button class="btn-primary" @click="showAddDefinitionDialog = true">
             <i class="pi pi-plus mr-2" />
-            <span>Add Award Type</span>
+            Add Award Type
           </Button>
           <AdminMenu v-if="authStore.isRaceAdmin" :race-id="activeRace?.id" />
         </div>
@@ -52,62 +52,70 @@
         </div>
 
         <!-- New Assignment Form -->
-        <Panel header="Assign New Award" toggleable class="mb-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >Award Type</label
-              >
-              <Select
-                v-model="newAssignment.awardDefinitionId"
-                :options="awardDefinitionOptions"
-                option-label="label"
-                option-value="value"
-                placeholder="Select award type"
-                class="w-full"
-              />
+        <Card class="mb-6">
+          <template #title>
+            <div class="flex items-center gap-3">
+              <i class="pi pi-plus text-brand-blue" />
+              <span>Assign New Award</span>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >Racer</label
-              >
-              <Select
-                v-model="newAssignment.racerId"
-                :options="racerOptions"
-                option-label="label"
-                option-value="value"
-                placeholder="Type to search racers..."
-                class="w-full"
-                filter
-                filter-placeholder="Search racers..."
-                :show-clear="true"
-              >
-                <template #option="slotProps">
-                  <div class="flex items-center gap-2">
-                    <span class="font-medium">{{ slotProps.option.label }}</span>
-                  </div>
-                </template>
-              </Select>
+          </template>
+          <template #content>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >Award Type</label
+                >
+                <Select
+                  v-model="newAssignment.awardDefinitionId"
+                  :options="awardDefinitionOptions"
+                  option-label="label"
+                  option-value="value"
+                  placeholder="Select award type"
+                  class="w-full"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >Racer</label
+                >
+                <Select
+                  v-model="newAssignment.racerId"
+                  :options="racerOptions"
+                  option-label="label"
+                  option-value="value"
+                  placeholder="Type to search racers..."
+                  class="w-full"
+                  filter
+                  filter-placeholder="Search racers..."
+                  :show-clear="true"
+                >
+                  <template #option="slotProps">
+                    <div class="flex items-center gap-2">
+                      <span class="font-medium">{{ slotProps.option.label }}</span>
+                    </div>
+                  </template>
+                </Select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >Notes (optional)</label
+                >
+                <InputText v-model="newAssignment.notes" placeholder="Award notes" class="w-full" />
+              </div>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >Notes (optional)</label
+            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+              <Button
+                :disabled="!newAssignment.awardDefinitionId || !newAssignment.racerId || assigning"
+                :loading="assigning"
+                class="btn-primary"
+                @click="assignAwardToRacer"
               >
-              <InputText v-model="newAssignment.notes" placeholder="Award notes" class="w-full" />
+                <i v-if="!assigning" class="pi pi-plus mr-2" />
+                <span>{{ assigning ? 'Assigning...' : 'Assign Award' }}</span>
+              </Button>
             </div>
-          </div>
-          <div class="mt-6 pt-4 border-t border-gray-200">
-            <Button
-              :disabled="!newAssignment.awardDefinitionId || !newAssignment.racerId || assigning"
-              :loading="assigning"
-              class="btn-primary"
-              @click="assignAwardToRacer"
-            >
-              <i v-if="!assigning" class="pi pi-plus mr-2" />
-              <span>{{ assigning ? 'Assigning...' : 'Assign Award' }}</span>
-            </Button>
-          </div>
-        </Panel>
+          </template>
+        </Card>
 
         <!-- Vote Results for Reference -->
         <div v-if="voteResults.length">
@@ -133,7 +141,7 @@
       </div>
 
       <!-- Award Definitions Management -->
-      <div class="mb-12">
+      <div class="mb-12 mt-16">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Award Types</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card
@@ -183,17 +191,40 @@
                   <i class="pi pi-pencil mr-2" />
                   <span>Edit</span>
                 </Button>
-                <Button
-                  size="small"
-                  :class="definition.active ? 'btn-secondary' : 'btn-primary'"
-                  @click="toggleDefinitionActiveStatus(definition)"
-                >
-                  <i :class="definition.active ? 'pi pi-times mr-2' : 'pi pi-check mr-2'" />
-                  <span>{{ definition.active ? 'Deactivate' : 'Activate' }}</span>
-                </Button>
+                <div class="flex gap-2">
+                  <Button
+                    size="small"
+                    :class="definition.active ? 'btn-secondary' : 'btn-primary'"
+                    @click="toggleDefinitionActiveStatus(definition)"
+                  >
+                    <i :class="definition.active ? 'pi pi-times mr-2' : 'pi pi-check mr-2'" />
+                    <span>{{ definition.active ? 'Deactivate' : 'Activate' }}</span>
+                  </Button>
+                  <Button
+                    size="small"
+                    class="btn-secondary"
+                    @click="confirmDeleteDefinition(definition)"
+                    v-tooltip.top="'Delete award type'"
+                  >
+                    <i class="pi pi-trash" />
+                  </Button>
+                </div>
               </div>
             </template>
           </Card>
+        </div>
+        
+        <!-- Link to Vote for Awards -->
+        <div v-if="activeRace" class="text-center mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
+          <p class="text-gray-600 dark:text-gray-400 mb-4">
+            Want to see what the community is voting for?
+          </p>
+          <NuxtLink :to="`/races/${activeRace.slug || activeRace.id}#voting`">
+            <Button class="btn-secondary">
+              <i class="pi pi-heart mr-2" />
+              View Award Voting
+            </Button>
+          </NuxtLink>
         </div>
       </div>
 
@@ -318,6 +349,9 @@
           </div>
         </template>
       </Dialog>
+
+      <!-- Delete Confirmation Dialog -->
+      <ConfirmDialog />
     </div>
   </div>
 </template>
@@ -325,10 +359,12 @@
 <script setup>
 import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 
 const authStore = useAuthStore()
 const supabase = useSupabaseClient()
 const toast = useToast()
+const confirm = useConfirm()
 
 // Navigation guard
 definePageMeta({
@@ -344,6 +380,7 @@ const {
   createAwardDefinition,
   updateAwardDefinition,
   toggleAwardDefinitionActive,
+  deleteAwardDefinition,
   assignAward,
   removeAward,
   getAwardsByRace,
@@ -452,6 +489,10 @@ const saveDefinition = async () => {
   if (!definitionForm.value.name) return
 
   savingDefinition.value = true
+  
+  // Capture values before they get reset
+  const awardName = definitionForm.value.name
+  const isEditing = !!editingDefinition.value
 
   try {
     if (editingDefinition.value) {
@@ -465,8 +506,8 @@ const saveDefinition = async () => {
 
     toast.add({
       severity: 'success',
-      summary: editingDefinition.value ? 'Award Updated' : 'Award Created',
-      detail: `Award type "${definitionForm.value.name}" has been ${editingDefinition.value ? 'updated' : 'created'} successfully.`,
+      summary: isEditing ? 'Award Updated' : 'Award Created',
+      detail: `Award type "${awardName}" has been ${isEditing ? 'updated' : 'created'} successfully.`,
       life: 3000
     })
   } catch (error) {
@@ -620,6 +661,49 @@ const removeAssignment = async (assignmentId) => {
       detail: error.message || 'Failed to remove award assignment. Please try again.',
       life: 5000
     })
+  }
+}
+
+// Confirm and delete definition
+const confirmDeleteDefinition = (definition) => {
+  confirm.require({
+    message: `Are you sure you want to delete the "${definition.name}" award type? This action cannot be undone and will remove all associated awards.`,
+    header: 'Delete Award Type',
+    icon: 'pi pi-exclamation-triangle',
+    rejectClass: 'p-button-secondary p-button-outlined',
+    acceptClass: 'p-button-danger',
+    rejectLabel: 'Cancel',
+    acceptLabel: 'Delete',
+    accept() {
+      deleteDefinition(definition.id, definition.name)
+    }
+  })
+}
+
+// Delete definition
+const deleteDefinition = async (definitionId, definitionName) => {
+  try {
+    await deleteAwardDefinition(definitionId)
+
+    toast.add({
+      severity: 'success',
+      summary: 'Award Type Deleted',
+      detail: `Award type "${definitionName}" has been deleted successfully.`,
+      life: 3000
+    })
+    
+    return true // Indicate success
+  } catch (error) {
+    // Keep essential error logging for production debugging
+    console.error('Error deleting award definition:', error)
+    toast.add({
+      severity: 'error',
+      summary: 'Delete Failed',
+      detail: error.message || 'Failed to delete award type. Please try again.',
+      life: 5000
+    })
+    
+    return false // Indicate failure
   }
 }
 
