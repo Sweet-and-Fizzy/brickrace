@@ -46,7 +46,9 @@
                     </p>
                     <p class="text-lg font-bold">CHECK-IN: 11:00 AM</p>
                     <p class="text-lg font-bold">RACE: NOON</p>
-                    <p class="mt-4">All racers should register online.</p>
+                    <p class="mt-4">
+                      All racers should <NuxtLink to="/racers/add" class="text-blue-600 hover:text-blue-800 underline">register online</NuxtLink>.
+                    </p>
                   </div>
                 </div>
               </div>
