@@ -1,13 +1,11 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <!-- Header -->
-    <div class="bg-white dark:bg-gray-900">
+    <div class="bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
-          <h1 class="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Photo Gallery
-          </h1>
-          <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto">
+          <h1 class="text-4xl md:text-5xl font-bold text-black mb-6">Photo Gallery</h1>
+          <p class="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto">
             Explore the creativity and excitement of The Great Holyoke Brick Race through photos
             from our community
           </p>
@@ -23,7 +21,7 @@
     <!-- Main Content -->
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Filters and Search -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 mb-8">
+      <div class="bg-white rounded-lg shadow-sm border mb-8">
         <div class="p-6">
           <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             <!-- Search and Filters -->
@@ -79,9 +77,9 @@
           <!-- Active Filters -->
           <div
             v-if="activeFilters.length > 0"
-            class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-600"
+            class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-200"
           >
-            <span class="text-sm text-gray-600 dark:text-gray-400 mr-2">Active filters:</span>
+            <span class="text-sm text-gray-600 mr-2">Active filters:</span>
             <Badge
               v-for="filter in activeFilters"
               :key="filter.key"
@@ -101,9 +99,7 @@
 
       <!-- Results Summary -->
       <div class="flex items-center justify-between mb-6">
-        <p class="text-gray-600 dark:text-gray-400">
-          Showing {{ filteredPhotos.length }} of {{ totalPhotos }} photos
-        </p>
+        <p class="text-gray-600">Showing {{ filteredPhotos.length }} of {{ totalPhotos }} photos</p>
 
         <Select
           v-model="sortBy"
@@ -131,7 +127,7 @@
           >
             <Image
               :src="photo.url"
-              :alt="photo.title"
+              :alt="photo.title?.replace(/[\r\n\t]/g, ' ').trim() || ''"
               image-class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               class="w-full h-48"
               :preview="false"
@@ -182,9 +178,9 @@
 
       <!-- Empty State -->
       <div v-if="filteredPhotos.length === 0" class="text-center py-12">
-        <i class="pi pi-images text-6xl text-gray-300 dark:text-gray-600 mb-4" />
-        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No Photos Found</h3>
-        <p class="text-gray-500 dark:text-gray-500 mb-6">
+        <i class="pi pi-images text-6xl text-gray-300 mb-4" />
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">No Photos Found</h3>
+        <p class="text-gray-500 mb-6">
           {{
             searchQuery || selectedCategory || selectedRace || selectedRacer
               ? 'Try adjusting your search criteria'
@@ -360,7 +356,7 @@ const racerOptions = computed(() => {
 const activeFilters = computed(() => {
   const filters = []
   if (searchQuery.value) {
-    filters.push({ key: 'search', label: `Search: "${searchQuery.value}"` })
+    filters.push({ key: 'search', label: `Search:""${searchQuery.value}"` })
   }
   if (selectedCategory.value) {
     const category = categoryOptions.value.find((c) => c.value === selectedCategory.value)

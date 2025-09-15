@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -91,13 +91,11 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-2">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Race Not Found</h2>
+        <p class="text-gray-600 mb-2">
           The race you're looking for doesn't exist or has been removed.
         </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          Slug requested: {{ route.params.slug }}
-        </p>
+        <p class="text-sm text-gray-500 mb-6">Slug requested: {{ route.params.slug }}</p>
         <div class="space-x-4">
           <NuxtLink to="/races">
             <Button class="btn-primary">
@@ -114,33 +112,41 @@
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
             <div class="mb-2">
-              <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ race.name }}</h1>
+              <h1 class="text-3xl font-bold text-black">{{ race.name }}</h1>
             </div>
-            <div class="flex flex-col gap-2 text-gray-600 dark:text-gray-300">
+            <div class="flex flex-col gap-2 text-gray-600">
               <div class="flex items-center gap-4">
-                <span>{{
-                  race.race_datetime 
-                    ? new Date(race.race_datetime).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      }) + ' from ' + new Date(race.race_datetime).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                      })
-                    : 'Date TBD'
-                }}{{
-                  race.end_time 
-                    ? ' - ' + new Date(race.end_time).toLocaleTimeString('en-US', {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                        hour12: true
-                      })
-                    : ''
-                }}</span>
-                <span v-if="!race.active" class="text-amber-600 dark:text-amber-400 font-medium">
+                <span
+                  >{{
+                    race.race_datetime
+                      ? new Date(race.race_datetime).toLocaleDateString('en-US', {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        }) +
+                        ' from ' +
+                        new Date(race.race_datetime).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true
+                        })
+                      : 'Date TBD'
+                  }}{{
+                    race.end_time
+                      ? ' - ' +
+                        new Date(race.end_time).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true
+                        })
+                      : ''
+                  }}</span
+                >
+                <span
+                  v-if="!race.active && authStore.isRaceAdmin"
+                  class="text-amber-600 font-medium"
+                >
                   <i class="pi pi-info-circle mr-1" />
                   Read-only view
                 </span>
@@ -165,7 +171,6 @@
           >
         </div>
 
-
         <!-- Race Process Steps -->
         <Card class="mb-8">
           <template #content>
@@ -173,7 +178,7 @@
             <div class="hidden md:block px-2">
               <Steps :model="raceSteps" :active-step="currentStep" class="mb-4" />
               <div class="text-center mt-4">
-                <p class="text-sm text-gray-600 dark:text-gray-400">
+                <p class="text-sm text-gray-600">
                   Current Status:
                   <span class="font-semibold">{{
                     raceSteps[currentStep]?.label || 'Unknown'
@@ -185,16 +190,16 @@
             <!-- Mobile: Vertical Timeline -->
             <div class="block md:hidden">
               <!-- Current Step Highlight -->
-              <div class="bg-white border-2 border-brand-blue dark:border-blue-400 rounded-lg p-4 mb-4">
+              <div class="bg-white border-2 border-brand-blue rounded-lg p-4 mb-4">
                 <div class="flex items-center gap-3">
                   <div
-                    class="w-10 h-10 bg-brand-blue dark:bg-blue-400 text-white rounded-full flex items-center justify-center"
+                    class="w-10 h-10 bg-brand-blue text-white rounded-full flex items-center justify-center"
                   >
                     <i :class="raceSteps[currentStep]?.icon" />
                   </div>
                   <div>
-                    <p class="font-semibold text-gray-900 dark:text-white">Current Step</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                    <p class="font-semibold text-black">Current Step</p>
+                    <p class="text-sm text-gray-600">
                       {{ raceSteps[currentStep]?.label }}
                     </p>
                   </div>
@@ -203,13 +208,13 @@
 
               <!-- Progress Bar -->
               <div class="mb-4">
-                <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <div class="flex justify-between text-xs text-gray-500 mb-2">
                   <span>Progress</span>
                   <span>{{ Math.round(((currentStep + 1) / raceSteps.length) * 100) }}%</span>
                 </div>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div class="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    class="bg-brand-blue dark:bg-blue-400 h-2 rounded-full transition-all duration-300"
+                    class="bg-brand-blue h-2 rounded-full transition-all duration-300"
                     :style="{ width: `${((currentStep + 1) / raceSteps.length) * 100}%` }"
                   />
                 </div>
@@ -222,11 +227,9 @@
                   :key="index"
                   class="flex items-center gap-3 p-2 rounded-lg transition-colors"
                   :class="{
-                    'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200':
-                      index < currentStep,
-                    'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200':
-                      index === currentStep,
-                    'text-gray-500 dark:text-gray-400': index > currentStep
+                    'bg-green-50/20 text-green-800': index < currentStep,
+                    'bg-blue-50/20 text-blue-800': index === currentStep,
+                    'text-gray-500': index > currentStep
                   }"
                 >
                   <div
@@ -234,8 +237,7 @@
                     :class="{
                       'bg-green-600 text-white': index < currentStep,
                       'bg-blue-600 text-white': index === currentStep,
-                      'bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300':
-                        index > currentStep
+                      'bg-gray-300 text-gray-600': index > currentStep
                     }"
                   >
                     <i v-if="index < currentStep" class="pi pi-check" />
@@ -255,20 +257,17 @@
             <div v-if="race.description && checkins.length === 0">
               <Card>
                 <template #title>
-                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">About This Race</h2>
+                  <h2 class="text-xl font-semibold text-black">About This Race</h2>
                 </template>
                 <template #content>
-                  <div 
-                    class="prose prose-gray dark:prose-invert"
-                    v-html="race.description"
-                  />
+                  <div class="prose prose-gray" v-html="race.description" />
                 </template>
               </Card>
             </div>
             <!-- Tournament Results Podium -->
             <Card v-if="tournamentResults.Fastest || tournamentResults.Slowest">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                <h2 class="text-xl font-bold text-black flex items-center gap-3">
                   <i class="pi pi-crown text-yellow-500 text-xl" />
                   Tournament Results
                 </h2>
@@ -276,7 +275,7 @@
               <template #content>
                 <div v-for="(result, bracketType) in tournamentResults" :key="bracketType">
                   <div v-if="result" class="mb-6 last:mb-0">
-                    <h3 class="text-lg font-bold text-center mb-4 text-gray-800 dark:text-gray-200">
+                    <h3 class="text-lg font-bold text-center mb-4 text-gray-800">
                       {{ bracketType }} Tournament Podium
                     </h3>
 
@@ -291,21 +290,21 @@
                           <RacerLink
                             :racer-id="result.second.racer_id"
                             :racer-name="result.second.racer_name"
-                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block truncate"
+                            class="text-sm font-bold text-gray-800 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
-                            class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-1 py-0.5 rounded text-xs font-semibold"
+                            class="bg-gray-100 text-gray-700 px-1 py-0.5 rounded text-xs font-semibold"
                           >
                             #{{ result.second.racer_number }}
                           </div>
-                          <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                          <div class="text-xs text-gray-600 mt-1">
                             {{ formatTime(result.second.time) }}
                           </div>
                         </div>
                         <div
-                          class="bg-gray-300 dark:bg-gray-600 h-8 rounded-t text-xs flex items-center justify-center"
+                          class="bg-gray-300 h-8 rounded-t text-xs flex items-center justify-center"
                         >
-                          <span class="font-bold text-gray-700 dark:text-gray-200">2nd</span>
+                          <span class="font-bold text-gray-700">2nd</span>
                         </div>
                       </div>
 
@@ -318,14 +317,14 @@
                           <RacerLink
                             :racer-id="result.first.racer_id"
                             :racer-name="result.first.racer_name"
-                            class="text-lg font-bold text-gray-900 dark:text-gray-100 hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block truncate"
+                            class="text-lg font-bold text-black hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
-                            class="bg-yellow-200 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-0.5 rounded-full text-sm font-bold mb-1"
+                            class="bg-yellow-200/30 text-yellow-800 px-2 py-0.5 rounded-full text-sm font-bold mb-1"
                           >
                             #{{ result.first.racer_number }}
                           </div>
-                          <div class="text-sm font-bold text-brand-blue dark:text-blue-400">
+                          <div class="text-sm font-bold text-brand-blue">
                             {{ formatTime(result.first.winning_time) }}
                           </div>
                           <div class="mt-1">
@@ -352,19 +351,19 @@
                           <RacerLink
                             :racer-id="result.third.racer_id"
                             :racer-name="result.third.racer_name"
-                            class="text-sm font-bold text-gray-800 dark:text-gray-200 hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block truncate"
+                            class="text-sm font-bold text-gray-800 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
-                            class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-1 py-0.5 rounded text-xs font-semibold"
+                            class="bg-orange-100/30 text-orange-700 px-1 py-0.5 rounded text-xs font-semibold"
                           >
                             #{{ result.third.racer_number }}
                           </div>
-                          <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                          <div class="text-xs text-gray-600 mt-1">
                             {{ formatTime(result.third.time) }}
                           </div>
                         </div>
                         <div
-                          class="bg-orange-400 dark:bg-orange-600 h-6 rounded-t text-xs flex items-center justify-center"
+                          class="bg-orange-400 h-6 rounded-t text-xs flex items-center justify-center"
                         >
                           <span class="font-bold text-white">3rd</span>
                         </div>
@@ -374,7 +373,7 @@
                     <!-- Tournament Type Badge -->
                     <div class="text-center">
                       <span
-                        class="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-bold"
+                        class="bg-purple-100/30 text-purple-800 px-3 py-1 rounded-full text-sm font-bold"
                       >
                         {{ bracketType }} Tournament Complete
                       </span>
@@ -387,7 +386,7 @@
             <!-- Brackets -->
             <Card v-if="race && getBracketsForRace(race.id).length">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-sitemap text-purple-600" />
                   Tournament Brackets
                 </h2>
@@ -397,14 +396,12 @@
                   <div
                     v-for="(bracket, index) in getBracketsForRace(race.id)"
                     :key="bracket.id"
-                    class="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 border border-purple-200 dark:border-purple-700 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+                    class="bg-gradient-to-r from-purple-50 to-blue-50/30/30 border border-purple-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
                   >
                     <div class="flex items-center justify-between mb-4">
-                      <h3
-                        class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2"
-                      >
+                      <h3 class="text-lg font-bold text-black flex items-center gap-2">
                         <span
-                          class="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-2 py-1 rounded-full text-sm font-medium"
+                          class="bg-purple-100/30 text-purple-800 px-2 py-1 rounded-full text-sm font-medium"
                         >
                           {{ bracket.bracket_type }}
                         </span>
@@ -414,25 +411,20 @@
 
                     <div class="flex items-center gap-4">
                       <!-- Track 1 -->
-                      <div
-                        class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600"
-                      >
+                      <div class="flex-1 bg-white rounded-lg p-4 border-2 border-blue-200">
                         <div class="text-center">
-                          <p class="text-sm font-medium text-brand-blue dark:text-blue-400 mb-2">Track 1</p>
+                          <p class="text-sm font-medium text-brand-blue mb-2">Track 1</p>
                           <div v-if="bracket.track1_racer_name">
                             <RacerLink
                               :racer-id="bracket.track1_racer_id"
                               :racer-name="bracket.track1_racer_name"
-                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block"
+                              class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200 block"
                             />
-                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                            <p class="text-sm text-gray-600 mb-2">
                               #{{ bracket.track1_racer_number }}
                             </p>
-                            <div
-                              v-if="bracket.track1_time"
-                              class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2"
-                            >
-                              <p class="text-lg font-bold text-brand-blue dark:text-blue-400">
+                            <div v-if="bracket.track1_time" class="bg-blue-50/20 rounded-lg p-2">
+                              <p class="text-lg font-bold text-brand-blue">
                                 {{ formatTime(bracket.track1_time) }}
                               </p>
                             </div>
@@ -449,31 +441,26 @@
                       <!-- VS Divider -->
                       <div class="flex items-center justify-center flex-shrink-0">
                         <div
-                          class="bg-purple-100 dark:bg-purple-900/30 rounded-full w-12 h-12 flex items-center justify-center shadow-md"
+                          class="bg-purple-100/30 rounded-full w-12 h-12 flex items-center justify-center shadow-md"
                         >
-                          <span class="font-bold text-purple-600 dark:text-purple-300">VS</span>
+                          <span class="font-bold text-purple-600">VS</span>
                         </div>
                       </div>
 
                       <!-- Track 2 -->
-                      <div
-                        class="flex-1 bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-red-200 dark:border-red-600"
-                      >
+                      <div class="flex-1 bg-white rounded-lg p-4 border-2 border-red-200">
                         <div class="text-center">
                           <p class="text-sm font-medium text-red-600 mb-2">Track 2</p>
                           <div v-if="bracket.track2_racer_name">
                             <RacerLink
                               :racer-id="bracket.track2_racer_id"
                               :racer-name="bracket.track2_racer_name"
-                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue dark:hover:text-blue-400 hover:underline transition-colors duration-200 block"
+                              class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200 block"
                             />
-                            <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                            <p class="text-sm text-gray-600 mb-2">
                               #{{ bracket.track2_racer_number }}
                             </p>
-                            <div
-                              v-if="bracket.track2_time"
-                              class="bg-red-50 dark:bg-red-900/20 rounded-lg p-2"
-                            >
+                            <div v-if="bracket.track2_time" class="bg-red-50/20 rounded-lg p-2">
                               <p class="text-lg font-bold text-red-600">
                                 {{ formatTime(bracket.track2_time) }}
                               </p>
@@ -492,15 +479,15 @@
                     <!-- Winner Display -->
                     <div v-if="bracket.track1_time && bracket.track2_time" class="mt-4 text-center">
                       <div
-                        class="bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 border border-yellow-300 dark:border-yellow-700 rounded-lg p-3"
+                        class="bg-gradient-to-r from-yellow-100 to-orange-100/30/30 border border-yellow-300 rounded-lg p-3"
                       >
                         <p
-                          class="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-1 flex items-center justify-center gap-1"
+                          class="text-sm font-medium text-yellow-800 mb-1 flex items-center justify-center gap-1"
                         >
                           <i class="pi pi-trophy" />
                           Winner
                         </p>
-                        <p class="font-bold text-lg text-yellow-900 dark:text-yellow-200">
+                        <p class="font-bold text-lg text-yellow-900">
                           {{ getWinner(bracket) }}
                         </p>
                       </div>
@@ -514,47 +501,63 @@
             <div v-if="(currentHeatData || hasValidUpcomingHeats) && race.active" class="mb-8">
               <!-- Current Heat Hero Section -->
               <Card
-v-if="currentHeatData" class="border-4 shadow-xl mb-4" 
-                    :class="showCompletedHeatResults ? 'border-green-500' : 'border-brand-blue dark:border-blue-400'">
+                v-if="currentHeatData"
+                class="border-4 shadow-xl mb-4"
+                :class="showCompletedHeatResults ? 'border-green-500' : 'border-brand-blue'"
+              >
                 <template #content>
                   <div
                     class="-m-6 p-6 rounded-t-lg"
-                    :class="showCompletedHeatResults 
-                      ? 'bg-gradient-to-r from-green-500/10 to-blue-500/10' 
-                      : 'bg-gradient-to-r from-brand-blue/10 to-brand-green/10'"
+                    :class="
+                      showCompletedHeatResults
+                        ? 'bg-gradient-to-r from-green-500/10 to-blue-500/10'
+                        : 'bg-gradient-to-r from-brand-blue/10 to-brand-green/10'
+                    "
                   >
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
                         <div
-class="text-white rounded-full p-2 relative w-10 h-10 flex items-center justify-center"
-                             :class="showCompletedHeatResults ? 'bg-green-500' : 'bg-brand-blue dark:bg-blue-400'">
+                          class="text-white rounded-full p-2 relative w-10 h-10 flex items-center justify-center"
+                          :class="showCompletedHeatResults ? 'bg-green-500' : 'bg-brand-blue'"
+                        >
                           <i
-class="text-sm" 
-                             :class="showCompletedHeatResults ? 'pi pi-check-circle' : 'pi pi-flag-fill'" />
-                          <div v-if="!showCompletedHeatResults" class="absolute inset-0 bg-brand-blue dark:bg-blue-400 rounded-full animate-ping opacity-75"/>
+                            class="text-sm"
+                            :class="
+                              showCompletedHeatResults ? 'pi pi-check-circle' : 'pi pi-flag-fill'
+                            "
+                          />
+                          <div
+                            v-if="!showCompletedHeatResults"
+                            class="absolute inset-0 bg-brand-blue rounded-full animate-ping opacity-75"
+                          />
                         </div>
                         <div>
-                          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                            Heat {{ currentHeatData.heat_number }} - {{ showCompletedHeatResults ? 'RESULTS' : 'NOW RACING' }}
+                          <h2 class="text-2xl font-bold text-black">
+                            Heat {{ currentHeatData.heat_number }} -
+                            {{ showCompletedHeatResults ? 'RESULTS' : 'NOW RACING' }}
                           </h2>
-                          <p class="text-sm text-gray-600 dark:text-gray-400">
-                            {{ showCompletedHeatResults ? 'Qualifying Complete • Times Posted' : 'Qualifying Round • Live Timing' }}
+                          <p class="text-sm text-gray-600">
+                            {{
+                              showCompletedHeatResults
+                                ? 'Qualifying Complete • Times Posted'
+                                : 'Qualifying Round • Live Timing'
+                            }}
                           </p>
                         </div>
                       </div>
                       <div class="flex items-center gap-2">
                         <span
                           class="px-3 py-1 rounded-full text-sm font-bold"
-                          :class="showCompletedHeatResults 
-                            ? 'bg-green-500 text-white' 
-                            : 'bg-red-500 text-white animate-pulse'"
+                          :class="
+                            showCompletedHeatResults
+                              ? 'bg-green-500 text-white'
+                              : 'bg-red-500 text-white animate-pulse'
+                          "
                         >
                           {{ showCompletedHeatResults ? 'COMPLETE' : 'LIVE' }}
                         </span>
                         <div v-if="showCompletedHeatResults" class="text-right">
-                          <p class="text-xs text-gray-500 dark:text-gray-400">
-                            Next heat starting soon...
-                          </p>
+                          <p class="text-xs text-gray-500">Next heat starting soon...</p>
                         </div>
                       </div>
                     </div>
@@ -562,11 +565,9 @@ class="text-sm"
                     <!-- Current Heat Racers -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                       <!-- Track 1 -->
-                      <div
-                        class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-brand-blue dark:border-blue-400"
-                      >
+                      <div class="bg-white rounded-lg p-4 border-2 border-brand-blue">
                         <div class="flex items-center justify-between mb-3">
-                          <span class="text-sm font-bold text-brand-blue dark:text-blue-400">TRACK 1</span>
+                          <span class="text-sm font-bold text-brand-blue">TRACK 1</span>
                         </div>
                         <div
                           v-if="getTrackRacer(currentHeatData.racers, 1)"
@@ -580,7 +581,7 @@ class="text-sm"
                           >
                           <div
                             v-else
-                            class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                            class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
                           >
                             <i class="pi pi-car text-2xl text-gray-400" />
                           </div>
@@ -588,21 +589,26 @@ class="text-sm"
                             <RacerLink
                               :racer-id="getTrackRacer(currentHeatData.racers, 1).racer_id"
                               :racer-name="getTrackRacer(currentHeatData.racers, 1).racer_name"
-                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                              class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200"
                             />
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                            <p class="text-sm text-gray-600">
                               #{{ getTrackRacer(currentHeatData.racers, 1).racer_number }}
                             </p>
                             <div v-if="getTrackRacer(currentHeatData.racers, 1).time" class="mt-2">
                               <span
                                 class="px-2 py-1 rounded font-bold"
-                                :class="showCompletedHeatResults 
-                                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 text-lg' 
-                                  : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm'"
+                                :class="
+                                  showCompletedHeatResults
+                                    ? 'bg-blue-100/30 text-blue-800 text-lg'
+                                    : 'bg-green-100/30 text-green-800 text-sm'
+                                "
                               >
                                 {{ formatTime(getTrackRacer(currentHeatData.racers, 1).time) }}
                               </span>
-                              <div v-if="showCompletedHeatResults" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              <div
+                                v-if="showCompletedHeatResults"
+                                class="text-xs text-gray-500 mt-1"
+                              >
                                 Final Time
                               </div>
                             </div>
@@ -615,7 +621,7 @@ class="text-sm"
                       </div>
 
                       <!-- Track 2 -->
-                      <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-red-500">
+                      <div class="bg-white rounded-lg p-4 border-2 border-red-500">
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-sm font-bold text-red-500">TRACK 2</span>
                         </div>
@@ -631,7 +637,7 @@ class="text-sm"
                           >
                           <div
                             v-else
-                            class="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                            class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
                           >
                             <i class="pi pi-car text-2xl text-gray-400" />
                           </div>
@@ -639,21 +645,26 @@ class="text-sm"
                             <RacerLink
                               :racer-id="getTrackRacer(currentHeatData.racers, 2).racer_id"
                               :racer-name="getTrackRacer(currentHeatData.racers, 2).racer_name"
-                              class="font-bold text-lg text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                              class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200"
                             />
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
+                            <p class="text-sm text-gray-600">
                               #{{ getTrackRacer(currentHeatData.racers, 2).racer_number }}
                             </p>
                             <div v-if="getTrackRacer(currentHeatData.racers, 2).time" class="mt-2">
                               <span
                                 class="px-2 py-1 rounded font-bold"
-                                :class="showCompletedHeatResults 
-                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 text-lg' 
-                                  : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-sm'"
+                                :class="
+                                  showCompletedHeatResults
+                                    ? 'bg-red-100/30 text-red-800 text-lg'
+                                    : 'bg-green-100/30 text-green-800 text-sm'
+                                "
                               >
                                 {{ formatTime(getTrackRacer(currentHeatData.racers, 2).time) }}
                               </span>
-                              <div v-if="showCompletedHeatResults" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              <div
+                                v-if="showCompletedHeatResults"
+                                class="text-xs text-gray-500 mt-1"
+                              >
                                 Final Time
                               </div>
                             </div>
@@ -674,27 +685,21 @@ class="text-sm"
                 <Card
                   v-for="heat in upcomingHeatsData.slice(0, 2)"
                   :key="heat.heat_number"
-                  class="border-2 border-gray-300 dark:border-gray-600"
+                  class="border-2 border-gray-300"
                 >
                   <template #content>
                     <div class="flex items-center justify-between mb-4">
-                      <h3 class="font-bold text-lg text-gray-900 dark:text-white">
-                        Heat {{ heat.heat_number }}
-                      </h3>
-                      <span
-                        class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-full text-sm"
-                      >
+                      <h3 class="font-bold text-lg text-black">Heat {{ heat.heat_number }}</h3>
+                      <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
                         On Deck
                       </span>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <!-- Track 1 -->
-                      <div
-                        class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600"
-                      >
+                      <div class="bg-white rounded-lg p-3 border-2 border-gray-300">
                         <div class="flex items-center justify-between mb-3">
-                          <span class="text-xs font-bold text-brand-blue dark:text-blue-400">TRACK 1</span>
+                          <span class="text-xs font-bold text-brand-blue">TRACK 1</span>
                         </div>
                         <div v-if="getTrackRacer(heat.racers, 1)" class="flex items-center gap-3">
                           <img
@@ -705,7 +710,7 @@ class="text-sm"
                           >
                           <div
                             v-else
-                            class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                            class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center"
                           >
                             <i class="pi pi-car text-gray-400" />
                           </div>
@@ -713,9 +718,9 @@ class="text-sm"
                             <RacerLink
                               :racer-id="getTrackRacer(heat.racers, 1).racer_id"
                               :racer-name="getTrackRacer(heat.racers, 1).racer_name"
-                              class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                              class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
                             />
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <p class="text-xs text-gray-500">
                               #{{ getTrackRacer(heat.racers, 1).racer_number }}
                             </p>
                           </div>
@@ -727,9 +732,7 @@ class="text-sm"
                       </div>
 
                       <!-- Track 2 -->
-                      <div
-                        class="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600"
-                      >
+                      <div class="bg-white rounded-lg p-3 border-2 border-gray-300">
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-xs font-bold text-red-500">TRACK 2</span>
                         </div>
@@ -742,7 +745,7 @@ class="text-sm"
                           >
                           <div
                             v-else
-                            class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+                            class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center"
                           >
                             <i class="pi pi-car text-gray-400" />
                           </div>
@@ -750,9 +753,9 @@ class="text-sm"
                             <RacerLink
                               :racer-id="getTrackRacer(heat.racers, 2).racer_id"
                               :racer-name="getTrackRacer(heat.racers, 2).racer_name"
-                              class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                              class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
                             />
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <p class="text-xs text-gray-500">
                               #{{ getTrackRacer(heat.racers, 2).racer_number }}
                             </p>
                           </div>
@@ -771,7 +774,7 @@ class="text-sm"
             <!-- Qualifiers Results -->
             <Card v-if="completedQualifiers.length">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-clock" />
                   Qualifying Times
                 </h2>
@@ -780,9 +783,7 @@ class="text-sm"
                 <!-- Sort Controls -->
                 <div class="mb-4 flex items-center justify-between">
                   <div class="flex items-center gap-3">
-                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Sort by:
-                    </label>
+                    <label class="text-sm font-medium text-gray-700"> Sort by: </label>
                     <Select
                       v-model="qualifiersSortOption"
                       :options="sortOptions"
@@ -791,7 +792,7 @@ class="text-sm"
                       class="w-48"
                     />
                   </div>
-                  <div class="text-sm text-gray-500 dark:text-gray-400">
+                  <div class="text-sm text-gray-500">
                     {{ completedQualifiers.length }} qualifying runs
                   </div>
                 </div>
@@ -804,7 +805,7 @@ class="text-sm"
                 >
                   <Column field="racer_number" header="#" style="width: 60px">
                     <template #body="slotProps">
-                      <span class="font-semibold text-brand-blue dark:text-blue-400"
+                      <span class="font-semibold text-brand-blue"
                         >#{{ slotProps.data.racer_number }}</span
                       >
                     </template>
@@ -815,9 +816,9 @@ class="text-sm"
                         <RacerLink
                           :racer-id="slotProps.data.racer_id"
                           :racer-name="slotProps.data.racer_name"
-                          class="font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200"
+                          class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
                         />
-                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <div class="text-xs text-gray-500 mt-1">
                           Heat {{ slotProps.data.heat_number }} • Track
                           {{ slotProps.data.track_number }}
                         </div>
@@ -826,17 +827,14 @@ class="text-sm"
                   </Column>
                   <Column field="time" header="Time">
                     <template #body="slotProps">
-                      <span class="font-bold text-lg text-brand-blue dark:text-blue-400">{{
+                      <span class="font-bold text-lg text-brand-blue">{{
                         formatTime(slotProps.data.time)
                       }}</span>
                     </template>
                   </Column>
                   <Column field="created_at" header="Completed">
                     <template #body="slotProps">
-                      <span
-                        v-if="slotProps.data.created_at"
-                        class="text-sm text-gray-600 dark:text-gray-300"
-                      >
+                      <span v-if="slotProps.data.created_at" class="text-sm text-gray-600">
                         {{ new Date(slotProps.data.created_at).toLocaleTimeString() }}
                       </span>
                       <span v-else class="text-sm text-gray-400 italic"> Not completed </span>
@@ -849,7 +847,7 @@ class="text-sm"
             <!-- Awards Voting Section -->
             <Card v-if="voteableAwards.length && race?.active">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-trophy text-yellow-500" />
                   Vote for Awards
                 </h2>
@@ -859,7 +857,7 @@ class="text-sm"
                   <div
                     v-for="award in voteableAwards"
                     :key="award.id"
-                    class="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800"
+                    class="border rounded-lg p-4 bg-gray-50"
                   >
                     <div class="flex items-start gap-4 mb-4">
                       <!-- Award Image -->
@@ -868,13 +866,13 @@ class="text-sm"
                           v-if="award.image_url"
                           :src="award.image_url"
                           :alt="award.name"
-                          image-class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600"
+                          image-class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
                           class="w-16 h-16"
                           preview
                         />
                         <div
                           v-else
-                          class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center rounded-lg border-2 border-gray-200 dark:border-gray-600"
+                          class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center rounded-lg border-2 border-gray-200"
                         >
                           <i class="pi pi-trophy text-2xl text-red-500" />
                         </div>
@@ -883,15 +881,15 @@ class="text-sm"
                       <!-- Award Info -->
                       <div class="flex-1">
                         <div class="flex items-center justify-between mb-2">
-                          <h3 class="font-bold text-gray-900 dark:text-white">{{ award.name }}</h3>
+                          <h3 class="font-bold text-black">{{ award.name }}</h3>
                           <NuxtLink
                             to="/awards"
-                            class="text-brand-blue dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
+                            class="text-brand-blue hover:text-blue-800 text-sm font-medium"
                           >
                             Vote Now →
                           </NuxtLink>
                         </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                        <p class="text-sm text-gray-600">
                           {{ award.description }}
                         </p>
                       </div>
@@ -899,21 +897,19 @@ class="text-sm"
 
                     <!-- Current Vote Leaders -->
                     <div v-if="awardLeaderboards[award.id]?.length > 0" class="mt-4">
-                      <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                        Current Leaders:
-                      </h4>
+                      <h4 class="text-sm font-semibold text-gray-700 mb-2">Current Leaders:</h4>
                       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <div
                           v-for="(leader, index) in awardLeaderboards[award.id]?.slice(0, 3)"
                           :key="`${leader.racer_id}-${leader.award_definition_id}`"
-                          class="flex items-center gap-2 p-2 bg-white dark:bg-gray-700 rounded border"
+                          class="flex items-center gap-2 p-2 bg-white rounded border"
                         >
                           <div class="flex-shrink-0">
                             <span
                               class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                               :class="{
                                 'bg-yellow-400 text-yellow-900': index === 0,
-                                'bg-gray-400 text-gray-900': index === 1,
+                                'bg-gray-400 text-black': index === 1,
                                 'bg-orange-400 text-orange-900': index === 2
                               }"
                             >
@@ -924,9 +920,9 @@ class="text-sm"
                             <RacerLink
                               :racer-id="leader.racer_id"
                               :racer-name="leader.racer_name"
-                              class="text-sm font-medium text-gray-900 dark:text-white hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
+                              class="text-sm font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                             />
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                            <p class="text-xs text-gray-500">
                               {{ leader.vote_count }} vote{{ leader.vote_count !== 1 ? 's' : '' }}
                             </p>
                           </div>
@@ -934,7 +930,7 @@ class="text-sm"
                       </div>
                     </div>
 
-                    <div v-else class="text-center text-gray-500 dark:text-gray-400 py-4">
+                    <div v-else class="text-center text-gray-500 py-4">
                       <i class="pi pi-info-circle mb-2" />
                       <p class="text-sm">No votes yet - be the first to vote!</p>
                     </div>
@@ -946,7 +942,7 @@ class="text-sm"
             <!-- Checked In Racers -->
             <Card v-if="checkins.length">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-users" />
                   Checked In Racers ({{ checkins.length }})
                 </h2>
@@ -957,7 +953,7 @@ class="text-sm"
                     v-for="checkin in checkins"
                     :key="checkin.id"
                     :racer-id="checkin.racer_id"
-                    class="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors duration-200"
+                    class="flex items-center gap-3 p-3 bg-green-50/20 border border-green-200 rounded-lg hover:bg-green-100/30 transition-colors duration-200"
                   >
                     <div class="relative">
                       <img
@@ -968,19 +964,19 @@ class="text-sm"
                       >
                       <div
                         v-else
-                        class="w-12 h-12 bg-gray-200 dark:bg-gray-600 rounded-full border-2 border-green-300 flex items-center justify-center"
+                        class="w-12 h-12 bg-gray-200 rounded-full border-2 border-green-300 flex items-center justify-center"
                       >
-                        <i class="pi pi-car text-gray-500 dark:text-gray-300" />
+                        <i class="pi pi-car text-gray-500" />
                       </div>
                       <i
-                        class="pi pi-check-circle text-green-600 dark:text-green-400 text-sm absolute -bottom-1 -right-1 bg-white dark:bg-gray-800 rounded-full w-5 h-5 flex items-center justify-center"
+                        class="pi pi-check-circle text-green-600 text-sm absolute -bottom-1 -right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center"
                       />
                     </div>
                     <div class="flex-1">
-                      <p class="font-medium text-gray-900 dark:text-white hover:text-indigo-600">
+                      <p class="font-medium text-black hover:text-indigo-600">
                         {{ checkin.racer_name }}
                       </p>
-                      <p class="text-sm text-gray-600 dark:text-gray-300">
+                      <p class="text-sm text-gray-600">
                         #{{ checkin.racer_number }} •
                         {{ new Date(checkin.time).toLocaleTimeString() }}
                       </p>
@@ -993,7 +989,7 @@ class="text-sm"
             <!-- Race Photo Gallery -->
             <Card v-if="racePhotos.length > 0">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-images" />
                   Race Photos
                 </h2>
@@ -1001,10 +997,8 @@ class="text-sm"
               <template #content>
                 <div class="space-y-6">
                   <!-- Filter Controls -->
-                  <div
-                    class="flex items-center justify-between border-b border-gray-200 dark:border-gray-600 pb-4"
-                  >
-                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <div class="flex items-center justify-between border-b border-gray-200 pb-4">
+                    <span class="text-sm font-medium text-gray-700">
                       {{ filteredRacePhotos.length }} photo{{
                         filteredRacePhotos.length !== 1 ? 's' : ''
                       }}
@@ -1042,10 +1036,10 @@ class="text-sm"
                   </div>
 
                   <!-- See All Photos Link -->
-                  <div class="text-center pt-4 border-t border-gray-200 dark:border-gray-600">
+                  <div class="text-center pt-4 border-t border-gray-200">
                     <NuxtLink
                       to="/gallery"
-                      class="inline-flex items-center gap-2 text-brand-blue hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200 font-medium transition-colors"
+                      class="inline-flex items-center gap-2 text-brand-blue hover:text-blue-800 font-medium transition-colors"
                     >
                       <i class="pi pi-images" />
                       See all photos
@@ -1065,25 +1059,25 @@ class="text-sm"
               <template #content>
                 <div class="space-y-4">
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Total Racers</span>
+                    <span class="text-gray-600">Total Racers</span>
                     <span class="font-semibold">{{ checkins.length }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Qualifying Runs</span>
+                    <span class="text-gray-600">Qualifying Runs</span>
                     <span class="font-semibold">{{ qualifiers.length }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Bracket Races</span>
+                    <span class="text-gray-600">Bracket Races</span>
                     <span class="font-semibold">{{
                       race && getBracketsForRace(race.id).length
                     }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Fastest Time</span>
+                    <span class="text-gray-600">Fastest Time</span>
                     <span class="font-semibold">{{ fastestTime || 'N/A' }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Slowest Time</span>
+                    <span class="text-gray-600">Slowest Time</span>
                     <span class="font-semibold">{{ slowestTime || 'N/A' }}</span>
                   </div>
                 </div>
@@ -1093,9 +1087,7 @@ class="text-sm"
             <!-- Race Timeline -->
             <Card>
               <template #title>
-                <h3
-                  class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
-                >
+                <h3 class="text-lg font-semibold text-black flex items-center gap-2">
                   <i class="pi pi-history" />
                   Race Timeline
                 </h3>
@@ -1118,17 +1110,17 @@ class="text-sm"
                   </template>
                   <template #opposite="{ item }">
                     <div class="pr-4 text-right">
-                      <p class="text-gray-500 dark:text-gray-500 text-xs font-medium">
+                      <p class="text-gray-500 text-xs font-medium">
                         {{ formatEventTime(item.date) }}
                       </p>
                     </div>
                   </template>
                   <template #content="{ item }">
                     <div class="pl-4">
-                      <h4 class="font-semibold text-gray-900 dark:text-white text-sm">
+                      <h4 class="font-semibold text-black text-sm">
                         {{ item.title }}
                       </h4>
-                      <p class="text-gray-600 dark:text-gray-400 text-xs mt-1">
+                      <p class="text-gray-600 text-xs mt-1">
                         {{ item.description }}
                       </p>
                     </div>
@@ -1141,13 +1133,10 @@ class="text-sm"
             <div v-if="race.description && checkins.length > 0">
               <Card>
                 <template #title>
-                  <h2 class="text-xl font-semibold text-gray-900 dark:text-white">About This Race</h2>
+                  <h2 class="text-xl font-semibold text-black">About This Race</h2>
                 </template>
                 <template #content>
-                  <div 
-                    class="prose prose-gray dark:prose-invert"
-                    v-html="race.description"
-                  />
+                  <div class="prose prose-gray" v-html="race.description" />
                 </template>
               </Card>
             </div>
@@ -1900,9 +1889,14 @@ useHead({
   border-bottom: 1px solid #374151 !important;
 }
 
-
 /* Target the specific RacerLink anchor elements with maximum specificity */
-:deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a.font-medium.dark\:text-white.hover\:text-brand-blue),
+:deep(
+  .app-dark
+    .custom-datatable
+    .p-datatable-tbody
+    > tr:hover
+    a.font-medium.dark\:text-white.hover\:text-brand-blue
+),
 :deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a.font-medium.dark\:text-white),
 :deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a.font-medium),
 :deep(.app-dark .custom-datatable .p-datatable-tbody > tr:hover a),

@@ -7,11 +7,11 @@
       :loop="true"
       :autoplay="{
         delay: 4000,
-        disableOnInteraction: false,
+        disableOnInteraction: false
       }"
       :pagination="{
         clickable: true,
-        dynamicBullets: true,
+        dynamicBullets: true
       }"
       :navigation="true"
       :grab-cursor="true"
@@ -19,19 +19,19 @@
       :breakpoints="{
         768: {
           slidesPerView: 2,
-          spaceBetween: 40,
+          spaceBetween: 40
         },
         1024: {
           slidesPerView: 3,
-          spaceBetween: 50,
-        },
+          spaceBetween: 50
+        }
       }"
       class="beautiful-swiper"
       @swiper="onSwiper"
       @slide-change="onSlideChange"
     >
       <swiper-slide v-for="(image, index) in images" :key="index" class="relative group">
-        <div 
+        <div
           class="relative overflow-hidden rounded-2xl shadow-2xl bg-gradient-to-br from-gray-900 to-gray-700 cursor-pointer"
           @click="handleSlideClick(index)"
         >
@@ -42,11 +42,17 @@
             loading="lazy"
           >
           <!-- Gradient overlay -->
-          <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          />
+
           <!-- Click indicator -->
-          <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <div class="bg-white/20 backdrop-blur-sm rounded-full p-4 transform scale-0 group-hover:scale-100 transition-transform duration-300">
+          <div
+            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+          >
+            <div
+              class="bg-white/20 backdrop-blur-sm rounded-full p-4 transform scale-0 group-hover:scale-100 transition-transform duration-300"
+            >
               <i class="pi pi-search-plus text-white text-2xl" />
             </div>
           </div>
@@ -55,10 +61,14 @@
     </swiper>
 
     <!-- Custom navigation buttons -->
-    <div class="swiper-button-prev-custom absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/20 transition-all duration-300 cursor-pointer">
+    <div
+      class="swiper-button-prev-custom absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/20 transition-all duration-300 cursor-pointer"
+    >
       <i class="pi pi-chevron-left text-xl" />
     </div>
-    <div class="swiper-button-next-custom absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/20 transition-all duration-300 cursor-pointer">
+    <div
+      class="swiper-button-next-custom absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm rounded-full p-3 text-white hover:bg-white/20 transition-all duration-300 cursor-pointer"
+    >
       <i class="pi pi-chevron-right text-xl" />
     </div>
   </div>
@@ -89,7 +99,7 @@ const onSwiper = (swiper) => {
   // Custom navigation
   const prevButton = document.querySelector('.swiper-button-prev-custom')
   const nextButton = document.querySelector('.swiper-button-next-custom')
-  
+
   if (prevButton) {
     prevButton.addEventListener('click', () => swiper.slidePrev())
   }
@@ -145,6 +155,6 @@ const handleSlideClick = (index) => {
 /* Custom slide shadows for coverflow effect */
 :deep(.swiper-slide-shadow-left),
 :deep(.swiper-slide-shadow-right) {
-  background: linear-gradient(to right, rgba(0,0,0,0.5), transparent) !important;
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.5), transparent) !important;
 }
 </style>

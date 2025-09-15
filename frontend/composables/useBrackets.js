@@ -61,7 +61,9 @@ export const useBrackets = () => {
       const eligibleRacers = await getEligibleRacers(raceId)
 
       if (eligibleRacers.length < 2) {
-        throw new Error('At least 2 checked-in, non-withdrawn racers are required to generate brackets')
+        throw new Error(
+          'At least 2 checked-in, non-withdrawn racers are required to generate brackets'
+        )
       }
 
       // Generate initial winner bracket pairs with seeding
@@ -101,8 +103,7 @@ export const useBrackets = () => {
       // Insert brackets into database
       const { data: insertedBrackets, error: insertError } = await supabase
         .from('brackets')
-        .insert(bracketPairs)
-        .select(`
+        .insert(bracketPairs).select(`
           *,
           track1_racer:racers!track1_racer_id(name, racer_number),
           track2_racer:racers!track2_racer_id(name, racer_number)
@@ -140,12 +141,13 @@ export const useBrackets = () => {
 
       if (withdrawalError) throw withdrawalError
 
-      const withdrawnRacerIds = (withdrawnRacers || []).map(w => w.racer_id)
+      const withdrawnRacerIds = (withdrawnRacers || []).map((w) => w.racer_id)
 
       // Get checked-in racers who are not withdrawn
       const { data: checkedInRacers, error: checkinError } = await supabase
         .from('checkins')
-        .select(`
+        .select(
+          `
           racer_id,
           racers (
             id,
@@ -153,7 +155,8 @@ export const useBrackets = () => {
             racer_number,
             user_id
           )
-        `)
+        `
+        )
         .eq('race_id', raceId)
         .not('racer_id', 'in', `(${withdrawnRacerIds.join(',') || 'null'})`)
 
@@ -170,7 +173,7 @@ export const useBrackets = () => {
 
       // Create map of best qualifying times
       const bestTimes = new Map()
-      qualifiers.forEach(q => {
+      qualifiers.forEach((q) => {
         if (!bestTimes.has(q.racer_id) || q.time < bestTimes.get(q.racer_id)) {
           bestTimes.set(q.racer_id, q.time)
         }
@@ -178,8 +181,8 @@ export const useBrackets = () => {
 
       // Combine checked-in racers with their best times for seeding
       const eligibleRacers = checkedInRacers
-        .filter(c => c.racers) // Only include valid racer data
-        .map(c => ({
+        .filter((c) => c.racers) // Only include valid racer data
+        .map((c) => ({
           racer_id: c.racer_id,
           name: c.racers.name,
           racer_number: c.racers.racer_number,
@@ -335,7 +338,7 @@ export const useBrackets = () => {
       if (error) throw error
 
       // Update local bracket state
-      const bracketIndex = state.brackets.value.findIndex(b => b.id === bracketId)
+      const bracketIndex = state.brackets.value.findIndex((b) => b.id === bracketId)
       if (bracketIndex !== -1) {
         state.brackets.value[bracketIndex] = {
           ...state.brackets.value[bracketIndex],
@@ -347,15 +350,11 @@ export const useBrackets = () => {
       }
 
       // Get bracket info for notification
-      const bracket = state.brackets.value.find(b => b.id === bracketId)
-      const winnerName = result.winner_track === 1 
-        ? bracket?.track1_racer?.name 
-        : bracket?.track2_racer?.name
+      const bracket = state.brackets.value.find((b) => b.id === bracketId)
+      const winnerName =
+        result.winner_track === 1 ? bracket?.track1_racer?.name : bracket?.track2_racer?.name
 
-      notifications.success(
-        'Forfeit Recorded', 
-        `${winnerName} advances by forfeit. ${reason}`
-      )
+      notifications.success('Forfeit Recorded', `${winnerName} advances by forfeit. ${reason}`)
 
       // Check if we should generate next round brackets
       await checkAndGenerateNextRound(bracket?.race_id)
@@ -425,7 +424,7 @@ export const useBrackets = () => {
 
       // Generate next round if elimination tournament
       if (state.bracketConfig.value.autoAdvanceWinners && bracket.bracket_type !== 'round_robin') {
-        await generateNextRound(bracket.race_id)
+        await checkAndGenerateNextRound(bracket.race_id)
       }
 
       return winnerRacerId
@@ -439,20 +438,25 @@ export const useBrackets = () => {
   // Check if a round is complete and generate next round for double elimination
   const checkAndGenerateNextRound = async (raceId) => {
     try {
-      const raceBrackets = state.brackets.value.filter(b => b.race_id === raceId)
-      
+      const raceBrackets = state.brackets.value.filter((b) => b.race_id === raceId)
+
       // Group by bracket group and round
-      const winnerBrackets = raceBrackets.filter(b => b.bracket_group === 'winner')
-      const loserBrackets = raceBrackets.filter(b => b.bracket_group === 'loser')
-      
+      const winnerBrackets = raceBrackets.filter((b) => b.bracket_group === 'winner')
+      const loserBrackets = raceBrackets.filter((b) => b.bracket_group === 'loser')
+
       // Check if current winner bracket round is complete
-      const currentWinnerRound = Math.max(...winnerBrackets.map(b => b.round_number), 0)
-      const winnerRoundBrackets = winnerBrackets.filter(b => b.round_number === currentWinnerRound)
-      const completedWinnerBrackets = winnerRoundBrackets.filter(b => 
-        b.winner_racer_id || (b.track1_time && b.track2_time) || b.is_forfeit
+      const currentWinnerRound = Math.max(...winnerBrackets.map((b) => b.round_number), 0)
+      const winnerRoundBrackets = winnerBrackets.filter(
+        (b) => b.round_number === currentWinnerRound
       )
-      
-      if (winnerRoundBrackets.length > 0 && completedWinnerBrackets.length === winnerRoundBrackets.length) {
+      const completedWinnerBrackets = winnerRoundBrackets.filter(
+        (b) => b.winner_racer_id || (b.track1_time && b.track2_time) || b.is_forfeit
+      )
+
+      if (
+        winnerRoundBrackets.length > 0 &&
+        completedWinnerBrackets.length === winnerRoundBrackets.length
+      ) {
         // Winner bracket round is complete, generate next rounds
         await generateDoubleEliminationNextRounds(raceId)
       }
@@ -464,18 +468,20 @@ export const useBrackets = () => {
   // Generate next rounds for double elimination (winner and loser brackets)
   const generateDoubleEliminationNextRounds = async (raceId) => {
     try {
-      const raceBrackets = state.brackets.value.filter(b => b.race_id === raceId)
-      
+      const raceBrackets = state.brackets.value.filter((b) => b.race_id === raceId)
+
       // Get current winners from winner bracket
-      const winnerBrackets = raceBrackets.filter(b => b.bracket_group === 'winner')
-      const currentWinnerRound = Math.max(...winnerBrackets.map(b => b.round_number))
-      const currentRoundBrackets = winnerBrackets.filter(b => b.round_number === currentWinnerRound)
-      
+      const winnerBrackets = raceBrackets.filter((b) => b.bracket_group === 'winner')
+      const currentWinnerRound = Math.max(...winnerBrackets.map((b) => b.round_number))
+      const currentRoundBrackets = winnerBrackets.filter(
+        (b) => b.round_number === currentWinnerRound
+      )
+
       // Get winners and losers from current round
       const winners = []
       const losers = []
-      
-      currentRoundBrackets.forEach(bracket => {
+
+      currentRoundBrackets.forEach((bracket) => {
         if (bracket.winner_racer_id) {
           // Winner determined
           const winnerIsTrack1 = bracket.winner_track === 1
@@ -483,7 +489,7 @@ export const useBrackets = () => {
             racer_id: bracket.winner_racer_id,
             name: winnerIsTrack1 ? bracket.track1_racer?.name : bracket.track2_racer?.name
           })
-          
+
           // Add loser to loser bracket (unless it's a bye)
           if (bracket.track1_racer_id && bracket.track2_racer_id) {
             const loserRacerId = winnerIsTrack1 ? bracket.track2_racer_id : bracket.track1_racer_id
@@ -494,13 +500,13 @@ export const useBrackets = () => {
           }
         }
       })
-      
+
       const nextBrackets = []
-      
+
       // Generate next winner bracket round if we have enough winners
       if (winners.length >= 2) {
         const nextWinnerRound = currentWinnerRound + 1
-        
+
         for (let i = 0; i < Math.floor(winners.length / 2); i++) {
           nextBrackets.push({
             race_id: raceId,
@@ -511,7 +517,7 @@ export const useBrackets = () => {
             round_number: nextWinnerRound
           })
         }
-        
+
         // Handle odd winner (bye)
         if (winners.length % 2 === 1) {
           const byeWinner = winners[winners.length - 1]
@@ -527,14 +533,13 @@ export const useBrackets = () => {
           })
         }
       }
-      
+
       // Generate loser bracket round if we have losers
       if (losers.length >= 2) {
-        const loserBrackets = raceBrackets.filter(b => b.bracket_group === 'loser')
-        const nextLoserRound = loserBrackets.length > 0 
-          ? Math.max(...loserBrackets.map(b => b.round_number)) + 1 
-          : 1
-        
+        const loserBrackets = raceBrackets.filter((b) => b.bracket_group === 'loser')
+        const nextLoserRound =
+          loserBrackets.length > 0 ? Math.max(...loserBrackets.map((b) => b.round_number)) + 1 : 1
+
         for (let i = 0; i < Math.floor(losers.length / 2); i++) {
           nextBrackets.push({
             race_id: raceId,
@@ -546,30 +551,26 @@ export const useBrackets = () => {
           })
         }
       }
-      
+
       // Insert new brackets if any were generated
       if (nextBrackets.length > 0) {
         const { error } = await supabase.from('brackets').insert(nextBrackets)
-        
+
         if (error) throw error
-        
+
         notifications.info(
-          'Next Round Generated', 
+          'Next Round Generated',
           `Created ${nextBrackets.length} bracket(s) for next round.`
         )
-        
+
         // Refresh brackets
         await fetchBrackets()
       }
-      
+
       // Check if tournament is complete (only one winner left)
       if (winners.length === 1 && losers.length === 0) {
-        notifications.success(
-          'Tournament Complete!', 
-          `${winners[0].name} is the champion!`
-        )
+        notifications.success('Tournament Complete!', `${winners[0].name} is the champion!`)
       }
-      
     } catch (err) {
       console.error('Error generating double elimination next rounds:', err)
       notifications.error('Failed to Generate Next Round', err.message)

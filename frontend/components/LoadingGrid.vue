@@ -3,7 +3,7 @@
     <Card
       v-for="n in count"
       :key="n"
-      class="group border-2 border-gray-100 dark:border-gray-700 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 h-full relative"
+      class="group border-2 border-gray-100 rounded-2xl overflow-hidden bg-white h-full relative"
       style="box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05)"
     >
       <template #header>

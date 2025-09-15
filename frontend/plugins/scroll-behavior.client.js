@@ -8,7 +8,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         }, 100)
       })
     }
-    
+
     // If navigating to a hash (anchor), scroll to it
     if (to.hash) {
       return {
@@ -16,7 +16,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         behavior: 'smooth'
       }
     }
-    
+
     // Otherwise scroll to top
     return { top: 0, behavior: 'smooth' }
   }

@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <!-- Header -->
       <div class="mb-8">
         <div class="flex flex-col md:flex-row md:items-start md:justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Heat Management</h1>
-            <p class="text-gray-600 dark:text-gray-300">Manage qualifier heats and times</p>
+            <h1 class="text-3xl font-bold text-black mb-2">Heat Management</h1>
+            <p class="text-gray-600">Manage qualifier heats and times</p>
           </div>
           <div class="mt-4 md:mt-0">
             <AdminMenu />
@@ -15,14 +15,12 @@
       </div>
 
       <!-- Current Race Info -->
-      <div v-if="currentRace" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Active Race: {{ currentRace.name }}
-        </h2>
+      <div v-if="currentRace" class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h2 class="text-lg font-semibold text-black mb-4">Active Race: {{ currentRace.name }}</h2>
 
         <!-- Qualifying Mode Controls -->
-        <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-          <h3 class="text-md font-medium text-gray-900 dark:text-white mb-3">Qualifying Mode</h3>
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+          <h3 class="text-md font-medium text-black mb-3">Qualifying Mode</h3>
           <div class="flex flex-wrap gap-3 mb-3">
             <button
               :disabled="loading"
@@ -64,7 +62,7 @@
               Ready for Brackets
             </button>
           </div>
-          <div class="text-sm text-gray-600 dark:text-gray-400">
+          <div class="text-sm text-gray-600">
             <span v-if="qualifyingMode === 'auto'">
               <i class="pi pi-check-circle text-green-600 mr-1" />
               New heats will be automatically generated after each completion
@@ -105,67 +103,65 @@
           >
             Start First Heat
           </button>
-          <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+          <div class="text-sm text-gray-600 flex items-center">
             <i class="pi pi-info-circle mr-2" />
             Generates heats prioritizing racers with fewer attempts
           </div>
         </div>
 
         <!-- Qualifying Stats -->
-        <div v-if="qualifyingStats" class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <h3 class="text-md font-medium text-gray-900 dark:text-white mb-3">
-            Qualifying Progress
-          </h3>
+        <div v-if="qualifyingStats" class="mt-6 p-4 bg-blue-50/20 rounded-lg">
+          <h3 class="text-md font-medium text-black mb-3">Qualifying Progress</h3>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
             <div class="text-center">
-              <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              <p class="text-2xl font-bold text-blue-600">
                 {{ qualifyingStats.total_racers }}
               </p>
-              <p class="text-gray-600 dark:text-gray-400">Total Racers</p>
+              <p class="text-gray-600">Total Racers</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+              <p class="text-2xl font-bold text-green-600">
                 {{ qualifyingStats.total_attempts }}
               </p>
-              <p class="text-gray-600 dark:text-gray-400">Total Attempts</p>
+              <p class="text-gray-600">Total Attempts</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-bold text-orange-600 dark:text-orange-400">
+              <p class="text-2xl font-bold text-orange-600">
                 {{ qualifyingStats.min_attempts }}
               </p>
-              <p class="text-gray-600 dark:text-gray-400">Fewest Attempts</p>
+              <p class="text-gray-600">Fewest Attempts</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+              <p class="text-2xl font-bold text-purple-600">
                 {{ qualifyingStats.max_attempts }}
               </p>
-              <p class="text-gray-600 dark:text-gray-400">Most Attempts</p>
+              <p class="text-gray-600">Most Attempts</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-bold text-red-600 dark:text-red-400">
+              <p class="text-2xl font-bold text-red-600">
                 {{ qualifyingStats.racers_with_min_attempts }}
               </p>
-              <p class="text-gray-600 dark:text-gray-400">Need More Runs</p>
+              <p class="text-gray-600">Need More Runs</p>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Error Display -->
-      <div v-if="error" class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-6">
-        <p class="text-red-800 dark:text-red-200">{{ error }}</p>
+      <div v-if="error" class="bg-red-50/20 p-4 rounded-lg mb-6">
+        <p class="text-red-800">{{ error }}</p>
       </div>
 
       <!-- Current Heat -->
-      <div v-if="currentHeat" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div v-if="currentHeat" class="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h3 class="text-lg font-semibold text-black mb-4">
           Current Heat #{{ currentHeat.heat_number }}
         </h3>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Track 1 -->
-          <div class="border rounded-lg p-4 dark:border-gray-700">
-            <h4 class="font-medium text-gray-900 dark:text-white mb-2">Track 1</h4>
+          <div class="border rounded-lg p-4">
+            <h4 class="font-medium text-black mb-2">Track 1</h4>
             <div v-if="currentHeat.racers[0]" class="space-y-2">
               <div class="flex items-center gap-3">
                 <img
@@ -176,7 +172,7 @@
                 >
                 <div>
                   <p class="font-medium">{{ currentHeat.racers[0].racer_name }}</p>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                  <p class="text-sm text-gray-600">
                     Racer #{{ currentHeat.racers[0].racer_number }}
                   </p>
                 </div>
@@ -186,14 +182,14 @@
                 type="number"
                 step="0.01"
                 placeholder="Time (seconds)"
-                class="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                class="w-full px-3 py-2 border rounded-md"
               >
             </div>
           </div>
 
           <!-- Track 2 -->
-          <div class="border rounded-lg p-4 dark:border-gray-700">
-            <h4 class="font-medium text-gray-900 dark:text-white mb-2">Track 2</h4>
+          <div class="border rounded-lg p-4">
+            <h4 class="font-medium text-black mb-2">Track 2</h4>
             <div v-if="currentHeat.racers[1]" class="space-y-2">
               <div class="flex items-center gap-3">
                 <img
@@ -204,7 +200,7 @@
                 >
                 <div>
                   <p class="font-medium">{{ currentHeat.racers[1].racer_name }}</p>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                  <p class="text-sm text-gray-600">
                     Racer #{{ currentHeat.racers[1].racer_number }}
                   </p>
                 </div>
@@ -214,7 +210,7 @@
                 type="number"
                 step="0.01"
                 placeholder="Time (seconds)"
-                class="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                class="w-full px-3 py-2 border rounded-md"
               >
             </div>
           </div>
@@ -239,22 +235,13 @@
       </div>
 
       <!-- Upcoming Heats -->
-      <div
-        v-if="upcomingHeats.length > 0"
-        class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6"
-      >
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Upcoming Heats</h3>
+      <div v-if="upcomingHeats.length > 0" class="bg-white rounded-lg shadow-sm p-6">
+        <h3 class="text-lg font-semibold text-black mb-4">Upcoming Heats</h3>
 
         <div class="space-y-4">
-          <div
-            v-for="heat in upcomingHeats"
-            :key="heat.heat_number"
-            class="border rounded-lg p-4 dark:border-gray-700"
-          >
+          <div v-for="heat in upcomingHeats" :key="heat.heat_number" class="border rounded-lg p-4">
             <div class="flex justify-between items-start mb-3">
-              <h4 class="font-medium text-gray-900 dark:text-white">
-                Heat #{{ heat.heat_number }}
-              </h4>
+              <h4 class="font-medium text-black">Heat #{{ heat.heat_number }}</h4>
               <div v-if="!currentHeat" class="flex gap-2">
                 <button
                   class="text-sm px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -277,7 +264,7 @@
                 :key="racer.track_number"
                 class="flex items-center gap-3"
               >
-                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <span class="text-sm font-medium text-gray-600">
                   Track {{ racer.track_number }}:
                 </span>
                 <img
@@ -288,7 +275,7 @@
                 >
                 <div>
                   <p class="text-sm font-medium">{{ racer.racer_name }}</p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400">#{{ racer.racer_number }}</p>
+                  <p class="text-xs text-gray-600">#{{ racer.racer_number }}</p>
                 </div>
               </div>
             </div>
@@ -297,13 +284,8 @@
       </div>
 
       <!-- No Active Race -->
-      <div
-        v-else-if="!loading && !currentRace"
-        class="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg"
-      >
-        <p class="text-yellow-800 dark:text-yellow-200">
-          No active race found. Please set a race as active first.
-        </p>
+      <div v-else-if="!loading && !currentRace" class="bg-yellow-50/20 p-6 rounded-lg">
+        <p class="text-yellow-800">No active race found. Please set a race as active first.</p>
         <NuxtLink to="/races" class="mt-2 inline-block text-blue-600 hover:text-blue-800">
           Manage Races →
         </NuxtLink>
@@ -318,32 +300,28 @@
         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
       >
         <div class="space-y-6">
-          <p class="text-gray-600 dark:text-gray-300">
+          <p class="text-gray-600">
             Create a custom heat with specific racers. This is useful for creating special matchups
             or filling specific heat numbers.
           </p>
 
           <!-- Heat Number -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Heat Number
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"> Heat Number </label>
             <InputNumber
               v-model="manualHeat.heatNumber"
               :min="1"
               placeholder="Auto (next available)"
               class="w-full"
             />
-            <small class="text-gray-500 dark:text-gray-400">
+            <small class="text-gray-500">
               Leave empty for auto-increment, or specify to fill gaps in heat numbering
             </small>
           </div>
 
           <!-- Track 1 Racer -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Track 1 Racer
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"> Track 1 Racer </label>
             <Select
               v-model="manualHeat.track1Racer"
               :options="availableRacers"
@@ -363,7 +341,7 @@
                   >
                   <div
                     v-else
-                    class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center"
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center"
                   >
                     <i class="pi pi-car text-gray-500 text-sm" />
                   </div>
@@ -378,9 +356,7 @@
 
           <!-- Track 2 Racer -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Track 2 Racer
-            </label>
+            <label class="block text-sm font-medium text-gray-700 mb-2"> Track 2 Racer </label>
             <Select
               v-model="manualHeat.track2Racer"
               :options="availableRacers"
@@ -400,7 +376,7 @@
                   >
                   <div
                     v-else
-                    class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center"
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center"
                   >
                     <i class="pi pi-car text-gray-500 text-sm" />
                   </div>
@@ -416,7 +392,7 @@
           <!-- Options -->
           <div class="flex items-center gap-3">
             <Checkbox v-model="manualHeat.setAsCurrent" binary input-id="setAsCurrent" />
-            <label for="setAsCurrent" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label for="setAsCurrent" class="text-sm font-medium text-gray-700">
               Set as current heat immediately
             </label>
           </div>

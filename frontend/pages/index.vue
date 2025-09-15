@@ -1,130 +1,186 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
-    <!-- Header Section -->
-    <div class="py-16 bg-white dark:bg-gray-900">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Logo and Title -->
-        <div class="text-center mb-12">
-          <div class="flex justify-center mb-6">
-            <img
-              src="~/assets/img/brick_race_logo.jpg"
-              alt="The Great Holyoke Brick Race Logo"
-              class="h-32 md:h-40 w-auto object-contain rounded-lg"
-            >
-          </div>
-          <h2
-            class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
-          >
-            the great holyoke brick race
-          </h2>
-          <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-            Where performance art meets sport in the first brick race of its kind.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Featured Race (Hero Section) -->
-    <div v-if="activeRace && !pending" class="bg-white dark:bg-gray-900">
-      <!-- Race Image at Very Top -->
-      <div class="w-full mb-8">
-        <Image
-          v-if="activeRace.image_url"
-          :src="activeRace.image_url"
-          :alt="activeRace.name"
-          image-class="w-full h-64 md:h-80 object-contain"
-          class="w-full h-64 md:h-80"
-        />
-        <div
-          v-else
-          class="w-full h-64 md:h-80 bg-gray-200 dark:bg-gray-800 flex items-center justify-center"
-        >
-          <i class="pi pi-flag text-6xl text-gray-400 dark:text-gray-500" />
-        </div>
-      </div>
-
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="text-center mb-12">
-          <h1
-            class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 tracking-wide"
-          >
-            {{ activeRace.name }}
+  <div class="min-h-screen bg-white">
+    <!-- Featured Race (Hero Section) - Static Content -->
+    <div class="bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="text-center mb-4">
+          <h1 class="text-4xl md:text-6xl font-bold text-black mb-4 tracking-wide">
+            The 2025 Brick Race
           </h1>
-          <div class="text-xl md:text-2xl text-gray-700 dark:text-gray-300 mb-8 text-center">
-            <p>
-              {{
-                activeRace.race_datetime 
-                  ? new Date(activeRace.race_datetime).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })
-                  : 'Date TBD'
-              }}
-            </p>
-            <p v-if="activeRace.race_datetime" class="text-lg md:text-xl">
-              {{
-                new Date(activeRace.race_datetime).toLocaleTimeString('en-US', {
-                  hour: 'numeric',
-                  minute: '2-digit',
-                  hour12: true
-                })
-              }}{{
-                activeRace.end_time 
-                  ? ' - ' + new Date(activeRace.end_time).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true
-                    })
-                  : ''
-              }}
-            </p>
+          <p class="text-xl text-gray-600 mb-3 max-w-3xl mx-auto">
+            Make it fast. Make it weird. Make it unforgettable.
+          </p>
+
+          <!-- Race Image -->
+          <div class="w-full mb-2">
+            <Image
+              src="https://ehbmnhyyycvduhtfgoho.supabase.co/storage/v1/object/public/race-images/races/race-1751424799956.jpg"
+              alt="The 2025 Brick Race"
+              image-class="w-full h-64 md:h-80 object-contain rounded-lg"
+              class="w-full h-64 md:h-80"
+            />
           </div>
         </div>
 
         <!-- Race Description and Map Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <!-- Race Description -->
-          <Card class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full">
+          <Card
+            class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full overflow-hidden no-padding-card"
+          >
             <template #content>
-              <div class="text-center space-y-6 h-full flex flex-col">
-                <div class="flex-1">
-                  <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
-                  >
-                    About This Race
-                  </h2>
-                  <div v-if="activeRace.description" class="text-gray-700 dark:text-gray-300 leading-relaxed prose prose-gray dark:prose-invert max-w-none text-left" v-html="activeRace.description" />
-                  <p v-else class="text-gray-600 dark:text-gray-400 italic">
-                    Race description coming soon...
-                  </p>
+              <div class="h-full flex flex-col">
+                <h2
+                  class="text-2xl font-bold text-white bg-black py-2 px-6 tracking-wide text-left"
+                >
+                  About This Race
+                </h2>
+                <div class="flex-1 p-6">
+                  <div class="text-gray-700 leading-relaxed text-left">
+                    <p class="text-xl font-bold">Saturday, October 11</p>
+                    <p class="text-xl font-bold">11 AM - 3 PM</p>
+                    <p class="mt-4 mb-4">
+                      Gravity-powered vehicles competing for speed, creativity, and artistry. Awards
+                      for fastest and slowest racers, those with the best engineering, best crashes,
+                      and more.
+                    </p>
+                    <p class="text-lg font-bold">CHECK-IN: 11:00 AM</p>
+                    <p class="text-lg font-bold">RACE: NOON</p>
+                    <p class="mt-4">All racers should register online.</p>
+                  </div>
                 </div>
               </div>
             </template>
           </Card>
 
           <!-- Google Maps -->
+          <Card
+            class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full overflow-hidden no-padding-card"
+          >
+            <template #content>
+              <div class="h-full flex flex-col">
+                <h2
+                  class="text-2xl font-bold text-white bg-black py-2 px-6 tracking-wide text-left"
+                >
+                  Location
+                </h2>
+                <div class="flex-1">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2938.8234567890123!2d-72.6098765!3d42.2087654!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89e6e74f8a8b8c8d%3A0x1234567890abcdef!2s80%20Race%20St%2C%20Holyoke%2C%20MA%2001040!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus&q=80+Race+St,+Holyoke,+MA"
+                    width="100%"
+                    style="border: 0; height: 100%"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    class="w-full min-h-[300px]"
+                  />
+                </div>
+              </div>
+            </template>
+          </Card>
+        </div>
+
+        <!-- Event Details -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <!-- Parking -->
+          <div class="text-center">
+            <div class="flex justify-center mb-3">
+              <div class="w-12 h-12 bg-brand-blue rounded-full flex items-center justify-center">
+                <i class="pi pi-car text-white text-xl" />
+              </div>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Parking</h3>
+            <p class="text-gray-600 text-sm">
+              Street parking available on Race Street and surrounding areas
+            </p>
+          </div>
+
+          <!-- Spectators Welcome -->
+          <div class="text-center">
+            <div class="flex justify-center mb-3">
+              <div class="w-12 h-12 bg-brand-green rounded-full flex items-center justify-center">
+                <i class="pi pi-users text-white text-xl" />
+              </div>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Spectators Welcome</h3>
+            <p class="text-gray-600 text-sm">
+              Join over 1,000 spectators who attend this beloved annual event
+            </p>
+          </div>
+
+          <!-- Food & Refreshments -->
+          <div class="text-center">
+            <div class="flex justify-center mb-3">
+              <div class="w-12 h-12 bg-brand-gold rounded-full flex items-center justify-center">
+                <i class="pi pi-shopping-bag text-white text-xl" />
+              </div>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Food & Refreshments</h3>
+            <p class="text-gray-600 text-sm">
+              Food trucks and local vendors provide delicious options throughout the event
+            </p>
+          </div>
+
+          <!-- Family Friendly -->
+          <div class="text-center">
+            <div class="flex justify-center mb-3">
+              <div class="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
+                <i class="pi pi-heart text-white text-xl" />
+              </div>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Family Friendly</h3>
+            <p class="text-gray-600 text-sm">
+              A fun community event perfect for all ages and backgrounds
+            </p>
+          </div>
+        </div>
+
+        <!-- Additional Info Blocks -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <!-- Test Drive Block -->
           <Card class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full">
             <template #content>
-              <div class="text-center space-y-6 h-full flex flex-col">
-                <div class="flex-1">
-                  <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
+              <div class="flex items-start gap-4">
+                <!-- Go image for left column -->
+                <div class="flex-shrink-0 w-24 h-24">
+                  <img
+                    src="~/assets/img/go.png"
+                    alt="Test Drive"
+                    class="w-full h-full object-contain"
                   >
-                    Location
-                  </h2>
-                  <div class="bg-gray-200 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg">
-                    <iframe
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2938.8234567890123!2d-72.6098765!3d42.2087654!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89e6e74f8a8b8c8d%3A0x1234567890abcdef!2s80%20Race%20St%2C%20Holyoke%2C%20MA%2001040!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus&q=80+Race+St,+Holyoke,+MA"
-                      width="100%"
-                      style="border:0;"
-                      allowfullscreen=""
-                      loading="lazy"
-                      referrerpolicy="no-referrer-when-downgrade"
-                      class="w-full h-[300px]"
-                    />
-                  </div>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-bold text-black mb-2">Test drive the track</h3>
+                  <p class="text-lg">Saturday, October 4</p>
+                  <p class="text-lg">11 AM - 2 PM</p>
+                  <p class="text-gray-700 mt-2">LightHouse School (114 Race St.)</p>
+                </div>
+              </div>
+            </template>
+          </Card>
+
+          <!-- More to do Block -->
+          <Card class="shadow-sm hover:shadow-md transition-shadow duration-200 h-full">
+            <template #content>
+              <div class="flex items-start gap-4">
+                <!-- Car cartoon image for right column -->
+                <div class="flex-shrink-0 w-24 h-24">
+                  <img
+                    src="~/assets/img/car-cartoon.png"
+                    alt="Explore Holyoke"
+                    class="w-full h-full object-contain"
+                  >
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-bold text-black mb-2">More to do around town</h3>
+                  <a
+                    href="https://exploreholyoke.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-blue-600 hover:text-blue-800 underline text-lg"
+                  >
+                    exploreholyoke.com
+                  </a>
                 </div>
               </div>
             </template>
@@ -132,70 +188,54 @@
         </div>
 
         <!-- Race Info and Stats -->
-        <div class="space-y-6 mb-12">
+        <div class="space-y-4 mb-8">
           <!-- Countdown Timer -->
           <div
-            class="text-center mb-6 p-8 bg-white dark:bg-gray-800 border-2 border-brand-gold shadow-lg"
+            v-if="false"
+            class="text-center mb-6 p-8 bg-white border-2 border-brand-gold shadow-lg"
           >
-            <h3
-              class="text-2xl font-bold text-gray-900 dark:text-white mb-6"
-            >
-              ⚡ RACE COUNTDOWN ⚡
-            </h3>
+            <h3 class="text-2xl font-bold text-black mb-6">⚡ RACE COUNTDOWN ⚡</h3>
             <div v-if="countdown.isActive" class="grid grid-cols-4 gap-6">
               <div class="text-center transform hover:scale-105 transition-transform">
                 <div
-                  class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg animate-bounce"
+                  class="text-5xl md:text-6xl font-black text-black drop-shadow-lg animate-bounce"
                 >
                   {{ countdown.days }}
                 </div>
-                <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">
-                  DAYS
-                </div>
+                <div class="text-sm font-bold text-black tracking-widest">DAYS</div>
               </div>
               <div class="text-center transform hover:scale-105 transition-transform">
-                <div
-                  class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg"
-                >
+                <div class="text-5xl md:text-6xl font-black text-black drop-shadow-lg">
                   {{ countdown.hours }}
                 </div>
-                <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">
-                  HOURS
-                </div>
+                <div class="text-sm font-bold text-black tracking-widest">HOURS</div>
               </div>
               <div class="text-center transform hover:scale-105 transition-transform">
-                <div
-                  class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg"
-                >
+                <div class="text-5xl md:text-6xl font-black text-black drop-shadow-lg">
                   {{ countdown.minutes }}
                 </div>
-                <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">
-                  MINUTES
-                </div>
+                <div class="text-sm font-bold text-black tracking-widest">MINUTES</div>
               </div>
               <div class="text-center transform hover:scale-105 transition-transform">
                 <div
-                  class="text-5xl md:text-6xl font-black text-gray-900 dark:text-white drop-shadow-lg animate-pulse"
+                  class="text-5xl md:text-6xl font-black text-black drop-shadow-lg animate-pulse"
                 >
                   {{ countdown.seconds }}
                 </div>
-                <div class="text-sm font-bold text-gray-900 dark:text-white tracking-widest">
-                  SECONDS
-                </div>
+                <div class="text-sm font-bold text-black tracking-widest">SECONDS</div>
               </div>
             </div>
-            <div v-else class="text-4xl font-black text-gray-900 dark:text-white animate-bounce">
+            <div v-else class="text-4xl font-black text-black animate-bounce">
               🚀 RACE DAY IS HERE! 🚀
             </div>
           </div>
-
         </div>
 
         <div class="flex justify-center">
           <Button
             size="large"
             class="btn-primary px-10 py-4"
-            @click="navigateTo(`/races/${activeRace.slug || activeRace.id}`)"
+            @click="navigateTo('/races/the-2025-brick-race')"
           >
             <i class="pi pi-flag mr-3 text-lg" />
             <span>View Race Details</span>
@@ -204,12 +244,14 @@
       </div>
     </div>
 
-    <!-- Default Hero Section (when no active race) -->
-    <div v-else-if="!pending" class="bg-white dark:bg-gray-900">
+    <!-- Default Hero Section (removed - always show active race) -->
+    <div v-if="false" class="bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div class="text-center">
-          <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-wide">🏁 The Great Holyoke Brick Race</h1>
-          <p class="text-xl md:text-2xl mb-8 text-gray-600 dark:text-gray-400">
+          <h1 class="text-4xl md:text-6xl font-bold mb-6 tracking-wide">
+            🏁 The Great Holyoke Brick Race
+          </h1>
+          <p class="text-xl md:text-2xl mb-8 text-gray-600">
             Join our community of creative builders and racers!
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -231,7 +273,7 @@
     </div>
 
     <!-- Call to Action Cards -->
-    <div v-if="!pending" class="py-16 bg-white dark:bg-gray-900">
+    <div class="py-16 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Learn About Our History -->
@@ -249,13 +291,17 @@
                 </div>
 
                 <div class="flex-1">
-                  <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
-                  >
+                  <h2 class="text-2xl font-bold text-black mb-4 tracking-wide">
                     What is a Brick Race?
                   </h2>
-                  <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                    As the name implies, a "Brick Race" involves designing and building a brick racecar that is cleverly mounted on wheels and raced down an inclined track using only gravity to cross the finish line. Our Brick Race will emphasize creativity and the sculptural quality of the racecars as well as making the fastest machine to cross the finish line first.
+                  <p class="text-gray-700 leading-relaxed mb-4">
+                    Learn the story behind The Great Holyoke Brick Race - from its conception by
+                    local artists in 2010 to becoming the first brick race of its kind in the
+                    country.
+                  </p>
+                  <p class="text-gray-700 leading-relaxed mb-6">
+                    Explore 14 years of creative racing history, memorable designs, and the
+                    community spirit that makes this event special.
                   </p>
                 </div>
 
@@ -288,19 +334,14 @@
                 </div>
 
                 <div class="flex-1">
-                  <h2
-                    class="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-wide"
-                  >
-                    Build Your Own Racer
-                  </h2>
-                  <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-6">
-                    Ready to join the creative chaos? Learn everything you need to know about
-                    building your brick racer, from specifications and rules to awards and race day
-                    logistics.
+                  <h2 class="text-2xl font-bold text-black mb-4 tracking-wide">Build a Racer</h2>
+                  <p class="text-gray-700 leading-relaxed mb-6">
+                    Ready to join the creative chaos? Learn what you need to know to build your
+                    brick racer—specifications, rules, awards, and race day logistics.
                   </p>
-                  <p class="text-gray-600 dark:text-gray-400 mb-6">
-                    Open to all ages and backgrounds worldwide - artists, engineers, tinkerers, and
-                    dreamers welcome!
+                  <p class="text-gray-600 mb-6">
+                    Open to everyone worldwide - artists, engineers, tinkerers, and dreamers
+                    welcome!
                   </p>
                 </div>
 
@@ -322,47 +363,27 @@
     </div>
 
     <!-- Featured Photos -->
-    <div v-if="!pending && featuredPhotos.length > 0" class="py-16 bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div v-if="featuredPhotos.length > 0" class="py-16 bg-black">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-white mb-4 tracking-wide">
-            Featured Photos
-          </h2>
-          <p class="text-lg text-gray-300">
-            Highlights from our creative racing community
-          </p>
+          <h2 class="text-3xl font-bold text-white mb-4 tracking-wide">Featured Photos</h2>
+          <p class="text-lg text-gray-300">Highlights from our creative racing community</p>
         </div>
-        
-        <BeautifulSlideshow 
-          :images="featuredPhotos" 
-          @slide-click="openFeaturedGallery"
-        />
+
+        <BeautifulSlideshow :images="featuredPhotos" @slide-click="openFeaturedGallery" />
 
         <!-- View More Links -->
         <div class="text-center mt-12 space-y-6">
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="large" 
-              class="gallery-button"
-              @click="navigateTo('/gallery')"
-            >
+            <Button size="large" class="gallery-button" @click="navigateTo('/gallery')">
               <i class="pi pi-images mr-2" />
               View Photo Gallery
             </Button>
-            <Button 
-              size="large" 
-              class="gallery-button"
-              @click="navigateTo('/my-photos')"
-            >
+            <Button size="large" class="gallery-button" @click="navigateTo('/my-photos')">
               <i class="pi pi-upload mr-2" />
               Share Your Photos
             </Button>
           </div>
-
-          <p class="text-sm text-gray-200 max-w-2xl mx-auto">
-            Have photos from races or events? Help build our community gallery by uploading and
-            sharing your shots!
-          </p>
         </div>
       </div>
     </div>
@@ -393,13 +414,9 @@
     </Galleria>
 
     <!-- Past Races -->
-    <div v-if="!pending && pastRaces.length > 0" class="py-16 bg-white dark:bg-gray-900">
+    <div v-if="pastRaces.length > 0" class="py-16 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2
-          class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white tracking-wide"
-        >
-          Past Races
-        </h2>
+        <h2 class="text-3xl font-bold text-center mb-12 text-black tracking-wide">Past Races</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card v-for="race in pastRaces" :key="race.id" class="hover:shadow-lg transition-shadow">
@@ -407,16 +424,13 @@
               <Image
                 v-if="race.image_url"
                 :src="race.image_url"
-                :alt="race.name"
+                :alt="race.name.replace(/[\r\n\t]/g, ' ').trim()"
                 image-class="w-full h-48 object-cover"
                 class="w-full h-48"
                 preview
               />
-              <div
-                v-else
-                class="w-full h-48 bg-gray-200 dark:bg-gray-800 flex items-center justify-center"
-              >
-                <i class="pi pi-flag text-4xl text-gray-400 dark:text-gray-500" />
+              <div v-else class="w-full h-48 bg-gray-200 flex items-center justify-center">
+                <i class="pi pi-flag text-4xl text-gray-400" />
               </div>
             </template>
 
@@ -446,13 +460,13 @@
     </div>
 
     <!-- Section Divider -->
-    <div class="border-t border-gray-200 dark:border-gray-700" />
+    <div class="border-t border-gray-200" />
 
     <!-- Social Media Section -->
-    <div class="py-16 bg-white dark:bg-gray-900">
+    <div class="py-16 bg-white">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6 tracking-wide text-gray-900 dark:text-white">Stay Connected</h2>
-        <p class="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6 tracking-wide text-black">Stay Connected</h2>
+        <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
           Follow along for race updates, behind-the-scenes content, and inspiration from our amazing
           community of builders and racers!
         </p>
@@ -505,7 +519,7 @@ const countdown = ref({
 })
 
 // Use singleton composables for data
-const { activeRace, recentPastRaces, initialize: initializeRaces } = useRaces()
+const { recentPastRaces, initialize: initializeRaces } = useRaces()
 const { featuredPhotos, initialize: initializePhotos } = usePhotos()
 
 // Featured photos gallery state
@@ -515,14 +529,9 @@ const activeFeaturedIndex = ref(0)
 // Alias for easier template usage
 const pastRaces = recentPastRaces
 
-// Countdown timer logic
+// Countdown timer logic - Static date for The 2025 Brick Race
 const updateCountdown = () => {
-  // Use race_datetime if available, otherwise fall back to date
-  const raceDateTime = activeRace.value?.race_datetime
-  if (!raceDateTime) {
-    countdown.value.isActive = false
-    return
-  }
+  const raceDateTime = '2025-10-11T15:00:00+00:00' // October 11, 2025 at 3:00 PM UTC
 
   const now = new Date().getTime()
   const raceTime = new Date(raceDateTime).getTime()
@@ -547,6 +556,7 @@ onMounted(async () => {
   pending.value = true
 
   try {
+    // Still initialize for past races and photos
     await Promise.all([initializeRaces(), initializePhotos()])
   } catch (error) {
     // Keep essential error logging for production debugging
@@ -556,6 +566,7 @@ onMounted(async () => {
   }
 
   // Start countdown timer
+  updateCountdown() // Initial update
   countdownInterval = setInterval(updateCountdown, 1000)
 })
 
@@ -565,16 +576,6 @@ onUnmounted(() => {
   }
   // Composable cleanup is handled automatically by their own onUnmounted hooks
 })
-
-// Watch for activeRace changes to update countdown
-watch(
-  activeRace,
-  () => {
-    updateCountdown()
-  },
-  { immediate: true }
-)
-
 
 // Featured photos computed properties
 const featuredGalleryImages = computed(() => {
@@ -586,7 +587,6 @@ const featuredGalleryImages = computed(() => {
       alt: `Featured Photo ${index + 1}`
     }))
 })
-
 
 const openFeaturedGallery = (index) => {
   activeFeaturedIndex.value = index
@@ -607,7 +607,8 @@ useHead({
     },
     {
       property: 'og:description',
-      content: 'Design and build gravity-powered brick racers. Compete for speed, creativity, and artistry in this unique community event. Open to all ages and backgrounds!'
+      content:
+        'Design and build gravity-powered brick racers. Compete for speed, creativity, and artistry in this unique community event. Open to all ages and backgrounds!'
     },
     {
       property: 'og:type',
@@ -621,7 +622,8 @@ useHead({
         '@context': 'https://schema.org',
         '@type': 'Event',
         name: 'The Great Holyoke Brick Race',
-        description: 'Annual gravity-powered brick racing competition emphasizing creativity and engineering',
+        description:
+          'Annual gravity-powered brick racing competition emphasizing creativity and engineering',
         location: {
           '@type': 'Place',
           name: 'Paper City Studios',
@@ -651,14 +653,13 @@ useHead({
 :deep(.gallery-button:active),
 :deep(.gallery-button:focus),
 :deep(.gallery-button:visited),
-:deep(.gallery-button[data-pc-name="button"]),
+:deep(.gallery-button[data-pc-name='button']),
 :deep(button.gallery-button),
 :deep(.p-button.gallery-button) {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: transparent !important;
   color: white !important;
-  border: 2px solid rgba(255, 255, 255, 0.3) !important;
+  border: 2px solid white !important;
   border-radius: 0 !important;
-  backdrop-filter: blur(10px) !important;
   transform: skewX(-8deg) !important;
   font-family: 'Open Sans', sans-serif !important;
   font-weight: 600 !important;
@@ -667,20 +668,26 @@ useHead({
 }
 
 :deep(.gallery-button:hover),
-:deep(.gallery-button:hover[data-pc-name="button"]),
+:deep(.gallery-button:hover[data-pc-name='button']),
 :deep(button.gallery-button:hover),
 :deep(.p-button.gallery-button:hover) {
-  background: rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
-  border: 2px solid rgba(255, 255, 255, 0.5) !important;
+  background: white !important;
+  color: black !important;
+  border: 2px solid white !important;
   transform: skewX(-8deg) translateY(-2px) !important;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Unskew child elements */
 :deep(.gallery-button > *),
-:deep(.gallery-button [data-pc-section="label"]) {
+:deep(.gallery-button [data-pc-section='label']) {
   transform: none !important;
   display: inline-block !important;
+}
+
+/* Remove padding from specific cards */
+:deep(.no-padding-card .p-card-body) {
+  padding: 0 !important;
+  gap: 0 !important;
 }
 </style>

@@ -1,15 +1,12 @@
 <template>
   <div class="space-y-6">
     <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Photo Gallery</h3>
+      <h3 class="text-lg font-semibold text-black">Photo Gallery</h3>
       <Badge v-if="maxPhotos" :value="`${photos.length}/${maxPhotos} photos`" />
     </div>
 
     <!-- Upload Area -->
-    <div
-      v-if="canUpload"
-      class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6"
-    >
+    <div v-if="canUpload" class="border-2 border-dashed border-gray-300 rounded-lg p-6">
       <div class="text-center">
         <FileUpload
           mode="basic"
@@ -27,7 +24,7 @@
       <!-- Selected Files Preview -->
       <div v-if="selectedFiles.length > 0" class="mt-4 space-y-4">
         <div>
-          <h4 class="font-medium text-gray-900 dark:text-white mb-3">Selected Files</h4>
+          <h4 class="font-medium text-black mb-3">Selected Files</h4>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             <div v-for="(file, index) in selectedFiles" :key="index" class="relative">
               <img
@@ -68,9 +65,9 @@
       </div>
 
       <div v-else-if="!photos.length" class="text-center py-8">
-        <i class="pi pi-images text-4xl text-gray-400 dark:text-gray-500 mb-4" />
-        <p class="text-gray-500 dark:text-gray-400 mb-2">No photos yet</p>
-        <p class="text-sm text-gray-400 dark:text-gray-500">
+        <i class="pi pi-images text-4xl text-gray-400 mb-4" />
+        <p class="text-gray-500 mb-2">No photos yet</p>
+        <p class="text-sm text-gray-400">
           {{ isAtMaxPhotos ? 'Maximum photos reached' : 'Upload images to showcase your racer' }}
         </p>
       </div>
@@ -78,7 +75,7 @@
 
     <!-- Current Photos Gallery -->
     <div v-if="photos.length > 0" class="space-y-4">
-      <h4 class="font-medium text-gray-900 dark:text-white">Current Photos</h4>
+      <h4 class="font-medium text-black">Current Photos</h4>
 
       <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
         <div
@@ -92,7 +89,7 @@
             image-class="w-full h-24 object-cover rounded-lg border-2 transition-all duration-200"
             :class="{
               'border-blue-500 ring-2 ring-blue-200': photo.featured,
-              'border-gray-300 dark:border-gray-600 group-hover:border-blue-400': !photo.featured
+              'border-gray-300 group-hover:border-blue-400': !photo.featured
             }"
             class="w-full h-24"
             preview

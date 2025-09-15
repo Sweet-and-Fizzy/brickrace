@@ -11,50 +11,11 @@
     --brand-blue: #175bd3;
     --brand-green: #1e6863;
     --brand-gold: #ffc927;
-    
+
     /* Override PrimeVue MenuBar variables */
     --p-menubar-border-color: transparent;
     --p-menubar-border-width: 0;
     --p-menubar-background: transparent;
-  }
-
-  /* Dark mode color overrides for better readability */
-  .dark\:text-brand-blue-light {
-    color: #60A5FA; /* blue-400 */
-  }
-
-  .dark\:hover\:text-brand-blue-light:hover {
-    color: #93C5FD; /* blue-300 */
-  }
-
-  /* PrimeVue Accordion dark mode CSS variables - use the correct app-dark class */
-  .app-dark,
-  html.app-dark,
-  [data-theme=dark] {
-    --p-accordion-header-background: #1f2937;
-    --p-accordion-header-color: #ffffff;
-    --p-accordion-header-border-color: #4b5563;
-    --p-accordion-header-hover-background: #374151;
-    --p-accordion-header-hover-color: #ffffff;
-    --p-accordion-header-active-background: #1f2937;
-    --p-accordion-header-active-color: #ffffff;
-    --p-accordion-header-active-hover-background: #374151;
-    --p-accordion-header-active-hover-color: #ffffff;
-    --p-accordion-content-background: #1f2937;
-    --p-accordion-content-color: #d1d5db;
-    --p-accordion-content-border-color: #4b5563;
-    
-    /* PrimeVue DataTable dark mode CSS variables */
-    --p-datatable-header-cell-background: #1f2937;
-    --p-datatable-header-cell-color: #f9fafb;
-    --p-datatable-header-cell-border-color: #374151;
-    --p-datatable-row-background: #1f2937;
-    --p-datatable-row-color: #f9fafb;
-    --p-datatable-row-border-color: #374151;
-    --p-datatable-row-hover-background: #374151;
-    --p-datatable-row-hover-color: #f9fafb;
-    --p-datatable-striped-row-background: #374151;
-    --p-datatable-striped-row-color: #f9fafb;
   }
 
   /* Set Open Sans as the default body font */
@@ -64,18 +25,12 @@
     letter-spacing: -0.01em;
   }
 
-  /* Impact for h1 and h2 display headers */
+  /* Open Sans for h1 and h2 display headers */
   h1,
   h2 {
-    font-family: Impact, sans-serif;
-    font-weight: 400;
-    letter-spacing: 0.05em;
-  }
-  
-  /* Ensure headings respect Tailwind color classes in dark mode */
-  .dark h1,
-  .dark h2 {
-    color: inherit;
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
 
   /* Open Sans for smaller headers */
@@ -84,7 +39,7 @@
   h5,
   h6 {
     font-family: 'Open Sans', sans-serif;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0.02em;
   }
 
@@ -118,85 +73,11 @@
   }
 }
 
-@layer utilities {
-  /* Better dark mode blue text for readability */
-  .dark .text-brand-blue {
-    color: #60A5FA !important; /* blue-400 - more readable on dark backgrounds */
-  }
-
-  .dark .hover\:text-brand-blue\/80:hover {
-    color: #93C5FD !important; /* blue-300 */
-  }
-}
-
 @layer components {
-  /* Dark mode datatable thead styling - higher specificity */
-  html.app-dark .custom-datatable .p-datatable-thead > tr > th,
-  body.app-dark .custom-datatable .p-datatable-thead > tr > th,
-  .app-dark body .custom-datatable .p-datatable-thead > tr > th {
-    background-color: #1f2937 !important;
-    color: #f9fafb !important;
-    border-bottom: 2px solid #374151 !important;
-    font-weight: 600 !important;
-  }
-
-  /* Dark mode datatable hover styling - all rows go to gray-600 */
-  html.app-dark .custom-datatable .p-datatable-tbody > tr:hover,
-  body.app-dark .custom-datatable .p-datatable-tbody > tr:hover,
-  .app-dark body .custom-datatable .p-datatable-tbody > tr:hover {
-    background-color: #4b5563 !important;
-    color: #f9fafb !important;
-  }
-
-  /* Dark mode pagination controls - match card background */
-  html.app-dark .p-paginator,
-  body.app-dark .p-paginator,
-  .app-dark body .p-paginator {
-    background-color: #1f2937 !important;
-    border: none !important;
-    border-radius: 0.5rem !important;
-  }
-
-  html.app-dark .p-paginator .p-paginator-page,
-  html.app-dark .p-paginator .p-paginator-first,
-  html.app-dark .p-paginator .p-paginator-prev,
-  html.app-dark .p-paginator .p-paginator-next,
-  html.app-dark .p-paginator .p-paginator-last,
-  body.app-dark .p-paginator .p-paginator-page,
-  body.app-dark .p-paginator .p-paginator-first,
-  body.app-dark .p-paginator .p-paginator-prev,
-  body.app-dark .p-paginator .p-paginator-next,
-  body.app-dark .p-paginator .p-paginator-last {
-    background-color: transparent !important;
-    color: #f9fafb !important;
-    border: none !important;
-  }
-
-  html.app-dark .p-paginator .p-paginator-page:hover,
-  html.app-dark .p-paginator .p-paginator-first:hover,
-  html.app-dark .p-paginator .p-paginator-prev:hover,
-  html.app-dark .p-paginator .p-paginator-next:hover,
-  html.app-dark .p-paginator .p-paginator-last:hover,
-  body.app-dark .p-paginator .p-paginator-page:hover,
-  body.app-dark .p-paginator .p-paginator-first:hover,
-  body.app-dark .p-paginator .p-paginator-prev:hover,
-  body.app-dark .p-paginator .p-paginator-next:hover,
-  body.app-dark .p-paginator .p-paginator-last:hover {
-    background-color: #374151 !important;
-    color: #f9fafb !important;
-  }
-
-  html.app-dark .p-paginator .p-paginator-page-selected,
-  body.app-dark .p-paginator .p-paginator-page-selected {
-    background-color: #4b5563 !important;
-    color: #f9fafb !important;
-    border: none !important;
-  }
-
   /* Remove border from navigation MenuBar - all states */
   .p-menubar,
-  .p-menubar[data-pc-name="menubar"],
-  [data-pc-name="menubar"],
+  .p-menubar[data-pc-name='menubar'],
+  [data-pc-name='menubar'],
   .p-component.p-menubar {
     border: none !important;
     border-width: 0 !important;
@@ -204,17 +85,6 @@
     box-shadow: none !important;
   }
 
-  /* Dark mode MenuBar background */
-  .app-dark .p-menubar,
-  .app-dark .p-menubar[data-pc-name="menubar"],
-  .app-dark [data-pc-name="menubar"],
-  .app-dark .p-component.p-menubar {
-    background: transparent !important;
-    border: none !important;
-    border-width: 0 !important;
-    box-shadow: none !important;
-  }
-  
   /* Also target the root menu element */
   .p-menubar-root,
   .p-menubar .p-menubar-root {
@@ -254,12 +124,6 @@
     outline: none;
   }
 
-  /* Dark mode: invert to white background with black text */
-  .app-dark .btn-primary {
-    @apply bg-white text-black;
-    border: 2px solid transparent;
-  }
-
   .btn-primary > span,
   .btn-primary > i {
     display: inline-block;
@@ -274,21 +138,9 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
-  /* Dark mode hover: outline with gray border */
-  .app-dark .btn-primary:hover {
-    background-color: transparent !important;
-    color: white !important;
-    border: 2px solid #9CA3AF !important; /* border-gray-400 */
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-  }
-
   .btn-primary:active {
     transform: skewX(-8deg);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  }
-
-  .app-dark .btn-primary:active {
-    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.2);
   }
 
   /* Secondary button style - outline parallelogram */
@@ -300,13 +152,6 @@
     border: 2px solid black;
     border-radius: 0;
     outline: none;
-  }
-
-  /* Dark mode: gray border and light text */
-  .app-dark .btn-secondary {
-    @apply bg-transparent;
-    color: #E5E7EB !important; /* text-gray-200 */
-    border: 2px solid #6B7280 !important; /* border-gray-500 */
   }
 
   .btn-secondary > span,
@@ -322,21 +167,9 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
-  /* Dark mode hover: gray background with light text */
-  .app-dark .btn-secondary:hover {
-    background-color: #374151 !important; /* bg-gray-700 */
-    color: white !important;
-    border: 2px solid #6B7280 !important; /* border-gray-500 */
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-  }
-
   .btn-secondary:active {
     transform: skewX(-8deg);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-  }
-
-  .app-dark .btn-secondary:active {
-    box-shadow: 0 2px 6px rgba(255, 255, 255, 0.15);
   }
 
   /* Brand color variations */
@@ -357,7 +190,7 @@
   .btn-primary:active,
   .btn-primary:focus,
   .btn-primary:visited,
-  .btn-primary[data-pc-name="button"],
+  .btn-primary[data-pc-name='button'],
   button.btn-primary {
     border: 2px solid transparent !important;
     border-radius: 0 !important;
@@ -371,36 +204,13 @@
   .btn-secondary:active,
   .btn-secondary:focus,
   .btn-secondary:visited,
-  .btn-secondary[data-pc-name="button"],
+  .btn-secondary[data-pc-name='button'],
   button.btn-secondary {
     border: 2px solid black !important;
     border-radius: 0 !important;
     background-color: transparent !important;
     color: black !important;
     transform: skewX(-8deg) !important;
-  }
-
-  /* Dark mode overrides */
-  .app-dark .btn-primary,
-  .app-dark .btn-primary:active,
-  .app-dark .btn-primary:focus,
-  .app-dark .btn-primary:visited,
-  .app-dark .btn-primary[data-pc-name="button"],
-  .app-dark button.btn-primary {
-    background-color: white !important;
-    color: black !important;
-    border: 2px solid transparent !important;
-  }
-
-  .app-dark .btn-secondary,
-  .app-dark .btn-secondary:active, 
-  .app-dark .btn-secondary:focus,
-  .app-dark .btn-secondary:visited,
-  .app-dark .btn-secondary[data-pc-name="button"],
-  .app-dark button.btn-secondary {
-    border: 2px solid #6B7280 !important; /* border-gray-500 */
-    background-color: transparent !important;
-    color: #E5E7EB !important; /* text-gray-200 */
   }
 
   /* Ensure child elements are properly unskewed */
@@ -416,7 +226,7 @@
     .btn-primary:active,
     .btn-primary:focus,
     .btn-primary:hover,
-    .btn-primary[data-pc-name="button"],
+    .btn-primary[data-pc-name='button'],
     button.btn-primary,
     .p-button.btn-primary {
       background-color: black !important;
@@ -433,7 +243,7 @@
     .btn-secondary:active,
     .btn-secondary:focus,
     .btn-secondary:hover,
-    .btn-secondary[data-pc-name="button"],
+    .btn-secondary[data-pc-name='button'],
     button.btn-secondary,
     .p-button.btn-secondary {
       background-color: transparent !important;
@@ -444,30 +254,6 @@
       padding: 0.75rem 1.5rem !important;
       white-space: nowrap !important;
       overflow: visible !important;
-    }
-
-    .app-dark .btn-primary,
-    .app-dark .btn-primary:active,
-    .app-dark .btn-primary:focus,
-    .app-dark .btn-primary:hover,
-    .app-dark .btn-primary[data-pc-name="button"],
-    .app-dark button.btn-primary,
-    .app-dark .p-button.btn-primary {
-      background-color: white !important;
-      color: black !important;
-      border: 2px solid transparent !important;
-    }
-
-    .app-dark .btn-secondary,
-    .app-dark .btn-secondary:active,
-    .app-dark .btn-secondary:focus,
-    .app-dark .btn-secondary:hover,
-    .app-dark .btn-secondary[data-pc-name="button"],
-    .app-dark button.btn-secondary,
-    .app-dark .p-button.btn-secondary {
-      border: 2px solid #6B7280 !important; /* border-gray-500 */
-      color: #E5E7EB !important; /* text-gray-200 */
-      background-color: transparent !important;
     }
   }
 
@@ -482,15 +268,5 @@
 
   [data-pc-name='card']:hover {
     box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.15) !important;
-  }
-
-  /* Dark mode card styling with better contrast */
-  .app-dark [data-pc-name='card'] {
-    background-color: #1F2937 !important; /* bg-gray-800 */
-    border-color: #374151 !important; /* border-gray-700 */
-  }
-
-  .app-dark [data-pc-name='card']:hover {
-    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.3) !important;
   }
 }

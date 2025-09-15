@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -12,15 +12,11 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-          Racer Not Found
-        </h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-2">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Racer Not Found</h2>
+        <p class="text-gray-600 mb-2">
           The racer you're looking for doesn't exist or has been removed.
         </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          Slug requested: {{ route.params.slug }}
-        </p>
+        <p class="text-sm text-gray-500 mb-6">Slug requested: {{ route.params.slug }}</p>
         <div class="space-x-4">
           <NuxtLink to="/racers">
             <Button>Back to All Racers</Button>
@@ -33,7 +29,7 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div>
-            <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ racer.name }}</h1>
+            <h1 class="text-3xl font-bold text-black mb-2">{{ racer.name }}</h1>
           </div>
 
           <div class="flex gap-2 mt-4 md:mt-0">
@@ -111,7 +107,7 @@
                 </div>
 
                 <!-- Thumbnail Strip (if more than 1 photo) -->
-                <div v-if="allRacerPhotos.length > 1" class="p-4 bg-gray-50 dark:bg-gray-700">
+                <div v-if="allRacerPhotos.length > 1" class="p-4 bg-gray-50">
                   <div class="flex gap-2 overflow-x-auto">
                     <div
                       v-for="(photo, index) in allRacerPhotos.slice(1, 6)"
@@ -129,10 +125,10 @@
                     </div>
                     <div
                       v-if="allRacerPhotos.length > 6"
-                      class="flex-shrink-0 w-16 h-16 bg-gray-200 dark:bg-gray-600 rounded border-2 border-dashed border-gray-300 dark:border-gray-500 flex items-center justify-center cursor-pointer hover:border-blue-400 transition-colors"
+                      class="flex-shrink-0 w-16 h-16 bg-gray-200 rounded border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-blue-400 transition-colors"
                       @click="openRacerGallery(6)"
                     >
-                      <span class="text-xs font-medium text-gray-600 dark:text-gray-400"
+                      <span class="text-xs font-medium text-gray-600"
                         >+{{ allRacerPhotos.length - 6 }}</span
                       >
                     </div>
@@ -148,13 +144,11 @@
               :pt="{ body: { class: 'p-0' }, content: { class: 'p-0' } }"
             >
               <template #content>
-                <div
-                  class="w-full h-64 md:h-96 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
-                >
+                <div class="w-full h-64 md:h-96 bg-gray-200 flex items-center justify-center">
                   <div class="text-center">
-                    <i class="pi pi-car text-6xl text-gray-400 dark:text-gray-500 mb-4" />
-                    <p class="text-gray-500 dark:text-gray-300 font-medium">{{ racer.name }}</p>
-                    <p class="text-gray-400 dark:text-gray-400 text-sm mt-1">No photos uploaded</p>
+                    <i class="pi pi-car text-6xl text-gray-400 mb-4" />
+                    <p class="text-gray-500 font-medium">{{ racer.name }}</p>
+                    <p class="text-gray-400 text-sm mt-1">No photos uploaded</p>
                   </div>
                 </div>
 
@@ -249,7 +243,7 @@
                   <div
                     v-for="bracket in racer.brackets"
                     :key="bracket.id"
-                    class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600"
+                    class="p-4 bg-gray-50 rounded-lg border border-gray-200"
                   >
                     <div class="flex items-center justify-between mb-3">
                       <div class="flex items-center gap-2">
@@ -257,9 +251,7 @@
                           :value="bracket.bracket_type"
                           :severity="bracket.bracket_type === 'Fastest' ? 'success' : 'info'"
                         />
-                        <span class="text-sm text-gray-600 dark:text-gray-400">{{
-                          bracket.races?.name
-                        }}</span>
+                        <span class="text-sm text-gray-600">{{ bracket.races?.name }}</span>
                       </div>
                     </div>
 
@@ -269,16 +261,16 @@
                         :class="[
                           'relative text-center p-3 rounded border transition-all',
                           bracket.track1_racer_id === racer.id
-                            ? 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-600 ring-2 ring-red-400/50'
+                            ? 'bg-red-50/30 border-red-300 ring-2 ring-red-400/50'
                             : isTrack1Winner(bracket)
-                              ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-600'
-                              : 'bg-white dark:bg-gray-600 border-gray-200 dark:border-gray-500'
+                              ? 'bg-green-50/30 border-green-300'
+                              : 'bg-white border-gray-200'
                         ]"
                       >
                         <!-- Winner Crown -->
                         <div
                           v-if="isTrack1Winner(bracket)"
-                          class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-800"
+                          class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white"
                         >
                           <i class="pi pi-crown text-xs text-yellow-800" />
                         </div>
@@ -286,7 +278,7 @@
                         <!-- Current Racer Badge -->
                         <div
                           v-if="bracket.track1_racer_id === racer.id"
-                          class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-md"
+                          class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center border-2 border-white shadow-md"
                         >
                           <i class="pi pi-user text-xs text-white" />
                         </div>
@@ -294,14 +286,12 @@
                         <div
                           :class="[
                             'font-medium mb-1',
-                            bracket.track1_racer_id === racer.id
-                              ? 'text-red-900 dark:text-red-200'
-                              : 'text-gray-900 dark:text-white'
+                            bracket.track1_racer_id === racer.id ? 'text-red-900' : 'text-black'
                           ]"
                         >
                           {{ bracket.track1_racer?.name || 'Unknown' }}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Track 1</div>
+                        <div class="text-sm text-gray-600 mb-2">Track 1</div>
                         <Badge
                           v-if="bracket.track1_time"
                           :value="formatTime(bracket.track1_time)"
@@ -316,16 +306,16 @@
                         :class="[
                           'relative text-center p-3 rounded border transition-all',
                           bracket.track2_racer_id === racer.id
-                            ? 'bg-red-50 dark:bg-red-900/30 border-red-300 dark:border-red-600 ring-2 ring-red-400/50'
+                            ? 'bg-red-50/30 border-red-300 ring-2 ring-red-400/50'
                             : isTrack2Winner(bracket)
-                              ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-600'
-                              : 'bg-white dark:bg-gray-600 border-gray-200 dark:border-gray-500'
+                              ? 'bg-green-50/30 border-green-300'
+                              : 'bg-white border-gray-200'
                         ]"
                       >
                         <!-- Winner Crown -->
                         <div
                           v-if="isTrack2Winner(bracket)"
-                          class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-800"
+                          class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white"
                         >
                           <i class="pi pi-crown text-xs text-yellow-800" />
                         </div>
@@ -333,7 +323,7 @@
                         <!-- Current Racer Badge -->
                         <div
                           v-if="bracket.track2_racer_id === racer.id"
-                          class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-md"
+                          class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center border-2 border-white shadow-md"
                         >
                           <i class="pi pi-user text-xs text-white" />
                         </div>
@@ -341,14 +331,12 @@
                         <div
                           :class="[
                             'font-medium mb-1',
-                            bracket.track2_racer_id === racer.id
-                              ? 'text-red-900 dark:text-red-200'
-                              : 'text-gray-900 dark:text-white'
+                            bracket.track2_racer_id === racer.id ? 'text-red-900' : 'text-black'
                           ]"
                         >
                           {{ bracket.track2_racer?.name || 'Unknown' }}
                         </div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400 mb-2">Track 2</div>
+                        <div class="text-sm text-gray-600 mb-2">Track 2</div>
                         <Badge
                           v-if="bracket.track2_time"
                           :value="formatTime(bracket.track2_time)"
@@ -399,7 +387,7 @@
                 </div>
               </template>
               <template #content>
-                <p class="text-gray-900 dark:text-white leading-relaxed whitespace-pre-wrap">
+                <p class="text-black leading-relaxed whitespace-pre-wrap">
                   {{ racer.team_members }}
                 </p>
               </template>
@@ -418,7 +406,7 @@
                   <div
                     v-for="award in racer.awards"
                     :key="award.id"
-                    class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                    class="p-3 bg-gray-50 rounded-lg border border-gray-200"
                   >
                     <!-- Award Image -->
                     <div class="mb-3">
@@ -426,27 +414,27 @@
                         v-if="award.award_definition?.image_url"
                         :src="award.award_definition.image_url"
                         :alt="award.award_definition.name"
-                        class="w-full aspect-square object-cover rounded border border-gray-300 dark:border-gray-600"
+                        class="w-full aspect-square object-cover rounded border border-gray-300"
                       >
                       <div
                         v-else
-                        class="w-full aspect-square bg-gray-100 dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 flex items-center justify-center"
+                        class="w-full aspect-square bg-gray-100 rounded border border-gray-300 flex items-center justify-center"
                       >
-                        <i class="pi pi-trophy text-amber-600 dark:text-amber-400 text-4xl" />
+                        <i class="pi pi-trophy text-amber-600 text-4xl" />
                       </div>
                     </div>
 
                     <!-- Award Info -->
                     <div class="text-center">
-                      <p class="font-semibold text-gray-900 dark:text-white">
+                      <p class="font-semibold text-black">
                         {{ award.award_definition?.name || award.name }}
                       </p>
-                      <p class="text-gray-600 dark:text-gray-300 text-sm">
+                      <p class="text-gray-600 text-sm">
                         {{ award.race?.name || 'Unknown Race' }}
                       </p>
                       <p
                         v-if="award.award_definition?.description"
-                        class="text-gray-500 dark:text-gray-400 text-xs mt-1"
+                        class="text-gray-500 text-xs mt-1"
                       >
                         {{ award.award_definition.description }}
                       </p>
@@ -474,9 +462,9 @@
                   >
                     <!-- Race Header -->
                     <div
-                      class="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700"
+                      class="flex items-center justify-between p-3 bg-blue-50/30 rounded-lg border border-blue-200"
                     >
-                      <h4 class="font-semibold text-blue-900 dark:text-blue-200">
+                      <h4 class="font-semibold text-blue-900">
                         {{ raceGroup.raceName }}
                       </h4>
                       <Badge
@@ -491,10 +479,10 @@
                       <div
                         v-for="voteCount in raceGroup.votes"
                         :key="`${voteCount.award_definition_id}-${voteCount.race_id}`"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                        class="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200"
                       >
                         <div>
-                          <p class="font-medium text-gray-900 dark:text-white">
+                          <p class="font-medium text-black">
                             {{ voteCount.award_name }}
                           </p>
                         </div>
@@ -512,11 +500,9 @@
                   <!-- Overall Total -->
                   <div v-if="voteCountsByRace.length > 1" class="border-t pt-4 mt-4">
                     <div
-                      class="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700"
+                      class="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50/30/30 rounded-lg border border-green-200"
                     >
-                      <span class="font-bold text-green-900 dark:text-green-200"
-                        >All-Time Total:</span
-                      >
+                      <span class="font-bold text-green-900">All-Time Total:</span>
                       <Badge
                         :value="`❤️ ${totalVotes}`"
                         severity="success"
@@ -526,10 +512,7 @@
                   </div>
 
                   <!-- No votes message -->
-                  <div
-                    v-if="voteCountsByRace.length === 0"
-                    class="text-center py-6 text-gray-500 dark:text-gray-400"
-                  >
+                  <div v-if="voteCountsByRace.length === 0" class="text-center py-6 text-gray-500">
                     <i class="pi pi-heart text-2xl mb-2" />
                     <p>No votes received yet</p>
                   </div>
@@ -543,34 +526,26 @@
               <template #content>
                 <div class="space-y-4">
                   <div v-if="racer.weight" class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Weight</span>
-                    <span class="font-semibold text-gray-900 dark:text-white"
+                    <span class="text-gray-600">Weight</span>
+                    <span class="font-semibold text-black"
                       >{{ (racer.weight / 453.592).toFixed(2) }} lbs</span
                     >
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Fastest Time</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      fastestTime || 'N/A'
-                    }}</span>
+                    <span class="text-gray-600">Fastest Time</span>
+                    <span class="font-semibold text-black">{{ fastestTime || 'N/A' }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Slowest Time</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      slowestTime || 'N/A'
-                    }}</span>
+                    <span class="text-gray-600">Slowest Time</span>
+                    <span class="font-semibold text-black">{{ slowestTime || 'N/A' }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Total Races</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      totalRaces
-                    }}</span>
+                    <span class="text-gray-600">Total Races</span>
+                    <span class="font-semibold text-black">{{ totalRaces }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Awards Won</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      racer.awards?.length || 0
-                    }}</span>
+                    <span class="text-gray-600">Awards Won</span>
+                    <span class="font-semibold text-black">{{ racer.awards?.length || 0 }}</span>
                   </div>
                 </div>
               </template>
@@ -589,14 +564,14 @@
                   <div
                     v-for="checkin in racerCheckins"
                     :key="checkin.id"
-                    class="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                    class="p-3 bg-gray-50 rounded-lg border border-gray-200"
                   >
                     <div class="mb-2">
-                      <span class="font-medium text-gray-900 dark:text-white">
+                      <span class="font-medium text-black">
                         {{ checkin.race?.name || 'Unknown Race' }}
                       </span>
                     </div>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">
+                    <p class="text-sm text-gray-600">
                       {{ formatCheckinTime(checkin.time) }}
                     </p>
                   </div>

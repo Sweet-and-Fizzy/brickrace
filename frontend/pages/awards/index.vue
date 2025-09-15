@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <PageHeader title="Awards" :actions="headerActions" />
 
@@ -9,10 +9,10 @@
           <template #content>
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                <h3 class="text-2xl font-bold text-black mb-1">
                   {{ activeRace.name }}
                 </h3>
-                <p class="text-gray-600 dark:text-gray-400 font-medium">
+                <p class="text-gray-600 font-medium">
                   {{
                     new Date(activeRace.race_datetime).toLocaleDateString('en-US', {
                       weekday: 'long',
@@ -24,8 +24,8 @@
                 </p>
               </div>
               <div class="text-right">
-                <div class="text-gray-600 dark:text-gray-400 text-sm font-medium">Total Awards</div>
-                <div class="text-3xl font-bold text-gray-900 dark:text-white">
+                <div class="text-gray-600 text-sm font-medium">Total Awards</div>
+                <div class="text-3xl font-bold text-black">
                   {{ voteableAwards.length + filteredAssignedAwards.length }}
                 </div>
               </div>
@@ -43,7 +43,7 @@
             <Card
               v-for="n in 3"
               :key="n"
-              class="hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
+              class="hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 border-2 border-gray-200 rounded-lg overflow-hidden bg-white"
             >
               <template #header>
                 <div class="relative">
@@ -78,7 +78,7 @@
             <Card
               v-for="n in 2"
               :key="n + 10"
-              class="border-2 border-brand-gold bg-white dark:bg-gray-800 hover:shadow-2xl transition-all duration-300 overflow-hidden"
+              class="border-2 border-brand-gold bg-white hover:shadow-2xl transition-all duration-300 overflow-hidden"
             >
               <template #header>
                 <div class="relative">
@@ -97,9 +97,7 @@
               <template #content>
                 <div class="px-6 pb-6 space-y-3">
                   <!-- Winner display skeleton -->
-                  <div
-                    class="flex items-center gap-3 p-3 bg-yellow-100/50 dark:bg-yellow-900/20 rounded-lg"
-                  >
+                  <div class="flex items-center gap-3 p-3 bg-yellow-100/50/20 rounded-lg">
                     <Skeleton width="3rem" height="3rem" class="rounded-full" />
                     <div class="space-y-1 flex-1">
                       <Skeleton width="60%" height="1rem" />
@@ -117,12 +115,12 @@
       <div v-if="selectedRace">
         <!-- Voteable Awards -->
         <div v-if="voteableAwards.length" class="mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Vote for Awards</h2>
+          <h2 class="text-3xl font-bold text-black mb-8">Vote for Awards</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card
               v-for="award in voteableAwards"
               :key="award.id"
-              class="hover:shadow-lg hover:scale-[1.01] transition-all duration-200 border-2 border-gray-200 dark:border-gray-600 hover:border-red-400 dark:hover:border-red-500 rounded-lg overflow-hidden bg-white dark:bg-gray-800"
+              class="hover:shadow-lg hover:scale-[1.01] transition-all duration-200 border-2 border-gray-200 hover:border-red-400 rounded-lg overflow-hidden bg-white"
               style="
                 box-shadow:
                   0 4px 12px rgba(0, 0, 0, 0.1),
@@ -142,7 +140,7 @@
                   />
                   <div
                     v-else
-                    class="w-full h-80 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center border-b-2 border-gray-300 dark:border-gray-600"
+                    class="w-full h-80 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center border-b-2 border-gray-300"
                   >
                     <i
                       class="pi pi-trophy text-8xl text-red-500"
@@ -154,14 +152,14 @@
 
               <template #title>
                 <div class="px-6 pt-6">
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 class="text-xl font-bold text-black">
                     {{ award.name }}
                   </h3>
                 </div>
               </template>
               <template #subtitle>
                 <div class="px-6 pb-4">
-                  <p class="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  <p class="text-sm text-gray-600 leading-relaxed">
                     {{ award.description }}
                   </p>
                 </div>
@@ -171,7 +169,7 @@
                 <div class="px-6 pb-6">
                   <div v-if="authStore.user && activeRace">
                     <div v-if="racers.length > 0">
-                      <label class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
+                      <label class="block text-sm font-bold text-gray-700 mb-3">
                         Cast Your Vote:
                       </label>
                       <Select
@@ -194,7 +192,7 @@
                                 v-if="slotProps.option.image_url"
                                 :src="slotProps.option.image_url"
                                 :alt="slotProps.option.name"
-                                class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                                class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                               >
                               <div
                                 v-else
@@ -207,11 +205,11 @@
                             <!-- Racer Info -->
                             <div class="flex flex-col min-w-0 flex-1">
                               <div class="flex items-center gap-2">
-                                <span class="font-medium text-gray-900 dark:text-white">{{
+                                <span class="font-medium text-black">{{
                                   slotProps.option.name
                                 }}</span>
                                 <span
-                                  class="text-xs font-mono text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded"
+                                  class="text-xs font-mono text-gray-500 px-2 py-1 bg-gray-100 rounded"
                                 >
                                   #{{ slotProps.option.racer_number }}
                                 </span>
@@ -278,12 +276,12 @@
 
         <!-- Current Winners / Assigned Awards -->
         <div v-if="filteredAssignedAwards.length">
-          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Award Winners</h2>
+          <h2 class="text-3xl font-bold text-black mb-8">Award Winners</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card
               v-for="award in filteredAssignedAwards"
               :key="award.id"
-              class="border-2 border-brand-gold bg-white dark:bg-gray-800 hover:shadow-2xl transition-all duration-300 overflow-hidden"
+              class="border-2 border-brand-gold bg-white hover:shadow-2xl transition-all duration-300 overflow-hidden"
               style="
                 box-shadow:
                   0 8px 20px rgba(245, 158, 11, 0.2),
@@ -303,10 +301,10 @@
                   />
                   <div
                     v-else
-                    class="w-full h-80 bg-gradient-to-br from-yellow-200 to-amber-300 dark:from-yellow-700 dark:to-amber-700 flex items-center justify-center border-b-2 border-yellow-400 dark:border-yellow-500"
+                    class="w-full h-80 bg-gradient-to-br from-yellow-200 to-amber-300 flex items-center justify-center border-b-2 border-yellow-400"
                   >
                     <i
-                      class="pi pi-trophy text-8xl text-yellow-700 dark:text-yellow-300"
+                      class="pi pi-trophy text-8xl text-yellow-700"
                       style="text-shadow: 0 2px 4px rgba(245, 158, 11, 0.4)"
                     />
                   </div>
@@ -321,7 +319,7 @@
 
               <template #title>
                 <div class="px-6 pt-6">
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 class="text-xl font-bold text-black">
                     {{ award.award_definition?.name }}
                   </h3>
                 </div>
@@ -331,7 +329,7 @@
                   <RacerLink
                     :racer-id="award.racer.id"
                     :racer-slug="award.racer.slug"
-                    class="flex items-center gap-4 p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all duration-200 border border-yellow-300 dark:border-yellow-600"
+                    class="flex items-center gap-4 p-3 rounded-lg bg-white/50/50 hover:bg-white/70/70 transition-all duration-200 border border-yellow-300"
                   >
                     <!-- Racer Photo -->
                     <div class="flex-shrink-0">
@@ -339,11 +337,11 @@
                         v-if="award.racer.image_url"
                         :src="award.racer.image_url"
                         :alt="award.racer.name"
-                        class="w-16 h-16 rounded-full object-cover border-2 border-yellow-400 dark:border-yellow-500"
+                        class="w-16 h-16 rounded-full object-cover border-2 border-yellow-400"
                       >
                       <div
                         v-else
-                        class="w-16 h-16 bg-yellow-600 text-white flex items-center justify-center text-sm font-bold border-2 border-yellow-400 dark:border-yellow-500 rounded-full"
+                        class="w-16 h-16 bg-yellow-600 text-white flex items-center justify-center text-sm font-bold border-2 border-yellow-400 rounded-full"
                       >
                         #{{ award.racer.racer_number || '?' }}
                       </div>
@@ -352,7 +350,7 @@
                     <!-- Racer Info -->
                     <div class="flex-1">
                       <p
-                        class="text-lg font-black text-yellow-800 dark:text-yellow-200"
+                        class="text-lg font-black text-yellow-800"
                         style="
                           font-family: 'Courier New', monospace;
                           text-shadow: 0 1px 2px rgba(245, 158, 11, 0.2);
@@ -360,14 +358,14 @@
                       >
                         {{ award.racer.name }}
                       </p>
-                      <p class="text-sm font-bold text-yellow-700 dark:text-yellow-300 mt-1">
+                      <p class="text-sm font-bold text-yellow-700 mt-1">
                         Racer #{{ award.racer.racer_number || 'N/A' }}
                       </p>
                     </div>
 
                     <!-- Link Indicator -->
                     <div class="flex-shrink-0">
-                      <i class="pi pi-external-link text-yellow-600 dark:text-yellow-400" />
+                      <i class="pi pi-external-link text-yellow-600" />
                     </div>
                   </RacerLink>
                 </div>
@@ -377,7 +375,7 @@
                 <div class="px-6 pb-6">
                   <div
                     v-if="award.notes"
-                    class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed bg-white/50 dark:bg-gray-800/50 p-3 rounded border"
+                    class="text-sm text-gray-700 leading-relaxed bg-white/50/50 p-3 rounded border"
                   >
                     {{ award.notes }}
                   </div>
@@ -389,12 +387,12 @@
 
         <!-- Vote Results -->
         <div v-if="voteableAwards.length" class="mt-12">
-          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">Vote Results</h2>
+          <h2 class="text-3xl font-bold text-black mb-8">Vote Results</h2>
           <div class="space-y-8">
             <Card
               v-for="award in voteableAwards"
               :key="award.id"
-              class="overflow-hidden border-2 border-gray-200 dark:border-gray-600 rounded-lg"
+              class="overflow-hidden border-2 border-gray-200 rounded-lg"
               style="
                 box-shadow:
                   0 4px 12px rgba(0, 0, 0, 0.1),
@@ -409,7 +407,7 @@
                   >
                     <i class="pi pi-chart-bar text-sm" />
                   </div>
-                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 class="text-xl font-bold text-black">
                     {{ award.name }}
                   </h3>
                 </div>
@@ -469,7 +467,7 @@
       <!-- No Active Race -->
       <div v-else class="text-center py-12">
         <i class="pi pi-trophy text-6xl text-brand-gold mb-4" />
-        <h3 class="text-2xl font-bold text-gray-700 dark:text-gray-300 mb-2">No Active Race</h3>
+        <h3 class="text-2xl font-bold text-gray-700 mb-2">No Active Race</h3>
         <p class="text-gray-500">Check back later for voting opportunities!</p>
       </div>
     </div>
@@ -627,7 +625,7 @@ const fetchActiveRace = async () => {
       .eq('active', true)
       .single()
 
-    if (error && error.code !== 'PGRST116') throw error // PGRST116 is "no rows found"
+    if (error && error.code !== 'PGRST116') throw error // PGRST116 is""no rows found"
 
     activeRace.value = data || null
 

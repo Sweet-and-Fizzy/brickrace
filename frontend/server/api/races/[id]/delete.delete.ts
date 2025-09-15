@@ -2,7 +2,7 @@ import { serverSupabaseUser, serverSupabaseServiceRole } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   const raceId = getRouterParam(event, 'id')
-  
+
   if (!raceId) {
     throw createError({
       statusCode: 400,
@@ -46,10 +46,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Delete race (this will cascade delete related data due to foreign key constraints)
-    const { error: deleteError } = await supabase
-      .from('races')
-      .delete()
-      .eq('id', raceId)
+    const { error: deleteError } = await supabase.from('races').delete().eq('id', raceId)
 
     if (deleteError) {
       console.error('Race deletion error:', deleteError)
@@ -68,11 +65,11 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error) {
     console.error('Error deleting race:', error)
-    
+
     if (error && typeof error === 'object' && 'statusCode' in error) {
       throw error
     }
-    
+
     throw createError({
       statusCode: 500,
       statusMessage: 'Internal server error while deleting race'

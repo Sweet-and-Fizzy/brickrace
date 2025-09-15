@@ -2,7 +2,7 @@
   <div v-if="photos.length > 0" class="space-y-6">
     <!-- Featured Photos (if any) -->
     <div v-if="featuredPhotos.length > 0" class="space-y-4">
-      <h4 class="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+      <h4 class="font-medium text-black flex items-center gap-2">
         <i class="pi pi-star text-yellow-500" />
         Featured Photos
       </h4>
@@ -43,9 +43,7 @@
 
     <!-- All Photos Grid -->
     <div class="space-y-4">
-      <h4 v-if="featuredPhotos.length > 0" class="font-medium text-gray-900 dark:text-white">
-        All Photos
-      </h4>
+      <h4 v-if="featuredPhotos.length > 0" class="font-medium text-black">All Photos</h4>
 
       <div
         :class="
@@ -70,7 +68,7 @@
             "
             :class="{
               'border-yellow-400': photo.featured,
-              'border-gray-300 dark:border-gray-600': !photo.featured
+              'border-gray-300': !photo.featured
             }"
             :class-name="enableFeaturedSection ? 'w-full h-24' : 'w-full h-48'"
             :preview="false"
@@ -150,16 +148,12 @@
 
     <!-- Photo Contribution Links -->
     <div v-if="showContributionLinks" class="mt-8">
-      <div
-        class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 text-center"
-      >
-        <h4
-          class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center justify-center gap-2"
-        >
-          <i class="pi pi-camera text-blue-600 dark:text-blue-400" />
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+        <h4 class="font-semibold text-black mb-3 flex items-center justify-center gap-2">
+          <i class="pi pi-camera text-blue-600" />
           Share Your Photos
         </h4>
-        <p class="text-gray-600 dark:text-gray-400 mb-4">
+        <p class="text-gray-600 mb-4">
           Have photos from this racer or event? Help us build the community gallery!
         </p>
         <div class="flex flex-col sm:flex-row gap-3 justify-center">
@@ -181,9 +175,9 @@
   </div>
 
   <div v-else-if="showEmptyState" class="text-center py-12">
-    <i class="pi pi-images text-6xl text-gray-300 dark:text-gray-600 mb-4" />
-    <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No Photos Yet</h3>
-    <p class="text-gray-500 dark:text-gray-500">
+    <i class="pi pi-images text-6xl text-gray-300 mb-4" />
+    <h3 class="text-xl font-semibold text-gray-600 mb-2">No Photos Yet</h3>
+    <p class="text-gray-500">
       {{ emptyMessage || 'Photos will appear here once they are uploaded and approved.' }}
     </p>
   </div>

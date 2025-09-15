@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -12,10 +12,8 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
-          The race you're trying to edit doesn't exist.
-        </p>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Race Not Found</h2>
+        <p class="text-gray-600 mb-6">The race you're trying to edit doesn't exist.</p>
         <NuxtLink to="/races">
           <Button severity="primary"> Back to All Races </Button>
         </NuxtLink>
@@ -24,7 +22,7 @@
       <!-- Edit Form -->
       <div v-else-if="race" class="max-w-2xl mx-auto">
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Edit Race</h1>
+          <h1 class="text-3xl font-bold text-black">Edit Race</h1>
         </div>
 
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
@@ -32,10 +30,7 @@
             <form class="space-y-8" @submit.prevent="updateRace">
               <!-- Race Name -->
               <div>
-                <label
-                  for="name"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
                   Race Name *
                 </label>
                 <InputText
@@ -52,10 +47,7 @@
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Race Date -->
                 <div>
-                  <label
-                    for="date"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
+                  <label for="date" class="block text-sm font-medium text-gray-700 mb-2">
                     Race Date *
                   </label>
                   <DatePicker
@@ -74,10 +66,7 @@
 
                 <!-- Race Start Time -->
                 <div>
-                  <label
-                    for="time"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
+                  <label for="time" class="block text-sm font-medium text-gray-700 mb-2">
                     Race Start Time *
                   </label>
                   <DatePicker
@@ -95,10 +84,7 @@
 
                 <!-- Race End Time -->
                 <div>
-                  <label
-                    for="endTime"
-                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
+                  <label for="endTime" class="block text-sm font-medium text-gray-700 mb-2">
                     Race End Time
                   </label>
                   <DatePicker
@@ -110,30 +96,30 @@
                     :invalid="!!errors.endTime"
                     class="w-full"
                   />
-                  <p v-if="errors.endTime" class="mt-1 text-sm text-red-600">{{ errors.endTime }}</p>
+                  <p v-if="errors.endTime" class="mt-1 text-sm text-red-600">
+                    {{ errors.endTime }}
+                  </p>
                   <p class="mt-1 text-xs text-gray-500">Optional end time for the race event</p>
                 </div>
               </div>
 
               <!-- Race Description -->
               <div>
-                <label
-                  for="description"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
                   Description
                 </label>
                 <TiptapEditor v-model="form.description" />
-                <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
-                <p class="mt-1 text-xs text-gray-500">Add a detailed description of the race event</p>
+                <p v-if="errors.description" class="mt-1 text-sm text-red-600">
+                  {{ errors.description }}
+                </p>
+                <p class="mt-1 text-xs text-gray-500">
+                  Add a detailed description of the race event
+                </p>
               </div>
 
               <!-- Race Image -->
               <div>
-                <label
-                  for="imageFile"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="imageFile" class="block text-sm font-medium text-gray-700 mb-2">
                   Race Image
                 </label>
 
@@ -166,9 +152,7 @@
 
               <!-- Image Preview -->
               <div v-if="form.image_url" class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >Preview</label
-                >
+                <label class="block text-sm font-medium text-gray-700 mb-2">Preview</label>
                 <img
                   :src="form.image_url"
                   alt="Race preview"
@@ -179,10 +163,7 @@
 
               <!-- Submit Button -->
               <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                <NuxtLink
-                  :to="`/races/${race?.slug || $route.params.slug}`"
-                  class="flex-1"
-                >
+                <NuxtLink :to="`/races/${race?.slug || $route.params.slug}`" class="flex-1">
                   <Button
                     type="button"
                     severity="secondary"
@@ -202,27 +183,23 @@
 
         <!-- Admin Actions (Race Admin+) -->
         <div v-if="authStore.isRaceAdmin && race" class="mt-8">
-          <div class="bg-blue-50 dark:bg-blue-900/20 rounded-2xl border-2 border-blue-200 dark:border-blue-800 overflow-hidden">
+          <div class="bg-blue-50/20 rounded-2xl border-2 border-blue-200 overflow-hidden">
             <div class="p-6">
-              <h3 class="text-lg font-semibold text-blue-900 dark:text-blue-200 mb-4 flex items-center">
+              <h3 class="text-lg font-semibold text-blue-900 mb-4 flex items-center">
                 <i class="pi pi-cog mr-2" />
                 Admin Actions
               </h3>
-              
+
               <div class="space-y-6">
                 <!-- Set as Active (Race Admins) -->
                 <div v-if="!race.active">
-                  <h4 class="font-medium text-blue-800 dark:text-blue-300 mb-2">Set as Active Race</h4>
-                  <p class="text-sm text-blue-700 dark:text-blue-400 mb-4">
-                    Make this the current active race. This will deactivate any other active race 
+                  <h4 class="font-medium text-blue-800 mb-2">Set as Active Race</h4>
+                  <p class="text-sm text-blue-700 mb-4">
+                    Make this the current active race. This will deactivate any other active race
                     and show this race prominently on the homepage.
                   </p>
-                  
-                  <Button
-                    :loading="settingActive"
-                    class="btn-primary"
-                    @click="setActiveRace"
-                  >
+
+                  <Button :loading="settingActive" class="btn-primary" @click="setActiveRace">
                     <i class="pi pi-play mr-2" />
                     Set as Active
                   </Button>
@@ -242,26 +219,22 @@
 
         <!-- Danger Zone (Full Admins Only) -->
         <div v-if="authStore.isAdmin && race && !race.active" class="mt-8">
-          <div class="bg-red-50 dark:bg-red-900/20 rounded-2xl border-2 border-red-200 dark:border-red-800 overflow-hidden">
+          <div class="bg-red-50/20 rounded-2xl border-2 border-red-200 overflow-hidden">
             <div class="p-6">
-              <h3 class="text-lg font-semibold text-red-900 dark:text-red-200 mb-4 flex items-center">
+              <h3 class="text-lg font-semibold text-red-900 mb-4 flex items-center">
                 <i class="pi pi-exclamation-triangle mr-2" />
                 Danger Zone
               </h3>
-              
+
               <div class="space-y-4">
                 <div>
-                  <h4 class="font-medium text-red-800 dark:text-red-300 mb-2">Delete Race</h4>
-                  <p class="text-sm text-red-700 dark:text-red-400 mb-4">
-                    Permanently delete this race and all associated data including qualifying times, brackets, 
-                    check-ins, and awards. This action cannot be undone.
+                  <h4 class="font-medium text-red-800 mb-2">Delete Race</h4>
+                  <p class="text-sm text-red-700 mb-4">
+                    Permanently delete this race and all associated data including qualifying times,
+                    brackets, check-ins, and awards. This action cannot be undone.
                   </p>
-                  
-                  <Button
-                    :loading="deletingRace"
-                    severity="danger"
-                    @click="confirmDeleteRace"
-                  >
+
+                  <Button :loading="deletingRace" severity="danger" @click="confirmDeleteRace">
                     <i class="pi pi-trash mr-2" />
                     Delete Race
                   </Button>
@@ -274,7 +247,7 @@
 
       <!-- Toast Messages -->
       <Toast />
-      
+
       <!-- Confirmation Dialog -->
       <ConfirmDialog />
     </div>
@@ -310,7 +283,6 @@ const uploadError = ref('')
 const fileInput = ref(null)
 const deletingRace = ref(false)
 const settingActive = ref(false)
-
 
 // Breadcrumb navigation
 const breadcrumbItems = computed(() => [
@@ -458,10 +430,10 @@ const setActiveRace = async () => {
 
   try {
     await setActiveRaceComposable(race.value.id)
-    
+
     // Update local race state
     race.value.active = true
-    
+
     $toast.add({
       severity: 'success',
       summary: 'Race Activated',
@@ -470,7 +442,7 @@ const setActiveRace = async () => {
     })
   } catch (error) {
     console.error('Error setting active race:', error)
-    
+
     $toast.add({
       severity: 'error',
       summary: 'Failed to Activate',
@@ -485,7 +457,7 @@ const setActiveRace = async () => {
 // Delete race with confirmation
 const confirmDeleteRace = () => {
   $confirm.require({
-    message: `Are you sure you want to delete "${race.value.name}"? This action cannot be undone and will remove all associated data including qualifying times, brackets, check-ins, and awards.`,
+    message: `Are you sure you want to delete""${race.value.name}"? This action cannot be undone and will remove all associated data including qualifying times, brackets, check-ins, and awards.`,
     header: 'Delete Race',
     icon: 'pi pi-exclamation-triangle',
     rejectLabel: 'Cancel',
@@ -519,9 +491,9 @@ const deleteRace = async () => {
     }, 1000)
   } catch (error) {
     console.error('Error deleting race:', error)
-    
+
     let errorMessage = 'Failed to delete race. Please try again.'
-    
+
     // Handle different error response formats
     if (error.data?.message) {
       errorMessage = error.data.message
@@ -532,7 +504,7 @@ const deleteRace = async () => {
     } else if (typeof error === 'string') {
       errorMessage = error
     }
-    
+
     $toast.add({
       severity: 'error',
       summary: 'Delete Failed',
@@ -556,7 +528,7 @@ const updateRace = async () => {
     if (form.value.date && form.value.time) {
       const date = new Date(form.value.date)
       const time = new Date(form.value.time)
-      
+
       // Create combined datetime in local timezone
       const combined = new Date(
         date.getFullYear(),
@@ -566,7 +538,7 @@ const updateRace = async () => {
         time.getMinutes(),
         time.getSeconds()
       )
-      
+
       raceDateTime = combined.toISOString()
     }
 
@@ -575,7 +547,7 @@ const updateRace = async () => {
     if (form.value.date && form.value.endTime) {
       const date = new Date(form.value.date)
       const time = new Date(form.value.endTime)
-      
+
       // Create combined end datetime in local timezone
       const combined = new Date(
         date.getFullYear(),
@@ -585,10 +557,10 @@ const updateRace = async () => {
         time.getMinutes(),
         time.getSeconds()
       )
-      
+
       endTime = combined.toISOString()
     }
-    
+
     const raceData = {
       name: form.value.name.trim(),
       race_datetime: raceDateTime,

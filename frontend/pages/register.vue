@@ -1,15 +1,13 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
-  >
+  <div class="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div class="text-center">
-        <h2 class="text-3xl font-bold text-gray-900 dark:text-white">Create your account</h2>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <h2 class="text-3xl font-bold text-black">Create your account</h2>
+        <p class="mt-2 text-sm text-gray-600">
           Or
           <NuxtLink
             to="/login"
-            class="font-medium text-brand-blue hover:text-brand-blue/80 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+            class="font-medium text-black hover:text-gray-600 transition-colors underline hover:no-underline"
           >
             sign in to existing account
           </NuxtLink>
@@ -17,27 +15,18 @@
       </div>
 
       <!-- Email Confirmation Message -->
-      <Card
-        v-if="showConfirmation"
-        class="shadow-xl border-2 border-brand-green bg-white dark:bg-gray-800"
-      >
+      <Card v-if="showConfirmation" class="shadow-xl border-2 border-brand-green bg-white">
         <template #content>
           <div class="text-center p-6">
             <div class="mb-4">
               <i class="pi pi-envelope text-4xl text-brand-green" />
             </div>
-            <h3 class="text-xl font-bold text-green-800 dark:text-green-200 mb-3">
-              Check Your Email!
-            </h3>
-            <p class="text-green-700 dark:text-green-300 mb-4">
-              We've sent a confirmation link to:
-            </p>
-            <p
-              class="font-mono text-green-800 dark:text-green-200 bg-green-100 dark:bg-green-800/30 px-4 py-2 rounded-lg mb-4"
-            >
+            <h3 class="text-xl font-bold text-green-800 mb-3">Check Your Email!</h3>
+            <p class="text-green-700 mb-4">We've sent a confirmation link to:</p>
+            <p class="font-mono text-green-800 bg-green-100 px-4 py-2 rounded-lg mb-4">
               {{ registeredEmail }}
             </p>
-            <p class="text-green-700 dark:text-green-300 text-sm mb-6">
+            <p class="text-green-700 text-sm mb-6">
               Click the link in your email to activate your account, then you can sign in.
             </p>
             <div class="space-y-3">
@@ -76,22 +65,17 @@
             <!-- Divider -->
             <div class="relative">
               <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-gray-300 dark:border-gray-600" />
+                <div class="w-full border-t border-gray-300" />
               </div>
               <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-                  >Or use email</span
-                >
+                <span class="px-2 bg-white text-gray-500">Or use email</span>
               </div>
             </div>
 
             <!-- Email/Password Form -->
             <form class="space-y-4" @submit.prevent="handleRegister">
               <div>
-                <label
-                  for="name"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
                   Full Name
                 </label>
                 <InputText
@@ -106,10 +90,7 @@
               </div>
 
               <div>
-                <label
-                  for="email"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
                   Email address
                 </label>
                 <InputText
@@ -125,10 +106,7 @@
               </div>
 
               <div>
-                <label
-                  for="password"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
                 <Password
@@ -147,10 +125,7 @@
               </div>
 
               <div>
-                <label
-                  for="confirmPassword"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-2">
                   Confirm Password
                 </label>
                 <Password

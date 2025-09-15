@@ -60,6 +60,19 @@ export default createConfigForNuxt({
       ]
     }
   })
+  .override('nuxt/typescript/rules', {
+    rules: {
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_'
+        }
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn'
+    }
+  })
   .override('nuxt/javascript', {
     languageOptions: {
       globals: {
@@ -80,6 +93,9 @@ export default createConfigForNuxt({
         useRuntimeConfig: 'readonly',
         useState: 'readonly',
         readonly: 'readonly',
+        // Supabase auto-imports
+        useSupabaseClient: 'readonly',
+        useSupabaseUser: 'readonly',
         // Browser globals
         console: 'readonly',
         localStorage: 'readonly',
@@ -108,7 +124,7 @@ export default createConfigForNuxt({
           destructuredArrayIgnorePattern: '^_'
         }
       ],
-      // Disable the prefer-number-properties rule for parseFloat/isNaN
+      // Allow traditional isNaN for compatibility
       'unicorn/prefer-number-properties': 'off'
     }
   })

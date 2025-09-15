@@ -1,19 +1,22 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
-    <div class="container mx-auto px-4 py-12 max-w-2xl">
+  <div class="min-h-screen bg-white">
+    <div class="container mx-auto px-4 pt-0 pb-12 max-w-2xl">
       <!-- Header -->
-      <div class="text-center mb-12">
-        <div
-          class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-green-600 to-teal-600 rounded-full mb-6"
-        >
-          <i class="pi pi-car text-2xl text-white" />
+      <div class="flex items-center gap-8 mb-12">
+        <div class="flex-shrink-0">
+          <img
+            src="~/assets/img/brickracer.jpg"
+            alt="Brick Racer"
+            class="w-64 h-48 object-contain"
+          >
         </div>
-        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Add New Racer</h1>
-        <p class="text-lg text-gray-600 dark:text-gray-300 max-w-lg mx-auto">
-          Create a new custom gravity-powered vehicle for the competition
-        </p>
+        <div class="flex-1">
+          <h1 class="text-4xl font-bold text-black mb-4">Add New Racer</h1>
+          <p class="text-lg text-gray-600">
+            Create a new custom gravity-powered vehicle for the competition
+          </p>
+        </div>
       </div>
-
 
       <!-- Form Card -->
       <Card>
@@ -21,10 +24,7 @@
           <form class="space-y-8" @submit.prevent="handleSubmit">
             <!-- Name Input -->
             <div>
-              <label
-                for="name"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
+              <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
                 Racer Name
               </label>
               <InputText
@@ -36,15 +36,13 @@
                 class="w-full"
               />
               <p v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</p>
-              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              <p class="mt-2 text-sm text-gray-500">
                 You can add weight, photos, and other details later by editing your racer.
               </p>
             </div>
 
             <!-- Action Buttons -->
-            <div
-              class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 dark:border-gray-600"
-            >
+            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
               <Button
                 type="submit"
                 :loading="loading"
@@ -65,13 +63,9 @@
 
       <!-- Help Text -->
       <div class="text-center mt-8">
-        <p class="text-gray-500 dark:text-gray-400 text-sm">
+        <p class="text-gray-500 text-sm">
           Need help? Check out our
-          <NuxtLink
-            to="/faq"
-            class="text-green-700 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300 font-medium"
-            >FAQ</NuxtLink
-          >
+          <NuxtLink to="/faq" class="text-green-700 hover:text-green-600 font-medium">FAQ</NuxtLink>
           for competition requirements, race process, awards, and other frequently asked questions.
         </p>
       </div>

@@ -3,7 +3,7 @@
     <!-- Upload Area -->
     <div class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">
           Select Photos to Upload
         </label>
         <FileUpload
@@ -20,7 +20,7 @@
           class="w-full"
           :pt="{
             root: {
-              class: 'border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg'
+              class: 'border-2 border-dashed border-gray-300 rounded-lg'
             },
             content: { class: 'p-6' }
           }"
@@ -32,13 +32,9 @@
         >
           <template #empty>
             <div class="text-center">
-              <i class="pi pi-cloud-upload text-4xl text-gray-400 dark:text-gray-500 mb-4" />
-              <p class="text-gray-600 dark:text-gray-400 mb-2">
-                Drag and drop photos here, or click to select files
-              </p>
-              <p class="text-sm text-gray-500 dark:text-gray-500">
-                JPG, PNG, GIF up to 10MB each • Maximum 10 photos
-              </p>
+              <i class="pi pi-cloud-upload text-4xl text-gray-400 mb-4" />
+              <p class="text-gray-600 mb-2">Drag and drop photos here, or click to select files</p>
+              <p class="text-sm text-gray-500">JPG, PNG, GIF up to 10MB each • Maximum 10 photos</p>
             </div>
           </template>
 
@@ -50,9 +46,7 @@
               removeFileCallback
             }"
           >
-            <div
-              class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 border rounded-lg"
-            >
+            <div class="flex items-center justify-between p-3 bg-gray-50 border rounded-lg">
               <div class="flex items-center gap-3">
                 <img
                   v-if="file.objectURL"
@@ -61,8 +55,8 @@
                   class="w-12 h-12 object-cover rounded border"
                 >
                 <div class="flex-1">
-                  <p class="font-medium text-gray-900 dark:text-white text-sm">{{ file.name }}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                  <p class="font-medium text-black text-sm">{{ file.name }}</p>
+                  <p class="text-xs text-gray-500">
                     {{ formatFileSize(file.size) }}
                   </p>
                 </div>
@@ -89,9 +83,7 @@
       <!-- Photo Metadata -->
       <div v-if="selectedFiles.length > 0" class="space-y-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Photo Category
-          </label>
+          <label class="block text-sm font-medium text-gray-700 mb-2"> Photo Category </label>
           <Select
             v-model="photoCategory"
             :options="categoryOptions"
@@ -103,20 +95,17 @@
         </div>
 
         <!-- Show race info if provided -->
-        <div
-          v-if="raceId && raceName"
-          class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3"
-        >
+        <div v-if="raceId && raceName" class="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <div class="flex items-center gap-2">
-            <i class="pi pi-flag text-blue-600 dark:text-blue-400" />
-            <span class="text-sm font-medium text-blue-800 dark:text-blue-200">
+            <i class="pi pi-flag text-blue-600" />
+            <span class="text-sm font-medium text-blue-800">
               Photos will be associated with: {{ raceName }}
             </span>
           </div>
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
             Description (Optional)
           </label>
           <Textarea
@@ -132,19 +121,17 @@
     <!-- Upload Progress -->
     <div v-if="uploading" class="space-y-3">
       <div class="flex items-center justify-between">
-        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <span class="text-sm font-medium text-gray-700">
           Uploading {{ uploadedCount }} of {{ totalFiles }} photos...
         </span>
-        <span class="text-sm text-gray-500 dark:text-gray-400">
-          {{ Math.round(uploadProgress) }}%
-        </span>
+        <span class="text-sm text-gray-500"> {{ Math.round(uploadProgress) }}% </span>
       </div>
       <ProgressBar :value="uploadProgress" class="h-2" :show-value="false" />
     </div>
 
     <!-- Error Messages -->
     <div v-if="errors.length > 0" class="space-y-2">
-      <div v-for="error in errors" :key="error" class="text-sm text-red-600 dark:text-red-400">
+      <div v-for="error in errors" :key="error" class="text-sm text-red-600">
         <i class="pi pi-exclamation-triangle mr-1" />
         {{ error }}
       </div>
@@ -153,11 +140,11 @@
     <!-- Success Message -->
     <div
       v-if="uploadComplete && uploadedCount > 0"
-      class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4"
+      class="bg-green-50 border border-green-200 rounded-lg p-4"
     >
       <div class="flex items-center">
-        <i class="pi pi-check-circle text-green-600 dark:text-green-400 mr-2" />
-        <p class="text-sm text-green-800 dark:text-green-200">
+        <i class="pi pi-check-circle text-green-600 mr-2" />
+        <p class="text-sm text-green-800">
           Successfully uploaded {{ uploadedCount }} photo{{ uploadedCount !== 1 ? 's' : '' }}!
           {{
             authStore.isRaceAdmin

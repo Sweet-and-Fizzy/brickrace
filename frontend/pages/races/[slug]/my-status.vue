@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -12,8 +12,8 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Race Not Found</h2>
+        <p class="text-gray-600 mb-6">
           The race you're looking for doesn't exist or has been removed.
         </p>
         <NuxtLink to="/races">
@@ -25,44 +25,45 @@
       <div v-else-if="race">
         <!-- Header -->
         <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            My Racers Status: {{ race.name }}
-          </h1>
-          <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
+          <h1 class="text-3xl font-bold text-black mb-2">My Racers Status: {{ race.name }}</h1>
+          <div class="flex items-center gap-4 text-gray-600">
             <span>{{
-              race.race_datetime ? new Date(race.race_datetime).toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              }) : 'Date TBD'
+              race.race_datetime
+                ? new Date(race.race_datetime).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })
+                : 'Date TBD'
             }}</span>
-            <span class="font-semibold text-blue-600 dark:text-blue-400"
+            <span class="font-semibold text-blue-600"
               >{{ myRacersInRace.length }} of your racers</span
             >
           </div>
         </div>
 
         <!-- My Racers Cards -->
-        <div v-if="myRacersInRace.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          v-if="myRacersInRace.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
           <Card
             v-for="racer in myRacersInRace"
             :key="racer.id"
             class="border-2"
             :class="{
-              'border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800': isWithdrawn(racer.id),
-              'border-gray-200 dark:border-gray-600': !isWithdrawn(racer.id)
+              'border-red-200 bg-red-50/20': isWithdrawn(racer.id),
+              'border-gray-200': !isWithdrawn(racer.id)
             }"
           >
             <template #content>
               <!-- Racer Info -->
               <div class="flex items-center justify-between mb-4">
                 <div>
-                  <h3 class="font-semibold text-gray-900 dark:text-white">{{ racer.name }}</h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-300">
-                    Racer #{{ racer.racer_number }}
-                  </p>
-                  <p v-if="racer.team_members" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <h3 class="font-semibold text-black">{{ racer.name }}</h3>
+                  <p class="text-sm text-gray-600">Racer #{{ racer.racer_number }}</p>
+                  <p v-if="racer.team_members" class="text-xs text-gray-500 mt-1">
                     Team: {{ racer.team_members }}
                   </p>
                 </div>
@@ -82,19 +83,19 @@
               <!-- Status Indicators -->
               <div class="space-y-3">
                 <!-- Check-in Status -->
-                <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                  <span class="text-sm text-gray-600 dark:text-gray-300">Check-in Status</span>
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span class="text-sm text-gray-600">Check-in Status</span>
                   <div class="flex items-center">
                     <i
                       v-if="isCheckedIn(racer.id)"
-                      class="pi pi-check-circle text-green-600 dark:text-green-400 mr-2"
+                      class="pi pi-check-circle text-green-600 mr-2"
                     />
                     <i v-else class="pi pi-circle text-gray-400 mr-2" />
-                    <span 
+                    <span
                       class="text-sm font-medium"
                       :class="{
-                        'text-green-600 dark:text-green-400': isCheckedIn(racer.id),
-                        'text-gray-500 dark:text-gray-400': !isCheckedIn(racer.id)
+                        'text-green-600': isCheckedIn(racer.id),
+                        'text-gray-500': !isCheckedIn(racer.id)
                       }"
                     >
                       {{ isCheckedIn(racer.id) ? 'Checked In' : 'Not Checked In' }}
@@ -103,19 +104,19 @@
                 </div>
 
                 <!-- Withdrawal Status -->
-                <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
-                  <span class="text-sm text-gray-600 dark:text-gray-300">Race Status</span>
+                <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                  <span class="text-sm text-gray-600">Race Status</span>
                   <div class="flex items-center">
                     <i
                       v-if="isWithdrawn(racer.id)"
-                      class="pi pi-exclamation-triangle text-red-600 dark:text-red-400 mr-2"
+                      class="pi pi-exclamation-triangle text-red-600 mr-2"
                     />
-                    <i v-else class="pi pi-check text-green-600 dark:text-green-400 mr-2" />
-                    <span 
+                    <i v-else class="pi pi-check text-green-600 mr-2" />
+                    <span
                       class="text-sm font-medium"
                       :class="{
-                        'text-red-600 dark:text-red-400': isWithdrawn(racer.id),
-                        'text-green-600 dark:text-green-400': !isWithdrawn(racer.id)
+                        'text-red-600': isWithdrawn(racer.id),
+                        'text-green-600': !isWithdrawn(racer.id)
                       }"
                     >
                       {{ isWithdrawn(racer.id) ? 'Withdrawn' : 'Active' }}
@@ -144,13 +145,9 @@
 
         <!-- No Racers -->
         <div v-else class="text-center py-12">
-          <i class="pi pi-inbox text-6xl text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-            No Racers Found
-          </h3>
-          <p class="text-gray-600 dark:text-gray-300 mb-6">
-            You don't have any racers in this race.
-          </p>
+          <i class="pi pi-inbox text-6xl text-gray-300 mb-4" />
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">No Racers Found</h3>
+          <p class="text-gray-600 mb-6">You don't have any racers in this race.</p>
           <NuxtLink to="/racers/add">
             <Button severity="primary">
               <i class="pi pi-plus mr-2" />
@@ -174,16 +171,13 @@ const supabase = useSupabaseClient()
 
 // Use composables
 const { getRaceBySlug, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
-const { 
-  myRacers, 
-  withdrawRacerFromRace, 
+const {
+  myRacers,
+  withdrawRacerFromRace,
   reinstateRacerToRace,
   initialize: initializeRacers
 } = useRacers()
-const { 
-  isCheckedIn: isCheckedInComposable,
-  initialize: initializeCheckins
-} = useCheckins()
+const { isCheckedIn: isCheckedInComposable, initialize: initializeCheckins } = useCheckins()
 
 // Local reactive data
 const race = ref(null)
@@ -224,12 +218,12 @@ const toggleWithdrawal = async (racer) => {
 
   try {
     const isCurrentlyWithdrawn = isWithdrawn(racer.id)
-    
+
     if (isCurrentlyWithdrawn) {
       // Reinstate racer
       await reinstateRacerToRace(racer.id, race.value.id)
       withdrawnRacers.value.delete(racer.id)
-      
+
       toast.add({
         severity: 'success',
         summary: 'Racer Reinstated',
@@ -240,7 +234,7 @@ const toggleWithdrawal = async (racer) => {
       // Withdraw racer
       await withdrawRacerFromRace(racer.id, race.value.id, 'Withdrawn by racer owner')
       withdrawnRacers.value.add(racer.id)
-      
+
       toast.add({
         severity: 'info',
         summary: 'Racer Withdrawn',
@@ -270,11 +264,14 @@ const loadWithdrawalStatus = async () => {
       .from('race_withdrawals')
       .select('racer_id')
       .eq('race_id', race.value.id)
-      .in('racer_id', myRacers.value.map(r => r.id))
+      .in(
+        'racer_id',
+        myRacers.value.map((r) => r.id)
+      )
 
     if (error) throw error
 
-    withdrawnRacers.value = new Set((raceWithdrawals || []).map(w => w.racer_id))
+    withdrawnRacers.value = new Set((raceWithdrawals || []).map((w) => w.racer_id))
   } catch (err) {
     console.error('Error loading withdrawal status:', err)
   }
@@ -284,13 +281,13 @@ const loadWithdrawalStatus = async () => {
 const fetchRaceData = async () => {
   try {
     await initializeRaces()
-    
+
     const slug = route.params.slug
     let raceData = getRaceBySlug(slug)
     if (!raceData) {
       raceData = await fetchRaceBySlug(slug)
     }
-    
+
     if (!raceData) {
       throw new Error('Race not found')
     }

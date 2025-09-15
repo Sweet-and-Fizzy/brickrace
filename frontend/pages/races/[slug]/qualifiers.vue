@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -12,8 +12,8 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Race Not Found</h2>
+        <p class="text-gray-600 mb-6">
           The race you're looking for doesn't exist or has been removed.
         </p>
         <NuxtLink to="/races">
@@ -24,10 +24,8 @@
       <!-- Access Denied -->
       <div v-else-if="!authStore.isRaceAdmin" class="text-center py-12">
         <i class="pi pi-ban text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Access Denied</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
-          You need race admin privileges to manage qualifying times.
-        </p>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Access Denied</h2>
+        <p class="text-gray-600 mb-6">You need race admin privileges to manage qualifying times.</p>
         <NuxtLink to="/races">
           <Button label="Back to All Races" icon="pi pi-arrow-left" severity="primary" />
         </NuxtLink>
@@ -39,19 +37,19 @@
         <div class="mb-8">
           <div class="flex flex-col md:flex-row md:items-start md:justify-between">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Qualifiers: {{ race.name }}
-              </h1>
-              <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
+              <h1 class="text-3xl font-bold text-black mb-2">Qualifiers: {{ race.name }}</h1>
+              <div class="flex items-center gap-4 text-gray-600">
                 <span>{{
-                  race.race_datetime ? new Date(race.race_datetime).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  }) : 'Date TBD'
+                  race.race_datetime
+                    ? new Date(race.race_datetime).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                    : 'Date TBD'
                 }}</span>
-                <span class="font-semibold text-blue-600 dark:text-blue-400"
+                <span class="font-semibold text-blue-600"
                   >{{ qualifiers.length }} qualifying runs</span
                 >
               </div>
@@ -70,10 +68,7 @@
               <template #content>
                 <div class="flex flex-col md:flex-row gap-4">
                   <div class="flex-1">
-                    <label
-                      for="search"
-                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
                       Search Racers
                     </label>
                     <InputText
@@ -109,35 +104,30 @@
                       />
                       <div
                         v-else
-                        class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center"
+                        class="w-12 h-12 bg-gray-200 rounded-full border-2 border-gray-300 flex items-center justify-center"
                       >
-                        <i class="pi pi-car text-gray-500 dark:text-gray-400" />
+                        <i class="pi pi-car text-gray-500" />
                       </div>
                       <div>
-                        <h3 class="font-semibold text-gray-900 dark:text-white">
+                        <h3 class="font-semibold text-black">
                           {{ racer.name }}
                         </h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
-                          Racer #{{ racer.racer_number }}
-                        </p>
-                        <p
-                          v-if="racer.team_members"
-                          class="text-xs text-gray-500 dark:text-gray-400"
-                        >
+                        <p class="text-sm text-gray-600">Racer #{{ racer.racer_number }}</p>
+                        <p v-if="racer.team_members" class="text-xs text-gray-500">
                           Team: {{ racer.team_members }}
                         </p>
                       </div>
                     </div>
                     <div class="text-left sm:text-right space-y-2">
                       <div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Fastest Time</p>
-                        <p class="text-lg font-bold text-green-600 dark:text-green-400">
+                        <p class="text-sm text-gray-500">Fastest Time</p>
+                        <p class="text-lg font-bold text-green-600">
                           {{ getBestTime(racer.id) || 'No runs' }}
                         </p>
                       </div>
                       <div>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">Slowest Time</p>
-                        <p class="text-lg font-bold text-red-600 dark:text-red-400">
+                        <p class="text-sm text-gray-500">Slowest Time</p>
+                        <p class="text-lg font-bold text-red-600">
                           {{ getWorstTime(racer.id) || 'No runs' }}
                         </p>
                       </div>
@@ -151,7 +141,7 @@
                       <div class="flex-shrink-0 sm:w-32">
                         <label
                           :for="`time-${racer.id}`"
-                          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                          class="block text-sm font-medium text-gray-700 mb-1"
                         >
                           Time (sec)
                         </label>
@@ -188,14 +178,12 @@
 
                     <!-- Previous Runs -->
                     <div v-if="getRacerQualifiers(racer.id).length > 0" class="w-full">
-                      <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        Previous Runs:
-                      </h4>
+                      <h4 class="text-sm font-medium text-gray-700 mb-2">Previous Runs:</h4>
                       <div class="flex flex-wrap gap-2">
                         <div
                           v-for="qualifier in getRacerQualifiers(racer.id)"
                           :key="qualifier.id"
-                          class="flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 border border-blue-300 dark:border-blue-700 rounded-full text-sm text-blue-800 dark:text-blue-200"
+                          class="flex items-center gap-2 px-3 py-1 bg-blue-100/30 border border-blue-300 rounded-full text-sm text-blue-800"
                         >
                           <span class="font-medium">{{ formatTime(qualifier.time) }}</span>
                           <Button
@@ -218,11 +206,9 @@
 
             <!-- No Racers Found -->
             <div v-if="filteredCheckedInRacers.length === 0" class="text-center py-12">
-              <i class="pi pi-search text-6xl text-gray-300 dark:text-gray-600 mb-4" />
-              <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-                No Racers Found
-              </h3>
-              <p class="text-gray-600 dark:text-gray-300">
+              <i class="pi pi-search text-6xl text-gray-300 mb-4" />
+              <h3 class="text-xl font-semibold text-gray-800 mb-2">No Racers Found</h3>
+              <p class="text-gray-600">
                 {{
                   searchQuery
                     ? 'Try adjusting your search terms.'
@@ -243,9 +229,7 @@
             <!-- Fastest Times Standings -->
             <Card>
               <template #title>
-                <h3
-                  class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
-                >
+                <h3 class="text-lg font-semibold text-black flex items-center gap-2">
                   <i class="pi pi-trophy text-green-600" />
                   Fastest Times
                 </h3>
@@ -261,7 +245,7 @@
                   }"
                 >
                   <template #empty>
-                    <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                    <div class="text-center py-6 text-gray-500">
                       <i class="pi pi-clock text-3xl mb-2" />
                       <p>No qualifying times yet</p>
                     </div>
@@ -273,9 +257,9 @@
                         class="flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm"
                         :class="{
                           'bg-yellow-400 text-yellow-900': index === 0,
-                          'bg-gray-400 text-gray-900': index === 1,
+                          'bg-gray-400 text-black': index === 1,
                           'bg-orange-400 text-orange-900': index === 2,
-                          'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200': index > 2
+                          'bg-gray-200 text-gray-700': index > 2
                         }"
                       >
                         {{ index + 1 }}
@@ -286,12 +270,10 @@
                   <Column header="Racer">
                     <template #body="{ data }">
                       <div>
-                        <p class="font-medium text-gray-900 dark:text-white">
+                        <p class="font-medium text-black">
                           {{ data.racer_name }}
                         </p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
-                          #{{ data.racer_number }}
-                        </p>
+                        <p class="text-sm text-gray-600">#{{ data.racer_number }}</p>
                       </div>
                     </template>
                   </Column>
@@ -299,18 +281,16 @@
                   <Column header="Time" class="text-right">
                     <template #body="{ data }">
                       <div class="text-right">
-                        <p class="font-bold text-blue-600 dark:text-blue-400">
+                        <p class="font-bold text-blue-600">
                           {{ formatTime(data.best_time) }}
                         </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                          {{ data.run_count }} runs
-                        </p>
+                        <p class="text-xs text-gray-500">{{ data.run_count }} runs</p>
                       </div>
                     </template>
                   </Column>
                 </DataTable>
 
-                <div v-else class="text-center py-6 text-gray-500 dark:text-gray-400">
+                <div v-else class="text-center py-6 text-gray-500">
                   <i class="pi pi-clock text-3xl mb-2" />
                   <p>No qualifying times yet</p>
                 </div>
@@ -320,9 +300,7 @@
             <!-- Slowest Times Standings -->
             <Card>
               <template #title>
-                <h3
-                  class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2"
-                >
+                <h3 class="text-lg font-semibold text-black flex items-center gap-2">
                   <i class="pi pi-trophy text-red-600" />
                   Slowest Times
                 </h3>
@@ -338,7 +316,7 @@
                   }"
                 >
                   <template #empty>
-                    <div class="text-center py-6 text-gray-500 dark:text-gray-400">
+                    <div class="text-center py-6 text-gray-500">
                       <i class="pi pi-clock text-3xl mb-2" />
                       <p>No qualifying times yet</p>
                     </div>
@@ -350,9 +328,9 @@
                         class="flex items-center justify-center w-8 h-8 rounded-full font-bold text-sm"
                         :class="{
                           'bg-yellow-400 text-yellow-900': index === 0,
-                          'bg-gray-400 text-gray-900': index === 1,
+                          'bg-gray-400 text-black': index === 1,
                           'bg-orange-400 text-orange-900': index === 2,
-                          'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200': index > 2
+                          'bg-gray-200 text-gray-700': index > 2
                         }"
                       >
                         {{ index + 1 }}
@@ -363,12 +341,10 @@
                   <Column header="Racer">
                     <template #body="{ data }">
                       <div>
-                        <p class="font-medium text-gray-900 dark:text-white">
+                        <p class="font-medium text-black">
                           {{ data.racer_name }}
                         </p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
-                          #{{ data.racer_number }}
-                        </p>
+                        <p class="text-sm text-gray-600">#{{ data.racer_number }}</p>
                       </div>
                     </template>
                   </Column>
@@ -376,18 +352,16 @@
                   <Column header="Time" class="text-right">
                     <template #body="{ data }">
                       <div class="text-right">
-                        <p class="font-bold text-red-600 dark:text-red-400">
+                        <p class="font-bold text-red-600">
                           {{ formatTime(data.slowest_time) }}
                         </p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                          {{ data.run_count }} runs
-                        </p>
+                        <p class="text-xs text-gray-500">{{ data.run_count }} runs</p>
                       </div>
                     </template>
                   </Column>
                 </DataTable>
 
-                <div v-else class="text-center py-6 text-gray-500 dark:text-gray-400">
+                <div v-else class="text-center py-6 text-gray-500">
                   <i class="pi pi-clock text-3xl mb-2" />
                   <p>No qualifying times yet</p>
                 </div>
@@ -400,34 +374,24 @@
               <template #content>
                 <div class="space-y-4">
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Checked In</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      checkedInRacers.length
-                    }}</span>
+                    <span class="text-gray-600">Checked In</span>
+                    <span class="font-semibold text-black">{{ checkedInRacers.length }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Qualified</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      leaderboard.length
-                    }}</span>
+                    <span class="text-gray-600">Qualified</span>
+                    <span class="font-semibold text-black">{{ leaderboard.length }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Total Runs</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      qualifiers.length
-                    }}</span>
+                    <span class="text-gray-600">Total Runs</span>
+                    <span class="font-semibold text-black">{{ qualifiers.length }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Fastest Time</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      fastestTime || 'N/A'
-                    }}</span>
+                    <span class="text-gray-600">Fastest Time</span>
+                    <span class="font-semibold text-black">{{ fastestTime || 'N/A' }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span class="text-gray-600 dark:text-gray-300">Slowest Time</span>
-                    <span class="font-semibold text-gray-900 dark:text-white">{{
-                      slowestTime || 'N/A'
-                    }}</span>
+                    <span class="text-gray-600">Slowest Time</span>
+                    <span class="font-semibold text-black">{{ slowestTime || 'N/A' }}</span>
                   </div>
                 </div>
               </template>
@@ -450,11 +414,7 @@ const toast = useToast()
 const confirm = useConfirm()
 
 // Use composables
-const {
-  getRaceBySlug,
-  fetchRaceBySlug,
-  initialize: initializeRaces
-} = useRaces()
+const { getRaceBySlug, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
 
 const { getCheckinsForRace, racers: allRacers, initialize: initializeCheckins } = useCheckins()
 

@@ -9,99 +9,86 @@
     <!-- Admin Dropdown Menu -->
     <div
       v-if="showMenu"
-      class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 z-50"
+      class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50"
       @click="showMenu = false"
     >
       <div class="py-2">
         <!-- Race-specific admin items -->
         <template v-if="raceId && activeRace">
-          <div
-            class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-          >
+          <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
             Race Management
           </div>
           <NuxtLink
             to="/awards/manage"
-            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <i class="pi pi-trophy mr-2 text-yellow-600" />
             Awards
           </NuxtLink>
           <NuxtLink
             :to="`/races/${raceId}/brackets`"
-            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <i class="pi pi-sitemap mr-2 text-purple-600" />
             Brackets
           </NuxtLink>
           <NuxtLink
             :to="`/races/${raceId}/checkin`"
-            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <i class="pi pi-check mr-2 text-green-600" />
             Check-in Racers
           </NuxtLink>
           <NuxtLink
             to="/admin/heats"
-            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <i class="pi pi-stopwatch mr-2 text-orange-600" />
             Heat Management
           </NuxtLink>
           <NuxtLink
             :to="`/races/${raceId}/qualifiers`"
-            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <i class="pi pi-clock mr-2 text-blue-600" />
             Qualifiers
           </NuxtLink>
           <NuxtLink
             :to="`/races/${raceId}/my-status`"
-            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <i class="pi pi-user mr-2 text-teal-600" />
             My Status
           </NuxtLink>
           <NuxtLink
             :to="`/races/${raceId}/edit`"
-            class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <i class="pi pi-pencil mr-2 text-gray-600" />
             Edit Race
           </NuxtLink>
-          <hr class="my-2 border-gray-200 dark:border-gray-600" >
+          <hr class="my-2 border-gray-200" >
         </template>
 
         <!-- General admin items -->
-        <div
-          class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-        >
+        <div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
           General
         </div>
-        <NuxtLink
-          to="/admin"
-          class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
+        <NuxtLink to="/admin" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
           <i class="pi pi-chart-line mr-2 text-indigo-600" />
           Admin Dashboard
         </NuxtLink>
-        <NuxtLink
-          to="/races"
-          class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
+        <NuxtLink to="/races" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
           <i class="pi pi-flag mr-2 text-orange-600" />
           Manage Races
         </NuxtLink>
-        <NuxtLink
-          to="/racers"
-          class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
+        <NuxtLink to="/racers" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
           <i class="pi pi-users mr-2 text-green-600" />
           Manage Racers
         </NuxtLink>
         <NuxtLink
           :to="raceId ? `/admin/photos?race=${raceId}` : '/admin/photos'"
-          class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+          class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
         >
           <i class="pi pi-images mr-2 text-blue-600" />
           Manage Photos

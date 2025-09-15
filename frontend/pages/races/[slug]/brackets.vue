@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -12,8 +12,8 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Race Not Found</h2>
+        <p class="text-gray-600 mb-6">
           The race you're looking for doesn't exist or has been removed.
         </p>
         <NuxtLink to="/races">
@@ -27,10 +27,8 @@
       <!-- Access Denied -->
       <div v-else-if="!authStore.isRaceAdmin" class="text-center py-12">
         <i class="pi pi-ban text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Access Denied</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
-          You need race admin privileges to manage race brackets.
-        </p>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Access Denied</h2>
+        <p class="text-gray-600 mb-6">You need race admin privileges to manage race brackets.</p>
         <NuxtLink to="/races">
           <Button severity="primary">
             <i class="pi pi-arrow-left mr-2" />
@@ -45,19 +43,19 @@
         <div class="mb-8">
           <div class="flex flex-col md:flex-row md:items-start md:justify-between">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Brackets: {{ race.name }}
-              </h1>
-              <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
+              <h1 class="text-3xl font-bold text-black mb-2">Brackets: {{ race.name }}</h1>
+              <div class="flex items-center gap-4 text-gray-600">
                 <span>{{
-                  race.race_datetime ? new Date(race.race_datetime).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  }) : 'Date TBD'
+                  race.race_datetime
+                    ? new Date(race.race_datetime).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                    : 'Date TBD'
                 }}</span>
-                <span class="font-semibold text-purple-600 dark:text-purple-400"
+                <span class="font-semibold text-purple-600"
                   >{{ brackets.length }} bracket races</span
                 >
               </div>
@@ -74,22 +72,22 @@
             <!-- Bracket Generation Controls -->
             <Card>
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-sitemap" />
                   Generate Brackets
                 </h2>
               </template>
               <template #content>
                 <div class="space-y-4">
-                  <p class="text-gray-600 dark:text-gray-300">
-                    Create double elimination tournament with all checked-in, non-withdrawn racers. 
+                  <p class="text-gray-600">
+                    Create double elimination tournament with all checked-in, non-withdrawn racers.
                     Every racer gets a second chance through the loser bracket.
                   </p>
 
-                  <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-4">
+                  <div class="bg-blue-50/20 border border-blue-200 rounded-lg p-4 mb-4">
                     <div class="flex items-start gap-3">
-                      <i class="pi pi-info-circle text-blue-600 dark:text-blue-400 mt-0.5" />
-                      <div class="text-sm text-blue-800 dark:text-blue-300">
+                      <i class="pi pi-info-circle text-blue-600 mt-0.5" />
+                      <div class="text-sm text-blue-800">
                         <div class="font-semibold mb-1">Double Elimination Tournament</div>
                         <ul class="list-disc list-inside space-y-1">
                           <li>All checked-in racers automatically included</li>
@@ -104,12 +102,15 @@
 
                   <div class="flex flex-col sm:flex-row gap-4 items-center">
                     <div class="flex-1">
-                      <div class="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                        <strong>{{ eligibleRacerCount }}</strong> eligible racers 
-                        ({{ checkedInCount }} checked-in, {{ withdrawnCount }} withdrawn)
+                      <div class="text-sm text-gray-600 mb-2">
+                        <strong>{{ eligibleRacerCount }}</strong> eligible racers ({{
+                          checkedInCount
+                        }}
+                        checked-in, {{ withdrawnCount }} withdrawn)
                       </div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">
-                        Tournament will create {{ Math.floor(eligibleRacerCount / 2) }} initial bracket(s)
+                      <div class="text-xs text-gray-500">
+                        Tournament will create {{ Math.floor(eligibleRacerCount / 2) }} initial
+                        bracket(s)
                       </div>
                     </div>
                     <Button
@@ -128,8 +129,8 @@
                   <div v-if="canGenerateNextRound" class="border-t pt-4">
                     <div class="flex items-center justify-between">
                       <div>
-                        <h4 class="font-medium text-gray-900 dark:text-white">Next Round</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">
+                        <h4 class="font-medium text-black">Next Round</h4>
+                        <p class="text-sm text-gray-600">
                           All {{ completedBrackets }} bracket races completed - generate next round
                         </p>
                       </div>
@@ -146,20 +147,16 @@
 
                   <!-- Round Progress Indicator -->
                   <div v-else-if="brackets.length > 0" class="border-t pt-4">
-                    <div
-                      class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded p-3"
-                    >
+                    <div class="bg-blue-50/20 border border-blue-200 rounded p-3">
                       <div class="flex items-center gap-2 mb-2">
-                        <i class="pi pi-clock text-blue-600 dark:text-blue-400" />
-                        <h4 class="font-medium text-blue-900 dark:text-blue-200">
-                          Current Round Progress
-                        </h4>
+                        <i class="pi pi-clock text-blue-600" />
+                        <h4 class="font-medium text-blue-900">Current Round Progress</h4>
                       </div>
-                      <p class="text-sm text-blue-700 dark:text-blue-300">
+                      <p class="text-sm text-blue-700">
                         {{ completedBrackets }} of {{ brackets.length }} bracket races completed.
                         <span
                           v-if="tiedBrackets.length > 0"
-                          class="block mt-1 text-red-700 dark:text-red-400 font-medium"
+                          class="block mt-1 text-red-700 font-medium"
                         >
                           ⚠️ {{ tiedBrackets.length }} tied bracket(s) need to be resolved before
                           advancing.
@@ -186,7 +183,7 @@
 
                 <div
                   v-if="!canGenerateBrackets"
-                  class="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded p-3"
+                  class="text-sm text-amber-600 bg-amber-50/20 border border-amber-200 rounded p-3"
                 >
                   <i class="pi pi-exclamation-triangle mr-2" />
                   {{ generateBracketsMessage }}
@@ -195,11 +192,9 @@
                 <!-- Tournament Progress -->
                 <div
                   v-if="brackets.length > 0"
-                  class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4"
+                  class="bg-blue-50/20 border border-blue-200 rounded-lg p-4"
                 >
-                  <h4
-                    class="font-semibold text-blue-900 dark:text-blue-200 mb-3 flex items-center gap-2"
-                  >
+                  <h4 class="font-semibold text-blue-900 mb-3 flex items-center gap-2">
                     <i class="pi pi-chart-line" />
                     Tournament Progress
                   </h4>
@@ -210,10 +205,8 @@
                   >
                     <div v-if="totalBracketsByType[bracketType] > 0" class="space-y-2">
                       <div class="flex items-center justify-between">
-                        <span class="font-medium text-gray-700 dark:text-gray-300"
-                          >{{ bracketType }} Tournament</span
-                        >
-                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                        <span class="font-medium text-gray-700">{{ bracketType }} Tournament</span>
+                        <span class="text-sm text-gray-600">
                           {{ completedBracketsByType[bracketType] }}/{{
                             totalBracketsByType[bracketType]
                           }}
@@ -229,7 +222,7 @@
                         :show-value="false"
                         :pt="{ root: { style: 'height: 8px' } }"
                       />
-                      <div class="text-sm text-gray-600 dark:text-gray-400">
+                      <div class="text-sm text-gray-600">
                         <span
                           v-if="
                             winners.filter((w) => {
@@ -270,9 +263,7 @@
             <!-- Tournament Results Podium -->
             <Card v-if="tournamentResults.Fastest || tournamentResults.Slowest">
               <template #title>
-                <h2
-                  class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3"
-                >
+                <h2 class="text-2xl font-bold text-black flex items-center gap-3">
                   <i class="pi pi-crown text-yellow-500 text-2xl" />
                   Tournament Results
                 </h2>
@@ -280,7 +271,7 @@
               <template #content>
                 <div v-for="(result, bracketType) in tournamentResults" :key="bracketType">
                   <div v-if="result" class="mb-8 last:mb-0">
-                    <h3 class="text-xl font-bold text-center mb-6 text-gray-800 dark:text-gray-200">
+                    <h3 class="text-xl font-bold text-center mb-6 text-gray-800">
                       {{ bracketType }} Tournament Podium
                     </h3>
 
@@ -295,14 +286,14 @@
                           <RacerLink
                             :racer-id="result.second.racer_id"
                             :racer-name="result.second.racer_name"
-                            class="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200"
+                            class="text-lg font-bold text-gray-800 hover:text-blue-600 hover:underline transition-colors duration-200"
                           />
                           <div
-                            class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-sm font-semibold"
+                            class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-semibold"
                           >
                             #{{ result.second.racer_number }}
                           </div>
-                          <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          <div class="text-sm text-gray-600 mt-1">
                             {{ formatTime(result.second.time) }}
                           </div>
                         </div>
@@ -322,14 +313,14 @@
                           <RacerLink
                             :racer-id="result.first.racer_id"
                             :racer-name="result.first.racer_name"
-                            class="text-2xl font-bold text-gray-900 dark:text-gray-100 hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
+                            class="text-2xl font-bold text-black hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
                           />
                           <div
                             class="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-lg font-bold mb-2"
                           >
                             #{{ result.first.racer_number }}
                           </div>
-                          <div class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          <div class="text-lg font-bold text-blue-600">
                             {{ formatTime(result.first.winning_time) }}
                           </div>
                           <div class="mt-2">
@@ -356,14 +347,14 @@
                           <RacerLink
                             :racer-id="result.third.racer_id"
                             :racer-name="result.third.racer_name"
-                            class="text-lg font-bold text-gray-800 dark:text-gray-200 hover:text-blue-600 hover:underline transition-colors duration-200"
+                            class="text-lg font-bold text-gray-800 hover:text-blue-600 hover:underline transition-colors duration-200"
                           />
                           <div
-                            class="bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-2 py-1 rounded text-sm font-semibold"
+                            class="bg-orange-100/30 text-orange-700 px-2 py-1 rounded text-sm font-semibold"
                           >
                             #{{ result.third.racer_number }}
                           </div>
-                          <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          <div class="text-sm text-gray-600 mt-1">
                             {{ formatTime(result.third.time) }}
                           </div>
                         </div>
@@ -378,7 +369,7 @@
                     <!-- Tournament Type Badge -->
                     <div class="text-center">
                       <span
-                        class="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 px-4 py-2 rounded-full text-lg font-bold"
+                        class="bg-purple-100/30 text-purple-800 px-4 py-2 rounded-full text-lg font-bold"
                       >
                         {{ bracketType }} Tournament Complete
                       </span>
@@ -391,7 +382,7 @@
             <!-- Tournament Bracket Visualization -->
             <Card v-if="raceBrackets.length > 0" class="mb-6">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-sitemap" />
                   Tournament Bracket Tree
                 </h2>
@@ -407,60 +398,48 @@
                       <div
                         class="bracket-node p-3 rounded-lg border-2 text-center min-w-[120px]"
                         :class="{
-                          'border-blue-400 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-600':
-                            node.type === 'bracket',
-                          'border-green-400 bg-green-50 dark:bg-green-900/20 dark:border-green-600':
-                            node.type === 'winner',
-                          'border-gray-400 bg-gray-50 dark:bg-gray-800 dark:border-gray-600':
-                            node.type === 'pending'
+                          'border-blue-400 bg-blue-50/20': node.type === 'bracket',
+                          'border-green-400 bg-green-50/20': node.type === 'winner',
+                          'border-gray-400 bg-gray-50': node.type === 'pending'
                         }"
                       >
                         <div v-if="node.type === 'bracket'" class="space-y-1">
-                          <div class="text-xs font-semibold text-gray-600 dark:text-gray-400">
+                          <div class="text-xs font-semibold text-gray-600">
                             {{ node.label }}
                           </div>
                           <div class="text-sm">
-                            <div class="font-medium text-gray-900 dark:text-white">
+                            <div class="font-medium text-black">
                               {{ node.track1_name || 'TBD' }}
                             </div>
-                            <div
-                              v-if="node.track1_time"
-                              class="text-xs text-blue-600 dark:text-blue-400"
-                            >
+                            <div v-if="node.track1_time" class="text-xs text-blue-600">
                               {{ formatTime(node.track1_time) }}
                             </div>
                           </div>
-                          <div class="text-xs text-gray-500 dark:text-gray-400">VS</div>
+                          <div class="text-xs text-gray-500">VS</div>
                           <div class="text-sm">
-                            <div class="font-medium text-gray-900 dark:text-white">
+                            <div class="font-medium text-black">
                               {{ node.track2_name || 'TBD' }}
                             </div>
-                            <div
-                              v-if="node.track2_time"
-                              class="text-xs text-red-600 dark:text-red-400"
-                            >
+                            <div v-if="node.track2_time" class="text-xs text-red-600">
                               {{ formatTime(node.track2_time) }}
                             </div>
                           </div>
-                          <div
-                            v-if="node.winner"
-                            class="mt-2 text-xs font-bold text-green-600 dark:text-green-400"
-                          >
+                          <div v-if="node.winner" class="mt-2 text-xs font-bold text-green-600">
                             🏆 {{ node.winner }}
                           </div>
                         </div>
                         <div v-else-if="node.type === 'winner'" class="space-y-1">
-                          <div class="text-xs font-semibold text-green-700 dark:text-green-400">
+                          <div class="text-xs font-semibold text-green-700">
                             {{ node.label }}
                           </div>
-                          <div class="font-bold text-green-800 dark:text-green-300">
+                          <div class="font-bold text-green-800">
                             {{ node.racer_name }}
                           </div>
-                          <div class="text-xs text-green-600 dark:text-green-400">
+                          <div class="text-xs text-green-600">
                             {{ formatTime(node.time) }}
                           </div>
                         </div>
-                        <div v-else class="text-gray-500 dark:text-gray-400">
+                        <div v-else class="text-gray-500">
                           <div class="text-xs font-semibold">{{ node.label }}</div>
                           <div class="text-sm">{{ node.message || 'Pending' }}</div>
                         </div>
@@ -474,41 +453,59 @@
             <!-- Winner Bracket -->
             <Card v-if="winnerBrackets.length > 0" class="mb-6">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-trophy text-yellow-500" />
                   Winner Bracket
                 </h2>
               </template>
               <template #content>
                 <div class="space-y-4">
-                  <div v-for="(bracket, index) in winnerBrackets" :key="bracket.id" class="bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 border border-yellow-200 rounded-xl p-6 shadow-lg">
+                  <div
+                    v-for="(bracket, index) in winnerBrackets"
+                    :key="bracket.id"
+                    class="bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 border border-yellow-200 rounded-xl p-6 shadow-lg"
+                  >
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
-                        <div class="bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        <div
+                          class="bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-bold"
+                        >
                           Winner R{{ bracket.round_number }}
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900">Match #{{ index + 1 }}</h3>
+                        <h3 class="text-xl font-bold text-black">Match #{{ index + 1 }}</h3>
                       </div>
                     </div>
                     <!-- Bracket Race Content -->
                     <div class="flex items-center gap-6">
                       <!-- Track 1 -->
-                      <div class="flex-1 bg-white rounded-xl p-5 border-2 border-blue-200 shadow-md">
+                      <div
+                        class="flex-1 bg-white rounded-xl p-5 border-2 border-blue-200 shadow-md"
+                      >
                         <div class="text-center">
-                          <div class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block">
+                          <div
+                            class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block"
+                          >
                             <i class="pi pi-flag mr-1" />
                             Track 1
                           </div>
                           <div v-if="bracket.track1_racer_name">
-                            <div class="font-bold text-xl text-gray-900 mb-1">{{ bracket.track1_racer_name }}</div>
-                            <div class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block">
+                            <div class="font-bold text-xl text-black mb-1">
+                              {{ bracket.track1_racer_name }}
+                            </div>
+                            <div
+                              class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
+                            >
                               #{{ bracket.track1_racer_number }}
                             </div>
                             <div v-if="bracket.track1_time" class="text-lg font-bold text-blue-600">
                               {{ formatTime(bracket.track1_time) }}
                             </div>
                             <div v-if="!bracket.track1_time && !bracket.is_forfeit" class="mt-3">
-                              <Button severity="warning" size="small" @click="handleForfeit(bracket, 1)">
+                              <Button
+                                severity="warning"
+                                size="small"
+                                @click="handleForfeit(bracket, 1)"
+                              >
                                 <i class="pi pi-flag mr-1" />
                                 Forfeit
                               </Button>
@@ -523,7 +520,9 @@
 
                       <!-- VS Divider -->
                       <div class="flex items-center justify-center flex-shrink-0">
-                        <div class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+                        <div
+                          class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg"
+                        >
                           <span class="font-bold text-lg">VS</span>
                         </div>
                       </div>
@@ -531,20 +530,30 @@
                       <!-- Track 2 -->
                       <div class="flex-1 bg-white rounded-xl p-5 border-2 border-red-200 shadow-md">
                         <div class="text-center">
-                          <div class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block">
+                          <div
+                            class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block"
+                          >
                             <i class="pi pi-flag mr-1" />
                             Track 2
                           </div>
                           <div v-if="bracket.track2_racer_name">
-                            <div class="font-bold text-xl text-gray-900 mb-1">{{ bracket.track2_racer_name }}</div>
-                            <div class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block">
+                            <div class="font-bold text-xl text-black mb-1">
+                              {{ bracket.track2_racer_name }}
+                            </div>
+                            <div
+                              class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
+                            >
                               #{{ bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-red-600">
                               {{ formatTime(bracket.track2_time) }}
                             </div>
                             <div v-if="!bracket.track2_time && !bracket.is_forfeit" class="mt-3">
-                              <Button severity="warning" size="small" @click="handleForfeit(bracket, 2)">
+                              <Button
+                                severity="warning"
+                                size="small"
+                                @click="handleForfeit(bracket, 2)"
+                              >
                                 <i class="pi pi-flag mr-1" />
                                 Forfeit
                               </Button>
@@ -563,17 +572,26 @@
                       <div class="bg-orange-100 border border-orange-200 rounded-lg p-3">
                         <div class="flex items-center justify-center gap-2 text-orange-700">
                           <i class="pi pi-flag" />
-                          <span class="font-semibold">{{ bracket.forfeit_reason || 'Forfeit' }}</span>
+                          <span class="font-semibold">{{
+                            bracket.forfeit_reason || 'Forfeit'
+                          }}</span>
                         </div>
                       </div>
                     </div>
 
                     <!-- Winner Display -->
-                    <div v-else-if="bracket.track1_time && bracket.track2_time" class="mt-6 text-center">
-                      <div class="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl p-4">
+                    <div
+                      v-else-if="bracket.track1_time && bracket.track2_time"
+                      class="mt-6 text-center"
+                    >
+                      <div
+                        class="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl p-4"
+                      >
                         <div class="flex items-center justify-center gap-2 mb-2">
                           <i class="pi pi-trophy text-yellow-600 text-lg" />
-                          <p class="text-sm font-bold text-yellow-800 uppercase tracking-wide">Winner</p>
+                          <p class="text-sm font-bold text-yellow-800 uppercase tracking-wide">
+                            Winner
+                          </p>
                         </div>
                         <p class="font-bold text-xl text-yellow-900">{{ getWinner(bracket) }}</p>
                       </div>
@@ -586,41 +604,61 @@
             <!-- Loser Bracket -->
             <Card v-if="loserBrackets.length > 0" class="mb-6">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-refresh text-orange-500" />
                   Loser Bracket (Second Chance)
                 </h2>
               </template>
               <template #content>
                 <div class="space-y-4">
-                  <div v-for="(bracket, index) in loserBrackets" :key="bracket.id" class="bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 border border-orange-200 rounded-xl p-6 shadow-lg">
+                  <div
+                    v-for="(bracket, index) in loserBrackets"
+                    :key="bracket.id"
+                    class="bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 border border-orange-200 rounded-xl p-6 shadow-lg"
+                  >
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
-                        <div class="bg-gradient-to-r from-orange-600 to-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        <div
+                          class="bg-gradient-to-r from-orange-600 to-red-600 text-white px-3 py-1 rounded-full text-sm font-bold"
+                        >
                           Loser R{{ bracket.round_number }}
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900">Elimination Match #{{ index + 1 }}</h3>
+                        <h3 class="text-xl font-bold text-black">
+                          Elimination Match #{{ index + 1 }}
+                        </h3>
                       </div>
                     </div>
                     <!-- Similar bracket content but for loser bracket -->
                     <div class="flex items-center gap-6">
                       <!-- Track 1 -->
-                      <div class="flex-1 bg-white rounded-xl p-5 border-2 border-blue-200 shadow-md">
+                      <div
+                        class="flex-1 bg-white rounded-xl p-5 border-2 border-blue-200 shadow-md"
+                      >
                         <div class="text-center">
-                          <div class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block">
+                          <div
+                            class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block"
+                          >
                             <i class="pi pi-flag mr-1" />
                             Track 1
                           </div>
                           <div v-if="bracket.track1_racer_name">
-                            <div class="font-bold text-xl text-gray-900 mb-1">{{ bracket.track1_racer_name }}</div>
-                            <div class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block">
+                            <div class="font-bold text-xl text-black mb-1">
+                              {{ bracket.track1_racer_name }}
+                            </div>
+                            <div
+                              class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
+                            >
                               #{{ bracket.track1_racer_number }}
                             </div>
                             <div v-if="bracket.track1_time" class="text-lg font-bold text-blue-600">
                               {{ formatTime(bracket.track1_time) }}
                             </div>
                             <div v-if="!bracket.track1_time && !bracket.is_forfeit" class="mt-3">
-                              <Button severity="warning" size="small" @click="handleForfeit(bracket, 1)">
+                              <Button
+                                severity="warning"
+                                size="small"
+                                @click="handleForfeit(bracket, 1)"
+                              >
                                 <i class="pi pi-flag mr-1" />
                                 Forfeit
                               </Button>
@@ -635,7 +673,9 @@
 
                       <!-- VS Divider -->
                       <div class="flex items-center justify-center flex-shrink-0">
-                        <div class="bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+                        <div
+                          class="bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg"
+                        >
                           <span class="font-bold text-lg">VS</span>
                         </div>
                       </div>
@@ -643,20 +683,30 @@
                       <!-- Track 2 -->
                       <div class="flex-1 bg-white rounded-xl p-5 border-2 border-red-200 shadow-md">
                         <div class="text-center">
-                          <div class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block">
+                          <div
+                            class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block"
+                          >
                             <i class="pi pi-flag mr-1" />
                             Track 2
                           </div>
                           <div v-if="bracket.track2_racer_name">
-                            <div class="font-bold text-xl text-gray-900 mb-1">{{ bracket.track2_racer_name }}</div>
-                            <div class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block">
+                            <div class="font-bold text-xl text-black mb-1">
+                              {{ bracket.track2_racer_name }}
+                            </div>
+                            <div
+                              class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
+                            >
                               #{{ bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-red-600">
                               {{ formatTime(bracket.track2_time) }}
                             </div>
                             <div v-if="!bracket.track2_time && !bracket.is_forfeit" class="mt-3">
-                              <Button severity="warning" size="small" @click="handleForfeit(bracket, 2)">
+                              <Button
+                                severity="warning"
+                                size="small"
+                                @click="handleForfeit(bracket, 2)"
+                              >
                                 <i class="pi pi-flag mr-1" />
                                 Forfeit
                               </Button>
@@ -675,17 +725,26 @@
                       <div class="bg-orange-100 border border-orange-200 rounded-lg p-3">
                         <div class="flex items-center justify-center gap-2 text-orange-700">
                           <i class="pi pi-flag" />
-                          <span class="font-semibold">{{ bracket.forfeit_reason || 'Forfeit' }}</span>
+                          <span class="font-semibold">{{
+                            bracket.forfeit_reason || 'Forfeit'
+                          }}</span>
                         </div>
                       </div>
                     </div>
 
                     <!-- Winner Display (Survivor) -->
-                    <div v-else-if="bracket.track1_time && bracket.track2_time" class="mt-6 text-center">
-                      <div class="bg-gradient-to-r from-orange-100 to-red-100 border-2 border-orange-300 rounded-xl p-4">
+                    <div
+                      v-else-if="bracket.track1_time && bracket.track2_time"
+                      class="mt-6 text-center"
+                    >
+                      <div
+                        class="bg-gradient-to-r from-orange-100 to-red-100 border-2 border-orange-300 rounded-xl p-4"
+                      >
                         <div class="flex items-center justify-center gap-2 mb-2">
                           <i class="pi pi-heart text-orange-600 text-lg" />
-                          <p class="text-sm font-bold text-orange-800 uppercase tracking-wide">Survivor</p>
+                          <p class="text-sm font-bold text-orange-800 uppercase tracking-wide">
+                            Survivor
+                          </p>
                         </div>
                         <p class="font-bold text-xl text-orange-900">{{ getWinner(bracket) }}</p>
                       </div>
@@ -698,41 +757,62 @@
             <!-- Final Bracket -->
             <Card v-if="finalBrackets.length > 0" class="mb-6">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-star text-purple-500" />
                   Championship Final
                 </h2>
               </template>
               <template #content>
                 <div class="space-y-4">
-                  <div v-for="(bracket, index) in finalBrackets" :key="bracket.id" class="bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 border border-purple-200 rounded-xl p-6 shadow-xl">
+                  <div
+                    v-for="(bracket, index) in finalBrackets"
+                    :key="bracket.id"
+                    class="bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 border border-purple-200 rounded-xl p-6 shadow-xl"
+                  >
                     <div class="flex items-center justify-between mb-4">
                       <div class="flex items-center gap-3">
-                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        <div
+                          class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1 rounded-full text-sm font-bold"
+                        >
                           FINAL
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900">Championship Match</h3>
+                        <h3 class="text-xl font-bold text-black">Championship Match</h3>
                       </div>
                     </div>
                     <!-- Championship bracket content -->
                     <div class="flex items-center gap-6">
                       <!-- Track 1 -->
-                      <div class="flex-1 bg-white rounded-xl p-5 border-2 border-purple-200 shadow-md">
+                      <div
+                        class="flex-1 bg-white rounded-xl p-5 border-2 border-purple-200 shadow-md"
+                      >
                         <div class="text-center">
-                          <div class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block">
+                          <div
+                            class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block"
+                          >
                             <i class="pi pi-crown mr-1" />
                             Champion 1
                           </div>
                           <div v-if="bracket.track1_racer_name">
-                            <div class="font-bold text-xl text-gray-900 mb-1">{{ bracket.track1_racer_name }}</div>
-                            <div class="bg-purple-50 text-purple-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block">
+                            <div class="font-bold text-xl text-black mb-1">
+                              {{ bracket.track1_racer_name }}
+                            </div>
+                            <div
+                              class="bg-purple-50 text-purple-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
+                            >
                               #{{ bracket.track1_racer_number }}
                             </div>
-                            <div v-if="bracket.track1_time" class="text-lg font-bold text-purple-600">
+                            <div
+                              v-if="bracket.track1_time"
+                              class="text-lg font-bold text-purple-600"
+                            >
                               {{ formatTime(bracket.track1_time) }}
                             </div>
                             <div v-if="!bracket.track1_time && !bracket.is_forfeit" class="mt-3">
-                              <Button severity="warning" size="small" @click="handleForfeit(bracket, 1)">
+                              <Button
+                                severity="warning"
+                                size="small"
+                                @click="handleForfeit(bracket, 1)"
+                              >
                                 <i class="pi pi-flag mr-1" />
                                 Forfeit
                               </Button>
@@ -747,28 +827,42 @@
 
                       <!-- VS Divider -->
                       <div class="flex items-center justify-center flex-shrink-0">
-                        <div class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full w-20 h-20 flex items-center justify-center shadow-xl">
+                        <div
+                          class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full w-20 h-20 flex items-center justify-center shadow-xl"
+                        >
                           <i class="pi pi-star text-2xl" />
                         </div>
                       </div>
 
                       <!-- Track 2 -->
-                      <div class="flex-1 bg-white rounded-xl p-5 border-2 border-pink-200 shadow-md">
+                      <div
+                        class="flex-1 bg-white rounded-xl p-5 border-2 border-pink-200 shadow-md"
+                      >
                         <div class="text-center">
-                          <div class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block">
+                          <div
+                            class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full text-sm font-semibold mb-3 inline-block"
+                          >
                             <i class="pi pi-crown mr-1" />
                             Champion 2
                           </div>
                           <div v-if="bracket.track2_racer_name">
-                            <div class="font-bold text-xl text-gray-900 mb-1">{{ bracket.track2_racer_name }}</div>
-                            <div class="bg-pink-50 text-pink-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block">
+                            <div class="font-bold text-xl text-black mb-1">
+                              {{ bracket.track2_racer_name }}
+                            </div>
+                            <div
+                              class="bg-pink-50 text-pink-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
+                            >
                               #{{ bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-pink-600">
                               {{ formatTime(bracket.track2_time) }}
                             </div>
                             <div v-if="!bracket.track2_time && !bracket.is_forfeit" class="mt-3">
-                              <Button severity="warning" size="small" @click="handleForfeit(bracket, 2)">
+                              <Button
+                                severity="warning"
+                                size="small"
+                                @click="handleForfeit(bracket, 2)"
+                              >
                                 <i class="pi pi-flag mr-1" />
                                 Forfeit
                               </Button>
@@ -787,17 +881,26 @@
                       <div class="bg-orange-100 border border-orange-200 rounded-lg p-3">
                         <div class="flex items-center justify-center gap-2 text-orange-700">
                           <i class="pi pi-flag" />
-                          <span class="font-semibold">{{ bracket.forfeit_reason || 'Forfeit' }}</span>
+                          <span class="font-semibold">{{
+                            bracket.forfeit_reason || 'Forfeit'
+                          }}</span>
                         </div>
                       </div>
                     </div>
 
                     <!-- Tournament Champion -->
-                    <div v-else-if="bracket.track1_time && bracket.track2_time" class="mt-6 text-center">
-                      <div class="bg-gradient-to-r from-yellow-100 to-purple-100 border-2 border-yellow-300 rounded-xl p-6">
+                    <div
+                      v-else-if="bracket.track1_time && bracket.track2_time"
+                      class="mt-6 text-center"
+                    >
+                      <div
+                        class="bg-gradient-to-r from-yellow-100 to-purple-100 border-2 border-yellow-300 rounded-xl p-6"
+                      >
                         <div class="flex items-center justify-center gap-2 mb-3">
                           <i class="pi pi-star-fill text-yellow-600 text-2xl" />
-                          <p class="text-lg font-bold text-purple-800 uppercase tracking-wide">TOURNAMENT CHAMPION</p>
+                          <p class="text-lg font-bold text-purple-800 uppercase tracking-wide">
+                            TOURNAMENT CHAMPION
+                          </p>
                           <i class="pi pi-star-fill text-yellow-600 text-2xl" />
                         </div>
                         <p class="font-bold text-2xl text-purple-900">{{ getWinner(bracket) }}</p>
@@ -811,7 +914,7 @@
             <!-- Tournament Management -->
             <Card v-if="raceBrackets.length > 0">
               <template #title>
-                <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-cog" />
                   Tournament Management
                 </h2>
@@ -846,7 +949,7 @@
                           >
                             {{ bracket.bracket_type }}
                           </div>
-                          <h3 class="text-xl font-bold text-gray-900">Bracket #{{ index + 1 }}</h3>
+                          <h3 class="text-xl font-bold text-black">Bracket #{{ index + 1 }}</h3>
                         </div>
                         <Button
                           v-tooltip.top="'Delete Bracket'"
@@ -877,7 +980,7 @@
                               <RacerLink
                                 :racer-id="bracket.track1_racer_id"
                                 :racer-name="bracket.track1_racer_name"
-                                class="font-bold text-xl text-gray-900 hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
+                                class="font-bold text-xl text-black hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
                               />
                               <div
                                 class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
@@ -1029,7 +1132,7 @@
                               <RacerLink
                                 :racer-id="bracket.track2_racer_id"
                                 :racer-name="bracket.track2_racer_name"
-                                class="font-bold text-xl text-gray-900 hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
+                                class="font-bold text-xl text-black hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
                               />
                               <div
                                 class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
@@ -1202,7 +1305,7 @@
             <!-- Qualifying Summary -->
             <Card>
               <template #title>
-                <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <h3 class="text-lg font-semibold text-black flex items-center gap-2">
                   <i class="pi pi-list" />
                   Qualifying Results
                 </h3>
@@ -1283,7 +1386,13 @@ const confirm = useConfirm()
 const raceId = route.params.slug
 
 // Use singleton composables
-const { races, loading: racesLoading, initialize: initializeRaces, getRaceBySlug, fetchRaceBySlug } = useRaces()
+const {
+  races,
+  loading: racesLoading,
+  initialize: initializeRaces,
+  getRaceBySlug,
+  fetchRaceBySlug
+} = useRaces()
 const {
   qualifiers,
   loading: qualifiersLoading,
@@ -1302,7 +1411,7 @@ const {
 
 // Reactive data
 const race = ref(null)
-const raceBrackets = computed(() => race.value ? getBracketsForRace(race.value.id) : [])
+const raceBrackets = computed(() => (race.value ? getBracketsForRace(race.value.id) : []))
 const raceQualifiers = computed(() => qualifiers.value)
 const loading = computed(
   () => racesLoading.value || qualifiersLoading.value || bracketsLoading.value
@@ -1329,17 +1438,13 @@ const breadcrumbItems = computed(() => [
 // Computed properties for double elimination
 const eligibleRacerCount = computed(() => eligibleRacers.value.length)
 
-const winnerBrackets = computed(() => 
-  raceBrackets.value.filter(b => b.bracket_group === 'winner')
+const winnerBrackets = computed(() =>
+  raceBrackets.value.filter((b) => b.bracket_group === 'winner')
 )
 
-const loserBrackets = computed(() => 
-  raceBrackets.value.filter(b => b.bracket_group === 'loser')
-)
+const loserBrackets = computed(() => raceBrackets.value.filter((b) => b.bracket_group === 'loser'))
 
-const finalBrackets = computed(() => 
-  raceBrackets.value.filter(b => b.bracket_group === 'final')
-)
+const finalBrackets = computed(() => raceBrackets.value.filter((b) => b.bracket_group === 'final'))
 
 // Computed properties
 const qualifiedRacers = computed(() => {
@@ -1775,26 +1880,26 @@ const getWinner = (bracket) => {
 // Load eligible racers count for display
 const loadEligibleRacers = async () => {
   if (!race.value) return
-  
+
   try {
     const racers = await getEligibleRacers(race.value.id)
     eligibleRacers.value = racers
-    
+
     // Get counts for display
     const supabase = useSupabaseClient()
-    
+
     // Get checked-in count
     const { count: checkedIn } = await supabase
       .from('checkins')
       .select('*', { count: 'exact', head: true })
       .eq('race_id', race.value.id)
-    
+
     // Get withdrawn count
     const { count: withdrawn } = await supabase
       .from('race_withdrawals')
       .select('*', { count: 'exact', head: true })
       .eq('race_id', race.value.id)
-    
+
     checkedInCount.value = checkedIn || 0
     withdrawnCount.value = withdrawn || 0
   } catch (err) {
@@ -2180,7 +2285,7 @@ const cancelEdit = (bracket, track) => {
 // Handle forfeit with confirmation
 const handleForfeit = (bracket, track) => {
   const racerName = track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
-  
+
   confirm.require({
     message: `Are you sure ${racerName} wants to forfeit this race?`,
     header: 'Confirm Forfeit',
@@ -2213,7 +2318,8 @@ const handleForfeit = (bracket, track) => {
 // Confirm clear brackets
 const confirmClearBrackets = () => {
   confirm.require({
-    message: 'Are you sure you want to delete all tournament brackets? This action cannot be undone.',
+    message:
+      'Are you sure you want to delete all tournament brackets? This action cannot be undone.',
     header: 'Clear Tournament',
     icon: 'pi pi-exclamation-triangle',
     rejectClass: 'p-button-secondary p-button-outlined',

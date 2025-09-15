@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Manage Awards</h1>
+        <h1 class="text-3xl font-bold text-black">Manage Awards</h1>
         <div class="flex gap-2">
           <NuxtLink to="/awards">
             <Button class="btn-secondary">
@@ -20,7 +20,7 @@
 
       <!-- Award Assignment Section -->
       <div v-if="activeRace">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Assign Awards</h2>
+        <h2 class="text-2xl font-bold text-black mb-6">Assign Awards</h2>
 
         <!-- Current Assignments -->
         <div v-if="currentAssignments.length" class="mb-8">
@@ -29,16 +29,16 @@
             <div
               v-for="assignment in currentAssignments"
               :key="assignment.id"
-              class="flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-2 border-brand-green rounded-lg"
+              class="flex items-center justify-between p-4 bg-white border-2 border-brand-green rounded-lg"
             >
               <div class="flex items-center space-x-4">
                 <i class="pi pi-trophy text-brand-green text-xl" />
                 <div>
                   <div class="font-medium">{{ assignment.award_definition.name }}</div>
-                  <div class="text-sm text-gray-600 dark:text-gray-300">
+                  <div class="text-sm text-gray-600">
                     {{ assignment.racer.name }}
                   </div>
-                  <div v-if="assignment.notes" class="text-sm text-gray-500 dark:text-gray-400">
+                  <div v-if="assignment.notes" class="text-sm text-gray-500">
                     {{ assignment.notes }}
                   </div>
                 </div>
@@ -62,9 +62,7 @@
           <template #content>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >Award Type</label
-                >
+                <label class="block text-sm font-medium text-gray-700 mb-2">Award Type</label>
                 <Select
                   v-model="newAssignment.awardDefinitionId"
                   :options="awardDefinitionOptions"
@@ -75,9 +73,7 @@
                 />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >Racer</label
-                >
+                <label class="block text-sm font-medium text-gray-700 mb-2">Racer</label>
                 <Select
                   v-model="newAssignment.racerId"
                   :options="racerOptions"
@@ -97,13 +93,11 @@
                 </Select>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >Notes (optional)</label
-                >
+                <label class="block text-sm font-medium text-gray-700 mb-2">Notes (optional)</label>
                 <InputText v-model="newAssignment.notes" placeholder="Award notes" class="w-full" />
               </div>
             </div>
-            <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+            <div class="mt-6 pt-4 border-t border-gray-200">
               <Button
                 :disabled="!newAssignment.awardDefinitionId || !newAssignment.racerId || assigning"
                 :loading="assigning"
@@ -142,7 +136,7 @@
 
       <!-- Award Definitions Management -->
       <div class="mb-12 mt-16">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Award Types</h2>
+        <h2 class="text-2xl font-bold text-black mb-6">Award Types</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card
             v-for="definition in awardDefinitions"
@@ -159,9 +153,9 @@
                 >
                 <div
                   v-else
-                  class="w-full aspect-square bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                  class="w-full aspect-square bg-gray-200 flex items-center justify-center"
                 >
-                  <i class="pi pi-trophy text-4xl text-gray-400 dark:text-gray-500" />
+                  <i class="pi pi-trophy text-4xl text-gray-400" />
                 </div>
                 <div class="absolute top-2 right-2 flex gap-1">
                   <Badge
@@ -183,11 +177,7 @@
 
             <template #footer>
               <div class="flex justify-between">
-                <Button
-                  size="small"
-                  class="btn-secondary"
-                  @click="editDefinition(definition)"
-                >
+                <Button size="small" class="btn-secondary" @click="editDefinition(definition)">
                   <i class="pi pi-pencil mr-2" />
                   <span>Edit</span>
                 </Button>
@@ -213,12 +203,10 @@
             </template>
           </Card>
         </div>
-        
+
         <!-- Link to Vote for Awards -->
-        <div v-if="activeRace" class="text-center mt-8 pt-6 border-t border-gray-200 dark:border-gray-600">
-          <p class="text-gray-600 dark:text-gray-400 mb-4">
-            Want to see what the community is voting for?
-          </p>
+        <div v-if="activeRace" class="text-center mt-8 pt-6 border-t border-gray-200">
+          <p class="text-gray-600 mb-4">Want to see what the community is voting for?</p>
           <NuxtLink :to="`/races/${activeRace.slug || activeRace.id}#voting`">
             <Button class="btn-secondary">
               <i class="pi pi-heart mr-2" />
@@ -238,10 +226,7 @@
       >
         <div class="space-y-6">
           <div>
-            <label
-              for="award-name"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label for="award-name" class="block text-sm font-medium text-gray-700 mb-2">
               Award Name *
             </label>
             <InputText
@@ -252,10 +237,7 @@
             />
           </div>
           <div>
-            <label
-              for="award-description"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label for="award-description" class="block text-sm font-medium text-gray-700 mb-2">
               Description
             </label>
             <Textarea
@@ -267,10 +249,7 @@
             />
           </div>
           <div>
-            <label
-              for="award-image"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label for="award-image" class="block text-sm font-medium text-gray-700 mb-2">
               Award Image
             </label>
             <div class="space-y-3">
@@ -279,7 +258,7 @@
                 <img
                   :src="definitionForm.image_url"
                   alt="Award preview"
-                  class="w-16 h-16 object-cover rounded border border-gray-300 dark:border-gray-600"
+                  class="w-16 h-16 object-cover rounded border border-gray-300"
                 >
                 <Button
                   label="Remove Image"
@@ -308,8 +287,8 @@
                 </p>
 
                 <!-- URL Input as Alternative -->
-                <div class="border-t border-gray-200 dark:border-gray-600 pt-3">
-                  <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
+                <div class="border-t border-gray-200 pt-3">
+                  <label class="block text-sm font-medium text-gray-600 mb-2">
                     Or provide image URL:
                   </label>
                   <InputText
@@ -326,7 +305,7 @@
               <Checkbox v-model="definitionForm.voteable" input-id="voteable" binary />
             </div>
             <div class="ml-3 text-sm">
-              <label for="voteable" class="font-medium text-gray-700 dark:text-gray-300"
+              <label for="voteable" class="font-medium text-gray-700"
                 >Allow voting for this award</label
               >
               <p class="text-gray-500">
@@ -489,7 +468,7 @@ const saveDefinition = async () => {
   if (!definitionForm.value.name) return
 
   savingDefinition.value = true
-  
+
   // Capture values before they get reset
   const awardName = definitionForm.value.name
   const isEditing = !!editingDefinition.value
@@ -507,7 +486,7 @@ const saveDefinition = async () => {
     toast.add({
       severity: 'success',
       summary: isEditing ? 'Award Updated' : 'Award Created',
-      detail: `Award type "${awardName}" has been ${isEditing ? 'updated' : 'created'} successfully.`,
+      detail: `Award type""${awardName}" has been ${isEditing ? 'updated' : 'created'} successfully.`,
       life: 3000
     })
   } catch (error) {
@@ -539,7 +518,7 @@ const toggleDefinitionActiveStatus = async (definition) => {
     toast.add({
       severity: 'info',
       summary: 'Award Status Updated',
-      detail: `Award type "${definition.name}" has been ${!definition.active ? 'activated' : 'deactivated'}.`,
+      detail: `Award type""${definition.name}" has been ${!definition.active ? 'activated' : 'deactivated'}.`,
       life: 3000
     })
   } catch (error) {
@@ -667,7 +646,7 @@ const removeAssignment = async (assignmentId) => {
 // Confirm and delete definition
 const confirmDeleteDefinition = (definition) => {
   confirm.require({
-    message: `Are you sure you want to delete the "${definition.name}" award type? This action cannot be undone and will remove all associated awards.`,
+    message: `Are you sure you want to delete the""${definition.name}" award type? This action cannot be undone and will remove all associated awards.`,
     header: 'Delete Award Type',
     icon: 'pi pi-exclamation-triangle',
     rejectClass: 'p-button-secondary p-button-outlined',
@@ -688,10 +667,10 @@ const deleteDefinition = async (definitionId, definitionName) => {
     toast.add({
       severity: 'success',
       summary: 'Award Type Deleted',
-      detail: `Award type "${definitionName}" has been deleted successfully.`,
+      detail: `Award type""${definitionName}" has been deleted successfully.`,
       life: 3000
     })
-    
+
     return true // Indicate success
   } catch (error) {
     // Keep essential error logging for production debugging
@@ -702,7 +681,7 @@ const deleteDefinition = async (definitionId, definitionName) => {
       detail: error.message || 'Failed to delete award type. Please try again.',
       life: 5000
     })
-    
+
     return false // Indicate failure
   }
 }
@@ -784,11 +763,11 @@ useHead({
 }
 
 .awards-dialog :deep(.p-dialog-header) {
-  @apply bg-white text-gray-900 px-6 py-4 rounded-t-lg border-b-2 border-gray-200;
+  @apply bg-white text-black px-6 py-4 rounded-t-lg border-b-2 border-gray-200;
 }
 
 .awards-dialog :deep(.p-dialog-title) {
-  @apply text-lg font-semibold text-gray-900;
+  @apply text-lg font-semibold text-black;
 }
 
 .awards-dialog :deep(.p-dialog-header-close) {
@@ -796,7 +775,7 @@ useHead({
 }
 
 .awards-dialog :deep(.p-dialog-content) {
-  @apply bg-white px-6 py-6 text-gray-900 dark:text-white;
+  @apply bg-white px-6 py-6 text-black;
 }
 
 .awards-dialog :deep(.p-dialog-footer) {
@@ -805,12 +784,12 @@ useHead({
 
 /* Ensure proper text contrast */
 .awards-dialog label {
-  @apply text-gray-700 dark:text-gray-300 font-medium;
+  @apply text-gray-700 font-medium;
 }
 
 .awards-dialog input,
 .awards-dialog textarea,
 .awards-dialog select {
-  @apply text-gray-900 dark:text-white;
+  @apply text-black;
 }
 </style>

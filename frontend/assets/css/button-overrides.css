@@ -6,8 +6,8 @@
   .btn-primary:focus,
   .btn-primary:hover,
   .btn-primary:visited,
-  .btn-primary[data-pc-name="button"],
-  .btn-primary[data-pc-section="root"],
+  .btn-primary[data-pc-name='button'],
+  .btn-primary[data-pc-section='root'],
   button.btn-primary,
   .p-button.btn-primary {
     background-color: black !important;
@@ -25,8 +25,8 @@
   .btn-secondary:focus,
   .btn-secondary:hover,
   .btn-secondary:visited,
-  .btn-secondary[data-pc-name="button"],
-  .btn-secondary[data-pc-section="root"],
+  .btn-secondary[data-pc-name='button'],
+  .btn-secondary[data-pc-section='root'],
   button.btn-secondary,
   .p-button.btn-secondary {
     background-color: transparent !important;
@@ -45,7 +45,7 @@
   .app-dark .btn-primary:focus,
   .app-dark .btn-primary:hover,
   .app-dark .btn-primary:visited,
-  .app-dark .btn-primary[data-pc-name="button"],
+  .app-dark .btn-primary[data-pc-name='button'],
   .app-dark button.btn-primary,
   .app-dark .p-button.btn-primary {
     background-color: white !important;
@@ -58,7 +58,7 @@
   .app-dark .btn-secondary:focus,
   .app-dark .btn-secondary:hover,
   .app-dark .btn-secondary:visited,
-  .app-dark .btn-secondary[data-pc-name="button"],
+  .app-dark .btn-secondary[data-pc-name='button'],
   .app-dark button.btn-secondary,
   .app-dark .p-button.btn-secondary {
     border: 2px solid white !important;
@@ -68,8 +68,8 @@
 
   /* Hover states with high specificity */
   .btn-primary:hover,
-  .btn-primary:hover[data-pc-name="button"],
-  .btn-primary:hover[data-pc-section="root"],
+  .btn-primary:hover[data-pc-name='button'],
+  .btn-primary:hover[data-pc-section='root'],
   button.btn-primary:hover,
   .p-button.btn-primary:hover {
     background-color: transparent !important;
@@ -80,8 +80,8 @@
   }
 
   .btn-secondary:hover,
-  .btn-secondary:hover[data-pc-name="button"],
-  .btn-secondary:hover[data-pc-section="root"],
+  .btn-secondary:hover[data-pc-name='button'],
+  .btn-secondary:hover[data-pc-section='root'],
   button.btn-secondary:hover,
   .p-button.btn-secondary:hover {
     background-color: black !important;
@@ -93,7 +93,7 @@
 
   /* Dark mode hover states */
   .app-dark .btn-primary:hover,
-  .app-dark .btn-primary:hover[data-pc-name="button"],
+  .app-dark .btn-primary:hover[data-pc-name='button'],
   .app-dark button.btn-primary:hover,
   .app-dark .p-button.btn-primary:hover {
     background-color: transparent !important;
@@ -103,7 +103,7 @@
   }
 
   .app-dark .btn-secondary:hover,
-  .app-dark .btn-secondary:hover[data-pc-name="button"],
+  .app-dark .btn-secondary:hover[data-pc-name='button'],
   .app-dark button.btn-secondary:hover,
   .app-dark .p-button.btn-secondary:hover {
     background-color: white !important;
@@ -115,8 +115,8 @@
   /* Child element unskewing */
   .btn-primary > *,
   .btn-secondary > *,
-  .btn-primary [data-pc-section="label"],
-  .btn-secondary [data-pc-section="label"] {
+  .btn-primary [data-pc-section='label'],
+  .btn-secondary [data-pc-section='label'] {
     transform: skewX(8deg) !important;
     display: inline-block !important;
   }

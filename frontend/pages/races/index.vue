@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <PageHeader title="All Races" :actions="headerActions" />
 
@@ -18,15 +18,14 @@
         <Card
           v-for="race in races"
           :key="race.id"
-          class="hover:shadow-xl hover:shadow-gray-200 dark:hover:shadow-gray-800/50 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-all duration-300 relative overflow-hidden cursor-pointer group"
+          class="hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-brand-blue focus:ring-offset-2 transition-all duration-300 relative overflow-hidden cursor-pointer group"
           :class="{
-            'ring-2 ring-brand-green bg-white dark:bg-gray-800 hover:ring-brand-green': race.active,
-            'border border-gray-300 dark:border-gray-600 hover:border-brand-blue dark:hover:border-brand-blue':
-              !race.active
+            'ring-2 ring-brand-green bg-white hover:ring-brand-green': race.active,
+            'border border-gray-300 hover:border-brand-blue': !race.active
           }"
           tabindex="0"
           role="button"
-          :aria-label="`View details for ${race.name} race on ${race.race_datetime ? new Date(race.race_datetime).toLocaleDateString() : 'TBD'}`"
+          :aria-label="`View details for ${race.name.replace(/[\r\n\t]/g, ' ').trim()} race on ${race.race_datetime ? new Date(race.race_datetime).toLocaleDateString() : 'TBD'}`"
           @click="navigateToRace(race, $event)"
           @keydown.enter="navigateToRace(race, $event)"
           @keydown.space.prevent="navigateToRace(race, $event)"
@@ -42,14 +41,14 @@
               />
               <div
                 v-else
-                class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center rounded-t-lg"
+                class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-lg"
               >
-                <i class="pi pi-flag text-4xl text-gray-400 dark:text-gray-500" />
+                <i class="pi pi-flag text-4xl text-gray-400" />
               </div>
 
               <!-- Active Badge -->
               <div
-                v-if="race.active"
+                v-if="race.active && authStore.isRaceAdmin"
                 class="absolute top-2 left-2 bg-brand-green text-white px-2 py-1 rounded text-sm font-semibold z-20"
               >
                 <i class="pi pi-check-circle mr-1" />
@@ -61,7 +60,7 @@
           <template #title>
             <div class="px-4 pt-4">
               <h3
-                class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-brand-blue dark:group-hover:text-gray-200 transition-colors duration-300"
+                class="text-xl font-bold text-black group-hover:text-brand-blue transition-colors duration-300"
               >
                 {{ race.name }}
               </h3>
@@ -70,7 +69,7 @@
 
           <template #subtitle>
             <div class="px-4 pb-2">
-              <div class="text-gray-700 dark:text-gray-300 font-medium">
+              <div class="text-gray-700 font-medium">
                 {{ formatRaceDateTime(race) }}
               </div>
             </div>
@@ -85,11 +84,10 @@
                 </div>
                 <div class="text-right">
                   <i
-                    class="pi pi-arrow-right text-gray-600 dark:text-white group-hover:text-brand-blue dark:group-hover:text-gray-200 group-hover:translate-x-1 transition-all duration-300"
+                    class="pi pi-arrow-right text-gray-600 group-hover:text-brand-blue group-hover:translate-x-1 transition-all duration-300"
                   />
                 </div>
               </div>
-
             </div>
           </template>
         </Card>
@@ -97,11 +95,9 @@
 
       <!-- No Races State -->
       <div v-else class="text-center py-12">
-        <i class="pi pi-flag text-6xl text-gray-300 dark:text-gray-600 mb-4" />
-        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No races yet</h3>
-        <p class="text-gray-500 dark:text-gray-500 mb-6">
-          Check back soon for upcoming racing events!
-        </p>
+        <i class="pi pi-flag text-6xl text-gray-300 mb-4" />
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">No races yet</h3>
+        <p class="text-gray-500 mb-6">Check back soon for upcoming racing events!</p>
       </div>
     </div>
   </div>
@@ -151,8 +147,6 @@ const navigateToRace = (race, event) => {
   const route = race.slug || race.id
   navigateTo(`/races/${route}`)
 }
-
-
 
 // Initialize auth and data - let composable handle everything
 onMounted(async () => {

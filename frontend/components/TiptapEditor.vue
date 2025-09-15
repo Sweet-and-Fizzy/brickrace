@@ -1,11 +1,11 @@
 <template>
-  <div class="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+  <div class="border border-gray-300 rounded-lg overflow-hidden">
     <!-- Toolbar -->
-    <div class="border-b border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 p-2 flex gap-1 flex-wrap">
+    <div class="border-b border-gray-300 bg-gray-50 p-2 flex gap-1 flex-wrap">
       <button
         type="button"
-        :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('bold') }"
-        class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 font-bold"
+        :class="{ 'bg-gray-300': editor?.isActive('bold') }"
+        class="p-2 rounded hover:bg-gray-200 font-bold"
         title="Bold"
         @click="editor?.chain().focus().toggleBold().run()"
       >
@@ -13,8 +13,8 @@
       </button>
       <button
         type="button"
-        :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('italic') }"
-        class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 italic"
+        :class="{ 'bg-gray-300': editor?.isActive('italic') }"
+        class="p-2 rounded hover:bg-gray-200 italic"
         title="Italic"
         @click="editor?.chain().focus().toggleItalic().run()"
       >
@@ -22,8 +22,8 @@
       </button>
       <button
         type="button"
-        :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('bulletList') }"
-        class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+        :class="{ 'bg-gray-300': editor?.isActive('bulletList') }"
+        class="p-2 rounded hover:bg-gray-200"
         title="Bullet List"
         @click="editor?.chain().focus().toggleBulletList().run()"
       >
@@ -31,8 +31,8 @@
       </button>
       <button
         type="button"
-        :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('orderedList') }"
-        class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+        :class="{ 'bg-gray-300': editor?.isActive('orderedList') }"
+        class="p-2 rounded hover:bg-gray-200"
         title="Numbered List"
         @click="editor?.chain().focus().toggleOrderedList().run()"
       >
@@ -40,15 +40,15 @@
       </button>
       <button
         type="button"
-        :class="{ 'bg-gray-300 dark:bg-gray-600': editor?.isActive('link') }"
-        class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+        :class="{ 'bg-gray-300': editor?.isActive('link') }"
+        class="p-2 rounded hover:bg-gray-200"
         title="Link"
         @click="toggleLink"
       >
         <i class="pi pi-link" />
       </button>
     </div>
-    
+
     <!-- Editor -->
     <div class="p-4 min-h-[320px]">
       <EditorContent :editor="editor" />
@@ -84,7 +84,7 @@ const editor = useEditor({
   ],
   editorProps: {
     attributes: {
-      class: 'prose prose-gray dark:prose-invert max-w-none focus:outline-none min-h-[280px]'
+      class: 'prose prose-gray max-w-none focus:outline-none min-h-[280px]'
     }
   },
   onUpdate: ({ editor }) => {
@@ -93,11 +93,14 @@ const editor = useEditor({
 })
 
 // Watch for external changes
-watch(() => props.modelValue, (newValue) => {
-  if (editor.value && editor.value.getHTML() !== newValue) {
-    editor.value.commands.setContent(newValue)
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (editor.value && editor.value.getHTML() !== newValue) {
+      editor.value.commands.setContent(newValue)
+    }
   }
-})
+)
 
 const toggleLink = () => {
   if (editor.value?.isActive('link')) {
@@ -124,7 +127,8 @@ onBeforeUnmount(() => {
   margin: 0.5em 0;
 }
 
-:deep(.ProseMirror ul), :deep(.ProseMirror ol) {
+:deep(.ProseMirror ul),
+:deep(.ProseMirror ol) {
   margin: 0.5em 0;
   padding-left: 1.5em;
 }

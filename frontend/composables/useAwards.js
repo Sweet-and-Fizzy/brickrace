@@ -324,7 +324,9 @@ export const useAwards = () => {
       if (deleteError) throw deleteError
 
       // Remove from local state
-      state.awardDefinitions.value = state.awardDefinitions.value.filter((def) => def.id !== definitionId)
+      state.awardDefinitions.value = state.awardDefinitions.value.filter(
+        (def) => def.id !== definitionId
+      )
 
       return true
     } catch (err) {

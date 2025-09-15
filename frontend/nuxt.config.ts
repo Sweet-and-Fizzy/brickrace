@@ -36,33 +36,52 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'format-detection', content: 'telephone=no' },
-        
+
         // Primary Meta Tags
-        { name: 'description', content: 'The first brick race of its kind in the country. Design and build gravity-powered brick racers to compete for speed, creativity, and artistry in Holyoke, Massachusetts.' },
-        { name: 'keywords', content: 'brick race, holyoke, massachusetts, gravity racing, creative competition, community event, brick racer, art, engineering' },
+        {
+          name: 'description',
+          content:
+            'The first brick race of its kind in the country. Design and build gravity-powered brick racers to compete for speed, creativity, and artistry in Holyoke, Massachusetts.'
+        },
+        {
+          name: 'keywords',
+          content:
+            'brick race, holyoke, massachusetts, gravity racing, creative competition, community event, brick racer, art, engineering'
+        },
         { name: 'author', content: 'The Great Holyoke Brick Race' },
-        
+
         // Open Graph / Facebook
         { property: 'og:type', content: 'website' },
         { property: 'og:url', content: 'https://thegreatholyokebrickrace.com/' },
         { property: 'og:title', content: 'The Great Holyoke Brick Race' },
-        { property: 'og:description', content: 'Where performance art meets sport. Join our creative community of builders racing gravity-powered brick vehicles down an inclined track!' },
+        {
+          property: 'og:description',
+          content:
+            'Where performance art meets sport. Join our creative community of builders racing gravity-powered brick vehicles down an inclined track!'
+        },
         { property: 'og:image', content: '/og-image.jpg' },
         { property: 'og:image:width', content: '1200' },
         { property: 'og:image:height', content: '630' },
         { property: 'og:locale', content: 'en_US' },
         { property: 'og:site_name', content: 'The Great Holyoke Brick Race' },
-        
+
         // Twitter
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:url', content: 'https://thegreatholyokebrickrace.com/' },
         { name: 'twitter:title', content: 'The Great Holyoke Brick Race' },
-        { name: 'twitter:description', content: 'Where performance art meets sport. Join our creative community of builders racing gravity-powered brick vehicles!' },
+        {
+          name: 'twitter:description',
+          content:
+            'Where performance art meets sport. Join our creative community of builders racing gravity-powered brick vehicles!'
+        },
         { name: 'twitter:image', content: '/og-image.jpg' },
-        
+
         // Additional SEO
         { name: 'robots', content: 'index, follow' },
-        { name: 'googlebot', content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' },
+        {
+          name: 'googlebot',
+          content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1'
+        },
         { name: 'theme-color', content: '#175bd3' }
       ],
       link: [
@@ -129,7 +148,7 @@ export default defineNuxtConfig({
         'Galleria',
         'TabMenu',
         'SplitButton',
-        'Paginator',
+        'Paginator'
       ]
     }
   },

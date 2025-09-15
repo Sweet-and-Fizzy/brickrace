@@ -30,7 +30,10 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Get current user
-    const { data: { user }, error: authError } = await client.auth.getUser()
+    const {
+      data: { user },
+      error: authError
+    } = await client.auth.getUser()
     if (authError || !user) {
       throw createError({
         statusCode: 401,
@@ -40,7 +43,7 @@ export default defineEventHandler(async (event) => {
 
     // Check if user has permission (race admin via JWT metadata or racer owner)
     const isAdmin = user.user_metadata?.isRaceAdmin || user.user_metadata?.isAdmin || false
-    
+
     // Check if user owns the racer
     const { data: racerOwnerCheck, error: racerError } = await client
       .from('racers')
@@ -48,7 +51,7 @@ export default defineEventHandler(async (event) => {
       .eq('id', racerId)
       .eq('user_id', user.id)
       .single()
-    
+
     const isRacerOwner = !racerError && racerOwnerCheck
 
     if (!isAdmin && !isRacerOwner) {
@@ -60,10 +63,13 @@ export default defineEventHandler(async (event) => {
 
     if (withdrawn) {
       // First get preview of heat impact
-      const { data: heatImpact, error: previewError } = await client.rpc('preview_withdrawal_heat_impact', {
-        target_race_id: race_id,
-        target_racer_id: racerId
-      })
+      const { data: heatImpact, error: previewError } = await client.rpc(
+        'preview_withdrawal_heat_impact',
+        {
+          target_race_id: race_id,
+          target_racer_id: racerId
+        }
+      )
 
       if (previewError) {
         console.error('Heat impact preview error:', previewError)
@@ -87,10 +93,13 @@ export default defineEventHandler(async (event) => {
       }
 
       // Handle existing heats (remove from scheduled, preserve completed)
-      const { data: heatChanges, error: heatError } = await client.rpc('handle_racer_withdrawal_heats', {
-        target_race_id: race_id,
-        target_racer_id: racerId
-      })
+      const { data: heatChanges, error: heatError } = await client.rpc(
+        'handle_racer_withdrawal_heats',
+        {
+          target_race_id: race_id,
+          target_racer_id: racerId
+        }
+      )
 
       if (heatError) {
         console.error('Heat handling error:', heatError)

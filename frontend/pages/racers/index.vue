@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <PageHeader title="All Racers" :actions="headerActions" />
 
@@ -46,7 +46,7 @@
                           v-if="slotProps.option.image_url"
                           :src="slotProps.option.image_url"
                           :alt="slotProps.option.name"
-                          class="w-10 h-10 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                          class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
                         >
                         <div
                           v-else
@@ -67,10 +67,8 @@
                       <!-- Racer Info -->
                       <div class="flex flex-col min-w-0 flex-1">
                         <div class="flex items-center gap-2">
-                          <span class="font-medium text-gray-900 dark:text-white">{{
-                            slotProps.option.name
-                          }}</span>
-                          <span class="text-xs font-mono text-gray-500 dark:text-gray-400"
+                          <span class="font-medium text-black">{{ slotProps.option.name }}</span>
+                          <span class="text-xs font-mono text-gray-500"
                             >#{{ slotProps.option.racer_number }}</span
                           >
                         </div>
@@ -161,7 +159,7 @@
               >
                 <NuxtLink :to="`/racers/${racer.slug}`" class="block">
                   <Card
-                    class="group hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer border-2 border-gray-100 dark:border-gray-700 hover:border-red-400 dark:hover:border-red-500 rounded-2xl overflow-hidden bg-white dark:bg-gray-800 h-full relative"
+                    class="group hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-2 transition-all duration-500 ease-out cursor-pointer border-2 border-gray-100 hover:border-red-400 rounded-2xl overflow-hidden bg-white h-full relative"
                     style="box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05)"
                   >
                     <template #header>
@@ -242,9 +240,9 @@
                           />
                           <div
                             v-else
-                            class="w-full h-48 bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+                            class="w-full h-48 bg-gray-200 flex items-center justify-center"
                           >
-                            <i class="pi pi-car text-4xl text-gray-400 dark:text-gray-500" />
+                            <i class="pi pi-car text-4xl text-gray-400" />
                           </div>
                         </div>
 
@@ -271,9 +269,7 @@
                       <div>
                         <!-- Racer Name -->
                         <div>
-                          <h3
-                            class="text-xl font-bold text-gray-900 dark:text-white leading-tight normal-case"
-                          >
+                          <h3 class="text-xl font-bold text-black leading-tight normal-case">
                             {{ racer.name || 'NO NAME FOUND' }}
                           </h3>
                         </div>
@@ -284,7 +280,7 @@
                           <div v-if="racer.qualifiers?.length" class="flex gap-2 flex-wrap">
                             <span
                               v-if="getTimeRange(racer)"
-                              class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg shadow-sm"
+                              class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-50/50 border border-gray-200 rounded-lg shadow-sm"
                               style="font-family: 'Courier New', monospace; letter-spacing: 0.3px"
                             >
                               <i class="pi pi-clock mr-1.5 text-gray-500" />
@@ -297,7 +293,7 @@
                             <span
                               v-for="award in racer.awards"
                               :key="award.id"
-                              class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-yellow-700 dark:text-yellow-300 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:to-orange-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg shadow-sm"
+                              class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-yellow-700 bg-gradient-to-r from-yellow-50 to-orange-50/30/30 border border-yellow-200 rounded-lg shadow-sm"
                               style="font-weight: 600"
                             >
                               <i class="pi pi-star-fill mr-1.5 text-yellow-500" />
@@ -310,7 +306,7 @@
                             <span
                               v-for="vote in getVoteCounts(racer)"
                               :key="vote.awardId"
-                              class="inline-flex items-center px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-md shadow-sm"
+                              class="inline-flex items-center px-2.5 py-1 text-xs font-medium text-blue-700 bg-blue-50/30 border border-blue-200 rounded-md shadow-sm"
                             >
                               <i class="pi pi-heart-fill mr-1 text-red-500" />
                               {{ vote.count }} {{ vote.awardName }}

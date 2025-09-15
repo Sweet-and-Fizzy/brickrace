@@ -1,23 +1,19 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <!-- Breadcrumb Navigation -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+    <div class="bg-white shadow-sm border-b">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <BreadcrumbWrapper :items="breadcrumbItems" class="mb-2" />
       </div>
     </div>
 
     <!-- Header -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+    <div class="bg-white shadow-sm border-b">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-              Photo Management
-            </h1>
-            <p class="text-lg text-gray-600 dark:text-gray-400">
-              Review, approve, and manage user-submitted photos
-            </p>
+            <h1 class="text-3xl md:text-4xl font-bold text-black mb-4">Photo Management</h1>
+            <p class="text-lg text-gray-600">Review, approve, and manage user-submitted photos</p>
           </div>
 
           <div class="mt-4 md:mt-0 flex flex-wrap gap-3">
@@ -39,11 +35,11 @@
 
     <!-- Filter and Status Tabs -->
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 mb-6">
+      <div class="bg-white rounded-lg shadow-sm border mb-6">
         <div class="p-6">
           <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div class="flex gap-4 items-center">
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Photo Filters</h3>
+              <h3 class="text-lg font-semibold text-black">Photo Filters</h3>
             </div>
 
             <div class="flex flex-wrap gap-2">
@@ -134,20 +130,18 @@
               <div class="space-y-3">
                 <!-- Photo Info -->
                 <div>
-                  <h4 class="font-semibold text-gray-900 dark:text-white">
+                  <h4 class="font-semibold text-black">
                     {{ photo.racerName || 'General Race Photo' }}
                   </h4>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                  <p class="text-sm text-gray-600">
                     {{ photo.raceName || 'No race specified' }}
                   </p>
-                  <p class="text-xs text-gray-500 dark:text-gray-500">
-                    Uploaded {{ formatDate(photo.uploadedAt) }}
-                  </p>
+                  <p class="text-xs text-gray-500">Uploaded {{ formatDate(photo.uploadedAt) }}</p>
                 </div>
 
                 <!-- Uploader Info -->
                 <div class="border-t pt-3">
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                  <p class="text-sm text-gray-600">
                     <i class="pi pi-user mr-1" />
                     {{ photo.uploaderName || photo.uploaderEmail || 'Unknown user' }}
                   </p>
@@ -225,11 +219,11 @@
 
       <!-- Empty State -->
       <div v-else class="text-center py-12">
-        <i class="pi pi-images text-6xl text-gray-300 dark:text-gray-600 mb-4" />
-        <h3 class="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">
+        <i class="pi pi-images text-6xl text-gray-300 mb-4" />
+        <h3 class="text-xl font-semibold text-gray-600 mb-2">
           {{ getEmptyStateMessage() }}
         </h3>
-        <p class="text-gray-500 dark:text-gray-500 mb-6">
+        <p class="text-gray-500 mb-6">
           {{ getEmptyStateSubtitle() }}
         </p>
         <Button :loading="refreshing" @click="refreshPhotos">
@@ -386,7 +380,7 @@ const raceFilterOptions = computed(() => {
   })
 
   return options.sort((a, b) => {
-    if (a.value === '') return -1 // Keep "All Races" first
+    if (a.value === '') return -1 // Keep""All Races" first
     if (b.value === '') return 1
     return a.label.localeCompare(b.label)
   })

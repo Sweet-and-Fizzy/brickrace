@@ -1,17 +1,13 @@
 <template>
-  <div
-    class="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
-  >
+  <div class="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
-        <h2 class="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-          Sign in to your account
-        </h2>
-        <p class="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+        <h2 class="text-center text-3xl font-extrabold text-black">Sign in to your account</h2>
+        <p class="mt-2 text-center text-sm text-gray-600">
           Or
           <NuxtLink
             to="/register"
-            class="font-medium text-brand-blue hover:text-brand-blue/80 dark:text-blue-400 dark:hover:text-blue-300"
+            class="font-medium text-black hover:text-gray-600 transition-colors underline hover:no-underline"
           >
             create a new account
           </NuxtLink>
@@ -36,22 +32,17 @@
             <!-- Divider -->
             <div class="relative">
               <div class="absolute inset-0 flex items-center">
-                <div class="w-full border-t border-gray-300 dark:border-gray-600" />
+                <div class="w-full border-t border-gray-300" />
               </div>
               <div class="relative flex justify-center text-sm">
-                <span class="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400"
-                  >Or use email</span
-                >
+                <span class="px-2 bg-white text-gray-500">Or use email</span>
               </div>
             </div>
 
             <!-- Email/Password Form -->
             <form class="space-y-4" @submit.prevent="handleLogin">
               <div>
-                <label
-                  for="email"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
                   Email address
                 </label>
                 <InputText
@@ -67,10 +58,7 @@
               </div>
 
               <div>
-                <label
-                  for="password"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
                   Password
                 </label>
                 <Password
@@ -98,7 +86,7 @@
               <div class="text-center">
                 <NuxtLink
                   to="/forgot-password"
-                  class="text-sm text-brand-blue hover:text-brand-blue/80 dark:text-blue-400 dark:hover:text-blue-300"
+                  class="text-sm text-black hover:text-gray-600 transition-colors underline hover:no-underline"
                 >
                   Forgot your password?
                 </NuxtLink>

@@ -560,7 +560,9 @@ export const useRacers = () => {
 
       // Check if any rows were affected
       if (!updatedRacer || updatedRacer.length === 0) {
-        throw new Error('Update failed - no rows were modified. This may be due to database permissions.')
+        throw new Error(
+          'Update failed - no rows were modified. This may be due to database permissions.'
+        )
       }
 
       const racer = updatedRacer[0]
@@ -671,8 +673,8 @@ export const useRacers = () => {
     try {
       const response = await $fetch(`/api/racers/${racerId}/withdraw`, {
         method: 'PATCH',
-        body: { 
-          withdrawn: true, 
+        body: {
+          withdrawn: true,
           race_id: raceId,
           reason
         }
@@ -690,8 +692,8 @@ export const useRacers = () => {
     try {
       const response = await $fetch(`/api/racers/${racerId}/withdraw`, {
         method: 'PATCH',
-        body: { 
-          withdrawn: false, 
+        body: {
+          withdrawn: false,
           race_id: raceId
         }
       })
@@ -708,11 +710,13 @@ export const useRacers = () => {
     try {
       const { data: withdrawals, error } = await supabase
         .from('race_withdrawals')
-        .select(`
+        .select(
+          `
           *,
           racer:racers(id, name, racer_number, image_url),
           withdrawn_by_user:auth.users(id, email)
-        `)
+        `
+        )
         .eq('race_id', raceId)
 
       if (error) throw error
@@ -733,7 +737,8 @@ export const useRacers = () => {
         .eq('race_id', raceId)
         .single()
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+      if (error && error.code !== 'PGRST116') {
+        // PGRST116 = no rows returned
         throw error
       }
 
@@ -754,9 +759,9 @@ export const useRacers = () => {
 
       if (withdrawalError) throw withdrawalError
 
-      const withdrawnIds = (withdrawnRacerIds || []).map(w => w.racer_id)
-      
-      return racers.value.filter(racer => !withdrawnIds.includes(racer.id))
+      const withdrawnIds = (withdrawnRacerIds || []).map((w) => w.racer_id)
+
+      return racers.value.filter((racer) => !withdrawnIds.includes(racer.id))
     } catch (err) {
       console.error('Error getting active racers for race:', err)
       return racers.value // Return all racers if error
@@ -766,12 +771,12 @@ export const useRacers = () => {
   // Check if current user can withdraw/reinstate a specific racer
   const canUserWithdrawRacer = (racerId, raceId) => {
     if (!authStore.userId) return false
-    
+
     // Race admins can withdraw any racer
     if (authStore.isRaceAdmin) return true
-    
+
     // Racer owners can withdraw their own racers
-    const racer = racers.value.find(r => r.id === racerId)
+    const racer = racers.value.find((r) => r.id === racerId)
     return racer && racer.user_id === authStore.userId
   }
 
@@ -796,7 +801,7 @@ export const useRacers = () => {
     getAllRacerImages,
     getTimeRange,
     getVoteCounts,
-    
+
     // Race-specific withdrawal methods
     withdrawRacerFromRace,
     reinstateRacerToRace,

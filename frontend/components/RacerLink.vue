@@ -44,13 +44,13 @@ const racerSlug = computed(() => {
   if (props.racerSlug) {
     return props.racerSlug
   }
-  
+
   // If only ID is provided, look up the slug
   if (props.racerId && racers.value) {
-    const racer = racers.value.find(r => r.id === props.racerId)
+    const racer = racers.value.find((r) => r.id === props.racerId)
     return racer?.slug || null
   }
-  
+
   return null
 })
 

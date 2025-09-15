@@ -1,11 +1,9 @@
 <template>
-  <div
-    class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900"
-  >
+  <div class="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
     <div class="container mx-auto px-4 py-8">
       <div class="max-w-2xl mx-auto">
         <div class="flex items-center justify-between mb-8">
-          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Create New Race</h1>
+          <h1 class="text-3xl font-bold text-black">Create New Race</h1>
           <NuxtLink to="/races">
             <Button class="btn-secondary">
               <i class="pi pi-arrow-left mr-2" />
@@ -22,10 +20,7 @@
                 <div class="space-y-6">
                   <!-- Race Name -->
                   <div>
-                    <label
-                      for="name"
-                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
                       Race Name *
                     </label>
                     <InputText
@@ -42,10 +37,7 @@
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <!-- Race Date -->
                     <div>
-                      <label
-                        for="date"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                      >
+                      <label for="date" class="block text-sm font-medium text-gray-700 mb-2">
                         Race Date *
                       </label>
                       <DatePicker
@@ -61,10 +53,7 @@
 
                     <!-- Race Start Time -->
                     <div>
-                      <label
-                        for="time"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                      >
+                      <label for="time" class="block text-sm font-medium text-gray-700 mb-2">
                         Race Start Time *
                       </label>
                       <DatePicker
@@ -82,10 +71,7 @@
 
                     <!-- Race End Time -->
                     <div>
-                      <label
-                        for="endTime"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                      >
+                      <label for="endTime" class="block text-sm font-medium text-gray-700 mb-2">
                         Race End Time
                       </label>
                       <DatePicker
@@ -97,22 +83,25 @@
                         :invalid="!!errors.endTime"
                         class="w-full"
                       />
-                      <p v-if="errors.endTime" class="mt-1 text-sm text-red-600">{{ errors.endTime }}</p>
+                      <p v-if="errors.endTime" class="mt-1 text-sm text-red-600">
+                        {{ errors.endTime }}
+                      </p>
                       <p class="mt-1 text-xs text-gray-500">Optional end time for the race event</p>
                     </div>
                   </div>
 
                   <!-- Race Description -->
                   <div>
-                    <label
-                      for="description"
-                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
                       Description
                     </label>
                     <TiptapEditor v-model="form.description" />
-                    <p v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</p>
-                    <p class="mt-1 text-xs text-gray-500">Add a detailed description of the race event</p>
+                    <p v-if="errors.description" class="mt-1 text-sm text-red-600">
+                      {{ errors.description }}
+                    </p>
+                    <p class="mt-1 text-xs text-gray-500">
+                      Add a detailed description of the race event
+                    </p>
                   </div>
                 </div>
               </Panel>
@@ -122,10 +111,7 @@
                 <div class="space-y-6">
                   <!-- Race Image -->
                   <div>
-                    <label
-                      for="imageFile"
-                      class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                    >
+                    <label for="imageFile" class="block text-sm font-medium text-gray-700 mb-2">
                       Race Image
                     </label>
                     <FileUpload
@@ -147,9 +133,7 @@
 
                   <!-- Image Preview -->
                   <div v-if="form.image_url">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                      >Preview</label
-                    >
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Preview</label>
                     <img
                       :src="form.image_url"
                       alt="Race preview"
@@ -232,7 +216,6 @@ const loading = ref(false)
 const uploading = ref(false)
 const uploadError = ref('')
 
-
 // Form validation
 const validateForm = () => {
   errors.value = {}
@@ -308,7 +291,7 @@ const createRace = async () => {
     if (form.value.date && form.value.time) {
       const date = new Date(form.value.date)
       const time = new Date(form.value.time)
-      
+
       // Create combined datetime in local timezone
       const combined = new Date(
         date.getFullYear(),
@@ -318,7 +301,7 @@ const createRace = async () => {
         time.getMinutes(),
         time.getSeconds()
       )
-      
+
       raceDateTime = combined.toISOString()
     }
 
@@ -327,7 +310,7 @@ const createRace = async () => {
     if (form.value.date && form.value.endTime) {
       const date = new Date(form.value.date)
       const time = new Date(form.value.endTime)
-      
+
       // Create combined end datetime in local timezone
       const combined = new Date(
         date.getFullYear(),
@@ -337,10 +320,10 @@ const createRace = async () => {
         time.getMinutes(),
         time.getSeconds()
       )
-      
+
       endTime = combined.toISOString()
     }
-    
+
     const raceData = {
       name: form.value.name.trim(),
       race_datetime: raceDateTime,

@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <!-- Header -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+    <div class="bg-white shadow-sm border-b">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="text-center">
           <div class="flex justify-center mb-6">
@@ -9,10 +9,8 @@
               <i class="pi pi-images text-2xl text-white" />
             </div>
           </div>
-          <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            My Photos
-          </h1>
-          <p class="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+          <h1 class="text-3xl md:text-4xl font-bold text-black mb-4">My Photos</h1>
+          <p class="text-lg text-gray-600 max-w-3xl mx-auto">
             Upload and manage your race photos, racer galleries, and community contributions
           </p>
         </div>
@@ -28,22 +26,20 @@
     <div v-else class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="space-y-8">
         <!-- Quick Upload Section -->
-        <Card class="border-2 border-dashed border-green-500 dark:border-green-600">
+        <Card class="border-2 border-dashed border-green-500">
           <template #content>
             <div class="text-center space-y-6">
               <div class="flex justify-center">
                 <div
-                  class="bg-green-100 dark:bg-green-900/30 rounded-full w-20 h-20 flex items-center justify-center"
+                  class="bg-green-100/30 rounded-full w-20 h-20 flex items-center justify-center"
                 >
-                  <i class="pi pi-plus text-3xl text-green-700 dark:text-green-400" />
+                  <i class="pi pi-plus text-3xl text-green-700" />
                 </div>
               </div>
 
               <div>
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                  Upload New Photos
-                </h2>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                <h2 class="text-2xl font-bold text-black mb-4">Upload New Photos</h2>
+                <p class="text-gray-600 mb-6">
                   Share photos from races, your racers, or general community moments
                 </p>
               </div>
@@ -74,7 +70,7 @@
             <template #title>
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-car text-green-700 dark:text-green-400" />
+                  <i class="pi pi-car text-green-700" />
                   <span>My Racer Photos</span>
                 </div>
                 <Badge :value="racerPhotoCount" />
@@ -85,7 +81,7 @@
                 <div
                   v-for="racer in myRacers"
                   :key="racer.id"
-                  class="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  class="border rounded-lg p-4 hover:bg-gray-50/50 transition-colors"
                 >
                   <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-3">
@@ -99,17 +95,15 @@
                       />
                       <div
                         v-else
-                        class="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center"
+                        class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center"
                       >
-                        <i class="pi pi-car text-gray-500 dark:text-gray-400" />
+                        <i class="pi pi-car text-gray-500" />
                       </div>
                       <div>
-                        <h4 class="font-semibold text-gray-900 dark:text-white">
+                        <h4 class="font-semibold text-black">
                           {{ racer.name }}
                         </h4>
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                          #{{ racer.racer_number }}
-                        </p>
+                        <p class="text-sm text-gray-500">#{{ racer.racer_number }}</p>
                       </div>
                     </div>
                     <Badge :value="`${racer.photos?.length || 0} photos`" severity="info" />
@@ -133,10 +127,8 @@
               </div>
 
               <div v-else class="text-center py-6">
-                <i class="pi pi-car text-4xl text-gray-300 dark:text-gray-600 mb-4" />
-                <p class="text-gray-500 dark:text-gray-400 mb-4">
-                  You haven't registered any racers yet
-                </p>
+                <i class="pi pi-car text-4xl text-gray-300 mb-4" />
+                <p class="text-gray-500 mb-4">You haven't registered any racers yet</p>
                 <NuxtLink to="/racers/add">
                   <Button>
                     <i class="pi pi-plus mr-2" />
@@ -152,7 +144,7 @@
             <template #title>
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                  <i class="pi pi-images text-green-600 dark:text-green-400" />
+                  <i class="pi pi-images text-green-600" />
                   <span>My General Photos</span>
                 </div>
                 <Badge :value="generalPhotoCount" />
@@ -216,8 +208,8 @@
               </div>
 
               <div v-else class="text-center py-6">
-                <i class="pi pi-images text-4xl text-gray-300 dark:text-gray-600 mb-4" />
-                <p class="text-gray-500 dark:text-gray-400 mb-4">No general photos uploaded yet</p>
+                <i class="pi pi-images text-4xl text-gray-300 mb-4" />
+                <p class="text-gray-500 mb-4">No general photos uploaded yet</p>
                 <Button @click="showGeneralUpload = true">
                   <i class="pi pi-plus mr-2" />
                   Upload Photos
@@ -233,28 +225,28 @@
           <template #content>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div class="text-center">
-                <div class="text-2xl font-bold text-green-700 dark:text-green-400 mb-1">
+                <div class="text-2xl font-bold text-green-700 mb-1">
                   {{ totalPhotos }}
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-300">Total Photos</div>
+                <div class="text-sm text-gray-600">Total Photos</div>
               </div>
               <div class="text-center">
-                <div class="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">
+                <div class="text-2xl font-bold text-green-600 mb-1">
                   {{ approvedPhotos }}
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-300">Approved</div>
+                <div class="text-sm text-gray-600">Approved</div>
               </div>
               <div class="text-center">
-                <div class="text-2xl font-bold text-yellow-600 dark:text-yellow-400 mb-1">
+                <div class="text-2xl font-bold text-yellow-600 mb-1">
                   {{ pendingPhotos }}
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-300">Pending</div>
+                <div class="text-sm text-gray-600">Pending</div>
               </div>
               <div class="text-center">
-                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">
+                <div class="text-2xl font-bold text-purple-600 mb-1">
                   {{ featuredPhotos.length }}
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-300">Featured</div>
+                <div class="text-sm text-gray-600">Featured</div>
               </div>
             </div>
           </template>
@@ -265,13 +257,13 @@
     <!-- Racer Selection Dialog -->
     <Dialog v-model:visible="showRacerUpload" modal header="Select Racer" class="w-full max-w-md">
       <div class="space-y-4">
-        <p class="text-gray-600 dark:text-gray-400">Choose which racer these photos are for:</p>
+        <p class="text-gray-600">Choose which racer these photos are for:</p>
 
         <div class="space-y-2">
           <div
             v-for="racer in myRacers"
             :key="racer.id"
-            class="border rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
+            class="border rounded-lg p-3 hover:bg-gray-50/50 cursor-pointer transition-colors"
             @click="navigateToRacerEdit(racer)"
           >
             <div class="flex items-center gap-3">
@@ -285,13 +277,13 @@
               />
               <div
                 v-else
-                class="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center"
+                class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center"
               >
-                <i class="pi pi-car text-gray-500 dark:text-gray-400" />
+                <i class="pi pi-car text-gray-500" />
               </div>
               <div>
-                <h4 class="font-semibold text-gray-900 dark:text-white">{{ racer.name }}</h4>
-                <p class="text-sm text-gray-500 dark:text-gray-400">#{{ racer.racer_number }}</p>
+                <h4 class="font-semibold text-black">{{ racer.name }}</h4>
+                <p class="text-sm text-gray-500">#{{ racer.racer_number }}</p>
               </div>
             </div>
           </div>
@@ -313,9 +305,7 @@
 
         <!-- Description Field -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Description
-          </label>
+          <label class="block text-sm font-medium text-gray-700 mb-2"> Description </label>
           <Textarea
             v-model="editingPhoto.description"
             placeholder="Add a description for this photo..."
@@ -327,7 +317,7 @@
 
         <!-- Credit Field -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
             Photo Credit (Optional)
           </label>
           <InputText
@@ -354,13 +344,13 @@
       class="w-full max-w-2xl"
     >
       <div class="space-y-6">
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-gray-600">
           Upload photos from races, community events, or other racing-related content. These will be
           reviewed by admins before being published.
         </p>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
             Select Race (Optional)
           </label>
           <Select

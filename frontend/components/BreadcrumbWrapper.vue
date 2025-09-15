@@ -11,10 +11,10 @@
     <template #item="{ item, props: itemProps }">
       <NuxtLink v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
         <a :href="href" v-bind="itemProps.action" @click="navigate">
-          <span class="text-gray-600 dark:text-gray-300">{{ item.label }}</span>
+          <span class="text-gray-600">{{ item.label }}</span>
         </a>
       </NuxtLink>
-      <span v-else class="text-gray-900 dark:text-white">{{ item.label }}</span>
+      <span v-else class="text-black">{{ item.label }}</span>
     </template>
   </Breadcrumb>
 </template>

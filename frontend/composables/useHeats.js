@@ -7,12 +7,12 @@ export const useHeats = () => {
   const upcomingHeats = useState('heats-upcoming', () => [])
   const loading = useState('heats-loading', () => false)
   const error = useState('heats-error', () => null)
-  
+
   // New state for delayed heat display
   const recentlyCompletedHeat = useState('heats-recently-completed', () => null)
   const displayDelayTimer = useState('heats-display-timer', () => null)
   const showCompletedHeatResults = useState('heats-show-completed', () => false)
-  
+
   // Configuration for how long to show completed results (in milliseconds)
   const COMPLETED_HEAT_DISPLAY_DURATION = 15000 // 15 seconds
 
@@ -28,11 +28,11 @@ export const useHeats = () => {
   const startCompletedHeatDisplay = (completedHeatData) => {
     // Clear any existing timer
     clearCompletedHeatTimer()
-    
+
     // Set the completed heat data and show flag
     recentlyCompletedHeat.value = completedHeatData
     showCompletedHeatResults.value = true
-    
+
     // Set timer to hide completed results after the configured duration
     displayDelayTimer.value = setTimeout(() => {
       showCompletedHeatResults.value = false
@@ -49,12 +49,12 @@ export const useHeats = () => {
       // Check if the previous heat now has results by querying completed qualifiers
       return previousHeat
     }
-    
+
     // If the current heat changed heat_number, the previous one was completed
     if (previousHeat && newHeat && previousHeat.heat_number !== newHeat.heat_number) {
       return previousHeat
     }
-    
+
     return null
   }
 
@@ -65,7 +65,8 @@ export const useHeats = () => {
     try {
       const { data: completedQualifiers, error } = await supabase
         .from('qualifiers')
-        .select(`
+        .select(
+          `
           *,
           racer:racers(
             id,
@@ -73,7 +74,8 @@ export const useHeats = () => {
             racer_number,
             image_url
           )
-        `)
+        `
+        )
         .eq('race_id', currentRace.value.id)
         .eq('heat_number', heatNumber)
         .eq('status', 'completed')
@@ -125,11 +127,13 @@ export const useHeats = () => {
 
       // Detect if a heat was just completed
       const justCompletedHeat = detectHeatCompletion(previousHeat, newHeat, newUpcomingHeats)
-      
+
       if (justCompletedHeat) {
         // Fetch the completed heat results before starting the display
         try {
-          const completedHeatWithResults = await fetchCompletedHeatResults(justCompletedHeat.heat_number)
+          const completedHeatWithResults = await fetchCompletedHeatResults(
+            justCompletedHeat.heat_number
+          )
           if (completedHeatWithResults) {
             startCompletedHeatDisplay(completedHeatWithResults)
           }
@@ -315,7 +319,7 @@ export const useHeats = () => {
     upcomingHeats: readonly(upcomingHeats),
     loading: readonly(loading),
     error: readonly(error),
-    
+
     // New delayed display state
     recentlyCompletedHeat: readonly(recentlyCompletedHeat),
     showCompletedHeatResults: readonly(showCompletedHeatResults),
@@ -328,7 +332,7 @@ export const useHeats = () => {
     regenerateQualifiers,
     startHeat,
     completeCurrentHeat,
-    
+
     // New methods for delayed display
     clearCompletedHeatTimer,
     fetchCompletedHeatResults

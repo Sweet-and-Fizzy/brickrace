@@ -1,8 +1,8 @@
 <template>
   <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
     <div>
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">{{ title }}</h1>
-      <p v-if="subtitle" class="text-gray-600 dark:text-gray-300">{{ subtitle }}</p>
+      <h1 class="text-3xl font-bold text-black mb-2">{{ title }}</h1>
+      <p v-if="subtitle" class="text-gray-600">{{ subtitle }}</p>
     </div>
 
     <div v-if="actions.length > 0" class="flex gap-2 mt-4 md:mt-0">

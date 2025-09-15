@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-gray-800 dark:bg-gray-900 text-white">
+  <footer class="bg-black text-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Logo and Description Row -->
       <div class="text-center mb-12">
@@ -7,10 +7,7 @@
           <div class="flex items-center">
             <span class="site-name text-2xl font-bold">the great holyoke brick race</span>
           </div>
-          <p class="text-gray-300 max-w-2xl text-lg">
-            A celebration of creativity, engineering, and friendly competition where custom
-            gravity-powered vehicles race for glory.
-          </p>
+          <p class="text-gray-300 max-w-2xl text-lg">where performance art meets sport</p>
         </div>
       </div>
 
@@ -22,14 +19,20 @@
         <div class="space-y-4">
           <h3 class="text-lg font-semibold text-white">Races</h3>
           <nav class="space-y-2">
-            <!-- Current race if there's an active one -->
+            <!-- Static race links -->
             <NuxtLink
-              v-if="activeRace"
-              :to="`/races/${activeRace.slug || activeRace.id}`"
+              to="/races/the-2025-brick-race"
               class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
               <i class="pi pi-play-circle text-gray-300" />
-              <span>{{ activeRace.name }}</span>
+              <span>The 2025 Brick Race</span>
+            </NuxtLink>
+            <NuxtLink
+              to="/races/2025-test-day"
+              class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
+            >
+              <i class="pi pi-calendar text-gray-300" />
+              <span>2025 Test Day</span>
             </NuxtLink>
             <NuxtLink
               to="/races"
@@ -154,7 +157,7 @@
       </div>
 
       <!-- Bottom Bar -->
-      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-white">
         <p class="mb-4">&copy; {{ new Date().getFullYear() }} the great holyoke brick race</p>
         <p>
           Built with
@@ -174,9 +177,9 @@
 </template>
 
 <script setup>
-// Get races data for active race
-const { activeRace } = useRaces()
+import { useAuthStore } from '~/stores/auth'
 
-// Footer doesn't need these since Account section was removed
-// Authentication is handled in the main navigation
+// Get auth state for conditional menu items
+const authStore = useAuthStore()
+const isAuthenticated = computed(() => authStore.isAuthenticated)
 </script>

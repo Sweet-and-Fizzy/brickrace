@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -12,8 +12,8 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Race Not Found</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Race Not Found</h2>
+        <p class="text-gray-600 mb-6">
           The race you're looking for doesn't exist or has been removed.
         </p>
         <NuxtLink to="/races">
@@ -24,8 +24,8 @@
       <!-- Access Denied -->
       <div v-else-if="!authStore.isRaceAdmin" class="text-center py-12">
         <i class="pi pi-ban text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">Access Denied</h2>
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Access Denied</h2>
+        <p class="text-gray-600 mb-6">
           You need race admin privileges to access the check-in system.
         </p>
         <NuxtLink to="/races">
@@ -39,21 +39,19 @@
         <div class="mb-8">
           <div class="flex flex-col md:flex-row md:items-start md:justify-between">
             <div>
-              <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Check-in: {{ race.name }}
-              </h1>
-              <div class="flex items-center gap-4 text-gray-600 dark:text-gray-300">
+              <h1 class="text-3xl font-bold text-black mb-2">Check-in: {{ race.name }}</h1>
+              <div class="flex items-center gap-4 text-gray-600">
                 <span>{{
-                  race.race_datetime ? new Date(race.race_datetime).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  }) : 'Date TBD'
+                  race.race_datetime
+                    ? new Date(race.race_datetime).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                    : 'Date TBD'
                 }}</span>
-                <span class="font-semibold text-green-600 dark:text-green-400"
-                  >{{ checkedInCount }} checked in</span
-                >
+                <span class="font-semibold text-green-600">{{ checkedInCount }} checked in</span>
               </div>
             </div>
             <div class="mt-4 md:mt-0">
@@ -67,10 +65,7 @@
           <template #content>
             <div class="flex flex-col md:flex-row gap-4">
               <div class="flex-1">
-                <label
-                  for="search"
-                  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
                   Search Racers
                 </label>
                 <InputText
@@ -94,29 +89,25 @@
             :key="racer.id"
             class="border rounded-lg p-4 transition-all duration-200"
             :class="{
-              'bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-700':
-                isCheckedIn(racer.id),
-              'bg-white border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:hover:bg-gray-700':
-                !isCheckedIn(racer.id)
+              'bg-green-50 border-green-200/30': isCheckedIn(racer.id),
+              'bg-white border-gray-200 hover:bg-gray-50': !isCheckedIn(racer.id)
             }"
           >
             <!-- Racer Info -->
             <div class="flex items-center justify-between mb-3">
               <div>
-                <h3 class="font-semibold text-gray-900 dark:text-white">{{ racer.name }}</h3>
-                <p class="text-sm text-gray-600 dark:text-gray-300">
-                  Racer #{{ racer.racer_number }}
-                </p>
-                <p v-if="racer.team_members" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <h3 class="font-semibold text-black">{{ racer.name }}</h3>
+                <p class="text-sm text-gray-600">Racer #{{ racer.racer_number }}</p>
+                <p v-if="racer.team_members" class="text-xs text-gray-500 mt-1">
                   Team: {{ racer.team_members }}
                 </p>
               </div>
               <div class="flex items-center">
                 <i
                   v-if="isCheckedIn(racer.id)"
-                  class="pi pi-check-circle text-2xl text-green-600 dark:text-green-400"
+                  class="pi pi-check-circle text-2xl text-green-600"
                 />
-                <i v-else class="pi pi-circle text-2xl text-gray-300 dark:text-gray-500" />
+                <i v-else class="pi pi-circle text-2xl text-gray-300" />
               </div>
             </div>
 
@@ -132,20 +123,17 @@
             </div>
 
             <!-- Check-in Status -->
-            <div
-              v-if="isCheckedIn(racer.id)"
-              class="text-sm text-green-700 dark:text-green-300 mb-3"
-            >
+            <div v-if="isCheckedIn(racer.id)" class="text-sm text-green-700 mb-3">
               <i class="pi pi-check mr-1" />
               Checked in at {{ getCheckinTime(racer.id) }}
             </div>
 
             <!-- Withdrawal Status -->
-            <div 
-              v-if="isWithdrawn(racer.id)" 
-              class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md p-2 mb-3"
+            <div
+              v-if="isWithdrawn(racer.id)"
+              class="bg-red-50/20 border border-red-200 rounded-md p-2 mb-3"
             >
-              <div class="flex items-center text-red-700 dark:text-red-300">
+              <div class="flex items-center text-red-700">
                 <i class="pi pi-exclamation-triangle mr-2" />
                 <span class="text-sm font-medium">Withdrawn from race</span>
               </div>
@@ -185,11 +173,9 @@
 
         <!-- No Racers Found -->
         <div v-if="filteredRacers.length === 0" class="text-center py-12">
-          <i class="pi pi-search text-6xl text-gray-300 dark:text-gray-600 mb-4" />
-          <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-            No Racers Found
-          </h3>
-          <p class="text-gray-600 dark:text-gray-300">
+          <i class="pi pi-search text-6xl text-gray-300 mb-4" />
+          <h3 class="text-xl font-semibold text-gray-800 mb-2">No Racers Found</h3>
+          <p class="text-gray-600">
             {{
               searchQuery
                 ? 'Try adjusting your search terms.'
@@ -228,9 +214,9 @@ const {
 const { getRaceBySlug, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
 
 // Use racers composable for withdrawal functionality
-const { 
-  withdrawRacerFromRace, 
-  reinstateRacerToRace, 
+const {
+  withdrawRacerFromRace,
+  reinstateRacerToRace,
   isRacerWithdrawnFromRace,
   canUserWithdrawRacer
 } = useRacers()
@@ -284,12 +270,12 @@ const toggleWithdrawal = async (racer) => {
 
   try {
     const isCurrentlyWithdrawn = isWithdrawn(racer.id)
-    
+
     if (isCurrentlyWithdrawn) {
       // Reinstate racer
       await reinstateRacerToRace(racer.id, race.value.id)
       withdrawnRacers.value.delete(racer.id)
-      
+
       toast.add({
         severity: 'success',
         summary: 'Racer Reinstated',
@@ -300,10 +286,10 @@ const toggleWithdrawal = async (racer) => {
       // Withdraw racer
       const result = await withdrawRacerFromRace(racer.id, race.value.id, 'Withdrawn by race admin')
       withdrawnRacers.value.add(racer.id)
-      
+
       // Debug: Log the full result
       console.log('Withdrawal result:', result)
-      
+
       // Build detailed message about heat impact
       let detailMessage = `${racer.name} has been withdrawn from the race`
       if (result.heatChanges) {
@@ -318,7 +304,7 @@ const toggleWithdrawal = async (racer) => {
       } else {
         detailMessage += ` (No heat information returned)`
       }
-      
+
       toast.add({
         severity: 'info',
         summary: 'Racer Withdrawn',
@@ -352,7 +338,7 @@ const loadWithdrawalStatus = async () => {
     if (error) throw error
 
     // Update local withdrawal tracking
-    withdrawnRacers.value = new Set((raceWithdrawals || []).map(w => w.racer_id))
+    withdrawnRacers.value = new Set((raceWithdrawals || []).map((w) => w.racer_id))
   } catch (err) {
     console.error('Error loading withdrawal status:', err)
   }
@@ -362,14 +348,14 @@ const loadWithdrawalStatus = async () => {
 const fetchRaceData = async () => {
   try {
     await initializeRaces()
-    
+
     // Get race by slug
     const slug = route.params.slug
     let raceData = getRaceBySlug(slug)
     if (!raceData) {
       raceData = await fetchRaceBySlug(slug)
     }
-    
+
     if (!raceData) {
       throw new Error('Race not found')
     }

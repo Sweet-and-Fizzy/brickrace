@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900">
+  <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-12 max-w-2xl">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -12,10 +12,8 @@
       <!-- Error State -->
       <div v-else-if="error" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
-          Racer Not Found
-        </h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Racer Not Found</h2>
+        <p class="text-gray-600 mb-6">
           You don't have permission to edit this racer or it doesn't exist.
         </p>
         <NuxtLink to="/racers">
@@ -34,8 +32,8 @@
           >
             <i class="pi pi-pencil text-2xl text-white" />
           </div>
-          <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">Edit Racer</h1>
-          <p class="text-lg text-gray-600 dark:text-gray-400 max-w-lg mx-auto">
+          <h1 class="text-4xl font-bold text-black mb-4">Edit Racer</h1>
+          <p class="text-lg text-gray-600 max-w-lg mx-auto">
             Update your racer details for #{{ racer.racer_number }} - {{ racer.name }}
           </p>
         </div>
@@ -46,10 +44,7 @@
             <form class="space-y-8" @submit.prevent="handleSubmit">
               <!-- Name Input -->
               <div>
-                <label
-                  for="name"
-                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="name" class="block text-sm font-semibold text-gray-700 mb-2">
                   Racer Name *
                 </label>
                 <InputText
@@ -64,10 +59,7 @@
 
               <!-- About this Racer Input -->
               <div>
-                <label
-                  for="team_members"
-                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="team_members" class="block text-sm font-semibold text-gray-700 mb-2">
                   About this racer
                 </label>
                 <Textarea
@@ -79,17 +71,13 @@
                   auto-resize
                 />
                 <p class="mt-2 text-sm text-gray-500">
-                  Tell us who created this racer and any other information you would like to
-                  share.
+                  Tell us who created this racer and any other information you would like to share.
                 </p>
               </div>
 
               <!-- Weight Input -->
               <div>
-                <label
-                  for="weight"
-                  class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
-                >
+                <label for="weight" class="block text-sm font-semibold text-gray-700 mb-2">
                   Weight (pounds)
                 </label>
                 <InputNumber
@@ -112,7 +100,7 @@
 
               <!-- Main Racer Photo -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-4">
                   Main Racer Photo
                 </label>
                 <div class="space-y-4">
@@ -121,16 +109,12 @@
                     <!-- Status Header -->
                     <div class="flex items-center justify-center gap-2 mb-4">
                       <template v-if="previewImage">
-                        <i class="pi pi-clock text-green-700 dark:text-green-400" />
-                        <span class="text-sm text-green-700 dark:text-green-400 font-medium"
-                          >Photo ready to save</span
-                        >
+                        <i class="pi pi-clock text-green-700" />
+                        <span class="text-sm text-green-700 font-medium">Photo ready to save</span>
                       </template>
                       <template v-else>
-                        <i class="pi pi-check-circle text-green-600 dark:text-green-400" />
-                        <span class="text-sm text-green-600 dark:text-green-400 font-medium"
-                          >Main photo uploaded</span
-                        >
+                        <i class="pi pi-check-circle text-green-600" />
+                        <span class="text-sm text-green-600 font-medium">Main photo uploaded</span>
                         <Button
                           v-tooltip="'Remove main photo'"
                           icon="pi pi-times"
@@ -182,7 +166,7 @@
                       class="w-full"
                       @select="onMainPhotoSelect"
                     />
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    <p class="text-sm text-gray-500 mt-2">
                       This will be the primary photo displayed on the racer's detail page.
                     </p>
                   </div>
@@ -191,11 +175,11 @@
 
               <!-- Additional Photos -->
               <div>
-                <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
                   Additional Photos
                 </label>
                 <div class="mb-4">
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                  <p class="text-sm text-gray-600">
                     Upload additional photos of your racer for the gallery section.
                   </p>
                 </div>
