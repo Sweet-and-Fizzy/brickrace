@@ -1,15 +1,18 @@
 <template>
   <div class="min-h-screen bg-white">
     <div class="container mx-auto px-4 py-8">
-      <div class="flex justify-between items-center mb-8">
-        <div>
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+        <div class="flex-1">
           <h1 class="text-3xl font-bold text-black">My Racers</h1>
         </div>
-        <NuxtLink to="/racers/add">
-          <Button icon="pi pi-plus" class="btn-primary px-4 py-2"
-            ><span>Add New Racer</span></Button
-          >
-        </NuxtLink>
+        <div class="flex-shrink-0">
+          <NuxtLink to="/racers/add">
+            <Button size="large" class="btn-primary">
+              <i class="pi pi-plus mr-2" />
+              <span>Add New Racer</span>
+            </Button>
+          </NuxtLink>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -208,9 +211,10 @@
           Create your first custom gravity-powered vehicle to join the competition!
         </p>
         <NuxtLink to="/racers/add">
-          <Button icon="pi pi-plus" class="btn-primary" size="large"
-            ><span>Create Your First Racer</span></Button
-          >
+          <Button size="large" class="btn-primary">
+            <i class="pi pi-plus mr-2" />
+            <span>Create Your First Racer</span>
+          </Button>
         </NuxtLink>
       </div>
     </div>
