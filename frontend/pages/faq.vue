@@ -38,11 +38,11 @@
                 </AccordionHeader>
                 <AccordionContent>
                   <div class="space-y-4 text-gray-700">
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">1</span>
+                        <span class="text-white font-bold text-xs md:text-sm">1</span>
                       </div>
                       <p class="leading-relaxed">
                         We invite all interested people, of any age and background – artists,
@@ -51,11 +51,11 @@
                       </p>
                     </div>
 
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">2</span>
+                        <span class="text-white font-bold text-xs md:text-sm">2</span>
                       </div>
                       <p class="leading-relaxed">
                         You may enter as an individual or as part of a group with any number of
@@ -63,11 +63,11 @@
                       </p>
                     </div>
 
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">3</span>
+                        <span class="text-white font-bold text-xs md:text-sm">3</span>
                       </div>
                       <p class="leading-relaxed">
                         Entrants do not have to be residents of Holyoke, Massachusetts to
@@ -90,11 +90,11 @@
                 </AccordionHeader>
                 <AccordionContent>
                   <div class="space-y-4 text-gray-700">
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">1</span>
+                        <span class="text-white font-bold text-xs md:text-sm">1</span>
                       </div>
                       <p class="leading-relaxed">
                         Entrants must build a racer vehicle to transport a
@@ -107,11 +107,11 @@
                       </p>
                     </div>
 
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">2</span>
+                        <span class="text-white font-bold text-xs md:text-sm">2</span>
                       </div>
                       <p class="leading-relaxed">
                         Since the racers will travel down an inclined plane using
@@ -120,11 +120,11 @@
                       </p>
                     </div>
 
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">3</span>
+                        <span class="text-white font-bold text-xs md:text-sm">3</span>
                       </div>
                       <p class="leading-relaxed">
                         You may use <strong>any materials</strong> to build the racer including
@@ -134,11 +134,11 @@
                       </p>
                     </div>
 
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">4</span>
+                        <span class="text-white font-bold text-xs md:text-sm">4</span>
                       </div>
                       <p class="leading-relaxed">
                         To fit on the track, the total size of the racer, including the brick,
@@ -149,11 +149,11 @@
                       </p>
                     </div>
 
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">5</span>
+                        <span class="text-white font-bold text-xs md:text-sm">5</span>
                       </div>
                       <p class="leading-relaxed">
                         The total weight of the brick racer, including the brick and all materials
@@ -175,17 +175,17 @@
                 </AccordionHeader>
                 <AccordionContent>
                   <div class="space-y-6 text-gray-700">
-                    <p class="text-lg text-black font-medium mb-4">
+                    <p class="text-black font-medium mb-4">
                       The Great Holyoke Brick Race follows a structured process from registration to
                       victory:
                     </p>
 
                     <div class="space-y-5">
-                      <div class="flex items-start gap-4">
+                      <div class="flex items-start gap-2 md:gap-4">
                         <div
-                          class="bg-brand-green rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0"
+                          class="bg-brand-green rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0"
                         >
-                          <span class="text-white font-bold">1</span>
+                          <span class="text-white font-bold text-xs md:text-sm">1</span>
                         </div>
                         <div>
                           <h4 class="font-semibold text-black mb-2">Website Registration</h4>
@@ -196,21 +196,22 @@
                             anytime before the race. This step must be completed before you can
                             check in on race day.
                           </p>
-                          <div class="bg-white border-2 border-brand-green rounded-lg p-3">
-                            <p class="text-sm text-black">
-                              <i class="pi pi-info-circle mr-1" />
-                              <strong>Important:</strong> You cannot participate in the race without
-                              first registering your racer on this website.
-                            </p>
-                          </div>
                         </div>
                       </div>
+                      
+                      <div class="bg-white border-2 border-brand-green rounded-lg p-3 mt-3">
+                        <p class="text-sm text-black">
+                          <i class="pi pi-info-circle mr-1" />
+                          <strong>Important:</strong> You cannot participate in the race without
+                          first registering your racer on this website.
+                        </p>
+                      </div>
 
-                      <div class="flex items-start gap-4">
+                      <div class="flex items-start gap-2 md:gap-4">
                         <div
-                          class="bg-brand-green rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0"
+                          class="bg-brand-green rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0"
                         >
-                          <span class="text-white font-bold">2</span>
+                          <span class="text-white font-bold text-xs md:text-sm">2</span>
                         </div>
                         <div>
                           <h4 class="font-semibold text-black mb-2">Race Day Check-in</h4>
@@ -224,11 +225,11 @@
                         </div>
                       </div>
 
-                      <div class="flex items-start gap-4">
+                      <div class="flex items-start gap-2 md:gap-4">
                         <div
-                          class="bg-brand-green rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0"
+                          class="bg-brand-green rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0"
                         >
-                          <span class="text-white font-bold">3</span>
+                          <span class="text-white font-bold text-xs md:text-sm">3</span>
                         </div>
                         <div>
                           <h4 class="font-semibold text-black mb-2">Qualifying Rounds</h4>
@@ -242,11 +243,11 @@
                         </div>
                       </div>
 
-                      <div class="flex items-start gap-4">
+                      <div class="flex items-start gap-2 md:gap-4">
                         <div
-                          class="bg-brand-green rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0"
+                          class="bg-brand-green rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0"
                         >
-                          <span class="text-white font-bold">4</span>
+                          <span class="text-white font-bold text-xs md:text-sm">4</span>
                         </div>
                         <div>
                           <h4 class="font-semibold text-black mb-2">Tournament Brackets</h4>
@@ -259,11 +260,11 @@
                         </div>
                       </div>
 
-                      <div class="flex items-start gap-4">
+                      <div class="flex items-start gap-2 md:gap-4">
                         <div
-                          class="bg-brand-green rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0"
+                          class="bg-brand-green rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0"
                         >
-                          <span class="text-white font-bold">5</span>
+                          <span class="text-white font-bold text-xs md:text-sm">5</span>
                         </div>
                         <div>
                           <h4 class="font-semibold text-black mb-2">Awards Ceremony</h4>
@@ -289,7 +290,7 @@
                 </AccordionHeader>
                 <AccordionContent>
                   <div class="space-y-6 text-gray-700">
-                    <p class="text-lg text-black font-medium mb-4">
+                    <p class="text-black font-medium mb-4">
                       The Great Holyoke Brick Race celebrates both speed and creativity with custom
                       trophies:
                     </p>
@@ -366,26 +367,28 @@
                       v-if="awards.length > 0"
                       class="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mt-6"
                     >
-                      <div class="flex items-start gap-4">
+                      <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-4">
                         <div
                           class="bg-blue-500 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0"
                         >
                           <i class="pi pi-users text-white text-lg" />
                         </div>
-                        <div class="flex-1">
-                          <h4 class="text-lg font-semibold text-blue-900 mb-2">Community Voting</h4>
-                          <p class="text-blue-800 leading-relaxed mb-4">
+                        <div class="flex-1 text-center md:text-left">
+                          <h4 class="text-lg font-semibold text-black mb-2">Community Voting</h4>
+                          <p class="text-gray-700 leading-relaxed">
                             Many of these awards are decided by community voting! After racers are
                             registered and photos are uploaded, anyone can visit our awards page to
                             vote for their favorites in categories like Most Creative, Best Design,
                             and other special awards. Your vote helps celebrate the amazing
                             creativity and craftsmanship of our participants.
                           </p>
-                          <Button class="btn-primary" @click="navigateTo('/awards')">
-                            <i class="pi pi-trophy mr-2" />
-                            View Awards & Vote
-                          </Button>
                         </div>
+                      </div>
+                      <div class="mt-4 text-center">
+                        <Button class="btn-primary" @click="navigateTo('/awards')">
+                          <i class="pi pi-trophy mr-2" />
+                          View Awards & Vote
+                        </Button>
                       </div>
                     </div>
 
@@ -408,11 +411,11 @@
                 </AccordionHeader>
                 <AccordionContent>
                   <div class="space-y-4 text-gray-700">
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-red-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">1</span>
+                        <span class="text-white font-bold text-xs md:text-sm">1</span>
                       </div>
                       <p class="leading-relaxed">
                         If you need to withdraw your racer from the competition, you can do so at
@@ -421,11 +424,11 @@
                       </p>
                     </div>
 
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-red-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">2</span>
+                        <span class="text-white font-bold text-xs md:text-sm">2</span>
                       </div>
                       <p class="leading-relaxed">
                         If you withdraw before qualifying runs, your racer will simply not
@@ -434,11 +437,11 @@
                       </p>
                     </div>
 
-                    <div class="flex items-start gap-3">
+                    <div class="flex items-start gap-2 md:gap-3">
                       <div
-                        class="bg-red-500 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                       >
-                        <span class="text-white font-bold text-sm">3</span>
+                        <span class="text-white font-bold text-xs md:text-sm">3</span>
                       </div>
                       <p class="leading-relaxed">
                         Any qualifying times you achieved before withdrawal will be preserved in the
@@ -462,46 +465,48 @@
                   <div class="space-y-6 text-gray-700">
                     <!-- Main Venue Info -->
                     <div class="bg-white border-2 border-brand-blue rounded-lg p-6">
-                      <div class="flex items-start gap-4">
+                      <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-4">
                         <div
                           class="bg-brand-blue rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0"
                         >
                           <i class="pi pi-building text-white text-xl" />
                         </div>
-                        <div>
+                        <div class="text-center md:text-left">
                           <h4 class="text-lg font-semibold text-black mb-2">Paper City Studios</h4>
                           <p class="text-gray-700 mb-1">
                             <strong>80 Race Street</strong>
                           </p>
                           <p class="text-gray-700 mb-3">Holyoke, Massachusetts</p>
-                          <p class="text-sm text-gray-600 mb-4">
+                          <p class="text-sm text-gray-600">
                             The race takes place on the custom concrete track at this historic venue
                             on Race Street - a fitting location for our gravity-powered brick racing
                             competition!
                           </p>
-                          <Button
-                            size="small"
-                            class="btn-secondary"
-                            @click="
-                              () =>
-                                window.open(
-                                  'https://maps.google.com/?q=80+Race+Street,+Holyoke,+MA',
-                                  '_blank'
-                                )
-                            "
-                          >
-                            <i class="pi pi-map mr-2" />
-                            View on Google Maps
-                          </Button>
                         </div>
+                      </div>
+                      <div class="mt-4 text-center">
+                        <Button
+                          size="small"
+                          class="btn-secondary"
+                          @click="
+                            () =>
+                              window.open(
+                                'https://maps.google.com/?q=80+Race+Street,+Holyoke,+MA',
+                                '_blank'
+                              )
+                          "
+                        >
+                          <i class="pi pi-map mr-2" />
+                          View on Google Maps
+                        </Button>
                       </div>
                     </div>
 
                     <!-- Additional Location Details -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div class="flex items-start gap-3">
+                      <div class="flex items-start gap-2 md:gap-3">
                         <div
-                          class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                         >
                           <i class="pi pi-car text-white text-sm" />
                         </div>
@@ -513,9 +518,9 @@
                         </div>
                       </div>
 
-                      <div class="flex items-start gap-3">
+                      <div class="flex items-start gap-2 md:gap-3">
                         <div
-                          class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                         >
                           <i class="pi pi-users text-white text-sm" />
                         </div>
@@ -527,9 +532,9 @@
                         </div>
                       </div>
 
-                      <div class="flex items-start gap-3">
+                      <div class="flex items-start gap-2 md:gap-3">
                         <div
-                          class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                         >
                           <i class="pi pi-shopping-cart text-white text-sm" />
                         </div>
@@ -542,9 +547,9 @@
                         </div>
                       </div>
 
-                      <div class="flex items-start gap-3">
+                      <div class="flex items-start gap-2 md:gap-3">
                         <div
-                          class="bg-brand-blue rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
                         >
                           <i class="pi pi-heart text-white text-sm" />
                         </div>

@@ -16,7 +16,7 @@
         </div>
       </template>
 
-      <div class="space-y-2">
+      <div>
         <!-- Navigation Links -->
         <div v-for="item in sidebarMenuItems" :key="item.label" class="block">
           <Button
@@ -24,13 +24,13 @@
             :label="item.label"
             severity="secondary"
             text
-            class="w-full justify-start"
+            class="w-full justify-start py-1.5 text-sm"
             @click="handleSidebarNavigation(item.command)"
           />
         </div>
 
         <!-- Divider -->
-        <Divider class="my-4" />
+        <Divider class="my-1" />
 
         <!-- Auth Section -->
         <template v-if="authStore.isAuthenticated">
@@ -39,7 +39,7 @@
             icon="pi pi-sign-out"
             severity="danger"
             text
-            class="w-full justify-start"
+            class="w-full justify-start py-1.5 text-sm"
             @click="
               handleSidebarNavigation(async () => {
                 try {
@@ -58,7 +58,7 @@
             icon="pi pi-sign-in"
             severity="secondary"
             text
-            class="w-full justify-start"
+            class="w-full justify-start py-1.5 text-sm"
             @click="handleSidebarNavigation(() => navigateTo('/login'))"
           />
           <Button
@@ -66,7 +66,7 @@
             icon="pi pi-user-plus"
             severity="primary"
             text
-            class="w-full justify-start"
+            class="w-full justify-start py-1.5 text-sm"
             @click="handleSidebarNavigation(() => navigateTo('/register'))"
           />
         </template>
@@ -87,7 +87,7 @@
                 class: 'text-black hover:bg-gray-100 mx-2'
               },
               itemLink: {
-                class: 'text-black flex items-center text-base font-semibold'
+                class: 'text-black flex items-center text-base font-semibold gap-1'
               },
               itemLabel: {
                 class: 'text-black text-base font-semibold'
@@ -96,7 +96,7 @@
                 class: 'text-black mr-1 text-base'
               },
               submenuIcon: {
-                class: 'text-black'
+                class: 'text-black -ml-0.5'
               }
             }"
           />
@@ -140,11 +140,11 @@
                   style: 'border: none !important;'
                 },
                 itemLink: {
-                  class: 'text-black flex items-center text-base font-semibold border-0',
+                  class: 'text-black flex items-center text-base font-normal border-0',
                   style: 'border: none !important;'
                 },
                 itemLabel: {
-                  class: 'text-black text-base font-semibold'
+                  class: 'text-black text-base font-normal'
                 },
                 itemIcon: {
                   class: 'text-black mr-1 text-base'
@@ -179,162 +179,96 @@
           </div>
         </div>
 
-        <div class="flex items-center justify-between h-16">
-          <!-- Tablet Navigation (md to lg) -->
-          <div class="hidden md:block lg:hidden flex-1">
-            <div class="flex items-center justify-between">
-              <!-- Logo -->
-              <NuxtLink to="/" class="flex items-center">
-                <span class="site-name text-xl font-bold text-black">
-                  the great holyoke brick race
-                </span>
-              </NuxtLink>
-
-              <!-- Navigation Icons -->
-              <div class="flex items-center space-x-1">
-                <!-- Racing Section -->
-                <!-- Static race buttons -->
+        <!-- Tablet Navigation (md to lg) -->
+        <div class="hidden md:flex lg:hidden flex-col">
+          <!-- Top Navigation Bar -->
+          <div class="flex items-center justify-between py-2">
+            <!-- Hamburger Menu -->
+            <Button
+              icon="pi pi-bars"
+              severity="secondary"
+              text
+              aria-label="Open navigation menu"
+              @click="sidebarVisible = true"
+            />
+            
+            <!-- Navigation Links -->
+            <div class="flex items-center space-x-4 text-sm">
+              <NuxtLink to="/races/the-2025-brick-race" class="hover:text-brand-blue">2025 Race</NuxtLink>
+              <NuxtLink to="/racers" class="hover:text-brand-blue">Racers</NuxtLink>
+              <NuxtLink to="/gallery" class="hover:text-brand-blue">Gallery</NuxtLink>
+              <NuxtLink to="/faq" class="hover:text-brand-blue">FAQ</NuxtLink>
+            </div>
+            
+            <!-- Auth Section -->
+            <div class="flex items-center space-x-2">
+              <template v-if="authStore.isAuthenticated">
+                <!-- Use a simple button with menu for tablet to avoid hamburger -->
                 <Button
-                  v-tooltip.bottom="'The 2025 Brick Race'"
-                  icon="pi pi-play-circle"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/races/the-2025-brick-race')"
-                />
-                <Button
-                  v-tooltip.bottom="'2025 Test Day'"
-                  icon="pi pi-calendar"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/races/2025-test-day')"
-                />
-                <Button
-                  v-tooltip.bottom="'Awards'"
-                  icon="pi pi-trophy"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/awards')"
-                />
-                <Button
-                  v-tooltip.bottom="'All Races'"
-                  icon="pi pi-flag"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/races')"
-                />
-                <Button
-                  v-tooltip.bottom="'Our History'"
-                  icon="pi pi-clock"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/our-story')"
-                />
-                <!-- Racers Section -->
-                <Button
-                  v-tooltip.bottom="'Browse Racers'"
-                  icon="pi pi-car"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/racers')"
-                />
-                <Button
-                  v-if="authStore.isAuthenticated"
-                  v-tooltip.bottom="'My Racers'"
                   icon="pi pi-user"
                   severity="secondary"
                   text
-                  @click="navigateTo('/my-racers')"
+                  aria-label="User menu"
+                  @click="(event) => $refs.tabletUserMenu.toggle(event)"
                 />
-                <Button
-                  v-tooltip.bottom="'Add Your Racer'"
-                  icon="pi pi-plus"
-                  severity="secondary"
-                  text
-                  @click="
-                    () => {
-                      if (authStore.isAuthenticated) {
-                        navigateTo('/racers/add')
-                      } else {
-                        navigateTo('/login?redirect=/racers/add')
-                      }
+                <Menu 
+                  ref="tabletUserMenu" 
+                  :model="tabletUserMenuItems" 
+                  :popup="true"
+                  :pt="{
+                    itemLabel: {
+                      class: 'font-normal'
                     }
-                  "
+                  }"
                 />
-                <!-- Community Section -->
-                <Button
-                  v-tooltip.bottom="'Photo Gallery'"
-                  icon="pi pi-images"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/gallery')"
-                />
-                <Button
-                  v-if="authStore.isAuthenticated"
-                  v-tooltip.bottom="'My Photos'"
-                  icon="pi pi-images"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/my-photos')"
-                />
-                <!-- FAQ Section -->
-                <Button
-                  v-tooltip.bottom="'FAQ'"
-                  icon="pi pi-question-circle"
-                  severity="secondary"
-                  text
-                  @click="navigateTo('/faq')"
-                />
-
-                <!-- Auth buttons or user menu -->
-                <template v-if="!authStore.isAuthenticated">
-                  <NuxtLink
-                    to="/login"
-                    class="text-gray-600 hover:text-black transition-colors px-2 py-1 text-sm flex items-center"
-                  >
-                    <i class="pi pi-sign-in mr-2" />
-                    <span>Login</span>
-                  </NuxtLink>
-                  <NuxtLink
-                    to="/register"
-                    class="text-gray-600 hover:text-black transition-colors px-2 py-1 text-sm flex items-center"
-                  >
-                    <i class="pi pi-user-plus mr-2" />
-                    <span>Register</span>
-                  </NuxtLink>
-                </template>
-              </div>
+              </template>
+              <template v-else>
+                <NuxtLink to="/login" class="hover:text-brand-blue text-sm">Login</NuxtLink>
+                <NuxtLink to="/register" class="hover:text-brand-blue text-sm">Register</NuxtLink>
+              </template>
             </div>
           </div>
-
-          <!-- Mobile Logo and Menu Button -->
-          <div class="md:hidden w-full">
-            <div class="flex items-center justify-between mb-2">
-              <!-- Mobile menu button -->
-              <Button
-                v-tooltip.bottom="'Open navigation menu'"
-                icon="pi pi-bars"
-                severity="secondary"
-                text
-                aria-label="Open navigation menu"
-                @click="sidebarVisible = true"
-              />
-
-              <!-- Spacer for centering -->
-              <div class="w-10" />
-            </div>
-
-            <!-- Centered Logo and Text -->
-            <NuxtLink to="/" class="block text-center">
+          
+          <!-- Logo and Text Below -->
+          <div class="py-4">
+            <NuxtLink to="/" class="flex flex-col items-center">
               <img
                 src="~/assets/img/brick_race_logo.jpg"
                 alt="The Great Holyoke Brick Race Logo"
-                class="h-20 w-auto mx-auto mb-2"
+                class="h-24 w-auto mb-2"
               >
-              <div class="site-name text-2xl font-bold text-black">
+              <div class="site-name text-2xl font-bold text-black tracking-wider text-center">
                 the great holyoke brick race
               </div>
             </NuxtLink>
           </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div class="md:hidden">
+          <!-- Top Navigation Bar -->
+          <div class="flex items-center justify-end py-3 mb-4">
+            <!-- Hamburger Menu in upper right -->
+            <Button
+              icon="pi pi-bars"
+              severity="secondary"
+              text
+              aria-label="Open navigation menu"
+              @click="sidebarVisible = true"
+            />
+          </div>
+          
+          <!-- Logo and Text Below -->
+          <NuxtLink to="/" class="block text-center pb-4">
+            <img
+              src="~/assets/img/brick_race_logo.jpg"
+              alt="The Great Holyoke Brick Race Logo"
+              class="h-20 w-auto mx-auto mb-2"
+            >
+            <div class="site-name text-xl font-bold text-black">
+              the great holyoke brick race
+            </div>
+          </NuxtLink>
         </div>
       </div>
     </div>
@@ -356,6 +290,7 @@
 <script setup>
 import { useAuthStore } from '~/stores/auth'
 import MenuBar from 'primevue/menubar'
+import Menu from 'primevue/menu'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -440,6 +375,56 @@ const menuItems = computed(() => [
     command: () => navigateTo('/faq')
   }
 ])
+
+// Tablet user menu items (for dropdown)
+const tabletUserMenuItems = computed(() =>
+  authStore.isAuthenticated
+    ? [
+        ...(authStore.isRaceAdmin
+          ? [
+              {
+                label: 'Admin Dashboard',
+                icon: 'pi pi-shield',
+                command: () => {
+                  handleNavigation('/admin')
+                }
+              },
+              {
+                separator: true
+              }
+            ]
+          : []),
+        {
+          label: 'My Racers',
+          icon: 'pi pi-car',
+          command: () => {
+            handleNavigation('/my-racers')
+          }
+        },
+        {
+          label: 'My Photos',
+          icon: 'pi pi-images',
+          command: () => {
+            handleNavigation('/my-photos')
+          }
+        },
+        {
+          separator: true
+        },
+        {
+          label: 'Logout',
+          icon: 'pi pi-sign-out',
+          command: async () => {
+            try {
+              await authStore.logout()
+            } catch (error) {
+              console.error('Logout error:', error)
+            }
+          }
+        }
+      ]
+    : []
+)
 
 // User menu items for desktop (icons only)
 const userMenuItemsIconsOnly = computed(() =>
