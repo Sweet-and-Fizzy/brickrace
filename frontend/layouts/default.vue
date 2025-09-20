@@ -117,6 +117,15 @@
 
           <!-- Right: Personal Navigation -->
           <div class="flex items-center space-x-2 justify-self-end">
+            <!-- Sponsors Link -->
+            <NuxtLink
+              to="/sponsors"
+              class="text-black hover:text-brand-blue transition-colors px-3 py-2 text-base font-semibold flex items-center"
+            >
+              <i class="pi pi-building mr-1" />
+              <span>Sponsors</span>
+            </NuxtLink>
+
             <!-- User Menu for authenticated users -->
             <MenuBar
               v-if="authStore.isAuthenticated"
@@ -196,8 +205,9 @@
             <div class="flex items-center space-x-4 text-sm">
               <NuxtLink to="/races/the-2025-brick-race" class="hover:text-brand-blue">2025 Race</NuxtLink>
               <NuxtLink to="/racers" class="hover:text-brand-blue">Racers</NuxtLink>
-              <NuxtLink to="/gallery" class="hover:text-brand-blue">Gallery</NuxtLink>
+              <NuxtLink to="/photos" class="hover:text-brand-blue">Photos</NuxtLink>
               <NuxtLink to="/faq" class="hover:text-brand-blue">FAQ</NuxtLink>
+              <NuxtLink to="/sponsors" class="hover:text-brand-blue">Sponsors</NuxtLink>
             </div>
             
             <!-- Auth Section -->
@@ -355,33 +365,11 @@ const menuItems = computed(() => [
   },
   {
     label: 'Photos',
-    items: [
-      {
-        label: 'Photo Gallery',
-        command: () => navigateTo('/gallery')
-      },
-      ...(authStore.isAuthenticated
-        ? [
-            {
-              label: 'My Photos',
-              command: () => navigateTo('/my-photos')
-            }
-          ]
-        : [])
-    ]
+    command: () => navigateTo('/photos')
   },
   {
-    label: 'Community',
-    items: [
-      {
-        label: 'FAQ',
-        command: () => navigateTo('/faq')
-      },
-      {
-        label: 'Sponsors',
-        command: () => navigateTo('/sponsors')
-      }
-    ]
+    label: 'FAQ',
+    command: () => navigateTo('/faq')
   }
 ])
 
@@ -552,9 +540,9 @@ const sidebarMenuItems = computed(() => [
   },
   // Community Section
   {
-    label: 'Photo Gallery',
+    label: 'Photos',
     icon: 'pi pi-images',
-    command: () => navigateTo('/gallery')
+    command: () => navigateTo('/photos')
   },
   // FAQ Section
   {

@@ -1400,7 +1400,7 @@
                   <!-- See All Photos Link -->
                   <div class="text-center pt-4 border-t border-gray-200">
                     <NuxtLink
-                      to="/gallery"
+                      to="/photos"
                       class="inline-flex items-center gap-2 text-brand-blue hover:text-blue-800 font-medium transition-colors"
                     >
                       <i class="pi pi-images" />

@@ -93,7 +93,7 @@
           <h3 class="text-lg font-semibold text-white">Community & Help</h3>
           <nav class="space-y-2">
             <NuxtLink
-              to="/gallery"
+              to="/photos"
               class="block text-gray-300 hover:text-white transition-colors flex items-center gap-2"
             >
               <i class="pi pi-images text-gray-300" />

@@ -377,7 +377,7 @@
         <!-- View More Links -->
         <div class="text-center mt-12 space-y-6">
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="large" class="gallery-button" @click="navigateTo('/gallery')">
+            <Button size="large" class="gallery-button" @click="navigateTo('/photos')">
               <i class="pi pi-images mr-2" />
               View Photo Gallery
             </Button>
