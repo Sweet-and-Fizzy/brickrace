@@ -28,12 +28,67 @@
         <Card>
           <template #content>
             <Accordion :value="['0']" multiple>
-              <!-- Who can enter? -->
+              <!-- Quick Rules Summary -->
               <AccordionPanel value="0">
                 <AccordionHeader>
                   <div class="flex items-center gap-2">
+                    <i class="pi pi-list text-lg text-gray-600" />
+                    <span class="font-bold text-black">Quick Rules Summary</span>
+                  </div>
+                </AccordionHeader>
+                <AccordionContent>
+                  <div class="space-y-4 text-gray-700">
+                    <p class="leading-relaxed mb-4">
+                      <strong>Here's everything you need to know at a glance:</strong>
+                    </p>
+                    
+                    <div class="bg-gray-50 border-2 border-gray-300 rounded-lg p-4">
+                      <ul class="space-y-2">
+                        <li class="flex items-start">
+                          <i class="pi pi-check-circle text-green-500 mt-1 mr-2" />
+                          <span><strong>Brick:</strong> Standard building brick (8" × 4" × 2.5", 4-5 lbs)</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="pi pi-check-circle text-green-500 mt-1 mr-2" />
+                          <span><strong>Size limit:</strong> 10" wide × 18" long × 15" tall</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="pi pi-check-circle text-green-500 mt-1 mr-2" />
+                          <span><strong>Weight limit:</strong> 15 lbs total (including brick)</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="pi pi-check-circle text-green-500 mt-1 mr-2" />
+                          <span><strong>Power:</strong> Gravity only - no motors or propulsion</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="pi pi-check-circle text-green-500 mt-1 mr-2" />
+                          <span><strong>Materials:</strong> Anything safe - no sharp edges, hazardous, or flammable materials</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="pi pi-check-circle text-green-500 mt-1 mr-2" />
+                          <span><strong>Registration:</strong> FREE - register on this website before race day</span>
+                        </li>
+                        <li class="flex items-start">
+                          <i class="pi pi-check-circle text-green-500 mt-1 mr-2" />
+                          <span><strong>Who can enter:</strong> Everyone! All ages and backgrounds welcome</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <p class="text-sm text-gray-600 italic mt-4">
+                      When in doubt, remember: it's about creativity, community, and having a blast 
+                      watching bricks race down our custom concrete track!
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionPanel>
+
+              <!-- Who can enter? -->
+              <AccordionPanel value="1">
+                <AccordionHeader>
+                  <div class="flex items-center gap-2">
                     <i class="pi pi-users text-lg text-purple-600" />
-                    <span class="font-bold text-black">Who can enter?</span>
+                    <span class="font-bold text-black">Who Can Enter?</span>
                   </div>
                 </AccordionHeader>
                 <AccordionContent>
@@ -45,9 +100,9 @@
                         <span class="text-white font-bold text-xs md:text-sm">1</span>
                       </div>
                       <p class="leading-relaxed">
-                        We invite all interested people, of any age and background – artists,
-                        students, teachers, mechanics, car buffs, tinkerers, inventors, Library of
-                        Congress archivists and compulsive contest enterers, etc. – all are welcome.
+                        Everyone! Artists, students, mechanics, tinkerers, inventors, Library of
+                        Congress archivists, compulsive contest enterers – if you can build it, 
+                        you can race it.
                       </p>
                     </div>
 
@@ -58,8 +113,7 @@
                         <span class="text-white font-bold text-xs md:text-sm">2</span>
                       </div>
                       <p class="leading-relaxed">
-                        You may enter as an individual or as part of a group with any number of
-                        participants to make one racer.
+                        Solo or squad – bring your whole crew to build one epic racer.
                       </p>
                     </div>
 
@@ -70,10 +124,216 @@
                         <span class="text-white font-bold text-xs md:text-sm">3</span>
                       </div>
                       <p class="leading-relaxed">
-                        Entrants do not have to be residents of Holyoke, Massachusetts to
-                        participate in the competition, and we will accept entries from contestants
-                        worldwide including Framingham, Fargo, Fairbanks, Faskrudsfjordur (Iceland)
-                        and anywhere else – build a brick racer and you're in!
+                        We welcome racers from everywhere – Holyoke, Framingham, Fargo, 
+                        Fairbanks, Faskrudsfjordur (Iceland), or your kitchen table. 
+                        Build a brick racer and you're in!
+                      </p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionPanel>
+
+              <!-- Entry Fees and Registration -->
+              <AccordionPanel value="2">
+                <AccordionHeader>
+                  <div class="flex items-center gap-2">
+                    <i class="pi pi-dollar text-lg text-green-600" />
+                    <span class="font-bold text-black">Is It Free?</span>
+                  </div>
+                </AccordionHeader>
+                <AccordionContent>
+                  <div class="space-y-4 text-gray-700">
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-green-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">1</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        <strong>FREE!</strong> Zero dollars. Zilch. This is a community party, 
+                        not a cash grab.
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-green-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">2</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        Enter as many racers as you want – each needs separate registration, 
+                        but they're all free. Build one or build twenty, we're here for it.
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-green-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">3</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        Spectators are free too. Bring everyone – we need the cheering section.
+                      </p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionPanel>
+
+              <!-- Location & Venue -->
+              <AccordionPanel value="3">
+                <AccordionHeader>
+                  <div class="flex items-center gap-2">
+                    <i class="pi pi-map-marker text-lg text-blue-600" />
+                    <span class="font-bold text-black">Where's the Race?</span>
+                  </div>
+                </AccordionHeader>
+                <AccordionContent>
+                  <div class="space-y-6 text-gray-700">
+                    <!-- Main Venue Info -->
+                    <div class="bg-white border-2 border-brand-blue rounded-lg p-6">
+                      <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-4">
+                        <div
+                          class="bg-brand-blue rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0"
+                        >
+                          <i class="pi pi-building text-white text-xl" />
+                        </div>
+                        <div class="text-center md:text-left">
+                          <h4 class="text-lg font-semibold text-black mb-2">Paper City Studios</h4>
+                          <p class="text-gray-700 mb-1">
+                            <strong>80 Race Street</strong>
+                          </p>
+                          <p class="text-gray-700 mb-3">Holyoke, Massachusetts</p>
+                          <p class="text-sm text-gray-600">
+                            Custom concrete track on Race Street – because where else would you race bricks?
+                          </p>
+                        </div>
+                      </div>
+                      <div class="mt-4 text-center">
+                        <Button
+                          size="small"
+                          class="btn-secondary"
+                          @click="
+                            () =>
+                              window.open(
+                                'https://maps.google.com/?q=80+Race+Street,+Holyoke,+MA',
+                                '_blank'
+                              )
+                          "
+                        >
+                          <i class="pi pi-map mr-2" />
+                          View on Google Maps
+                        </Button>
+                      </div>
+                    </div>
+
+                    <!-- Additional Location Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div class="flex items-start gap-2 md:gap-3">
+                        <div
+                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        >
+                          <i class="pi pi-car text-white text-sm" />
+                        </div>
+                        <div>
+                          <p class="font-medium text-black mb-1">Parking</p>
+                          <p class="text-sm leading-relaxed">
+                            Street parking available on Race Street and surrounding areas
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="flex items-start gap-2 md:gap-3">
+                        <div
+                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        >
+                          <i class="pi pi-users text-white text-sm" />
+                        </div>
+                        <div>
+                          <p class="font-medium text-black mb-1">Spectators Welcome</p>
+                          <p class="text-sm leading-relaxed">
+                            Spectators welcome to cheer on the creativity
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="flex items-start gap-2 md:gap-3">
+                        <div
+                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        >
+                          <i class="pi pi-shopping-cart text-white text-sm" />
+                        </div>
+                        <div>
+                          <p class="font-medium text-black mb-1">Food & Refreshments</p>
+                          <p class="text-sm leading-relaxed">
+                            Food trucks keep you fueled for the fun
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="flex items-start gap-2 md:gap-3">
+                        <div
+                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                        >
+                          <i class="pi pi-heart text-white text-sm" />
+                        </div>
+                        <div>
+                          <p class="font-medium text-black mb-1">Family Friendly</p>
+                          <p class="text-sm leading-relaxed">
+                            Creative fun for all ages and skill levels
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionPanel>
+
+              <!-- What makes the cars go? -->
+              <AccordionPanel value="4">
+                <AccordionHeader>
+                  <div class="flex items-center gap-2">
+                    <i class="pi pi-send text-lg text-purple-600" />
+                    <span class="font-bold text-black">How Do Cars Go Fast?</span>
+                  </div>
+                </AccordionHeader>
+                <AccordionContent>
+                  <div class="space-y-4 text-gray-700">
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-purple-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">1</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        <strong>Gravity, obviously.</strong> No motors, batteries, jet packs, or hamster wheels. 
+                        Just you, your brick, and physics doing its thing down our concrete track.
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-purple-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">2</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        Moving parts? Sure! Spinning wheels, flapping wings, rotating doodads – 
+                        as long as they're not secretly rocket boosters. Style points matter.
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-purple-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">3</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        Weight distribution, aerodynamics, wheel alignment – it's science meets art. 
+                        Also known as "why did my perfectly engineered racer lose to a brick 
+                        duct-taped to a skateboard?"
                       </p>
                     </div>
                   </div>
@@ -81,11 +341,11 @@
               </AccordionPanel>
 
               <!-- Racer Specifications -->
-              <AccordionPanel value="1">
+              <AccordionPanel value="5">
                 <AccordionHeader>
                   <div class="flex items-center gap-2">
                     <i class="pi pi-cog text-lg text-gray-600" />
-                    <span class="font-bold text-black">Racer Specifications</span>
+                    <span class="font-bold text-black">Build Requirements</span>
                   </div>
                 </AccordionHeader>
                 <AccordionContent>
@@ -97,13 +357,11 @@
                         <span class="text-white font-bold text-xs md:text-sm">1</span>
                       </div>
                       <p class="leading-relaxed">
-                        Entrants must build a racer vehicle to transport a
-                        <strong>common building brick</strong> as the main component. A common brick
-                        is approximately
-                        <strong
-                          >8 inches in length × 4 inches in width × 2.5 inches in height</strong
-                        >
-                        and weighs between <strong>4 and 5 pounds</strong>.
+                        <strong>You must bring your own brick!</strong> Every racer needs a standard 
+                        building brick as its passenger - approximately
+                        <strong>8" × 4" × 2.5"</strong> and weighing <strong>4-5 pounds</strong>.
+                        Don't show up with a cinder block, decorative garden brick, or a Lego - 
+                        we mean a real clay building brick!
                       </p>
                     </div>
 
@@ -114,9 +372,8 @@
                         <span class="text-white font-bold text-xs md:text-sm">2</span>
                       </div>
                       <p class="leading-relaxed">
-                        Since the racers will travel down an inclined plane using
-                        <strong>gravity only</strong>, you may not use any extra motors or
-                        propulsion systems that would aid the speed of the racer.
+                        <strong>Decorate that brick!</strong> Paint, flames, glitter, googly eyes – 
+                        whatever makes your brick fabulous. Just keep it safe (no flamethrowers).
                       </p>
                     </div>
 
@@ -127,10 +384,8 @@
                         <span class="text-white font-bold text-xs md:text-sm">3</span>
                       </div>
                       <p class="leading-relaxed">
-                        You may use <strong>any materials</strong> to build the racer including
-                        painting the brick. You may not use sharp, hazardous or flammable materials,
-                        and we reserve the right to ban any racer that the judges deem to be
-                        dangerous.
+                        <strong>Gravity only!</strong> No motors, rockets, or tiny engines. 
+                        Let physics do the work.
                       </p>
                     </div>
 
@@ -141,11 +396,8 @@
                         <span class="text-white font-bold text-xs md:text-sm">4</span>
                       </div>
                       <p class="leading-relaxed">
-                        To fit on the track, the total size of the racer, including the brick,
-                        cannot exceed
-                        <strong
-                          >10 inches in width × 18 inches in length × 15 inches in height</strong
-                        >. (You may include lighter artistic elements over 15")
+                        Build with <strong>whatever you want</strong> – just keep it legal. 
+                        No knives, explosives, or things that'll get us on the news for the wrong reasons.
                       </p>
                     </div>
 
@@ -156,9 +408,26 @@
                         <span class="text-white font-bold text-xs md:text-sm">5</span>
                       </div>
                       <p class="leading-relaxed">
+                        To fit on the track, the total size of the racer, including the brick,
+                        cannot exceed
+                        <strong
+                          >10 inches in width × 18 inches in length × 15 inches in height</strong
+                        >. Want to add decorative wings or flags taller than 15"? Go for it - 
+                        but don't come crying if they snap off halfway down the ramp!
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">6</span>
+                      </div>
+                      <p class="leading-relaxed">
                         The total weight of the brick racer, including the brick and all materials
                         attached to it, should not exceed
-                        <strong>15lbs in total weight</strong>.
+                        <strong>15lbs in total weight</strong>. Pro tip: More weight means more momentum! 
+                        Many successful racers aim close to the 15lb limit to maximize speed down the ramp.
                       </p>
                     </div>
                   </div>
@@ -166,11 +435,11 @@
               </AccordionPanel>
 
               <!-- How Does the Race Work? -->
-              <AccordionPanel value="2">
+              <AccordionPanel value="6">
                 <AccordionHeader>
                   <div class="flex items-center gap-2">
                     <i class="pi pi-play-circle text-lg text-green-600" />
-                    <span class="font-bold text-black">How Does the Race Work?</span>
+                    <span class="font-bold text-black">How Does Race Day Work?</span>
                   </div>
                 </AccordionHeader>
                 <AccordionContent>
@@ -190,21 +459,10 @@
                         <div>
                           <h4 class="font-semibold text-black mb-2">Website Registration</h4>
                           <p class="leading-relaxed mb-3">
-                            <strong>Before race day:</strong> Create an account on this website and
-                            register your racer. Upload a photo, provide your racer details, and get
-                            your unique racer number assigned. You can edit your racer information
-                            anytime before the race. This step must be completed before you can
-                            check in on race day.
+                            Register here before the race, upload a photo, get your 
+                            racer number. No website registration = no racing. It's that simple.
                           </p>
                         </div>
-                      </div>
-                      
-                      <div class="bg-white border-2 border-brand-green rounded-lg p-3 mt-3">
-                        <p class="text-sm text-black">
-                          <i class="pi pi-info-circle mr-1" />
-                          <strong>Important:</strong> You cannot participate in the race without
-                          first registering your racer on this website.
-                        </p>
                       </div>
 
                       <div class="flex items-start gap-2 md:gap-4">
@@ -216,11 +474,8 @@
                         <div>
                           <h4 class="font-semibold text-black mb-2">Race Day Check-in</h4>
                           <p class="leading-relaxed">
-                            Arrive on race day with your completed brick racer and your website
-                            registration. Race officials will verify your racer meets
-                            specifications, confirm your registration details, and officially check
-                            you in for the event. You can also view your check-in status in
-                            real-time on this website.
+                            Show up with your racer. Officials check that it's legal, verify your 
+                            registration, and you're in. Track your status live on this site.
                           </p>
                         </div>
                       </div>
@@ -234,11 +489,8 @@
                         <div>
                           <h4 class="font-semibold text-black mb-2">Qualifying Rounds</h4>
                           <p class="leading-relaxed">
-                            Your racer will complete multiple timed runs down the custom concrete
-                            track in organized heats. Officials record your times precisely using
-                            electronic timing systems, and your best qualifying time determines your
-                            starting position for the main competition brackets. You can view live
-                            results on this website throughout the day.
+                            Multiple timed runs down the track. Electronic timing records everything, 
+                            your best time sets your bracket seeding. Watch live results here.
                           </p>
                         </div>
                       </div>
@@ -252,10 +504,8 @@
                         <div>
                           <h4 class="font-semibold text-black mb-2">Tournament Brackets</h4>
                           <p class="leading-relaxed">
-                            Based on qualifying times, racers are placed into double-elimination
-                            tournament brackets. Head-to-head races determine winners who advance
-                            through the rounds until champions are crowned in each category. Follow
-                            the bracket progression live on this website as the tournament unfolds.
+                            Double-elimination brackets based on qualifying times. Head-to-head races, 
+                            winners advance, champions crowned. Follow the madness live on this site.
                           </p>
                         </div>
                       </div>
@@ -280,12 +530,109 @@
                 </AccordionContent>
               </AccordionPanel>
 
-              <!-- Awards & Recognition -->
-              <AccordionPanel value="3">
+              <!-- What if my car breaks? -->
+              <AccordionPanel value="7">
+                <AccordionHeader>
+                  <div class="flex items-center gap-2">
+                    <i class="pi pi-wrench text-lg text-amber-600" />
+                    <span class="font-bold text-black">What If My Car Breaks?</span>
+                  </div>
+                </AccordionHeader>
+                <AccordionContent>
+                  <div class="space-y-4 text-gray-700">
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-amber-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">1</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        <strong>That's part of the fun!</strong> Win or spectacularly explode - 
+                        you've given everyone a show. Crowds love spectacular failures.
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-amber-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">2</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        During qualifiers? Your best time still counts. During brackets? 
+                        Opponent advances, but you've earned your place in racing history.
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-amber-600 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">3</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        Valuable data for next year! Note what worked, what didn't, 
+                        then build something even more amazing (and durable).
+                      </p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionPanel>
+
+              <!-- What if I need to withdraw? -->
+              <AccordionPanel value="8">
+                <AccordionHeader>
+                  <div class="flex items-center gap-2">
+                    <i class="pi pi-user-minus text-lg text-red-500" />
+                    <span class="font-bold text-black">Can I Withdraw?</span>
+                  </div>
+                </AccordionHeader>
+                <AccordionContent>
+                  <div class="space-y-4 text-gray-700">
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">1</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        Withdraw anytime through your racer profile or ask officials on race day.
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">2</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        Before qualifiers? No problem. After qualifiers? Brackets adjust
+                        automatically.
+                      </p>
+                    </div>
+
+                    <div class="flex items-start gap-2 md:gap-3">
+                      <div
+                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
+                      >
+                        <span class="text-white font-bold text-xs md:text-sm">3</span>
+                      </div>
+                      <p class="leading-relaxed">
+                        Your qualifying times stay in race history. Changed your mind? Rejoin
+                        before brackets start.
+                      </p>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionPanel>
+
+                            <!-- Awards & Recognition -->
+                            <AccordionPanel value="9">
                 <AccordionHeader>
                   <div class="flex items-center gap-2">
                     <i class="pi pi-trophy text-lg text-yellow-600" />
-                    <span class="font-bold text-black">Awards & Recognition</span>
+                    <span class="font-bold text-black">What Can I Win?</span>
                   </div>
                 </AccordionHeader>
                 <AccordionContent>
@@ -397,170 +744,6 @@
                       the race cars as much as speed. It's "performance art meets sport" –
                       everyone's a winner in this celebration of imagination!
                     </p>
-                  </div>
-                </AccordionContent>
-              </AccordionPanel>
-
-              <!-- What if I need to withdraw? -->
-              <AccordionPanel value="5">
-                <AccordionHeader>
-                  <div class="flex items-center gap-2">
-                    <i class="pi pi-user-minus text-lg text-red-500" />
-                    <span class="font-bold text-black">What if I need to withdraw?</span>
-                  </div>
-                </AccordionHeader>
-                <AccordionContent>
-                  <div class="space-y-4 text-gray-700">
-                    <div class="flex items-start gap-2 md:gap-3">
-                      <div
-                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
-                      >
-                        <span class="text-white font-bold text-xs md:text-sm">1</span>
-                      </div>
-                      <p class="leading-relaxed">
-                        If you need to withdraw your racer from the competition, you can do so at
-                        any time through your racer profile page on this website, or race officials
-                        can help you withdraw on race day.
-                      </p>
-                    </div>
-
-                    <div class="flex items-start gap-2 md:gap-3">
-                      <div
-                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
-                      >
-                        <span class="text-white font-bold text-xs md:text-sm">2</span>
-                      </div>
-                      <p class="leading-relaxed">
-                        If you withdraw before qualifying runs, your racer will simply not
-                        participate. If you withdraw after qualifying but before brackets, your
-                        bracket position will be adjusted automatically.
-                      </p>
-                    </div>
-
-                    <div class="flex items-start gap-2 md:gap-3">
-                      <div
-                        class="bg-red-500 rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
-                      >
-                        <span class="text-white font-bold text-xs md:text-sm">3</span>
-                      </div>
-                      <p class="leading-relaxed">
-                        Any qualifying times you achieved before withdrawal will be preserved in the
-                        race history. You can also be reinstated if you change your mind (before
-                        tournament brackets begin).
-                      </p>
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionPanel>
-
-              <!-- Location & Venue -->
-              <AccordionPanel value="6">
-                <AccordionHeader>
-                  <div class="flex items-center gap-2">
-                    <i class="pi pi-map-marker text-lg text-blue-600" />
-                    <span class="font-bold text-black">Location & Venue</span>
-                  </div>
-                </AccordionHeader>
-                <AccordionContent>
-                  <div class="space-y-6 text-gray-700">
-                    <!-- Main Venue Info -->
-                    <div class="bg-white border-2 border-brand-blue rounded-lg p-6">
-                      <div class="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-4">
-                        <div
-                          class="bg-brand-blue rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0"
-                        >
-                          <i class="pi pi-building text-white text-xl" />
-                        </div>
-                        <div class="text-center md:text-left">
-                          <h4 class="text-lg font-semibold text-black mb-2">Paper City Studios</h4>
-                          <p class="text-gray-700 mb-1">
-                            <strong>80 Race Street</strong>
-                          </p>
-                          <p class="text-gray-700 mb-3">Holyoke, Massachusetts</p>
-                          <p class="text-sm text-gray-600">
-                            The race takes place on the custom concrete track at this historic venue
-                            on Race Street - a fitting location for our gravity-powered brick racing
-                            competition!
-                          </p>
-                        </div>
-                      </div>
-                      <div class="mt-4 text-center">
-                        <Button
-                          size="small"
-                          class="btn-secondary"
-                          @click="
-                            () =>
-                              window.open(
-                                'https://maps.google.com/?q=80+Race+Street,+Holyoke,+MA',
-                                '_blank'
-                              )
-                          "
-                        >
-                          <i class="pi pi-map mr-2" />
-                          View on Google Maps
-                        </Button>
-                      </div>
-                    </div>
-
-                    <!-- Additional Location Details -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div class="flex items-start gap-2 md:gap-3">
-                        <div
-                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
-                        >
-                          <i class="pi pi-car text-white text-sm" />
-                        </div>
-                        <div>
-                          <p class="font-medium text-black mb-1">Parking</p>
-                          <p class="text-sm leading-relaxed">
-                            Street parking available on Race Street and surrounding areas
-                          </p>
-                        </div>
-                      </div>
-
-                      <div class="flex items-start gap-2 md:gap-3">
-                        <div
-                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
-                        >
-                          <i class="pi pi-users text-white text-sm" />
-                        </div>
-                        <div>
-                          <p class="font-medium text-black mb-1">Spectators Welcome</p>
-                          <p class="text-sm leading-relaxed">
-                            Join over 1,000 spectators who attend this beloved annual event
-                          </p>
-                        </div>
-                      </div>
-
-                      <div class="flex items-start gap-2 md:gap-3">
-                        <div
-                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
-                        >
-                          <i class="pi pi-shopping-cart text-white text-sm" />
-                        </div>
-                        <div>
-                          <p class="font-medium text-black mb-1">Food & Refreshments</p>
-                          <p class="text-sm leading-relaxed">
-                            Food trucks and local vendors provide delicious options throughout the
-                            event
-                          </p>
-                        </div>
-                      </div>
-
-                      <div class="flex items-start gap-2 md:gap-3">
-                        <div
-                          class="bg-brand-blue rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center flex-shrink-0 mt-1"
-                        >
-                          <i class="pi pi-heart text-white text-sm" />
-                        </div>
-                        <div>
-                          <p class="font-medium text-black mb-1">Family Friendly</p>
-                          <p class="text-sm leading-relaxed">
-                            A fun community event perfect for all ages and backgrounds
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 </AccordionContent>
               </AccordionPanel>
