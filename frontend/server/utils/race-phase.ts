@@ -1,12 +1,63 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+// Define types for function parameters to avoid 'any' types
+interface QualifierRecord {
+  id: string
+  status: string
+  heat_number: number
+  track_number: number
+  racer_id: string
+  time?: number
+  racer?: {
+    id: string
+    name: string
+    racer_number: number
+    image_url?: string
+  }
+}
+
+interface BracketRecord {
+  id: string
+  track1_time?: number
+  track2_time?: number
+  bracket_group?: string
+  round_number?: number
+  match_number?: number
+  track1_racer_id?: string
+  track2_racer_id?: string
+  winner_racer_id?: string
+  created_at: string
+  track1_racer?: {
+    id: string
+    name: string
+    racer_number: number
+    image_url?: string
+  }
+  track2_racer?: {
+    id: string
+    name: string
+    racer_number: number
+    image_url?: string
+  }
+}
+
+interface NextHeatRecord {
+  heat_number: number
+  track_number: number
+  racer_id: string
+  racer_name: string
+  racer_number: number
+  racer_image_url?: string
+  scheduled_order: number
+}
+
 export type RacePhase = 'qualifying' | 'brackets' | 'complete' | 'not_started'
 
 /**
  * Determines the current phase of a race based on the state of qualifiers and brackets
  */
 export async function getRacePhase(
-  client: SupabaseClient,
+  client: SupabaseClient<any>,
   raceId: string
 ): Promise<RacePhase> {
   try {
@@ -71,7 +122,7 @@ export async function getRacePhase(
  * Get the current "heat" which could be a qualifier heat or a bracket match
  */
 export async function getCurrentHeat(
-  client: SupabaseClient,
+  client: SupabaseClient<any>,
   raceId: string,
   phase: RacePhase
 ) {
@@ -94,11 +145,13 @@ export async function getCurrentHeat(
       .eq('status', 'in_progress')
       .order('track_number')
 
-    if (currentHeat && currentHeat.length > 0) {
+    const typedCurrentHeat = currentHeat as QualifierRecord[] | null
+
+    if (typedCurrentHeat && typedCurrentHeat.length > 0) {
       return {
-        heat_number: currentHeat[0].heat_number,
+        heat_number: typedCurrentHeat[0].heat_number,
         type: 'qualifier',
-        racers: currentHeat.map((q) => ({
+        racers: typedCurrentHeat.map((q) => ({
           track_number: q.track_number,
           racer_id: q.racer_id,
           racer_name: q.racer?.name,
@@ -138,19 +191,21 @@ export async function getCurrentHeat(
       .limit(1)
       .single()
 
-    if (currentBracket) {
+    const typedCurrentBracket = currentBracket as BracketRecord | null
+
+    if (typedCurrentBracket) {
       // Check if this is a bye match (only one racer) and auto-complete if needed
-      if (currentBracket.track1_racer_id && !currentBracket.track2_racer_id && !currentBracket.winner_racer_id) {
+      if (typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id && !typedCurrentBracket.winner_racer_id) {
         // Auto-complete the bye
         await client
           .from('brackets')
           .update({
             winner_track: 1,
-            winner_racer_id: currentBracket.track1_racer_id
+            winner_racer_id: typedCurrentBracket.track1_racer_id
           })
-          .eq('id', currentBracket.id)
+          .eq('id', typedCurrentBracket.id)
         
-        console.log(`Auto-completed bye for bracket ${currentBracket.id}`)
+        console.log(`Auto-completed bye for bracket ${typedCurrentBracket.id}`)
         
         // Recursively get the next bracket after auto-completing this bye
         return getCurrentHeat(client, raceId, phase)
@@ -166,32 +221,32 @@ export async function getCurrentHeat(
         .order('match_number', { ascending: true })
         .order('created_at', { ascending: true })
       
-      const bracketIndex = allBrackets?.findIndex(b => b.id === currentBracket.id) ?? 0
+      const bracketIndex = allBrackets?.findIndex(b => b.id === typedCurrentBracket.id) ?? 0
       const heatNumber = bracketIndex + 1 // Sequential numbering starting from 1
 
       return {
         heat_number: heatNumber,
         type: 'bracket',
-        bracket_id: currentBracket.id,
-        bracket_group: currentBracket.bracket_group,
-        round_number: currentBracket.round_number,
-        match_number: currentBracket.match_number,
+        bracket_id: typedCurrentBracket.id,
+        bracket_group: typedCurrentBracket.bracket_group,
+        round_number: typedCurrentBracket.round_number,
+        match_number: typedCurrentBracket.match_number,
         racers: [
           {
             track_number: 1,
-            racer_id: currentBracket.track1_racer_id,
-            racer_name: currentBracket.track1_racer?.name,
-            racer_number: currentBracket.track1_racer?.racer_number,
-            racer_image_url: currentBracket.track1_racer?.image_url,
-            time: currentBracket.track1_time
+            racer_id: typedCurrentBracket.track1_racer_id,
+            racer_name: typedCurrentBracket.track1_racer?.name,
+            racer_number: typedCurrentBracket.track1_racer?.racer_number,
+            racer_image_url: typedCurrentBracket.track1_racer?.image_url,
+            time: typedCurrentBracket.track1_time
           },
           {
             track_number: 2,
-            racer_id: currentBracket.track2_racer_id,
-            racer_name: currentBracket.track2_racer?.name,
-            racer_number: currentBracket.track2_racer?.racer_number,
-            racer_image_url: currentBracket.track2_racer?.image_url,
-            time: currentBracket.track2_time
+            racer_id: typedCurrentBracket.track2_racer_id,
+            racer_name: typedCurrentBracket.track2_racer?.name,
+            racer_number: typedCurrentBracket.track2_racer?.racer_number,
+            racer_image_url: typedCurrentBracket.track2_racer?.image_url,
+            time: typedCurrentBracket.track2_time
           }
         ].filter(r => r.racer_id) // Filter out null racers (byes)
       }
@@ -205,7 +260,7 @@ export async function getCurrentHeat(
  * Get upcoming heats/brackets
  */
 export async function getUpcomingHeats(
-  client: SupabaseClient,
+  client: SupabaseClient<any>,
   raceId: string,
   phase: RacePhase,
   count: number = 2
@@ -218,7 +273,7 @@ export async function getUpcomingHeats(
     
     if (nextHeats) {
       // Group by heat number
-      const grouped = nextHeats.reduce((acc: any, heat: any) => {
+      const grouped = (nextHeats as NextHeatRecord[]).reduce((acc: Record<number, any>, heat: NextHeatRecord) => {
         if (!acc[heat.heat_number]) {
           acc[heat.heat_number] = {
             heat_number: heat.heat_number,

@@ -70,7 +70,7 @@ export default defineEventHandler(async (event) => {
         }
       : null
 
-    const upcomingHeatsFormatted = upcomingHeats.map((heat) => ({
+    const upcomingHeatsFormatted = upcomingHeats.map((heat: any) => ({
       heat_number: heat.heat_number,
       scheduled_order: heat.scheduled_order,
       status: 'scheduled',

@@ -20,13 +20,13 @@ export default defineEventHandler(async (event) => {
     }
 
     // Determine what phase the race is in
-    const phase = await getRacePhase(client, activeRace.id)
+    const phase = await getRacePhase(client as any, activeRace.id)
 
     // Get current heat (could be qualifier or bracket)
-    const currentHeat = await getCurrentHeat(client, activeRace.id, phase)
+    const currentHeat = await getCurrentHeat(client as any, activeRace.id, phase)
 
     // Get upcoming heats/brackets
-    const upcomingHeats = await getUpcomingHeats(client, activeRace.id, phase, 2)
+    const upcomingHeats = await getUpcomingHeats(client as any, activeRace.id, phase, 2)
 
     return {
       data: {

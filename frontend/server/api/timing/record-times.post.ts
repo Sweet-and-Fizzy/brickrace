@@ -74,13 +74,13 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
     if (!allBrackets) return
 
     // Group by bracket group and round
-    const winnerBrackets = allBrackets.filter(b => b.bracket_group === 'winner')
-    const loserBrackets = allBrackets.filter(b => b.bracket_group === 'loser')
+    const winnerBrackets = allBrackets.filter((b: any) => b.bracket_group === 'winner')
+    const loserBrackets = allBrackets.filter((b: any) => b.bracket_group === 'loser')
     
     // Check if current winner bracket round is complete
     const currentRound = bracket.round_number
-    const currentRoundBrackets = winnerBrackets.filter(b => b.round_number === currentRound)
-    const completedInRound = currentRoundBrackets.filter(b => 
+    const currentRoundBrackets = winnerBrackets.filter((b: any) => b.round_number === currentRound)
+    const completedInRound = currentRoundBrackets.filter((b: any) => 
       b.winner_racer_id !== null // Check for winner instead of times (handles byes)
     )
 
@@ -243,9 +243,9 @@ async function generateNextRounds(client: any, raceId: string, completedBrackets
       .order('created_at')
 
     if (allBrackets) {
-      const winnerBrackets = allBrackets.filter(b => b.bracket_group === 'winner')
-      const loserBrackets = allBrackets.filter(b => b.bracket_group === 'loser')
-      const finalBrackets = allBrackets.filter(b => b.bracket_group === 'final')
+      const winnerBrackets = allBrackets.filter((b: any) => b.bracket_group === 'winner')
+      const loserBrackets = allBrackets.filter((b: any) => b.bracket_group === 'loser')
+      const finalBrackets = allBrackets.filter((b: any) => b.bracket_group === 'final')
       
       // Check if championship final exists and is completed
       if (finalBrackets.length > 0) {
@@ -260,7 +260,7 @@ async function generateNextRounds(client: any, raceId: string, completedBrackets
           // the winner bracket champion gets a second chance (reset final)
           if (championshipFinal.winner_racer_id === loserChampion && winnerChampion !== loserChampion) {
             // Check if reset final already exists
-            const resetFinalExists = finalBrackets.some(f => f.round_number === 2)
+            const resetFinalExists = finalBrackets.some((f: any) => f.round_number === 2)
             
             if (!resetFinalExists) {
               // Create reset final - winner bracket champion gets second chance
@@ -318,22 +318,22 @@ async function generateNextRounds(client: any, raceId: string, completedBrackets
 }
 
 // Helper function to find the last standing racer in a bracket group
-function getLastStandingRacer(brackets) {
+function getLastStandingRacer(brackets: any[]) {
   if (!brackets || brackets.length === 0) return null
   
   // Find the most recent completed bracket (highest round number with results)
-  const completedBrackets = brackets.filter(b => 
+  const completedBrackets = brackets.filter((b: any) => 
     b.winner_racer_id !== null // Universal completion indicator
   )
   
   if (completedBrackets.length === 0) return null
   
   // Sort by round number descending, then by created_at descending to get the most recent
-  completedBrackets.sort((a, b) => {
+  completedBrackets.sort((a: any, b: any) => {
     if (a.round_number !== b.round_number) {
-      return b.round_number - a.round_number
+      return (b.round_number || 0) - (a.round_number || 0)
     }
-    return new Date(b.created_at) - new Date(a.created_at)
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   })
   
   // The winner of the most recent bracket is the champion of this bracket group

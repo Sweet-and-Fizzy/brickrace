@@ -1,7 +1,7 @@
 import type { Sponsor } from '~/types/database'
 
 export const useSponsors = () => {
-  const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient<any>()
   const sponsors = ref<Sponsor[]>([])
   const loading = ref(false)
 
@@ -54,14 +54,14 @@ export const useSponsors = () => {
   const createSponsor = async (sponsorData: Partial<Sponsor>): Promise<Sponsor> => {
     const { data, error } = await supabase
       .from('sponsors')
-      .insert([{
-        name: sponsorData.name,
+      .insert({
+        name: sponsorData.name!,
         website_url: sponsorData.website_url,
         logo_url: sponsorData.logo_url,
         sponsorship_amount: sponsorData.sponsorship_amount || 0,
         is_active: sponsorData.is_active ?? true,
         display_order: sponsorData.display_order || 0
-      }])
+      })
       .select()
       .single()
 
@@ -81,7 +81,12 @@ export const useSponsors = () => {
     const { data, error } = await supabase
       .from('sponsors')
       .update({
-        ...updates,
+        name: updates.name,
+        website_url: updates.website_url,
+        logo_url: updates.logo_url,
+        sponsorship_amount: updates.sponsorship_amount,
+        is_active: updates.is_active,
+        display_order: updates.display_order,
         updated_at: new Date().toISOString()
       })
       .eq('id', id)
