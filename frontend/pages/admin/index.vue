@@ -134,6 +134,34 @@
           </template>
         </Card>
 
+        <!-- Sponsor Management -->
+        <Card
+          class="border-2 border-orange-200 hover:shadow-lg transition-shadow cursor-pointer"
+          @click="navigateTo('/admin/sponsors')"
+        >
+          <template #content>
+            <div class="text-center space-y-4">
+              <div class="flex justify-center">
+                <div
+                  class="bg-orange-100/30 rounded-full w-16 h-16 flex items-center justify-center"
+                >
+                  <i class="pi pi-building text-2xl text-orange-600" />
+                </div>
+              </div>
+
+              <div>
+                <h3 class="text-xl font-bold text-black mb-2">Sponsor Management</h3>
+                <p class="text-gray-600 mb-4">Manage race sponsors and partnerships</p>
+                <div class="flex justify-center space-x-4">
+                  <ClientOnly>
+                    <Badge :value="`${sponsorsCount} sponsors`" severity="info" />
+                  </ClientOnly>
+                </div>
+              </div>
+            </div>
+          </template>
+        </Card>
+
         <!-- User Management -->
         <Card class="border-2 border-indigo-200 hover:shadow-lg transition-shadow">
           <template #content>
@@ -201,10 +229,10 @@
               Manage Awards
             </Button>
           </NuxtLink>
-          <NuxtLink to="/racers">
+          <NuxtLink to="/admin/sponsors/add">
             <Button class="w-full h-16 text-left" outlined>
-              <i class="pi pi-car mr-2" />
-              View All Racers
+              <i class="pi pi-plus mr-2" />
+              Add New Sponsor
             </Button>
           </NuxtLink>
         </div>
@@ -231,7 +259,8 @@ const stats = ref({
   activeRaces: 0,
   totalRaces: 0,
   awards: 0,
-  racers: 0
+  racers: 0,
+  sponsors: 0
 })
 
 // Computed properties
@@ -241,6 +270,7 @@ const activeRacesCount = computed(() => stats.value.activeRaces)
 const totalRacesCount = computed(() => stats.value.totalRaces)
 const awardsCount = computed(() => stats.value.awards)
 const racersCount = computed(() => stats.value.racers)
+const sponsorsCount = computed(() => stats.value.sponsors)
 
 // Fetch dashboard statistics
 const fetchStats = async () => {
@@ -268,6 +298,14 @@ const fetchStats = async () => {
 
     if (awardsError) throw awardsError
     stats.value.awards = awardsData?.length || 0
+
+    // Fetch sponsors count
+    const { data: sponsorsData, error: sponsorsError } = await supabase
+      .from('sponsors')
+      .select('id', { count: 'exact' })
+
+    if (sponsorsError) throw sponsorsError
+    stats.value.sponsors = sponsorsData?.length || 0
 
     // Fetch photo statistics from both racer photos and general photos
     const { data: racersWithPhotos, error: photosError } = await supabase

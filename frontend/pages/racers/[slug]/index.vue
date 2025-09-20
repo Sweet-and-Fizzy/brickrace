@@ -565,15 +565,54 @@
                     v-for="checkin in racerCheckins"
                     :key="checkin.id"
                     class="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                    :class="{
+                      'border-red-200 bg-red-50/20': activeRace && checkin.race?.id === activeRace.id && isWithdrawn(checkin.race?.id)
+                    }"
                   >
-                    <div class="mb-2">
+                    <div class="flex items-center justify-between mb-2">
                       <span class="font-medium text-black">
                         {{ checkin.race?.name || 'Unknown Race' }}
                       </span>
+                      
+                      <!-- Withdrawal Status Badge (only for active race) -->
+                      <div v-if="activeRace && checkin.race?.id === activeRace.id" class="flex items-center gap-2">
+                        <Badge
+                          v-if="isWithdrawn(checkin.race?.id)"
+                          value="Withdrawn"
+                          severity="warning"
+                          class="text-xs"
+                        />
+                        <Badge
+                          v-else
+                          value="Active"
+                          severity="success"
+                          class="text-xs"
+                        />
+                      </div>
                     </div>
-                    <p class="text-sm text-gray-600">
+                    
+                    <p class="text-sm text-gray-600 mb-3">
                       {{ formatCheckinTime(checkin.time) }}
                     </p>
+                    
+                    <!-- Withdrawal Control (only for race owner and the currently active race) -->
+                    <div v-if="canEdit && activeRace && checkin.race?.id === activeRace.id" class="mt-3">
+                      <Button
+                        :loading="processingWithdrawal === checkin.race?.id"
+                        :severity="isWithdrawn(checkin.race?.id) ? 'success' : 'warning'"
+                        class="w-full"
+                        outlined
+                        size="small"
+                        @click="toggleWithdrawal(checkin)"
+                      >
+                        <i 
+                          v-if="isWithdrawn(checkin.race?.id)" 
+                          class="pi pi-user-plus mr-2" 
+                        />
+                        <i v-else class="pi pi-user-minus mr-2" />
+                        {{ isWithdrawn(checkin.race?.id) ? 'Reinstate to Race' : 'Withdraw from Race' }}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </template>
@@ -601,6 +640,9 @@ const {
   getRacerBySlug,
   fetchRacerDetailsBySlug,
   isDetailedDataFresh,
+  withdrawRacerFromRace,
+  reinstateRacerToRace,
+  isRacerWithdrawnFromRace,
   initialize: initializeRacers
 } = useRacers()
 
@@ -618,7 +660,14 @@ const {
 
 const { getRacerVoteCounts, initialize: initializeAwards } = useAwards()
 
-const { races: allRaces, initialize: initializeRaces } = useRaces()
+const { races: allRaces, activeRace, initialize: initializeRaces } = useRaces()
+
+// Toast for notifications
+const toast = useToast()
+
+// Withdrawal state
+const processingWithdrawal = ref(null)
+const withdrawalStatus = ref(new Map()) // Cache withdrawal status for each race
 
 // Qualifier sorting
 const qualifierSort = ref('fastest')
@@ -842,6 +891,78 @@ const racerCheckins = computed(() => {
   return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Most recent first
 })
 
+// Load withdrawal status for the active race only
+const loadWithdrawalStatus = async () => {
+  if (!racer.value?.id || !activeRace.value?.id) return
+  
+  try {
+    // Only check withdrawal status for the active race
+    const isWithdrawnFromRace = await isRacerWithdrawnFromRace(racer.value.id, activeRace.value.id)
+    withdrawalStatus.value.set(activeRace.value.id, isWithdrawnFromRace)
+    
+    // Trigger reactivity
+    withdrawalStatus.value = new Map(withdrawalStatus.value)
+  } catch (err) {
+    console.error('Error loading withdrawal status:', err)
+  }
+}
+
+// Check if racer is withdrawn from a specific race
+const isWithdrawn = (raceId) => {
+  return withdrawalStatus.value.get(raceId) || false
+}
+
+// Toggle withdrawal status for a racer in a specific race
+const toggleWithdrawal = async (checkin) => {
+  if (!checkin.race || processingWithdrawal.value === checkin.race.id) return
+  
+  processingWithdrawal.value = checkin.race.id
+  
+  try {
+    const isCurrentlyWithdrawn = isWithdrawn(checkin.race.id)
+    
+    if (isCurrentlyWithdrawn) {
+      // Reinstate racer
+      await reinstateRacerToRace(racer.value.id, checkin.race.id)
+      
+      // Update cache
+      withdrawalStatus.value.set(checkin.race.id, false)
+      withdrawalStatus.value = new Map(withdrawalStatus.value)
+      
+      toast.add({
+        severity: 'success',
+        summary: 'Racer Reinstated',
+        detail: `${racer.value.name} has been reinstated to ${checkin.race.name}`,
+        life: 3000
+      })
+    } else {
+      // Withdraw racer
+      await withdrawRacerFromRace(racer.value.id, checkin.race.id, 'Withdrawn by racer owner')
+      
+      // Update cache
+      withdrawalStatus.value.set(checkin.race.id, true)
+      withdrawalStatus.value = new Map(withdrawalStatus.value)
+      
+      toast.add({
+        severity: 'info',
+        summary: 'Racer Withdrawn',
+        detail: `${racer.value.name} has been withdrawn from ${checkin.race.name}`,
+        life: 3000
+      })
+    }
+  } catch (err) {
+    console.error('Error updating racer withdrawal status:', err)
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: err.message || 'Failed to update racer withdrawal status',
+      life: 5000
+    })
+  } finally {
+    processingWithdrawal.value = null
+  }
+}
+
 // Filter photos to only show approved ones
 const approvedPhotos = computed(() => {
   if (!racer.value?.photos || !Array.isArray(racer.value.photos)) return []
@@ -1018,13 +1139,25 @@ onMounted(async () => {
 
   // Run initialization in background
   if (initPromises.length > 0) {
-    Promise.all(initPromises).catch((err) => {
+    Promise.all(initPromises).then(() => {
+      // Load withdrawal status after checkins are loaded
+      nextTick(() => {
+        loadWithdrawalStatus()
+      })
+    }).catch((err) => {
       if (process.env.NODE_ENV === 'development') {
         console.warn('Background initialization failed:', err)
       }
     })
   }
 })
+
+// Watch for changes in activeRace to reload withdrawal status
+watch([activeRace, racer], () => {
+  if (activeRace.value?.id && racer.value?.id) {
+    loadWithdrawalStatus()
+  }
+}, { deep: true })
 
 // Note: Removed cleanup calls to prevent composable reloading on navigation
 // Composables will manage their own lifecycle and subscriptions

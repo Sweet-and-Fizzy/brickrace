@@ -1,4 +1,5 @@
 export const useHeats = () => {
+  console.log('🚨 useHeats() called - new instance created')
   const supabase = useSupabaseClient()
 
   // State management
@@ -12,9 +13,26 @@ export const useHeats = () => {
   const recentlyCompletedHeat = useState('heats-recently-completed', () => null)
   const displayDelayTimer = useState('heats-display-timer', () => null)
   const showCompletedHeatResults = useState('heats-show-completed', () => false)
+  
+  // Debounce timer for data fetching to prevent excessive API calls
+  const debounceTimer = useState('heats-debounce-timer', () => null)
 
   // Configuration for how long to show completed results (in milliseconds)
   const COMPLETED_HEAT_DISPLAY_DURATION = 15000 // 15 seconds
+  
+  // Debounced version of fetchCurrentRaceData to prevent API call spam
+  const debouncedFetchCurrentRaceData = async (delay = 500) => {
+    // Clear existing timer
+    if (debounceTimer.value) {
+      clearTimeout(debounceTimer.value)
+    }
+    
+    // Set new timer
+    debounceTimer.value = setTimeout(async () => {
+      await fetchCurrentRaceData()
+      debounceTimer.value = null
+    }, delay)
+  }
 
   // Helper function to clear the completed heat display timer
   const clearCompletedHeatTimer = () => {
@@ -58,45 +76,112 @@ export const useHeats = () => {
     return null
   }
 
-  // Fetch completed heat results with times
-  const fetchCompletedHeatResults = async (heatNumber) => {
+  // Fetch completed heat results with times (handles both qualifiers and brackets)
+  const fetchCompletedHeatResults = async (heatNumber, heatType = 'qualifier') => {
     if (!currentRace.value) return null
 
     try {
-      const { data: completedQualifiers, error } = await supabase
-        .from('qualifiers')
-        .select(
+      if (heatType === 'bracket') {
+        // Get the completed bracket data with racer information
+        const { data: completedBracket, error } = await supabase
+          .from('brackets')
+          .select(`
+            *,
+            track1_racer:racers!track1_racer_id(
+              id,
+              name,
+              racer_number,
+              image_url
+            ),
+            track2_racer:racers!track2_racer_id(
+              id,
+              name,
+              racer_number,
+              image_url
+            )
+          `)
+          .eq('race_id', currentRace.value.id)
+          .not('track1_time', 'is', null)
+          .not('track2_time', 'is', null)
+          .not('winner_racer_id', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (error) throw error
+
+        if (completedBracket) {
+          return {
+            heat_number: heatNumber,
+            type: 'bracket',
+            status: 'completed',
+            completed_at: completedBracket.updated_at || new Date().toISOString(),
+            bracket_group: completedBracket.bracket_group,
+            round_number: completedBracket.round_number,
+            match_number: completedBracket.match_number,
+            winner_racer_id: completedBracket.winner_racer_id,
+            racers: [
+              {
+                track_number: 1,
+                racer_id: completedBracket.track1_racer_id,
+                racer_name: completedBracket.track1_racer?.name,
+                racer_number: completedBracket.track1_racer?.racer_number,
+                racer_image_url: completedBracket.track1_racer?.image_url,
+                time: completedBracket.track1_time,
+                is_winner: completedBracket.winner_track === 1
+              },
+              {
+                track_number: 2,
+                racer_id: completedBracket.track2_racer_id,
+                racer_name: completedBracket.track2_racer?.name,
+                racer_number: completedBracket.track2_racer?.racer_number,
+                racer_image_url: completedBracket.track2_racer?.image_url,
+                time: completedBracket.track2_time,
+                is_winner: completedBracket.winner_track === 2
+              }
+            ].filter(r => r.racer_id) // Filter out null racers
+          }
+        }
+
+        return null
+      } else {
+        // Original qualifier logic
+        const { data: completedQualifiers, error } = await supabase
+          .from('qualifiers')
+          .select(
+            `
+            *,
+            racer:racers(
+              id,
+              name,
+              racer_number,
+              image_url
+            )
           `
-          *,
-          racer:racers(
-            id,
-            name,
-            racer_number,
-            image_url
           )
-        `
-        )
-        .eq('race_id', currentRace.value.id)
-        .eq('heat_number', heatNumber)
-        .eq('status', 'completed')
-        .not('time', 'is', null)
-        .order('track_number')
+          .eq('race_id', currentRace.value.id)
+          .eq('heat_number', heatNumber)
+          .eq('status', 'completed')
+          .not('time', 'is', null)
+          .order('track_number')
 
-      if (error) throw error
+        if (error) throw error
 
-      if (completedQualifiers && completedQualifiers.length > 0) {
-        return {
-          heat_number: heatNumber,
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          racers: completedQualifiers.map((q) => ({
-            track_number: q.track_number,
-            racer_id: q.racer_id,
-            racer_name: q.racer?.name,
-            racer_number: q.racer?.racer_number,
-            racer_image_url: q.racer?.image_url,
-            time: q.time
-          }))
+        if (completedQualifiers && completedQualifiers.length > 0) {
+          return {
+            heat_number: heatNumber,
+            type: 'qualifier',
+            status: 'completed',
+            completed_at: new Date().toISOString(),
+            racers: completedQualifiers.map((q) => ({
+              track_number: q.track_number,
+              racer_id: q.racer_id,
+              racer_name: q.racer?.name,
+              racer_number: q.racer?.racer_number,
+              racer_image_url: q.racer?.image_url,
+              time: q.time
+            }))
+          }
         }
       }
 
@@ -109,6 +194,7 @@ export const useHeats = () => {
 
   // Fetch current race and heat data
   const fetchCurrentRaceData = async () => {
+    console.log('📡 fetchCurrentRaceData() called')
     loading.value = true
     error.value = null
 
@@ -131,8 +217,10 @@ export const useHeats = () => {
       if (justCompletedHeat) {
         // Fetch the completed heat results before starting the display
         try {
+          console.log('useHeats: justCompletedHeat data:', justCompletedHeat)
           const completedHeatWithResults = await fetchCompletedHeatResults(
-            justCompletedHeat.heat_number
+            justCompletedHeat.heat_number,
+            justCompletedHeat.type || 'qualifier'
           )
           if (completedHeatWithResults) {
             startCompletedHeatDisplay(completedHeatWithResults)
@@ -146,6 +234,8 @@ export const useHeats = () => {
       currentRace.value = response.data.race
       currentHeat.value = newHeat
       upcomingHeats.value = newUpcomingHeats
+
+      // Logging disabled to reduce noise
 
       return response.data
     } catch (err) {
@@ -263,12 +353,13 @@ export const useHeats = () => {
     return updateHeatTimes(currentHeat.value.heat_number, track1Time, track2Time)
   }
 
-  // Setup real-time subscription for qualifiers
+  // Setup real-time subscriptions for qualifiers and brackets
   const setupRealtimeSubscription = () => {
     if (!currentRace.value) return
 
-    const channel = supabase
-      .channel(`heats-${currentRace.value.id}`)
+    // Channel for qualifiers
+    const qualifiersChannel = supabase
+      .channel(`qualifiers-${currentRace.value.id}`)
       .on(
         'postgres_changes',
         {
@@ -277,9 +368,40 @@ export const useHeats = () => {
           table: 'qualifiers',
           filter: `race_id=eq.${currentRace.value.id}`
         },
-        async () => {
-          // Refresh data when qualifiers change
-          await fetchCurrentRaceData()
+        async (payload) => {
+          // Only refresh if this affects the current heat or upcoming heats
+          if (payload.eventType === 'UPDATE' && payload.new?.status === 'completed') {
+            // A qualifier was completed - this might change current/upcoming heats
+            await debouncedFetchCurrentRaceData()
+          }
+          // Skip refreshing for other qualifier changes (like status changes during heat)
+        }
+      )
+      .subscribe()
+
+    // Channel for brackets
+    const bracketsChannel = supabase
+      .channel(`brackets-${currentRace.value.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'brackets',
+          filter: `race_id=eq.${currentRace.value.id}`
+        },
+        async (payload) => {
+          // Only refresh for meaningful bracket changes
+          if (payload.eventType === 'INSERT') {
+            // New brackets generated - current heat might have changed
+            console.log('🔄 New brackets generated, refreshing current heat')
+            await debouncedFetchCurrentRaceData()
+          } else if (payload.eventType === 'UPDATE' && payload.new?.winner_racer_id && !payload.old?.winner_racer_id) {
+            // Bracket completed (winner determined) - might trigger next round
+            console.log('🏁 Bracket completed, checking for heat changes')
+            await debouncedFetchCurrentRaceData()
+          }
+          // Skip refreshing for time updates without winner determination
         }
       )
       .subscribe()
@@ -287,13 +409,15 @@ export const useHeats = () => {
     // Cleanup on component unmount
     if (import.meta.client) {
       onUnmounted(() => {
-        channel.unsubscribe()
+        qualifiersChannel.unsubscribe()
+        bracketsChannel.unsubscribe()
       })
     }
   }
 
   // Initialize and setup subscriptions
   const initialize = async () => {
+    console.log('🎯 useHeats initialize() called')
     await fetchCurrentRaceData()
     if (currentRace.value) {
       setupRealtimeSubscription()

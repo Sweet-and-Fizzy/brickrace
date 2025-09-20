@@ -265,7 +265,7 @@
               </Card>
             </div>
             <!-- Tournament Results Podium -->
-            <Card v-if="tournamentResults.Fastest || tournamentResults.Slowest">
+            <Card v-if="tournamentResults.double_elimination">
               <template #title>
                 <h2 class="text-xl font-bold text-black flex items-center gap-3">
                   <i class="pi pi-crown text-yellow-500 text-xl" />
@@ -276,24 +276,24 @@
                 <div v-for="(result, bracketType) in tournamentResults" :key="bracketType">
                   <div v-if="result" class="mb-6 last:mb-0">
                     <h3 class="text-lg font-bold text-center mb-4 text-gray-800">
-                      {{ bracketType }} Tournament Podium
+                      {{ formatBracketTypeName(bracketType) }} Tournament Podium
                     </h3>
 
                     <!-- Compact Podium Display -->
-                    <div class="flex items-end justify-center gap-2 mb-4">
+                    <div class="flex items-end justify-center gap-2 md:gap-4 mb-4">
                       <!-- 2nd Place -->
-                      <div v-if="result.second" class="text-center flex-1 max-w-24">
+                      <div v-if="result.second" class="text-center flex-1 max-w-24 sm:max-w-32 md:max-w-40">
                         <div
-                          class="bg-gradient-to-br from-gray-200 to-gray-300 border border-gray-400 rounded-lg p-2 shadow-md mb-1"
+                          class="bg-gradient-to-br from-gray-300 to-gray-400 border border-gray-500 rounded-lg p-2 shadow-md mb-1"
                         >
                           <div class="text-2xl mb-1">🥈</div>
                           <RacerLink
                             :racer-id="result.second.racer_id"
                             :racer-name="result.second.racer_name"
-                            class="text-sm font-bold text-gray-800 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
+                            class="text-sm font-bold text-black hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
-                            class="bg-gray-100 text-gray-700 px-1 py-0.5 rounded text-xs font-semibold"
+                            class="bg-gray-500/20 text-gray-800 px-1 py-0.5 rounded text-xs font-semibold"
                           >
                             #{{ result.second.racer_number }}
                           </div>
@@ -302,16 +302,16 @@
                           </div>
                         </div>
                         <div
-                          class="bg-gray-300 h-8 rounded-t text-xs flex items-center justify-center"
+                          class="bg-black h-8 rounded-t text-xs flex items-center justify-center"
                         >
-                          <span class="font-bold text-gray-700">2nd</span>
+                          <span class="font-bold text-white">2nd</span>
                         </div>
                       </div>
 
                       <!-- 1st Place (Champion) -->
-                      <div class="text-center flex-1 max-w-28">
+                      <div class="text-center flex-1 max-w-28 sm:max-w-36 md:max-w-44">
                         <div
-                          class="bg-gradient-to-br from-yellow-200 to-orange-200 border border-yellow-400 rounded-lg p-3 shadow-xl mb-1"
+                          class="bg-gradient-to-br from-yellow-300 to-yellow-500 border border-yellow-600 rounded-lg p-3 shadow-xl mb-1"
                         >
                           <div class="text-3xl mb-1">🏆</div>
                           <RacerLink
@@ -320,7 +320,7 @@
                             class="text-lg font-bold text-black hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
-                            class="bg-yellow-200/30 text-yellow-800 px-2 py-0.5 rounded-full text-sm font-bold mb-1"
+                            class="bg-yellow-600/20 text-yellow-900 px-2 py-0.5 rounded-full text-sm font-bold mb-1"
                           >
                             #{{ result.first.racer_number }}
                           </div>
@@ -329,169 +329,47 @@
                           </div>
                           <div class="mt-1">
                             <span
-                              class="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-2 py-0.5 rounded-full text-xs font-bold"
+                              class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-2 py-0.5 rounded-full text-xs font-bold"
                             >
                               CHAMPION
                             </span>
                           </div>
                         </div>
                         <div
-                          class="bg-gradient-to-r from-yellow-400 to-orange-400 h-12 rounded-t text-sm flex items-center justify-center"
+                          class="bg-black h-12 rounded-t text-sm flex items-center justify-center"
                         >
                           <span class="font-bold text-white">1st</span>
                         </div>
                       </div>
 
                       <!-- 3rd Place -->
-                      <div v-if="result.third" class="text-center flex-1 max-w-24">
+                      <div v-if="result.third" class="text-center flex-1 max-w-24 sm:max-w-32 md:max-w-40">
                         <div
-                          class="bg-gradient-to-br from-orange-200 to-orange-300 border border-orange-400 rounded-lg p-2 shadow-md mb-1"
+                          class="bg-gradient-to-br from-amber-600 to-orange-700 border border-amber-700 rounded-lg p-2 shadow-md mb-1"
                         >
                           <div class="text-2xl mb-1">🥉</div>
                           <RacerLink
                             :racer-id="result.third.racer_id"
                             :racer-name="result.third.racer_name"
-                            class="text-sm font-bold text-gray-800 hover:text-brand-blue hover:underline transition-colors duration-200 block truncate"
+                            class="text-sm font-bold text-white hover:text-yellow-200 hover:underline transition-colors duration-200 block truncate"
                           />
                           <div
-                            class="bg-orange-100/30 text-orange-700 px-1 py-0.5 rounded text-xs font-semibold"
+                            class="bg-amber-800/30 text-amber-100 px-1 py-0.5 rounded text-xs font-semibold"
                           >
                             #{{ result.third.racer_number }}
                           </div>
-                          <div class="text-xs text-gray-600 mt-1">
+                          <div class="text-xs text-amber-100 mt-1">
                             {{ formatTime(result.third.time) }}
                           </div>
                         </div>
                         <div
-                          class="bg-orange-400 h-6 rounded-t text-xs flex items-center justify-center"
+                          class="bg-black h-6 rounded-t text-xs flex items-center justify-center"
                         >
                           <span class="font-bold text-white">3rd</span>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Tournament Type Badge -->
-                    <div class="text-center">
-                      <span
-                        class="bg-purple-100/30 text-purple-800 px-3 py-1 rounded-full text-sm font-bold"
-                      >
-                        {{ bracketType }} Tournament Complete
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </Card>
-
-            <!-- Brackets -->
-            <Card v-if="race && getBracketsForRace(race.id).length">
-              <template #title>
-                <h2 class="text-xl font-bold text-black flex items-center gap-2">
-                  <i class="pi pi-sitemap text-purple-600" />
-                  Tournament Brackets
-                </h2>
-              </template>
-              <template #content>
-                <div class="space-y-6">
-                  <div
-                    v-for="(bracket, index) in getBracketsForRace(race.id)"
-                    :key="bracket.id"
-                    class="bg-gradient-to-r from-purple-50 to-blue-50/30/30 border border-purple-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
-                  >
-                    <div class="flex items-center justify-between mb-4">
-                      <h3 class="text-lg font-bold text-black flex items-center gap-2">
-                        <span
-                          class="bg-purple-100/30 text-purple-800 px-2 py-1 rounded-full text-sm font-medium"
-                        >
-                          {{ bracket.bracket_type }}
-                        </span>
-                        Bracket #{{ index + 1 }}
-                      </h3>
-                    </div>
-
-                    <div class="flex items-center gap-4">
-                      <!-- Track 1 -->
-                      <div class="flex-1 bg-white rounded-lg p-4 border-2 border-blue-200">
-                        <div class="text-center">
-                          <p class="text-sm font-medium text-brand-blue mb-2">Track 1</p>
-                          <div v-if="bracket.track1_racer_name">
-                            <RacerLink
-                              :racer-id="bracket.track1_racer_id"
-                              :racer-name="bracket.track1_racer_name"
-                              class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200 block"
-                            />
-                            <p class="text-sm text-gray-600 mb-2">
-                              #{{ bracket.track1_racer_number }}
-                            </p>
-                            <div v-if="bracket.track1_time" class="bg-blue-50/20 rounded-lg p-2">
-                              <p class="text-lg font-bold text-brand-blue">
-                                {{ formatTime(bracket.track1_time) }}
-                              </p>
-                            </div>
-                            <div v-else class="text-gray-400">
-                              <p class="text-sm">No time recorded</p>
-                            </div>
-                          </div>
-                          <div v-else class="text-gray-400">
-                            <p class="font-medium">TBD</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- VS Divider -->
-                      <div class="flex items-center justify-center flex-shrink-0">
-                        <div
-                          class="bg-purple-100/30 rounded-full w-12 h-12 flex items-center justify-center shadow-md"
-                        >
-                          <span class="font-bold text-purple-600">VS</span>
-                        </div>
-                      </div>
-
-                      <!-- Track 2 -->
-                      <div class="flex-1 bg-white rounded-lg p-4 border-2 border-red-200">
-                        <div class="text-center">
-                          <p class="text-sm font-medium text-red-600 mb-2">Track 2</p>
-                          <div v-if="bracket.track2_racer_name">
-                            <RacerLink
-                              :racer-id="bracket.track2_racer_id"
-                              :racer-name="bracket.track2_racer_name"
-                              class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200 block"
-                            />
-                            <p class="text-sm text-gray-600 mb-2">
-                              #{{ bracket.track2_racer_number }}
-                            </p>
-                            <div v-if="bracket.track2_time" class="bg-red-50/20 rounded-lg p-2">
-                              <p class="text-lg font-bold text-red-600">
-                                {{ formatTime(bracket.track2_time) }}
-                              </p>
-                            </div>
-                            <div v-else class="text-gray-400">
-                              <p class="text-sm">No time recorded</p>
-                            </div>
-                          </div>
-                          <div v-else class="text-gray-400">
-                            <p class="font-medium">TBD</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Winner Display -->
-                    <div v-if="bracket.track1_time && bracket.track2_time" class="mt-4 text-center">
-                      <div
-                        class="bg-gradient-to-r from-yellow-100 to-orange-100/30/30 border border-yellow-300 rounded-lg p-3"
-                      >
-                        <p
-                          class="text-sm font-medium text-yellow-800 mb-1 flex items-center justify-center gap-1"
-                        >
-                          <i class="pi pi-trophy" />
-                          Winner
-                        </p>
-                        <p class="font-bold text-lg text-yellow-900">
-                          {{ getWinner(bracket) }}
-                        </p>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </template>
@@ -533,28 +411,24 @@
                         </div>
                         <div>
                           <h2 class="text-2xl font-bold text-black">
-                            Heat {{ currentHeatData.heat_number }} -
+                            {{ currentHeatType?.displayName || formatHeatDisplayName(currentHeatData) }} -
                             {{ showCompletedHeatResults ? 'RESULTS' : 'NOW RACING' }}
                           </h2>
                           <p class="text-sm text-gray-600">
                             {{
                               showCompletedHeatResults
-                                ? 'Qualifying Complete • Times Posted'
-                                : 'Qualifying Round • Live Timing'
+                                ? (currentHeatType?.type === 'bracket' ? 'Bracket Complete • Times Posted' : 'Qualifying Complete • Times Posted')
+                                : (currentHeatType?.description || 'Qualifying Round • Live Timing')
                             }}
                           </p>
                         </div>
                       </div>
                       <div class="flex items-center gap-2">
                         <span
-                          class="px-3 py-1 rounded-full text-sm font-bold"
-                          :class="
-                            showCompletedHeatResults
-                              ? 'bg-green-500 text-white'
-                              : 'bg-red-500 text-white animate-pulse'
-                          "
+                          v-if="!showCompletedHeatResults"
+                          class="px-3 py-1 rounded-full text-sm font-bold bg-red-500 text-white animate-pulse"
                         >
-                          {{ showCompletedHeatResults ? 'COMPLETE' : 'LIVE' }}
+                          LIVE
                         </span>
                         <div v-if="showCompletedHeatResults" class="text-right">
                           <p class="text-xs text-gray-500">Next heat starting soon...</p>
@@ -591,9 +465,17 @@
                               :racer-name="getTrackRacer(currentHeatData.racers, 1).racer_name"
                               class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200"
                             />
-                            <p class="text-sm text-gray-600">
-                              #{{ getTrackRacer(currentHeatData.racers, 1).racer_number }}
-                            </p>
+                            <div class="flex items-center gap-2">
+                              <p class="text-sm text-gray-600">
+                                #{{ getTrackRacer(currentHeatData.racers, 1).racer_number }}
+                              </p>
+                              <Badge
+                                v-if="isRacerWithdrawn(getTrackRacer(currentHeatData.racers, 1).racer_id)"
+                                value="WITHDRAWN"
+                                severity="warning"
+                                class="text-xs"
+                              />
+                            </div>
                             <div v-if="getTrackRacer(currentHeatData.racers, 1).time" class="mt-2">
                               <span
                                 class="px-2 py-1 rounded font-bold"
@@ -647,9 +529,17 @@
                               :racer-name="getTrackRacer(currentHeatData.racers, 2).racer_name"
                               class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200"
                             />
-                            <p class="text-sm text-gray-600">
-                              #{{ getTrackRacer(currentHeatData.racers, 2).racer_number }}
-                            </p>
+                            <div class="flex items-center gap-2">
+                              <p class="text-sm text-gray-600">
+                                #{{ getTrackRacer(currentHeatData.racers, 2).racer_number }}
+                              </p>
+                              <Badge
+                                v-if="isRacerWithdrawn(getTrackRacer(currentHeatData.racers, 2).racer_id)"
+                                value="WITHDRAWN"
+                                severity="warning"
+                                class="text-xs"
+                              />
+                            </div>
                             <div v-if="getTrackRacer(currentHeatData.racers, 2).time" class="mt-2">
                               <span
                                 class="px-2 py-1 rounded font-bold"
@@ -688,9 +578,458 @@
                   class="border-2 border-gray-300"
                 >
                   <template #content>
+                    <div class="flex items-center justify-between mb-4 gap-3">
+                      <h3 class="font-bold text-lg text-black flex-1 min-w-0">{{ formatHeatDisplayName(heat) }}</h3>
+                      <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm whitespace-nowrap flex-shrink-0">
+                        On Deck
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <!-- Track 1 -->
+                      <div class="bg-white rounded-lg p-3 border-2 border-gray-300">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-xs font-bold text-brand-blue">TRACK 1</span>
+                        </div>
+                        <div v-if="getTrackRacer(heat.racers, 1)" class="flex items-center gap-3">
+                          <img
+                            v-if="getTrackRacer(heat.racers, 1).racer_image_url"
+                            :src="getTrackRacer(heat.racers, 1).racer_image_url"
+                            :alt="getTrackRacer(heat.racers, 1).racer_name"
+                            class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
+                          >
+                          <div
+                            v-else
+                            class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-car text-gray-400" />
+                          </div>
+                          <div class="flex-1">
+                            <RacerLink
+                              :racer-id="getTrackRacer(heat.racers, 1).racer_id"
+                              :racer-name="getTrackRacer(heat.racers, 1).racer_name"
+                              class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
+                            />
+                            <p class="text-xs text-gray-500">
+                              #{{ getTrackRacer(heat.racers, 1).racer_number }}
+                            </p>
+                          </div>
+                        </div>
+                        <div v-else class="text-gray-400 text-center py-2">
+                          <i class="pi pi-clock text-lg mb-1" />
+                          <p class="text-sm">TBD</p>
+                        </div>
+                      </div>
+
+                      <!-- Track 2 -->
+                      <div class="bg-white rounded-lg p-3 border-2 border-gray-300">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-xs font-bold text-red-500">TRACK 2</span>
+                        </div>
+                        <div v-if="getTrackRacer(heat.racers, 2)" class="flex items-center gap-3">
+                          <img
+                            v-if="getTrackRacer(heat.racers, 2).racer_image_url"
+                            :src="getTrackRacer(heat.racers, 2).racer_image_url"
+                            :alt="getTrackRacer(heat.racers, 2).racer_name"
+                            class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
+                          >
+                          <div
+                            v-else
+                            class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-car text-gray-400" />
+                          </div>
+                          <div class="flex-1">
+                            <RacerLink
+                              :racer-id="getTrackRacer(heat.racers, 2).racer_id"
+                              :racer-name="getTrackRacer(heat.racers, 2).racer_name"
+                              class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
+                            />
+                            <p class="text-xs text-gray-500">
+                              #{{ getTrackRacer(heat.racers, 2).racer_number }}
+                            </p>
+                          </div>
+                        </div>
+                        <div v-else class="text-gray-400 text-center py-2">
+                          <i class="pi pi-clock text-lg mb-1" />
+                          <p class="text-sm">TBD</p>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </Card>
+              </div>
+            </div>
+
+            <!-- Brackets -->
+            <Card v-if="race && raceBrackets.length">
+              <template #title>
+                <h2 class="text-xl font-bold text-black flex items-center gap-2">
+                  <i class="pi pi-sitemap text-purple-600" />
+                  Tournament Brackets
+                </h2>
+              </template>
+              <template #content>
+                <div class="space-y-6">
+                  <div
+                    v-for="(bracket, index) in raceBrackets"
+                    :key="bracket.id"
+                    class="bg-gradient-to-r from-purple-50 to-blue-50/30/30 border border-purple-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+                  >
                     <div class="flex items-center justify-between mb-4">
-                      <h3 class="font-bold text-lg text-black">Heat {{ heat.heat_number }}</h3>
-                      <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
+                      <div class="flex flex-col gap-1">
+                        <div
+                          v-if="bracket.round_number"
+                          class="text-sm font-semibold text-blue-700"
+                        >
+                          {{ getTournamentRoundName(bracket.round_number, bracket.bracket_group) }}
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">
+                          Match #{{ getBracketMatchNumber(bracket) }}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                      <!-- Track 1 -->
+                      <div 
+                        class="flex-1 bg-white rounded-lg p-4 border-2 transition-colors duration-300"
+                        :class="bracket.track1_time && bracket.track2_time && isWinner(bracket, 1) ? 'border-yellow-400 bg-yellow-50' : 'border-blue-200'"
+                      >
+                        <div class="text-center">
+                          <p class="text-sm font-medium text-brand-blue mb-2">Track 1</p>
+                          <div v-if="bracket.track1_racer_name">
+                            <div class="flex flex-col items-center mb-3">
+                              <!-- Trophy at top (when winner) -->
+                              <div 
+                                v-if="bracket.track1_time && bracket.track2_time && isWinner(bracket, 1)"
+                                class="mb-2"
+                              >
+                                <i class="pi pi-trophy text-yellow-500 text-2xl" />
+                              </div>
+                              
+                              <!-- Photo and name side-by-side -->
+                              <div class="flex items-center gap-3 mb-2">
+                                <img
+                                  v-if="bracket.track1_racer_image_url"
+                                  :src="bracket.track1_racer_image_url"
+                                  :alt="bracket.track1_racer_name"
+                                  class="w-16 h-16 object-cover rounded-lg border-2 border-blue-200"
+                                >
+                                <div
+                                  v-else
+                                  class="w-16 h-16 bg-blue-50 rounded-lg flex items-center justify-center border-2 border-blue-200"
+                                >
+                                  <i class="pi pi-car text-2xl text-blue-400" />
+                                </div>
+                                <div class="text-left">
+                                  <RacerLink
+                                    :racer-id="bracket.track1_racer_id"
+                                    :racer-name="bracket.track1_racer_name"
+                                    class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200 block"
+                                  />
+                                  <p class="text-sm text-gray-600">
+                                    #{{ bracket.track1_racer_number }}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <div v-if="bracket.track1_time" class="bg-blue-50/20 rounded-lg p-2">
+                              <p class="text-lg font-bold text-brand-blue">
+                                {{ formatTime(bracket.track1_time) }}
+                              </p>
+                            </div>
+                            <div v-else class="text-gray-400">
+                              <p class="text-sm">No time recorded</p>
+                            </div>
+                          </div>
+                          <div v-else class="text-green-600">
+                            <i class="pi pi-check-circle text-2xl mb-2" />
+                            <p class="font-medium">BYE</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- VS Divider -->
+                      <div class="flex items-center justify-center flex-shrink-0">
+                        <div
+                          class="bg-purple-100/30 rounded-full w-12 h-12 flex items-center justify-center shadow-md"
+                        >
+                          <span class="font-bold text-purple-600">VS</span>
+                        </div>
+                      </div>
+
+                      <!-- Track 2 -->
+                      <div 
+                        class="flex-1 bg-white rounded-lg p-4 border-2 transition-colors duration-300"
+                        :class="bracket.track1_time && bracket.track2_time && isWinner(bracket, 2) ? 'border-yellow-400 bg-yellow-50' : 'border-red-200'"
+                      >
+                        <div class="text-center">
+                          <p class="text-sm font-medium text-red-600 mb-2">Track 2</p>
+                          <div v-if="bracket.track2_racer_name">
+                            <div class="flex flex-col items-center mb-3">
+                              <!-- Trophy at top (when winner) -->
+                              <div 
+                                v-if="bracket.track1_time && bracket.track2_time && isWinner(bracket, 2)"
+                                class="mb-2"
+                              >
+                                <i class="pi pi-trophy text-yellow-500 text-2xl" />
+                              </div>
+                              
+                              <!-- Photo and name side-by-side -->
+                              <div class="flex items-center gap-3 mb-2">
+                                <img
+                                  v-if="bracket.track2_racer_image_url"
+                                  :src="bracket.track2_racer_image_url"
+                                  :alt="bracket.track2_racer_name"
+                                  class="w-16 h-16 object-cover rounded-lg border-2 border-red-200"
+                                >
+                                <div
+                                  v-else
+                                  class="w-16 h-16 bg-red-50 rounded-lg flex items-center justify-center border-2 border-red-200"
+                                >
+                                  <i class="pi pi-car text-2xl text-red-400" />
+                                </div>
+                                <div class="text-left">
+                                  <RacerLink
+                                    :racer-id="bracket.track2_racer_id"
+                                    :racer-name="bracket.track2_racer_name"
+                                    class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200 block"
+                                  />
+                                  <p class="text-sm text-gray-600">
+                                    #{{ bracket.track2_racer_number }}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <div v-if="bracket.track2_time" class="bg-red-50/20 rounded-lg p-2">
+                              <p class="text-lg font-bold text-red-600">
+                                {{ formatTime(bracket.track2_time) }}
+                              </p>
+                            </div>
+                            <div v-else class="text-gray-400">
+                              <p class="text-sm">No time recorded</p>
+                            </div>
+                          </div>
+                          <div v-else class="text-green-600">
+                            <i class="pi pi-check-circle text-2xl mb-2" />
+                            <p class="font-medium">BYE</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </template>
+            </Card>
+
+            <!-- Dynamic Heat Display (Shows during active qualifying) -->
+            <div v-if="(currentHeatData || hasValidUpcomingHeats) && race.active" class="mb-8">
+              <!-- Current Heat Hero Section -->
+              <Card
+                v-if="currentHeatData"
+                class="border-4 shadow-xl mb-4"
+                :class="showCompletedHeatResults ? 'border-green-500' : 'border-brand-blue'"
+              >
+                <template #content>
+                  <div
+                    class="-m-6 p-6 rounded-t-lg"
+                    :class="
+                      showCompletedHeatResults
+                        ? 'bg-gradient-to-r from-green-500/10 to-blue-500/10'
+                        : 'bg-gradient-to-r from-brand-blue/10 to-brand-green/10'
+                    "
+                  >
+                    <div class="flex items-center justify-between mb-4">
+                      <div class="flex items-center gap-3">
+                        <div
+                          class="text-white rounded-full p-2 relative w-10 h-10 flex items-center justify-center"
+                          :class="showCompletedHeatResults ? 'bg-green-500' : 'bg-brand-blue'"
+                        >
+                          <i
+                            class="text-sm"
+                            :class="
+                              showCompletedHeatResults ? 'pi pi-check-circle' : 'pi pi-flag-fill'
+                            "
+                          />
+                          <div
+                            v-if="!showCompletedHeatResults"
+                            class="absolute inset-0 bg-brand-blue rounded-full animate-ping opacity-75"
+                          />
+                        </div>
+                        <div>
+                          <h2 class="text-2xl font-bold text-black">
+                            {{ currentHeatType?.displayName || formatHeatDisplayName(currentHeatData) }} -
+                            {{ showCompletedHeatResults ? 'RESULTS' : 'NOW RACING' }}
+                          </h2>
+                          <p class="text-sm text-gray-600">
+                            {{
+                              showCompletedHeatResults
+                                ? (currentHeatType?.type === 'bracket' ? 'Bracket Complete • Times Posted' : 'Qualifying Complete • Times Posted')
+                                : (currentHeatType?.description || 'Qualifying Round • Live Timing')
+                            }}
+                          </p>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <span
+                          v-if="!showCompletedHeatResults"
+                          class="px-3 py-1 rounded-full text-sm font-bold bg-red-500 text-white animate-pulse"
+                        >
+                          LIVE
+                        </span>
+                        <div v-if="showCompletedHeatResults" class="text-right">
+                          <p class="text-xs text-gray-500">Next heat starting soon...</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Current Heat Racers -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                      <!-- Track 1 -->
+                      <div class="bg-white rounded-lg p-4 border-2 border-brand-blue">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-sm font-bold text-brand-blue">TRACK 1</span>
+                        </div>
+                        <div
+                          v-if="getTrackRacer(currentHeatData.racers, 1)"
+                          class="flex items-center gap-3"
+                        >
+                          <img
+                            v-if="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
+                            :src="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
+                            :alt="getTrackRacer(currentHeatData.racers, 1).racer_name"
+                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                          >
+                          <div
+                            v-else
+                            class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-car text-2xl text-gray-400" />
+                          </div>
+                          <div class="flex-1">
+                            <RacerLink
+                              :racer-id="getTrackRacer(currentHeatData.racers, 1).racer_id"
+                              :racer-name="getTrackRacer(currentHeatData.racers, 1).racer_name"
+                              class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200"
+                            />
+                            <div class="flex items-center gap-2">
+                              <p class="text-sm text-gray-600">
+                                #{{ getTrackRacer(currentHeatData.racers, 1).racer_number }}
+                              </p>
+                              <Badge
+                                v-if="isRacerWithdrawn(getTrackRacer(currentHeatData.racers, 1).racer_id)"
+                                value="WITHDRAWN"
+                                severity="warning"
+                                class="text-xs"
+                              />
+                            </div>
+                            <div v-if="getTrackRacer(currentHeatData.racers, 1).time" class="mt-2">
+                              <span
+                                class="px-2 py-1 rounded font-bold"
+                                :class="
+                                  showCompletedHeatResults
+                                    ? 'bg-blue-100/30 text-blue-800 text-lg'
+                                    : 'bg-green-100/30 text-green-800 text-sm'
+                                "
+                              >
+                                {{ formatTime(getTrackRacer(currentHeatData.racers, 1).time) }}
+                              </span>
+                              <div
+                                v-if="showCompletedHeatResults"
+                                class="text-xs text-gray-500 mt-1"
+                              >
+                                Final Time
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div v-else class="text-gray-400 text-center py-4">
+                          <i class="pi pi-clock text-2xl mb-2" />
+                          <p>Awaiting Racer</p>
+                        </div>
+                      </div>
+
+                      <!-- Track 2 -->
+                      <div class="bg-white rounded-lg p-4 border-2 border-red-500">
+                        <div class="flex items-center justify-between mb-3">
+                          <span class="text-sm font-bold text-red-500">TRACK 2</span>
+                        </div>
+                        <div
+                          v-if="getTrackRacer(currentHeatData.racers, 2)"
+                          class="flex items-center gap-3"
+                        >
+                          <img
+                            v-if="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
+                            :src="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
+                            :alt="getTrackRacer(currentHeatData.racers, 2).racer_name"
+                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                          >
+                          <div
+                            v-else
+                            class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
+                          >
+                            <i class="pi pi-car text-2xl text-gray-400" />
+                          </div>
+                          <div class="flex-1">
+                            <RacerLink
+                              :racer-id="getTrackRacer(currentHeatData.racers, 2).racer_id"
+                              :racer-name="getTrackRacer(currentHeatData.racers, 2).racer_name"
+                              class="font-bold text-lg text-black hover:text-brand-blue hover:underline transition-colors duration-200"
+                            />
+                            <div class="flex items-center gap-2">
+                              <p class="text-sm text-gray-600">
+                                #{{ getTrackRacer(currentHeatData.racers, 2).racer_number }}
+                              </p>
+                              <Badge
+                                v-if="isRacerWithdrawn(getTrackRacer(currentHeatData.racers, 2).racer_id)"
+                                value="WITHDRAWN"
+                                severity="warning"
+                                class="text-xs"
+                              />
+                            </div>
+                            <div v-if="getTrackRacer(currentHeatData.racers, 2).time" class="mt-2">
+                              <span
+                                class="px-2 py-1 rounded font-bold"
+                                :class="
+                                  showCompletedHeatResults
+                                    ? 'bg-red-100/30 text-red-800 text-lg'
+                                    : 'bg-green-100/30 text-green-800 text-sm'
+                                "
+                              >
+                                {{ formatTime(getTrackRacer(currentHeatData.racers, 2).time) }}
+                              </span>
+                              <div
+                                v-if="showCompletedHeatResults"
+                                class="text-xs text-gray-500 mt-1"
+                              >
+                                Final Time
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div v-else class="text-gray-400 text-center py-4">
+                          <i class="pi pi-clock text-2xl mb-2" />
+                          <p>Awaiting Racer</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </Card>
+
+              <!-- Upcoming Heats -->
+              <div v-if="hasValidUpcomingHeats" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card
+                  v-for="heat in upcomingHeatsData.slice(0, 2)"
+                  :key="heat.heat_number"
+                  class="border-2 border-gray-300"
+                >
+                  <template #content>
+                    <div class="flex items-center justify-between mb-4 gap-3">
+                      <h3 class="font-bold text-lg text-black flex-1 min-w-0">{{ formatHeatDisplayName(heat) }}</h3>
+                      <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm whitespace-nowrap flex-shrink-0">
                         On Deck
                       </span>
                     </div>
@@ -908,9 +1247,9 @@
                             <span
                               class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
                               :class="{
-                                'bg-yellow-400 text-yellow-900': index === 0,
-                                'bg-gray-400 text-black': index === 1,
-                                'bg-orange-400 text-orange-900': index === 2
+                                'bg-black text-white': index === 0,
+                                'bg-black text-white': index === 1,
+                                'bg-black text-white': index === 2
                               }"
                             >
                               {{ index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉' }}
@@ -953,32 +1292,55 @@
                     v-for="checkin in checkins"
                     :key="checkin.id"
                     :racer-id="checkin.racer_id"
-                    class="flex items-center gap-3 p-3 bg-green-50/20 border border-green-200 rounded-lg hover:bg-green-100/30 transition-colors duration-200"
+                    :class="[
+                      'flex items-center gap-3 p-3 rounded-lg transition-colors duration-200',
+                      checkin.is_withdrawn 
+                        ? 'bg-red-50/20 border border-red-200 hover:bg-red-100/30' 
+                        : 'bg-green-50/20 border border-green-200 hover:bg-green-100/30'
+                    ]"
                   >
                     <div class="relative">
                       <img
                         v-if="checkin.racer_image_url"
                         :src="checkin.racer_image_url"
                         :alt="checkin.racer_name"
-                        class="w-12 h-12 object-cover rounded-full border-2 border-green-300"
+                        :class="[
+                          'w-12 h-12 object-cover rounded-full border-2',
+                          checkin.is_withdrawn ? 'border-red-300 opacity-60' : 'border-green-300'
+                        ]"
                       >
                       <div
                         v-else
-                        class="w-12 h-12 bg-gray-200 rounded-full border-2 border-green-300 flex items-center justify-center"
+                        :class="[
+                          'w-12 h-12 bg-gray-200 rounded-full border-2 flex items-center justify-center',
+                          checkin.is_withdrawn ? 'border-red-300 opacity-60' : 'border-green-300'
+                        ]"
                       >
                         <i class="pi pi-car text-gray-500" />
                       </div>
                       <i
+                        v-if="!checkin.is_withdrawn"
                         class="pi pi-check-circle text-green-600 text-sm absolute -bottom-1 -right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center"
+                      />
+                      <i
+                        v-else
+                        class="pi pi-times-circle text-red-600 text-sm absolute -bottom-1 -right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center"
                       />
                     </div>
                     <div class="flex-1">
-                      <p class="font-medium text-black hover:text-indigo-600">
+                      <p :class="[
+                        'font-medium hover:text-indigo-600',
+                        checkin.is_withdrawn ? 'text-gray-500 line-through' : 'text-black'
+                      ]">
                         {{ checkin.racer_name }}
                       </p>
                       <p class="text-sm text-gray-600">
                         #{{ checkin.racer_number }} •
                         {{ new Date(checkin.time).toLocaleTimeString() }}
+                      </p>
+                      <p v-if="checkin.is_withdrawn" class="text-xs text-red-600 mt-1">
+                        <i class="pi pi-exclamation-triangle mr-1" />
+                        Withdrawn: {{ checkin.withdrawal_reason }}
                       </p>
                     </div>
                   </RacerLink>
@@ -1069,7 +1431,7 @@
                   <div class="flex justify-between">
                     <span class="text-gray-600">Bracket Races</span>
                     <span class="font-semibold">{{
-                      race && getBracketsForRace(race.id).length
+                      race && raceBrackets.length
                     }}</span>
                   </div>
                   <div class="flex justify-between">
@@ -1170,7 +1532,36 @@ const qualifiers = computed(() => {
 })
 const formatTime = (time) => qualifiersComposable.value?.formatTime(time) || 'N/A'
 
-const { getBracketsForRace, initialize: initializeBrackets } = useBrackets()
+const { getBracketsForRace, getTotalRounds, initialize: initializeBrackets } = useBrackets()
+const { getRaceWithdrawals } = useRacers()
+
+// Withdrawals state
+const withdrawals = ref([])
+
+// Computed property to map bracket data with flattened racer names
+const raceBrackets = computed(() => {
+  if (!race.value) return []
+  const brackets = getBracketsForRace(race.value.id)
+  
+  // Debug: Check if brackets are loading properly and have match_number
+  if (process.env.NODE_ENV === 'development') {
+    console.log('raceBrackets computed - race:', race.value.id, 'brackets length:', brackets.length)
+    if (brackets.length > 0) {
+      console.log('raceBrackets: First bracket match_number:', brackets[0].match_number)
+      console.log('raceBrackets: First bracket data:', brackets[0])
+    }
+  }
+  // Map the bracket data to include flattened racer names
+  return brackets.map(b => ({
+    ...b,
+    track1_racer_name: b.track1_racer?.name || null,
+    track1_racer_number: b.track1_racer?.racer_number || null,
+    track1_racer_image_url: b.track1_racer?.image_url || null,
+    track2_racer_name: b.track2_racer?.name || null,
+    track2_racer_number: b.track2_racer?.racer_number || null,
+    track2_racer_image_url: b.track2_racer?.image_url || null
+  }))
+})
 
 const { racers: checkinsRacers, getCheckinsForRace, initialize: initializeCheckins } = useCheckins()
 
@@ -1213,15 +1604,22 @@ const checkins = computed(() => {
   if (!race.value?.id) return []
 
   const raceCheckins = getCheckinsForRace(race.value.id)
+  const withdrawnRacerIds = new Set(withdrawals.value.map(w => w.racer_id))
 
   return raceCheckins
     .map((checkin) => {
       const racer = checkinsRacers.value.find((r) => r.id === checkin.racer_id)
+      const isWithdrawn = withdrawnRacerIds.has(checkin.racer_id)
+      const withdrawal = withdrawals.value.find(w => w.racer_id === checkin.racer_id)
+      
       return {
         ...checkin,
         racer_name: racer?.name || `Racer #${racer?.racer_number || 'Unknown'}`,
         racer_number: racer?.racer_number,
-        racer_image_url: racer?.image_url
+        racer_image_url: racer?.image_url,
+        is_withdrawn: isWithdrawn,
+        withdrawal_reason: withdrawal?.reason,
+        withdrawn_at: withdrawal?.withdrawn_at
       }
     })
     .sort((a, b) => new Date(b.time) - new Date(a.time))
@@ -1252,6 +1650,13 @@ const getRaceData = async () => {
     } else {
       // Initialize qualifiers composable with the race ID
       qualifiersComposable.value = useQualifiers(race.value.id)
+      
+      // Load withdrawals for this race
+      try {
+        withdrawals.value = await getRaceWithdrawals(race.value.id)
+      } catch (err) {
+        console.error('Error loading withdrawals:', err)
+      }
     }
   } catch (err) {
     console.error('Error fetching race data:', err)
@@ -1321,15 +1726,17 @@ const slowestTime = computed(() => {
 
 const winners = computed(() => {
   // Get all completed brackets for this race by type
-  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
-  const completedBrackets = raceBrackets.filter(
+  const completedBrackets = raceBrackets.value.filter(
     (b) => b.track1_time && b.track2_time && b.track1_time !== b.track2_time
   )
 
   // Group by bracket type and find the most recent round for each type
-  const bracketsByType = { Fastest: [], Slowest: [] }
+  const bracketsByType = { double_elimination: [] }
   completedBrackets.forEach((bracket) => {
     if (bracket.bracket_type) {
+      if (!bracketsByType[bracket.bracket_type]) {
+        bracketsByType[bracket.bracket_type] = []
+      }
       bracketsByType[bracket.bracket_type].push(bracket)
     }
   })
@@ -1350,10 +1757,7 @@ const winners = computed(() => {
     const activeWinners = []
 
     sortedBrackets.forEach((bracket) => {
-      const isTrack1Winner =
-        bracket.bracket_type === 'Fastest'
-          ? bracket.track1_time < bracket.track2_time
-          : bracket.track1_time > bracket.track2_time
+      const isTrack1Winner = bracket.track1_time < bracket.track2_time
 
       const winnerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
       const winnerName = isTrack1Winner ? bracket.track1_racer_name : bracket.track2_racer_name
@@ -1390,58 +1794,54 @@ const winners = computed(() => {
 })
 
 const completedBracketsByType = computed(() => {
-  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
-  const byType = { Fastest: 0, Slowest: 0 }
-  raceBrackets.forEach((b) => {
+  const byType = { double_elimination: 0 }
+  raceBrackets.value.forEach((b) => {
     if (b.track1_time && b.track2_time && b.bracket_type) {
-      byType[b.bracket_type]++
+      byType[b.bracket_type] = (byType[b.bracket_type] || 0) + 1
     }
   })
   return byType
 })
 
 const totalBracketsByType = computed(() => {
-  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
-  const byType = { Fastest: 0, Slowest: 0 }
-  raceBrackets.forEach((b) => {
+  const byType = { double_elimination: 0 }
+  raceBrackets.value.forEach((b) => {
     if (b.bracket_type) {
-      byType[b.bracket_type]++
+      byType[b.bracket_type] = (byType[b.bracket_type] || 0) + 1
     }
   })
   return byType
 })
 
 const tournamentResults = computed(() => {
-  const results = { Fastest: null, Slowest: null }
+  const results = { double_elimination: null }
 
-  // Check each bracket type for tournament completion
-  for (const bracketType of ['Fastest', 'Slowest']) {
-    const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
-    const typeBrackets = raceBrackets.filter((b) => b.bracket_type === bracketType)
-    const typeCompleted = completedBracketsByType.value[bracketType]
-    const typeTotal = totalBracketsByType.value[bracketType]
-    const typeWinners = winners.value.filter((w) => w.bracket_type === bracketType)
+  // Check for double elimination tournament completion
+  const bracketType = 'double_elimination'
+  const typeBrackets = raceBrackets.value.filter((b) => b.bracket_type === bracketType)
+  const typeCompleted = completedBracketsByType.value[bracketType] || 0
+  const typeTotal = totalBracketsByType.value[bracketType] || 0
+  const typeWinners = winners.value.filter((w) => w.bracket_type === bracketType)
 
-    if (
-      typeBrackets.length > 0 &&
-      typeCompleted === typeTotal &&
-      typeWinners.length === 1 &&
-      typeTotal >= 1
-    ) {
-      const champion = typeWinners[0]
-      const placings = getTournamentPlacings(bracketType)
+  if (
+    typeBrackets.length > 0 &&
+    typeCompleted === typeTotal &&
+    typeWinners.length === 1 &&
+    typeTotal >= 1
+  ) {
+    const champion = typeWinners[0]
+    const placings = getTournamentPlacings(bracketType)
 
-      results[bracketType] = {
-        first: {
-          ...champion,
-          bracket_type: bracketType,
-          racer_name: champion.racer_name,
-          racer_number: champion.racer_number,
-          winning_time: champion.winning_time
-        },
-        second: placings.second,
-        third: placings.third
-      }
+    results[bracketType] = {
+      first: {
+        ...champion,
+        bracket_type: bracketType,
+        racer_name: champion.racer_name,
+        racer_number: champion.racer_number,
+        winning_time: champion.winning_time
+      },
+      second: placings.second,
+      third: placings.third
     }
   }
 
@@ -1479,16 +1879,15 @@ const raceEvents = computed(() => {
   }
 
   // First bracket race
-  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
-  if (raceBrackets.length > 0) {
-    const firstBracket = raceBrackets.reduce((earliest, b) =>
+  if (raceBrackets.value.length > 0) {
+    const firstBracket = raceBrackets.value.reduce((earliest, b) =>
       new Date(b.created_at) < new Date(earliest.created_at) ? b : earliest
     )
     events.push({
       type: 'brackets',
       icon: 'pi pi-sitemap',
       title: 'Brackets Generated',
-      description: `${raceBrackets.length} bracket races created`,
+      description: `${raceBrackets.value.length} bracket races created`,
       date: firstBracket.created_at
     })
   }
@@ -1545,8 +1944,7 @@ const currentStep = computed(() => {
   if (completedTournaments.length > 0) return 4
 
   // Brackets phase - if any brackets exist
-  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
-  if (raceBrackets.length > 0) return 3
+  if (raceBrackets.value.length > 0) return 3
 
   // Qualifying phase - if any qualifying times exist
   if (qualifiers.value.length > 0) return 2
@@ -1559,8 +1957,7 @@ const currentStep = computed(() => {
 })
 
 const getTournamentPlacings = (bracketType) => {
-  const raceBrackets = race.value ? getBracketsForRace(race.value.id) : []
-  const typeBrackets = raceBrackets
+  const typeBrackets = raceBrackets.value
     .filter((b) => b.bracket_type === bracketType && b.track1_time && b.track2_time)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
@@ -1568,10 +1965,7 @@ const getTournamentPlacings = (bracketType) => {
 
   const finalBracket = typeBrackets[0]
 
-  const isTrack1Winner =
-    bracketType === 'Fastest'
-      ? finalBracket.track1_time < finalBracket.track2_time
-      : finalBracket.track1_time > finalBracket.track2_time
+  const isTrack1Winner = finalBracket.track1_time < finalBracket.track2_time
 
   const secondPlace = {
     racer_id: isTrack1Winner ? finalBracket.track2_racer_id : finalBracket.track1_racer_id,
@@ -1597,10 +1991,7 @@ const getTournamentPlacings = (bracketType) => {
 
     const semiFinalLosers = []
     semiFinalBrackets.forEach((bracket) => {
-      const isTrack1WinnerSemi =
-        bracketType === 'Fastest'
-          ? bracket.track1_time < bracket.track2_time
-          : bracket.track1_time > bracket.track2_time
+      const isTrack1WinnerSemi = bracket.track1_time < bracket.track2_time
 
       const loserId = isTrack1WinnerSemi ? bracket.track2_racer_id : bracket.track1_racer_id
 
@@ -1617,10 +2008,7 @@ const getTournamentPlacings = (bracketType) => {
     })
 
     if (semiFinalLosers.length > 0) {
-      thirdPlace =
-        bracketType === 'Fastest'
-          ? semiFinalLosers.reduce((best, current) => (current.time < best.time ? current : best))
-          : semiFinalLosers.reduce((best, current) => (current.time > best.time ? current : best))
+      thirdPlace = semiFinalLosers.reduce((best, current) => (current.time < best.time ? current : best))
     }
   }
 
@@ -1704,18 +2092,180 @@ const awardLeaderboards = computed(() => {
   return leaderboards
 })
 
+// Helper function to get bracket match number
+const getBracketMatchNumber = (bracket) => {
+  // Use match_number from database
+  return bracket.match_number || raceBrackets.value.indexOf(bracket) + 1
+}
+
+// Helper function to check if a track is the winner
+const isWinner = (bracket, trackNumber) => {
+  if (!bracket.track1_time || !bracket.track2_time) return false
+  
+  const track1Time = Number.parseFloat(bracket.track1_time)
+  const track2Time = Number.parseFloat(bracket.track2_time)
+  
+  if (trackNumber === 1) {
+    return track1Time < track2Time
+  } else {
+    return track2Time < track1Time
+  }
+}
+
+// Helper function to get proper tournament round names
+const getTournamentRoundName = (roundNumber, bracketGroup = 'winner') => {
+  if (bracketGroup === 'final') {
+    return 'Championship'
+  }
+  
+  // For loser bracket, use proper tournament terminology
+  if (bracketGroup === 'loser') {
+    // Calculate expected loser bracket structure based on winner bracket
+    const winnerBrackets = raceBrackets.value.filter(b => b.bracket_group === 'winner')
+    const maxWinnerRound = winnerBrackets.length > 0 ? Math.max(...winnerBrackets.map(b => b.round_number)) : 1
+    
+    // In double elimination, loser bracket has (2 * winner_rounds - 1) rounds
+    const expectedLoserRounds = (maxWinnerRound * 2) - 1
+    const roundsFromEnd = expectedLoserRounds - roundNumber + 1
+    
+    if (roundsFromEnd === 1) {
+      return 'Loser Bracket Finals'
+    } else if (roundsFromEnd === 2) {
+      return 'Loser Bracket Semi-Finals'
+    } else if (roundsFromEnd === 3) {
+      return 'Loser Bracket Quarter-Finals'
+    } else {
+      // For earlier rounds, estimate participants
+      const participantsInRound = Math.pow(2, Math.ceil(roundsFromEnd / 2))
+      
+      // Use proper tournament terminology for standard bracket sizes
+      if (participantsInRound === 4) {
+        return 'Loser Bracket Quarter-Finals'
+      } else if (participantsInRound === 8) {
+        return 'Loser Bracket Eighth-Finals'
+      } else if (participantsInRound === 16) {
+        return 'Loser Bracket Sixteenth-Finals'
+      } else {
+        return `Loser Bracket Last ${participantsInRound}`
+      }
+    }
+  }
+  
+  // For winner bracket, calculate expected total rounds based on participants
+  const winnerBrackets = raceBrackets.value.filter(b => b.bracket_group === 'winner' && b.round_number === 1)
+  const firstRoundMatches = winnerBrackets.length
+  
+  // Calculate total participants from first round (each match = 2 participants, except byes)
+  let totalParticipants = 0
+  winnerBrackets.forEach(bracket => {
+    if (bracket.track1_racer_id) totalParticipants++
+    if (bracket.track2_racer_id) totalParticipants++
+  })
+  
+  // Calculate expected total rounds: log2(participants) rounded up
+  const expectedTotalRounds = Math.ceil(Math.log2(totalParticipants))
+  
+  // Now use expected rounds instead of actual max round
+  if (roundNumber === expectedTotalRounds) {
+    return 'Winner Bracket Finals'
+  } else if (roundNumber === expectedTotalRounds - 1 && expectedTotalRounds >= 2) {
+    return 'Winner Bracket Semi-Finals'
+  } else if (roundNumber === expectedTotalRounds - 2 && expectedTotalRounds >= 3) {
+    return 'Winner Bracket Quarter-Finals'
+  } else {
+    // Calculate "last X" for earlier rounds
+    const roundsFromEnd = expectedTotalRounds - roundNumber + 1
+    const participantsInRound = Math.pow(2, roundsFromEnd)
+    return `Winner Bracket Last ${participantsInRound}`
+  }
+}
+
+// Helper function to format heat display names
+const formatHeatDisplayName = (heat) => {
+  // If it's an object with type, use the bracket data directly
+  if (typeof heat === 'object' && heat.type === 'bracket') {
+    if (heat.bracket_group === 'final') {
+      return 'Championship Match'
+    } else if (heat.bracket_group && heat.round_number) {
+      const matchNum = heat.match_number || heat.heat_number || 1
+      const roundName = getTournamentRoundName(heat.round_number, heat.bracket_group)
+      return `${roundName} #${matchNum}`
+    }
+    return `Match ${heat.match_number || heat.heat_number}`
+  }
+  
+  // Handle legacy heat number format for backwards compatibility
+  const heatNumber = typeof heat === 'object' ? heat.heat_number : heat
+  if (typeof heat === 'object' && heat.type === 'qualifier') {
+    return `Heat ${heatNumber}`
+  }
+  
+  // Fallback for plain numbers (assume qualifier)
+  return `Heat ${heatNumber}`
+}
+
+// Helper function to format bracket type names for display
+const formatBracketTypeName = (bracketType) => {
+  switch (bracketType) {
+    case 'double_elimination':
+      return 'Double Elimination'
+    case 'single_elimination':
+      return 'Single Elimination'
+    case 'round_robin':
+      return 'Round Robin'
+    default:
+      return bracketType.charAt(0).toUpperCase() + bracketType.slice(1).replace(/_/g, ' ')
+  }
+}
+
+// Compute heat type and display info
+const currentHeatType = computed(() => {
+  if (!currentHeatData.value) return null
+  
+  const heat = currentHeatData.value
+  
+  if (heat.type === 'bracket') {
+    // Special handling for championship final
+    if (heat.bracket_group === 'final') {
+      return {
+        type: 'bracket',
+        displayName: '🏆 CHAMPIONSHIP FINAL',
+        description: 'Tournament Final • Championship Match'
+      }
+    }
+    
+    // Create clear, non-repetitive naming using bracket data directly
+    if (heat.bracket_group && heat.round_number) {
+      const matchNum = heat.match_number || heat.heat_number || 1
+      const roundName = getTournamentRoundName(heat.round_number, heat.bracket_group)
+      const displayName = roundName
+      const description = `Match ${matchNum} of ${roundName}`
+      
+      return {
+        type: 'bracket',
+        displayName: displayName,
+        description: description
+      }
+    } else {
+      return {
+        type: 'bracket',
+        displayName: `Tournament Match ${heat.match_number || heat.heat_number}`,
+        description: 'Bracket Race • Live Timing'
+      }
+    }
+  } else {
+    // Qualifier heat
+    return {
+      type: 'qualifier',
+      displayName: `Heat ${heat.heat_number}`,
+      description: 'Qualifying Round • Live Timing'
+    }
+  }
+})
+
 // Current heat data for display
 const currentHeatData = computed(() => {
-  // Debug logging
-  console.log('currentHeatData computed:', {
-    raceActive: race.value?.active,
-    raceId: race.value?.id,
-    currentRaceHeatId: currentRaceHeat.value?.id,
-    hasCurrentHeat: !!currentHeat.value,
-    currentHeat: currentHeat.value,
-    showCompletedResults: showCompletedHeatResults.value,
-    recentlyCompleted: recentlyCompletedHeat.value
-  })
+  // Minimal debug logging
 
   // If we should show completed heat results, prioritize that
   if (race.value?.active && showCompletedHeatResults.value && recentlyCompletedHeat.value) {
@@ -1763,6 +2313,11 @@ const hasValidUpcomingHeats = computed(() => {
 
 // Helper functions (formatTime is provided by useQualifiers composable)
 
+// Helper function to check if a racer is withdrawn
+const isRacerWithdrawn = (racerId) => {
+  return withdrawals.value.some(w => w.racer_id === racerId)
+}
+
 const formatEventTime = (dateString) => {
   if (!dateString) return 'Unknown time'
   const date = new Date(dateString)
@@ -1782,15 +2337,9 @@ const getWinner = (bracket) => {
     return `TIE: ${bracket.track1_racer_name} & ${bracket.track2_racer_name}`
   }
 
-  if (bracket.bracket_type === 'Fastest') {
-    return bracket.track1_time < bracket.track2_time
-      ? bracket.track1_racer_name
-      : bracket.track2_racer_name
-  } else {
-    return bracket.track1_time > bracket.track2_time
-      ? bracket.track1_racer_name
-      : bracket.track2_racer_name
-  }
+  return bracket.track1_time < bracket.track2_time
+    ? bracket.track1_racer_name
+    : bracket.track2_racer_name
 }
 
 // Helper function to find racer by track number

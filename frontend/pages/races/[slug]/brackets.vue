@@ -199,7 +199,7 @@
                     Tournament Progress
                   </h4>
                   <div
-                    v-for="bracketType in ['Fastest', 'Slowest']"
+                    v-for="bracketType in ['double_elimination']"
                     :key="bracketType"
                     class="mb-3 last:mb-0"
                   >
@@ -261,7 +261,7 @@
             </Card>
 
             <!-- Tournament Results Podium -->
-            <Card v-if="tournamentResults.Fastest || tournamentResults.Slowest">
+            <Card v-if="tournamentResults.double_elimination">
               <template #title>
                 <h2 class="text-2xl font-bold text-black flex items-center gap-3">
                   <i class="pi pi-crown text-yellow-500 text-2xl" />
@@ -567,8 +567,36 @@
                       </div>
                     </div>
 
+                    <!-- Double Withdrawal Resolution -->
+                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                      <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
+                        <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
+                          <i class="pi pi-exclamation-triangle text-lg" />
+                          <span class="font-bold">DOUBLE WITHDRAWAL</span>
+                        </div>
+                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
+                        
+                        <div class="flex flex-col gap-2">
+                          <Button
+                            label="Mark as Bye (No Advancement)"
+                            severity="secondary" 
+                            size="small"
+                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
+                            :loading="resolvingDoubleWithdrawal === bracket.id"
+                          />
+                          <Button
+                            label="Manual Selection..."
+                            severity="primary"
+                            size="small" 
+                            @click="showManualSelection(bracket)"
+                            :loading="resolvingDoubleWithdrawal === bracket.id"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <!-- Forfeit Status -->
-                    <div v-if="bracket.is_forfeit" class="mt-4 text-center">
+                    <div v-else-if="bracket.is_forfeit" class="mt-4 text-center">
                       <div class="bg-orange-100 border border-orange-200 rounded-lg p-3">
                         <div class="flex items-center justify-center gap-2 text-orange-700">
                           <i class="pi pi-flag" />
@@ -720,8 +748,36 @@
                       </div>
                     </div>
 
+                    <!-- Double Withdrawal Resolution -->
+                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                      <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
+                        <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
+                          <i class="pi pi-exclamation-triangle text-lg" />
+                          <span class="font-bold">DOUBLE WITHDRAWAL</span>
+                        </div>
+                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
+                        
+                        <div class="flex flex-col gap-2">
+                          <Button
+                            label="Mark as Bye (No Advancement)"
+                            severity="secondary" 
+                            size="small"
+                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
+                            :loading="resolvingDoubleWithdrawal === bracket.id"
+                          />
+                          <Button
+                            label="Manual Selection..."
+                            severity="primary"
+                            size="small" 
+                            @click="showManualSelection(bracket)"
+                            :loading="resolvingDoubleWithdrawal === bracket.id"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <!-- Forfeit Status -->
-                    <div v-if="bracket.is_forfeit" class="mt-4 text-center">
+                    <div v-else-if="bracket.is_forfeit" class="mt-4 text-center">
                       <div class="bg-orange-100 border border-orange-200 rounded-lg p-3">
                         <div class="flex items-center justify-center gap-2 text-orange-700">
                           <i class="pi pi-flag" />
@@ -876,8 +932,36 @@
                       </div>
                     </div>
 
+                    <!-- Double Withdrawal Resolution -->
+                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                      <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
+                        <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
+                          <i class="pi pi-exclamation-triangle text-lg" />
+                          <span class="font-bold">DOUBLE WITHDRAWAL</span>
+                        </div>
+                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
+                        
+                        <div class="flex flex-col gap-2">
+                          <Button
+                            label="Mark as Bye (No Advancement)"
+                            severity="secondary" 
+                            size="small"
+                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
+                            :loading="resolvingDoubleWithdrawal === bracket.id"
+                          />
+                          <Button
+                            label="Manual Selection..."
+                            severity="primary"
+                            size="small" 
+                            @click="showManualSelection(bracket)"
+                            :loading="resolvingDoubleWithdrawal === bracket.id"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <!-- Forfeit Status -->
-                    <div v-if="bracket.is_forfeit" class="mt-4 text-center">
+                    <div v-else-if="bracket.is_forfeit" class="mt-4 text-center">
                       <div class="bg-orange-100 border border-orange-200 rounded-lg p-3">
                         <div class="flex items-center justify-center gap-2 text-orange-700">
                           <i class="pi pi-flag" />
@@ -944,10 +1028,19 @@
                     >
                       <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-3">
-                          <div
-                            class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold"
-                          >
-                            {{ bracket.bracket_type }}
+                          <div class="flex items-center gap-2">
+                            <div
+                              v-if="bracket.bracket_group"
+                              class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold capitalize"
+                            >
+                              {{ bracket.bracket_group === 'winner' ? 'Winner Bracket' : bracket.bracket_group === 'loser' ? 'Loser Bracket' : 'Finals' }}
+                            </div>
+                            <div
+                              v-if="bracket.round_number"
+                              class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
+                            >
+                              Round {{ bracket.round_number }}
+                            </div>
                           </div>
                           <h3 class="text-xl font-bold text-black">Bracket #{{ index + 1 }}</h3>
                         </div>
@@ -1385,6 +1478,9 @@ const toast = useToast()
 const confirm = useConfirm()
 const raceId = route.params.slug
 
+// Since we only support double elimination now, set the selected bracket type
+const selectedBracketType = ref('double_elimination')
+
 // Use singleton composables
 const {
   races,
@@ -1411,7 +1507,17 @@ const {
 
 // Reactive data
 const race = ref(null)
-const raceBrackets = computed(() => (race.value ? getBracketsForRace(race.value.id) : []))
+const raceBrackets = computed(() => {
+  const brackets = race.value ? getBracketsForRace(race.value.id) : []
+  // Map the bracket data to include flattened racer names
+  return brackets.map(b => ({
+    ...b,
+    track1_racer_name: b.track1_racer?.name || null,
+    track1_racer_number: b.track1_racer?.racer_number || null,
+    track2_racer_name: b.track2_racer?.name || null,
+    track2_racer_number: b.track2_racer?.racer_number || null
+  }))
+})
 const raceQualifiers = computed(() => qualifiers.value)
 const loading = computed(
   () => racesLoading.value || qualifiersLoading.value || bracketsLoading.value
@@ -1426,6 +1532,8 @@ const editingTime = ref({})
 const eligibleRacers = ref([])
 const checkedInCount = ref(0)
 const withdrawnCount = ref(0)
+const withdrawnRacers = ref(new Set())
+const resolvingDoubleWithdrawal = ref(null) // Track which bracket is being resolved
 
 // Breadcrumb navigation
 const breadcrumbItems = computed(() => [
@@ -1484,20 +1592,20 @@ const completedBrackets = computed(() => {
 })
 
 const completedBracketsByType = computed(() => {
-  const byType = { Fastest: 0, Slowest: 0 }
+  const byType = { double_elimination: 0 }
   raceBrackets.value.forEach((b) => {
     if (b.track1_time && b.track2_time && b.bracket_type) {
-      byType[b.bracket_type]++
+      byType[b.bracket_type] = (byType[b.bracket_type] || 0) + 1
     }
   })
   return byType
 })
 
 const totalBracketsByType = computed(() => {
-  const byType = { Fastest: 0, Slowest: 0 }
+  const byType = { double_elimination: 0 }
   raceBrackets.value.forEach((b) => {
     if (b.bracket_type) {
-      byType[b.bracket_type]++
+      byType[b.bracket_type] = (byType[b.bracket_type] || 0) + 1
     }
   })
   return byType
@@ -1508,9 +1616,12 @@ const bracketTreeData = computed(() => {
   if (!raceBrackets.value || raceBrackets.value.length === 0) return null
 
   // Group brackets by type
-  const bracketsByType = { Fastest: [], Slowest: [] }
+  const bracketsByType = { double_elimination: [] }
   raceBrackets.value.forEach((bracket) => {
     if (bracket.bracket_type) {
+      if (!bracketsByType[bracket.bracket_type]) {
+        bracketsByType[bracket.bracket_type] = []
+      }
       bracketsByType[bracket.bracket_type].push(bracket)
     }
   })
@@ -1642,9 +1753,12 @@ const winners = computed(() => {
   )
 
   // Group by bracket type and find the most recent round for each type
-  const bracketsByType = { Fastest: [], Slowest: [] }
+  const bracketsByType = { double_elimination: [] }
   completedBrackets.forEach((bracket) => {
     if (bracket.bracket_type) {
+      if (!bracketsByType[bracket.bracket_type]) {
+        bracketsByType[bracket.bracket_type] = []
+      }
       bracketsByType[bracket.bracket_type].push(bracket)
     }
   })
@@ -1665,10 +1779,7 @@ const winners = computed(() => {
     const activeWinners = []
 
     sortedBrackets.forEach((bracket) => {
-      const isTrack1Winner =
-        bracket.bracket_type === 'Fastest'
-          ? bracket.track1_time < bracket.track2_time
-          : bracket.track1_time > bracket.track2_time
+      const isTrack1Winner = bracket.track1_time < bracket.track2_time
 
       const winnerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
       const winnerName = isTrack1Winner ? bracket.track1_racer_name : bracket.track2_racer_name
@@ -1723,54 +1834,53 @@ const tournamentResults = computed(() => {
     })
   }
 
-  const results = { Fastest: null, Slowest: null }
+  const results = { double_elimination: null }
 
-  // Check each bracket type for tournament completion
-  for (const bracketType of ['Fastest', 'Slowest']) {
-    const typeBrackets = raceBrackets.value.filter((b) => b.bracket_type === bracketType)
-    const typeCompleted = completedBracketsByType.value[bracketType]
-    const typeTotal = totalBracketsByType.value[bracketType]
-    const typeWinners = currentWinners.filter((w) => w.bracket_type === bracketType)
+  // Check for double elimination tournament completion
+  const bracketType = 'double_elimination'
+  const typeBrackets = raceBrackets.value.filter((b) => b.bracket_type === bracketType)
+  const typeCompleted = completedBracketsByType.value[bracketType] || 0
+  const typeTotal = totalBracketsByType.value[bracketType] || 0
+  const typeWinners = currentWinners.filter((w) => w.bracket_type === bracketType)
 
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`${bracketType} Tournament Status:`, {
+      typeWinners: typeWinners.length,
+      typeBrackets: typeBrackets.length,
+      typeCompleted,
+      typeTotal,
+      canGenerateMore: typeWinners.length >= 2
+    })
+  }
+
+  // Tournament is complete for this type if:
+  // 1. There are brackets of this type
+  // 2. All brackets are completed
+  // 3. There's exactly one winner remaining
+  if (
+    typeBrackets.length > 0 &&
+    typeCompleted === typeTotal &&
+    typeWinners.length === 1 &&
+    typeTotal >= 1
+  ) {
+    const champion = typeWinners[0]
     if (process.env.NODE_ENV === 'development') {
-      console.log(`${bracketType} Tournament Status:`, {
-        typeWinners: typeWinners.length,
-        typeBrackets: typeBrackets.length,
-        typeCompleted,
-        typeTotal,
-        canGenerateMore: typeWinners.length >= 2
-      })
+      console.log(`${bracketType} Champion found:`, champion)
     }
 
-    // Tournament is complete for this type if:
-    // 1. There are brackets of this type
-    // 2. All brackets are completed
-    // 3. There's exactly one winner remaining
-    if (
-      typeBrackets.length > 0 &&
-      typeCompleted === typeTotal &&
-      typeWinners.length === 1 &&
-      typeTotal >= 1
-    ) {
-      const champion = typeWinners[0]
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`${bracketType} Champion found:`, champion)
-      }
+    // Find 2nd and 3rd place
+    const placings = getTournamentPlacings(bracketType)
 
-      // Find 2nd and 3rd place
-      const placings = getTournamentPlacings(bracketType)
-
-      results[bracketType] = {
-        first: {
-          ...champion,
-          bracket_type: bracketType,
-          racer_name: champion.racer_name,
-          racer_number: champion.racer_number,
-          winning_time: champion.winning_time
-        },
-        second: placings.second,
-        third: placings.third
-      }
+    results[bracketType] = {
+      first: {
+        ...champion,
+        bracket_type: bracketType,
+        racer_name: champion.racer_name,
+        racer_number: champion.racer_number,
+        winning_time: champion.winning_time
+      },
+      second: placings.second,
+      third: placings.third
     }
   }
 
@@ -1788,10 +1898,7 @@ const getTournamentPlacings = (bracketType) => {
   const finalBracket = typeBrackets[0]
 
   // Get second place (loser of final bracket)
-  const isTrack1Winner =
-    bracketType === 'Fastest'
-      ? finalBracket.track1_time < finalBracket.track2_time
-      : finalBracket.track1_time > finalBracket.track2_time
+  const isTrack1Winner = finalBracket.track1_time < finalBracket.track2_time
 
   const secondPlace = {
     racer_id: isTrack1Winner ? finalBracket.track2_racer_id : finalBracket.track1_racer_id,
@@ -1820,10 +1927,7 @@ const getTournamentPlacings = (bracketType) => {
 
     const semiFinalLosers = []
     semiFinalBrackets.forEach((bracket) => {
-      const isTrack1WinnerSemi =
-        bracketType === 'Fastest'
-          ? bracket.track1_time < bracket.track2_time
-          : bracket.track1_time > bracket.track2_time
+      const isTrack1WinnerSemi = bracket.track1_time < bracket.track2_time
 
       const loserId = isTrack1WinnerSemi ? bracket.track2_racer_id : bracket.track1_racer_id
 
@@ -1842,10 +1946,7 @@ const getTournamentPlacings = (bracketType) => {
 
     // Best time among semi-final losers gets third place
     if (semiFinalLosers.length > 0) {
-      thirdPlace =
-        bracketType === 'Fastest'
-          ? semiFinalLosers.reduce((best, current) => (current.time < best.time ? current : best))
-          : semiFinalLosers.reduce((best, current) => (current.time > best.time ? current : best))
+      thirdPlace = semiFinalLosers.reduce((best, current) => (current.time < best.time ? current : best))
     }
   }
 
@@ -1866,15 +1967,9 @@ const getWinner = (bracket) => {
     return `TIE: ${bracket.track1_racer_name} & ${bracket.track2_racer_name}`
   }
 
-  if (bracket.bracket_type === 'Fastest') {
-    return bracket.track1_time < bracket.track2_time
-      ? bracket.track1_racer_name
-      : bracket.track2_racer_name
-  } else {
-    return bracket.track1_time > bracket.track2_time
-      ? bracket.track1_racer_name
-      : bracket.track2_racer_name
-  }
+  return bracket.track1_time < bracket.track2_time
+    ? bracket.track1_racer_name
+    : bracket.track2_racer_name
 }
 
 // Load eligible racers count for display
@@ -1894,14 +1989,15 @@ const loadEligibleRacers = async () => {
       .select('*', { count: 'exact', head: true })
       .eq('race_id', race.value.id)
 
-    // Get withdrawn count
-    const { count: withdrawn } = await supabase
+    // Get withdrawn racers
+    const { data: withdrawnData, count: withdrawn } = await supabase
       .from('race_withdrawals')
-      .select('*', { count: 'exact', head: true })
+      .select('racer_id', { count: 'exact' })
       .eq('race_id', race.value.id)
 
     checkedInCount.value = checkedIn || 0
     withdrawnCount.value = withdrawn || 0
+    withdrawnRacers.value = new Set((withdrawnData || []).map(w => w.racer_id))
   } catch (err) {
     console.error('Error loading eligible racers:', err)
   }
@@ -2280,6 +2376,95 @@ const cancelEdit = (bracket, track) => {
   const inputKey = bracket.id + `_track${track}`
   editingTime.value[editKey] = undefined
   bracketTimes.value[inputKey] = undefined
+}
+
+// Check if both racers in a bracket are withdrawn
+const isBothRacersWithdrawn = (bracket) => {
+  if (!bracket.track1_racer_id || !bracket.track2_racer_id) return false
+  return withdrawnRacers.value.has(bracket.track1_racer_id) && 
+         withdrawnRacers.value.has(bracket.track2_racer_id)
+}
+
+// Get previous round losers who could advance
+const getPreviousRoundLosers = (bracket) => {
+  // Find brackets from previous round that fed into this bracket
+  // This would need more complex logic based on bracket relationships
+  // For now, return empty array - would need parent bracket tracking
+  return []
+}
+
+// Show manual selection dialog for double withdrawal
+const showManualSelection = (bracket) => {
+  // Simple implementation - in practice would show a dialog with racer selection
+  const replacementRacerId = prompt('Enter replacement racer ID (or cancel):')
+  if (replacementRacerId) {
+    const reason = prompt('Enter reason for this resolution:') || 'Admin manual selection'
+    resolveDoubleWithdrawal(bracket, 'admin_choice', replacementRacerId, reason)
+  }
+}
+
+// Handle double withdrawal resolution
+const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = null, reason = '') => {
+  try {
+    resolvingDoubleWithdrawal.value = bracket.id
+    
+    // For now, we'll implement a simple forfeit-based resolution
+    // In a full implementation, this would call database functions to properly restructure
+    
+    if (action === 'admin_choice' && replacementRacerId) {
+      // Update bracket to advance the chosen racer
+      const { error } = await supabase
+        .from('brackets')
+        .update({
+          winner_racer_id: replacementRacerId,
+          winner_track: bracket.track1_racer_id === replacementRacerId ? 1 : 2,
+          is_forfeit: true,
+          forfeit_reason: `Double withdrawal resolved: ${reason || 'Admin selection'}`
+        })
+        .eq('id', bracket.id)
+      
+      if (error) throw error
+      
+      toast.add({
+        severity: 'success',
+        summary: 'Resolution Complete',
+        detail: 'Bracket resolved by admin selection',
+        life: 3000
+      })
+    } else if (action === 'advance_bye') {
+      // Mark bracket as bye with no advancement - both racers withdrawn
+      const { error } = await supabase
+        .from('brackets')
+        .update({
+          winner_racer_id: null, // No winner
+          is_forfeit: true // Mark as resolved to prevent showing double withdrawal warning
+        })
+        .eq('id', bracket.id)
+      
+      if (error) throw error
+      
+      toast.add({
+        severity: 'info',
+        summary: 'Marked as Bye',
+        detail: 'Bracket marked as bye - no racer advances to next round',
+        life: 3000
+      })
+    }
+    
+    // Refresh brackets
+    await initializeBrackets()
+    
+  } catch (err) {
+    console.error('Error resolving double withdrawal:', err)
+    toast.add({
+      severity: 'error',
+      summary: 'Resolution Failed',
+      detail: err.message,
+      life: 5000
+    })
+  } finally {
+    resolvingDoubleWithdrawal.value = null
+  }
 }
 
 // Handle forfeit with confirmation

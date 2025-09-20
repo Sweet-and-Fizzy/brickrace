@@ -371,8 +371,17 @@ const menuItems = computed(() => [
     ]
   },
   {
-    label: 'FAQ',
-    command: () => navigateTo('/faq')
+    label: 'Community',
+    items: [
+      {
+        label: 'FAQ',
+        command: () => navigateTo('/faq')
+      },
+      {
+        label: 'Sponsors',
+        command: () => navigateTo('/sponsors')
+      }
+    ]
   }
 ])
 
@@ -552,6 +561,12 @@ const sidebarMenuItems = computed(() => [
     label: 'FAQ',
     icon: 'pi pi-question-circle',
     command: () => navigateTo('/faq')
+  },
+  // Sponsors Section
+  {
+    label: 'Sponsors',
+    icon: 'pi pi-building',
+    command: () => navigateTo('/sponsors')
   },
   ...(authStore.isAuthenticated
     ? [

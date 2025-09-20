@@ -69,6 +69,7 @@ export const useBrackets = () => {
       // Generate initial winner bracket pairs with seeding
       const bracketPairs = []
       const racers = [...eligibleRacers] // Copy array for manipulation
+      let matchNumber = 1
 
       // Pair best seed vs worst seed, 2nd best vs 2nd worst, etc.
       while (racers.length >= 2) {
@@ -81,7 +82,8 @@ export const useBrackets = () => {
           track2_racer_id: worstSeed.racer_id,
           bracket_type: 'double_elimination',
           bracket_group: 'winner',
-          round_number: 1
+          round_number: 1,
+          match_number: matchNumber++
         })
       }
 
@@ -95,13 +97,14 @@ export const useBrackets = () => {
           bracket_type: 'double_elimination',
           bracket_group: 'winner',
           round_number: 1,
+          match_number: matchNumber,
           winner_track: 1,
           winner_racer_id: byeRacer.racer_id
         })
       }
 
       // Insert brackets into database
-      const { data: insertedBrackets, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('brackets')
         .insert(bracketPairs).select(`
           *,
@@ -116,8 +119,8 @@ export const useBrackets = () => {
         `Created ${bracketPairs.length} bracket races with ${eligibleRacers.length} racers.`
       )
 
-      // Refresh brackets
-      await fetchBrackets()
+      // Don't need to refresh brackets - realtime subscription will handle it
+      // await fetchBrackets() // This was causing duplicates!
 
       return true
     } catch (err) {
@@ -133,6 +136,8 @@ export const useBrackets = () => {
   // Get eligible racers for brackets (checked-in and not withdrawn)
   const getEligibleRacers = async (raceId, limit = null) => {
     try {
+      console.log('DEBUG: getEligibleRacers called with raceId:', raceId)
+      
       // Get withdrawn racers for this race
       const { data: withdrawnRacers, error: withdrawalError } = await supabase
         .from('race_withdrawals')
@@ -142,9 +147,10 @@ export const useBrackets = () => {
       if (withdrawalError) throw withdrawalError
 
       const withdrawnRacerIds = (withdrawnRacers || []).map((w) => w.racer_id)
+      console.log('DEBUG: Withdrawn racer IDs:', withdrawnRacerIds)
 
       // Get checked-in racers who are not withdrawn
-      const { data: checkedInRacers, error: checkinError } = await supabase
+      let checkinQuery = supabase
         .from('checkins')
         .select(
           `
@@ -158,7 +164,13 @@ export const useBrackets = () => {
         `
         )
         .eq('race_id', raceId)
-        .not('racer_id', 'in', `(${withdrawnRacerIds.join(',') || 'null'})`)
+      
+      // Only filter out withdrawn racers if there are any
+      if (withdrawnRacerIds.length > 0) {
+        checkinQuery = checkinQuery.not('racer_id', 'in', `(${withdrawnRacerIds.join(',')})`)
+      }
+      
+      const { data: checkedInRacers, error: checkinError } = await checkinQuery
 
       if (checkinError) throw checkinError
 
@@ -506,16 +518,20 @@ export const useBrackets = () => {
       // Generate next winner bracket round if we have enough winners
       if (winners.length >= 2) {
         const nextWinnerRound = currentWinnerRound + 1
+        let matchNumber = 1
 
         for (let i = 0; i < Math.floor(winners.length / 2); i++) {
-          nextBrackets.push({
+          const bracket = {
             race_id: raceId,
             track1_racer_id: winners[i * 2].racer_id,
             track2_racer_id: winners[i * 2 + 1].racer_id,
             bracket_type: 'double_elimination',
             bracket_group: 'winner',
-            round_number: nextWinnerRound
-          })
+            round_number: nextWinnerRound,
+            match_number: matchNumber++
+          }
+          console.log(`🏆 BRACKET DEBUG: Adding winner bracket - round ${nextWinnerRound}, match ${bracket.match_number}`)
+          nextBrackets.push(bracket)
         }
 
         // Handle odd winner (bye)
@@ -528,6 +544,7 @@ export const useBrackets = () => {
             bracket_type: 'double_elimination',
             bracket_group: 'winner',
             round_number: nextWinnerRound,
+            match_number: matchNumber,
             winner_track: 1,
             winner_racer_id: byeWinner.racer_id
           })
@@ -539,32 +556,42 @@ export const useBrackets = () => {
         const loserBrackets = raceBrackets.filter((b) => b.bracket_group === 'loser')
         const nextLoserRound =
           loserBrackets.length > 0 ? Math.max(...loserBrackets.map((b) => b.round_number)) + 1 : 1
+        let loserMatchNumber = 1
 
         for (let i = 0; i < Math.floor(losers.length / 2); i++) {
-          nextBrackets.push({
+          const bracket = {
             race_id: raceId,
             track1_racer_id: losers[i * 2].racer_id,
             track2_racer_id: losers[i * 2 + 1].racer_id,
             bracket_type: 'double_elimination',
             bracket_group: 'loser',
-            round_number: nextLoserRound
-          })
+            round_number: nextLoserRound,
+            match_number: loserMatchNumber++
+          }
+          console.log(`🏁 BRACKET DEBUG: Adding loser bracket - round ${nextLoserRound}, match ${bracket.match_number}`)
+          nextBrackets.push(bracket)
         }
       }
 
       // Insert new brackets if any were generated
       if (nextBrackets.length > 0) {
-        const { error } = await supabase.from('brackets').insert(nextBrackets)
+        console.log('📝 BRACKET DEBUG: About to insert brackets:', nextBrackets)
+        const { data, error } = await supabase.from('brackets').insert(nextBrackets).select('*')
 
-        if (error) throw error
+        if (error) {
+          console.error('❌ BRACKET DEBUG: Error inserting brackets:', error)
+          throw error
+        }
+
+        console.log('✅ BRACKET DEBUG: Successfully inserted brackets:', data)
 
         notifications.info(
           'Next Round Generated',
           `Created ${nextBrackets.length} bracket(s) for next round.`
         )
 
-        // Refresh brackets
-        await fetchBrackets()
+        // Don't need to refresh brackets - realtime subscription will handle it
+        // await fetchBrackets() // This was causing duplicates!
       }
 
       // Check if tournament is complete (only one winner left)
@@ -619,12 +646,14 @@ export const useBrackets = () => {
           track1_racer:racers!track1_racer_id (
             id,
             name,
-            racer_number
+            racer_number,
+            image_url
           ),
           track2_racer:racers!track2_racer_id (
             id,
             name,
-            racer_number
+            racer_number,
+            image_url
           )
         `
         )
@@ -633,6 +662,12 @@ export const useBrackets = () => {
       if (error) throw error
 
       state.brackets.value = data || []
+      
+      // Debug: Check if match_number field is present
+      if (process.env.NODE_ENV === 'development' && data && data.length > 0) {
+        console.log('useBrackets: Sample bracket data:', data[0])
+        console.log('useBrackets: match_number field present:', 'match_number' in data[0])
+      }
     } catch (err) {
       // Keep essential error logging for production debugging
       console.error('Error fetching brackets:', err)
@@ -741,6 +776,21 @@ export const useBrackets = () => {
           handleBracketUpdate(payload)
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'race_withdrawals'
+        },
+        (payload) => {
+          if (process.env.NODE_ENV === 'development') {
+            console.log('useBrackets: Withdrawal change detected:', payload)
+          }
+          // Withdrawals affect eligible racers, trigger refresh
+          handleBracketUpdate(payload)
+        }
+      )
       .subscribe((status) => {
         if (process.env.NODE_ENV === 'development') {
           console.log('useBrackets: Brackets subscription status:', status)
@@ -749,20 +799,112 @@ export const useBrackets = () => {
   }
 
   // Handle bracket updates
-  const handleBracketUpdate = (payload) => {
+  const handleBracketUpdate = async (payload) => {
     const { eventType, new: newRecord, old: oldRecord } = payload
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('useBrackets: Realtime bracket update received:', eventType, newRecord?.id)
+    }
 
     switch (eventType) {
       case 'INSERT':
-        // Add new bracket (need to fetch full data with relations)
-        fetchBrackets().then(() => computeWinners())
+        // Fetch just the new bracket with relations
+        if (newRecord?.id) {
+          try {
+            const { data, error } = await supabase
+              .from('brackets')
+              .select(
+                `
+                *,
+                track1_racer:racers!track1_racer_id (
+                  id,
+                  name,
+                  racer_number,
+                  image_url
+                ),
+                track2_racer:racers!track2_racer_id (
+                  id,
+                  name,
+                  racer_number,
+                  image_url
+                )
+              `
+              )
+              .eq('id', newRecord.id)
+              .single()
+
+            if (!error && data) {
+              // Check if bracket already exists to avoid duplicates
+              const exists = state.brackets.value.some(b => b.id === data.id)
+              if (!exists) {
+                // Use spread operator to ensure reactivity
+                state.brackets.value = [...state.brackets.value, data]
+                computeWinners()
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('useBrackets: Added new bracket to state, total brackets:', state.brackets.value.length)
+                }
+              } else if (process.env.NODE_ENV === 'development') {
+                console.log('useBrackets: Bracket already exists, skipping:', data.id)
+              }
+            }
+          } catch (err) {
+            console.error('Error fetching new bracket:', err)
+            // Fallback to full refresh on error
+            fetchBrackets().then(() => computeWinners())
+          }
+        }
         break
       case 'UPDATE': {
-        // Update existing bracket
-        const index = state.brackets.value.findIndex((b) => b.id === newRecord.id)
-        if (index !== -1) {
-          state.brackets.value[index] = { ...state.brackets.value[index], ...newRecord }
-          computeWinners() // Recompute winners when bracket times change
+        // Fetch just the updated bracket with relations
+        if (newRecord?.id) {
+          try {
+            const { data, error } = await supabase
+              .from('brackets')
+              .select(
+                `
+                *,
+                track1_racer:racers!track1_racer_id (
+                  id,
+                  name,
+                  racer_number,
+                  image_url
+                ),
+                track2_racer:racers!track2_racer_id (
+                  id,
+                  name,
+                  racer_number,
+                  image_url
+                )
+              `
+              )
+              .eq('id', newRecord.id)
+              .single()
+
+            if (!error && data) {
+              // Find and update the bracket in state
+              const index = state.brackets.value.findIndex((b) => b.id === data.id)
+              if (index !== -1) {
+                // Use spread operator to ensure reactivity
+                const newBrackets = [...state.brackets.value]
+                newBrackets[index] = data
+                state.brackets.value = newBrackets
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('useBrackets: Updated bracket in state at index:', index, 'total brackets:', state.brackets.value.length)
+                }
+              } else {
+                // If not found, add it
+                state.brackets.value = [...state.brackets.value, data]
+                if (process.env.NODE_ENV === 'development') {
+                  console.log('useBrackets: Added updated bracket to state (not found), total brackets:', state.brackets.value.length)
+                }
+              }
+              computeWinners()
+            }
+          } catch (err) {
+            console.error('Error fetching updated bracket:', err)
+            // Fallback to full refresh on error
+            fetchBrackets().then(() => computeWinners())
+          }
         }
         break
       }
@@ -781,8 +923,17 @@ export const useBrackets = () => {
     if (state.initialized.value) {
       if (process.env.NODE_ENV === 'development') {
         console.log('useBrackets: Already initialized, skipping')
+        // Force refresh in dev mode if we have no brackets data (likely due to previous error)
+        if (state.brackets.value.length === 0) {
+          console.log('useBrackets: No brackets data, forcing refresh in dev mode')
+          state.initialized.value = false
+        } else {
+          console.log('useBrackets: Have brackets data, count:', state.brackets.value.length)
+          return
+        }
+      } else {
+        return
       }
-      return
     }
 
     if (process.env.NODE_ENV === 'development') {
@@ -839,7 +990,28 @@ export const useBrackets = () => {
 
   // Helper function to get brackets for a specific race
   const getBracketsForRace = (raceId) => {
-    return state.brackets.value.filter((b) => b.race_id === raceId)
+    return state.brackets.value
+      .filter((b) => b.race_id === raceId)
+      .sort((a, b) => {
+        // Sort by bracket_group first (winner before loser)
+        if (a.bracket_group !== b.bracket_group) {
+          if (a.bracket_group === 'winner') return -1
+          if (b.bracket_group === 'winner') return 1
+        }
+        
+        // Then by round_number
+        if (a.round_number !== b.round_number) {
+          return a.round_number - b.round_number
+        }
+        
+        // Then by match_number
+        if (a.match_number !== null && b.match_number !== null) {
+          return a.match_number - b.match_number
+        }
+        
+        // Fallback to creation time for brackets without match_number
+        return new Date(a.created_at) - new Date(b.created_at)
+      })
   }
 
   // Helper function to get winners for a specific race
@@ -867,12 +1039,14 @@ export const useBrackets = () => {
           track1_racer:racers!track1_racer_id (
             id,
             name,
-            racer_number
+            racer_number,
+            image_url
           ),
           track2_racer:racers!track2_racer_id (
             id,
             name,
-            racer_number
+            racer_number,
+            image_url
           )
         `
         )
@@ -922,12 +1096,14 @@ export const useBrackets = () => {
           track1_racer:racers!track1_racer_id (
             id,
             name,
-            racer_number
+            racer_number,
+            image_url
           ),
           track2_racer:racers!track2_racer_id (
             id,
             name,
-            racer_number
+            racer_number,
+            image_url
           )
         `
         )

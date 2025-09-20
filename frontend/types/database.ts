@@ -46,6 +46,18 @@ export interface Award {
   updated_at: string
 }
 
+export interface Sponsor {
+  id: string
+  name: string
+  website_url?: string
+  logo_url?: string
+  sponsorship_amount?: number
+  is_active: boolean
+  display_order: number
+  created_at: string
+  updated_at: string
+}
+
 export interface AwardWinner {
   id: string
   award_id: string
@@ -97,16 +109,19 @@ export interface Qualifier {
 export interface Bracket {
   id: string
   race_id: string
-  round: number
-  match_number: number
-  racer1_id?: string
-  racer2_id?: string
-  winner_id?: string
-  racer1_time?: number
-  racer2_time?: number
-  notes?: string
+  track1_racer_id?: string
+  track2_racer_id?: string
+  track1_time?: number
+  track2_time?: number
+  bracket_type: 'double_elimination' | 'single_elimination' | 'Fastest' | 'Slowest'
+  bracket_group?: 'winner' | 'loser' | 'final'
+  round_number?: number
+  parent_bracket_winner_id?: string
+  parent_bracket_loser_id?: string
+  is_forfeit?: boolean
+  forfeit_reason?: string
   created_at: string
-  updated_at: string
+  updated_at?: string
 }
 
 // API Response types

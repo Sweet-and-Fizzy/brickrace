@@ -713,8 +713,7 @@ export const useRacers = () => {
         .select(
           `
           *,
-          racer:racers(id, name, racer_number, image_url),
-          withdrawn_by_user:auth.users(id, email)
+          racer:racers(id, name, racer_number, image_url)
         `
         )
         .eq('race_id', raceId)

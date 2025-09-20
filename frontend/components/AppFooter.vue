@@ -156,6 +156,41 @@
         </div>
       </div>
 
+      <!-- Sponsors Section -->
+      <ClientOnly>
+        <div v-if="displaySponsors.length > 0" class="border-t border-gray-700 mt-8 pt-8">
+          <div class="text-center mb-6">
+            <h3 class="text-lg font-semibold text-white mb-4">Our Sponsors</h3>
+            <div class="flex flex-wrap justify-center items-center gap-6 mb-4">
+              <a
+                v-for="sponsor in displaySponsors"
+                :key="sponsor.id"
+                :href="sponsor.website_url"
+                :target="sponsor.website_url ? '_blank' : undefined"
+                :rel="sponsor.website_url ? 'noopener noreferrer' : undefined"
+                class="flex items-center justify-center p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+                :class="{ 'cursor-default': !sponsor.website_url }"
+              >
+                <img
+                  v-if="sponsor.logo_url"
+                  :src="sponsor.logo_url"
+                  :alt="`${sponsor.name} logo`"
+                  class="h-8 max-w-24 object-contain"
+                >
+                <span v-else class="text-gray-600 text-sm px-2">{{ sponsor.name }}</span>
+              </a>
+            </div>
+            <NuxtLink
+              to="/sponsors"
+              class="text-gray-300 hover:text-white transition-colors text-sm inline-flex items-center"
+            >
+              <i class="pi pi-external-link mr-2"/>
+              View All Sponsors
+            </NuxtLink>
+          </div>
+        </div>
+      </ClientOnly>
+
       <!-- Bottom Bar -->
       <div class="border-t border-gray-700 mt-8 pt-8 text-center text-white">
         <p class="mb-4">&copy; {{ new Date().getFullYear() }} the great holyoke brick race</p>
@@ -182,4 +217,17 @@ import { useAuthStore } from '~/stores/auth'
 // Get auth state for conditional menu items
 const authStore = useAuthStore()
 const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+// Sponsors
+const sponsorsStore = useSponsors()
+
+// Show up to 6 sponsors in the footer
+const displaySponsors = computed(() => {
+  return sponsorsStore.sponsors.value.slice(0, 6)
+})
+
+// Initialize sponsors
+onMounted(async () => {
+  await sponsorsStore.getActiveSponsors()
+})
 </script>
