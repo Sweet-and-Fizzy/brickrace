@@ -3,8 +3,11 @@
 const { createClient } = require('@supabase/supabase-js')
 
 const supabase = createClient(
-  'https://ehbmnhyyycvduhtfgoho.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVoYm1uaHl5eWN2ZHVodGZnb2hvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0ODU3MzA5NywiZXhwIjoyMDY0MTQ5MDk3fQ.ETu5o0aCIIY6dw-t2zCcSnmwa4EAfp0qDYUnvE8u5Es'
+  process.env.SUPABASE_URL || 'https://ehbmnhyyycvduhtfgoho.supabase.co',
+  process.env.SUPABASE_SERVICE_KEY || (() => {
+    console.error('SUPABASE_SERVICE_KEY environment variable is required')
+    process.exit(1)
+  })()
 )
 
 const RACE_ID = '8644830f-d3a9-40e8-b3c1-55cfb8f46a54'

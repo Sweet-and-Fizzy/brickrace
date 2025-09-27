@@ -27,6 +27,9 @@ interface BracketRecord {
   track2_racer_id?: string
   winner_racer_id?: string
   created_at: string
+  challonge_match_id?: string
+  challonge_round?: number
+  challonge_suggested_play_order?: number
   track1_racer?: {
     id: string
     name: string
@@ -162,7 +165,7 @@ export async function getCurrentHeat(
       }
     }
   } else if (phase === 'brackets') {
-    // Get current bracket (first one without both times, ordered by bracket group, round, then match number)
+    // Get current bracket (first one without both times, ordered by Challonge play order)
     const { data: currentBracket } = await client
       .from('brackets')
       .select(
@@ -184,10 +187,9 @@ export async function getCurrentHeat(
       )
       .eq('race_id', raceId)
       .is('winner_racer_id', null) // Only get brackets without a winner (incomplete)
-      .order('bracket_group', { ascending: true }) // winner before loser
-      .order('round_number', { ascending: true })
+      .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+      .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
-      .order('created_at', { ascending: true }) // fallback for brackets without match_number
       .limit(1)
       .single()
 
@@ -211,15 +213,14 @@ export async function getCurrentHeat(
         return getCurrentHeat(client, raceId, phase)
       }
 
-      // Get all brackets to determine sequential heat number (using same ordering as current bracket query)
+      // Get all brackets to determine sequential heat number (using Challonge ordering)
       const { data: allBrackets } = await client
         .from('brackets')
         .select('id')
         .eq('race_id', raceId)
-        .order('bracket_group', { ascending: true })
-        .order('round_number', { ascending: true })
+        .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+        .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
-        .order('created_at', { ascending: true })
       
       const bracketIndex = allBrackets?.findIndex(b => b.id === typedCurrentBracket.id) ?? 0
       const heatNumber = bracketIndex + 1 // Sequential numbering starting from 1
@@ -231,6 +232,8 @@ export async function getCurrentHeat(
         bracket_group: typedCurrentBracket.bracket_group,
         round_number: typedCurrentBracket.round_number,
         match_number: typedCurrentBracket.match_number,
+        challonge_match_id: typedCurrentBracket.challonge_match_id,
+        challonge_round: typedCurrentBracket.challonge_round,
         racers: [
           {
             track_number: 1,
@@ -265,8 +268,6 @@ export async function getUpcomingHeats(
   phase: RacePhase,
   count: number = 2
 ) {
-  const upcomingHeats = []
-
   if (phase === 'qualifying') {
     // Use existing RPC function for qualifier heats
     const { data: nextHeats } = await client.rpc('get_next_heats', { heat_count: count })
@@ -317,25 +318,23 @@ export async function getUpcomingHeats(
       )
       .eq('race_id', raceId)
       .is('winner_racer_id', null) // Only get brackets without a winner (incomplete)
-      .order('bracket_group', { ascending: true }) // winner before loser
-      .order('round_number', { ascending: true })
+      .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+      .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
-      .order('created_at', { ascending: true }) // fallback
       .limit(count + 1) // +1 to skip current
 
     if (upcomingBrackets && upcomingBrackets.length > 1) {
       // Skip the first one (that's the current bracket)
       const nextBrackets = upcomingBrackets.slice(1)
       
-      // Get all brackets for numbering (using same ordering as current bracket query)
+      // Get all brackets for numbering (using Challonge ordering)
       const { data: allBrackets } = await client
         .from('brackets')
         .select('id')
         .eq('race_id', raceId)
-        .order('bracket_group', { ascending: true })
-        .order('round_number', { ascending: true })
+        .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+        .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
-        .order('created_at', { ascending: true })
 
       return nextBrackets.map((bracket, index) => {
         const bracketIndex = allBrackets?.findIndex(b => b.id === bracket.id) ?? 0
@@ -348,6 +347,8 @@ export async function getUpcomingHeats(
           bracket_group: bracket.bracket_group,
           round_number: bracket.round_number,
           match_number: bracket.match_number,
+          challonge_match_id: bracket.challonge_match_id,
+          challonge_round: bracket.challonge_round,
           scheduled_order: index + 1,
           racers: [
             {

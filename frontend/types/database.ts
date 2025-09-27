@@ -116,10 +116,16 @@ export interface Bracket {
   bracket_type: 'double_elimination' | 'single_elimination' | 'Fastest' | 'Slowest'
   bracket_group?: 'winner' | 'loser' | 'final'
   round_number?: number
+  match_number?: number
+  winner_racer_id?: string
+  winner_track?: number
   parent_bracket_winner_id?: string
   parent_bracket_loser_id?: string
   is_forfeit?: boolean
   forfeit_reason?: string
+  challonge_match_id?: string
+  challonge_round?: number
+  challonge_suggested_play_order?: number
   created_at: string
   updated_at?: string
 }
@@ -163,4 +169,48 @@ export interface GeneralPhotoFormData {
   description?: string
   race_id?: string
   credit?: string
+}
+
+// Challonge Integration Types
+export interface ChallongeTournament {
+  id: string
+  race_id: string
+  challonge_tournament_id: string
+  challonge_url: string
+  tournament_type: 'single_elimination' | 'double_elimination'
+  status: 'pending' | 'active' | 'completed'
+  embed_url?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ChallongeParticipant {
+  id: string
+  challonge_tournament_id: string
+  racer_id: string
+  challonge_participant_id: string
+  seed_position?: number
+  created_at: string
+}
+
+export interface ChallongeTournamentFormData {
+  name: string
+  description?: string
+  tournament_type: ChallongeTournament['tournament_type']
+}
+
+export interface ChallongeParticipantWithRacer extends ChallongeParticipant {
+  racer: Racer
+  best_time?: number
+}
+
+export interface ChallongeMatchSync {
+  id: string
+  bracket_id: string
+  challonge_tournament_id: string
+  challonge_match_id: string
+  winner_participant_id: string
+  scores_csv: string
+  synced_at: string
+  created_at: string
 }

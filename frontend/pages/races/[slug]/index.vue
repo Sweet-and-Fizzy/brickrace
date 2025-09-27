@@ -118,7 +118,7 @@
               <div class="flex items-center gap-4">
                 <span
                   >{{
-                    race.race_datetime
+                    race.race_datetime && !isNaN(new Date(race.race_datetime))
                       ? new Date(race.race_datetime).toLocaleDateString('en-US', {
                           weekday: 'long',
                           year: 'numeric',
@@ -133,7 +133,7 @@
                         })
                       : 'Date TBD'
                   }}{{
-                    race.end_time
+                    race.end_time && !isNaN(new Date(race.end_time))
                       ? ' - ' +
                         new Date(race.end_time).toLocaleTimeString('en-US', {
                           hour: 'numeric',
@@ -246,6 +246,30 @@
                   <span class="text-sm font-medium">{{ step.label }}</span>
                 </div>
               </div>
+            </div>
+          </template>
+        </Card>
+
+        <!-- Live Tournament Bracket - Full Width -->
+        <Card v-if="tournament && tournamentEmbedUrl" class="mb-8">
+          <template #title>
+            <h2 class="text-xl font-bold text-black flex items-center gap-2">
+              <i class="pi pi-trophy text-yellow-500" />
+              Tournament Bracket
+            </h2>
+          </template>
+          <template #content>
+            <div class="border-2 border-gray-300 rounded-lg overflow-hidden">
+              <iframe
+                :src="tournamentEmbedUrl"
+                width="100%"
+                height="600"
+                frameborder="0"
+                scrolling="auto"
+                allowtransparency="true"
+                class="w-full min-h-[600px]"
+              >
+              </iframe>
             </div>
           </template>
         </Card>
@@ -451,11 +475,11 @@
                             v-if="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
                             :src="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
                             :alt="getTrackRacer(currentHeatData.racers, 1).racer_name"
-                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                            class="w-24 h-24 object-cover rounded-lg border-2 border-gray-200"
                           >
                           <div
                             v-else
-                            class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
+                            class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center"
                           >
                             <i class="pi pi-car text-2xl text-gray-400" />
                           </div>
@@ -515,11 +539,11 @@
                             v-if="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
                             :src="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
                             :alt="getTrackRacer(currentHeatData.racers, 2).racer_name"
-                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                            class="w-24 h-24 object-cover rounded-lg border-2 border-gray-200"
                           >
                           <div
                             v-else
-                            class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
+                            class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center"
                           >
                             <i class="pi pi-car text-2xl text-gray-400" />
                           </div>
@@ -579,7 +603,10 @@
                 >
                   <template #content>
                     <div class="flex items-center justify-between mb-4 gap-3">
-                      <h3 class="font-bold text-lg text-black flex-1 min-w-0">{{ formatHeatDisplayName(heat) }}</h3>
+                      <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-lg text-black">{{ formatHeatDisplayName(heat) }}</h3>
+                        <div class="text-sm font-medium text-gray-600">Match {{ heat.match_number || heat.heat_number }}</div>
+                      </div>
                       <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm whitespace-nowrap flex-shrink-0">
                         On Deck
                       </span>
@@ -591,29 +618,15 @@
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-xs font-bold text-brand-blue">TRACK 1</span>
                         </div>
-                        <div v-if="getTrackRacer(heat.racers, 1)" class="flex items-center gap-3">
-                          <img
-                            v-if="getTrackRacer(heat.racers, 1).racer_image_url"
-                            :src="getTrackRacer(heat.racers, 1).racer_image_url"
-                            :alt="getTrackRacer(heat.racers, 1).racer_name"
-                            class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
-                          >
-                          <div
-                            v-else
-                            class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center"
-                          >
-                            <i class="pi pi-car text-gray-400" />
-                          </div>
-                          <div class="flex-1">
-                            <RacerLink
-                              :racer-id="getTrackRacer(heat.racers, 1).racer_id"
-                              :racer-name="getTrackRacer(heat.racers, 1).racer_name"
-                              class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
-                            />
-                            <p class="text-xs text-gray-500">
-                              #{{ getTrackRacer(heat.racers, 1).racer_number }}
-                            </p>
-                          </div>
+                        <div v-if="getTrackRacer(heat.racers, 1)">
+                          <RacerLink
+                            :racer-id="getTrackRacer(heat.racers, 1).racer_id"
+                            :racer-name="getTrackRacer(heat.racers, 1).racer_name"
+                            class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
+                          />
+                          <p class="text-xs text-gray-500">
+                            #{{ getTrackRacer(heat.racers, 1).racer_number }}
+                          </p>
                         </div>
                         <div v-else class="text-gray-400 text-center py-2">
                           <i class="pi pi-clock text-lg mb-1" />
@@ -626,29 +639,15 @@
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-xs font-bold text-red-500">TRACK 2</span>
                         </div>
-                        <div v-if="getTrackRacer(heat.racers, 2)" class="flex items-center gap-3">
-                          <img
-                            v-if="getTrackRacer(heat.racers, 2).racer_image_url"
-                            :src="getTrackRacer(heat.racers, 2).racer_image_url"
-                            :alt="getTrackRacer(heat.racers, 2).racer_name"
-                            class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
-                          >
-                          <div
-                            v-else
-                            class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center"
-                          >
-                            <i class="pi pi-car text-gray-400" />
-                          </div>
-                          <div class="flex-1">
-                            <RacerLink
-                              :racer-id="getTrackRacer(heat.racers, 2).racer_id"
-                              :racer-name="getTrackRacer(heat.racers, 2).racer_name"
-                              class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
-                            />
-                            <p class="text-xs text-gray-500">
-                              #{{ getTrackRacer(heat.racers, 2).racer_number }}
-                            </p>
-                          </div>
+                        <div v-if="getTrackRacer(heat.racers, 2)">
+                          <RacerLink
+                            :racer-id="getTrackRacer(heat.racers, 2).racer_id"
+                            :racer-name="getTrackRacer(heat.racers, 2).racer_name"
+                            class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
+                          />
+                          <p class="text-xs text-gray-500">
+                            #{{ getTrackRacer(heat.racers, 2).racer_number }}
+                          </p>
                         </div>
                         <div v-else class="text-gray-400 text-center py-2">
                           <i class="pi pi-clock text-lg mb-1" />
@@ -660,6 +659,7 @@
                 </Card>
               </div>
             </div>
+
 
             <!-- Brackets -->
             <Card v-if="race && raceBrackets.length">
@@ -682,7 +682,7 @@
                           v-if="bracket.round_number"
                           class="text-sm font-semibold text-blue-700"
                         >
-                          {{ getTournamentRoundName(bracket.round_number, bracket.bracket_group) }}
+                          {{ getTournamentRoundName(bracket.round_number, bracket.bracket_group, bracket.challonge_round) }}
                         </div>
                         <h3 class="text-lg font-bold text-gray-900">
                           Match #{{ getBracketMatchNumber(bracket) }}
@@ -900,11 +900,11 @@
                             v-if="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
                             :src="getTrackRacer(currentHeatData.racers, 1).racer_image_url"
                             :alt="getTrackRacer(currentHeatData.racers, 1).racer_name"
-                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                            class="w-24 h-24 object-cover rounded-lg border-2 border-gray-200"
                           >
                           <div
                             v-else
-                            class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
+                            class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center"
                           >
                             <i class="pi pi-car text-2xl text-gray-400" />
                           </div>
@@ -964,11 +964,11 @@
                             v-if="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
                             :src="getTrackRacer(currentHeatData.racers, 2).racer_image_url"
                             :alt="getTrackRacer(currentHeatData.racers, 2).racer_name"
-                            class="w-16 h-16 object-cover rounded-lg border-2 border-gray-200"
+                            class="w-24 h-24 object-cover rounded-lg border-2 border-gray-200"
                           >
                           <div
                             v-else
-                            class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center"
+                            class="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center"
                           >
                             <i class="pi pi-car text-2xl text-gray-400" />
                           </div>
@@ -1028,7 +1028,10 @@
                 >
                   <template #content>
                     <div class="flex items-center justify-between mb-4 gap-3">
-                      <h3 class="font-bold text-lg text-black flex-1 min-w-0">{{ formatHeatDisplayName(heat) }}</h3>
+                      <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-lg text-black">{{ formatHeatDisplayName(heat) }}</h3>
+                        <div class="text-sm font-medium text-gray-600">Match {{ heat.match_number || heat.heat_number }}</div>
+                      </div>
                       <span class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm whitespace-nowrap flex-shrink-0">
                         On Deck
                       </span>
@@ -1040,29 +1043,15 @@
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-xs font-bold text-brand-blue">TRACK 1</span>
                         </div>
-                        <div v-if="getTrackRacer(heat.racers, 1)" class="flex items-center gap-3">
-                          <img
-                            v-if="getTrackRacer(heat.racers, 1).racer_image_url"
-                            :src="getTrackRacer(heat.racers, 1).racer_image_url"
-                            :alt="getTrackRacer(heat.racers, 1).racer_name"
-                            class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
-                          >
-                          <div
-                            v-else
-                            class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center"
-                          >
-                            <i class="pi pi-car text-gray-400" />
-                          </div>
-                          <div class="flex-1">
-                            <RacerLink
-                              :racer-id="getTrackRacer(heat.racers, 1).racer_id"
-                              :racer-name="getTrackRacer(heat.racers, 1).racer_name"
-                              class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
-                            />
-                            <p class="text-xs text-gray-500">
-                              #{{ getTrackRacer(heat.racers, 1).racer_number }}
-                            </p>
-                          </div>
+                        <div v-if="getTrackRacer(heat.racers, 1)">
+                          <RacerLink
+                            :racer-id="getTrackRacer(heat.racers, 1).racer_id"
+                            :racer-name="getTrackRacer(heat.racers, 1).racer_name"
+                            class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
+                          />
+                          <p class="text-xs text-gray-500">
+                            #{{ getTrackRacer(heat.racers, 1).racer_number }}
+                          </p>
                         </div>
                         <div v-else class="text-gray-400 text-center py-2">
                           <i class="pi pi-clock text-lg mb-1" />
@@ -1075,29 +1064,15 @@
                         <div class="flex items-center justify-between mb-3">
                           <span class="text-xs font-bold text-red-500">TRACK 2</span>
                         </div>
-                        <div v-if="getTrackRacer(heat.racers, 2)" class="flex items-center gap-3">
-                          <img
-                            v-if="getTrackRacer(heat.racers, 2).racer_image_url"
-                            :src="getTrackRacer(heat.racers, 2).racer_image_url"
-                            :alt="getTrackRacer(heat.racers, 2).racer_name"
-                            class="w-10 h-10 object-cover rounded-lg border-2 border-gray-200"
-                          >
-                          <div
-                            v-else
-                            class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center"
-                          >
-                            <i class="pi pi-car text-gray-400" />
-                          </div>
-                          <div class="flex-1">
-                            <RacerLink
-                              :racer-id="getTrackRacer(heat.racers, 2).racer_id"
-                              :racer-name="getTrackRacer(heat.racers, 2).racer_name"
-                              class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
-                            />
-                            <p class="text-xs text-gray-500">
-                              #{{ getTrackRacer(heat.racers, 2).racer_number }}
-                            </p>
-                          </div>
+                        <div v-if="getTrackRacer(heat.racers, 2)">
+                          <RacerLink
+                            :racer-id="getTrackRacer(heat.racers, 2).racer_id"
+                            :racer-name="getTrackRacer(heat.racers, 2).racer_name"
+                            class="font-medium text-black hover:text-brand-blue hover:underline transition-colors duration-200"
+                          />
+                          <p class="text-xs text-gray-500">
+                            #{{ getTrackRacer(heat.racers, 2).racer_number }}
+                          </p>
                         </div>
                         <div v-else class="text-gray-400 text-center py-2">
                           <i class="pi pi-clock text-lg mb-1" />
@@ -1514,10 +1489,12 @@ import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const config = useRuntimeConfig()
 
 // Use reactive composables for all data
 
 const { races, getRaceBySlug, fetchRaceBySlug, initialize: initializeRaces } = useRaces()
+const { getTournamentByRace } = useChallonge()
 
 // Race data - needs to be defined before other composables that depend on it
 const race = ref(null)
@@ -1537,6 +1514,38 @@ const { getRaceWithdrawals } = useRacers()
 
 // Withdrawals state
 const withdrawals = ref([])
+
+// Tournament state
+const tournament = ref(null)
+const tournamentEmbedUrl = computed(() => {
+  console.log('Tournament embed URL computed:', {
+    tournament: tournament.value,
+    hasUrl: !!tournament.value?.challonge_url,
+    status: tournament.value?.status
+  })
+  
+  if (!tournament.value?.challonge_url) {
+    console.log('No challonge_url found')
+    return null
+  }
+  
+  try {
+    const baseUrl = `${config.public.challonge.embedBaseUrl}/${tournament.value.challonge_url}/module`
+    const params = new URLSearchParams({
+      multiplier: '0.8',
+      match_width_multiplier: '1.0',
+      show_final_results: '1',
+      theme: '1'
+    })
+    
+    const url = `${baseUrl}?${params.toString()}`
+    console.log('Generated embed URL:', url)
+    return url
+  } catch (error) {
+    console.error('Error generating embed URL:', error)
+    return null
+  }
+})
 
 // Computed property to map bracket data with flattened racer names
 const raceBrackets = computed(() => {
@@ -1656,6 +1665,15 @@ const getRaceData = async () => {
         withdrawals.value = await getRaceWithdrawals(race.value.id)
       } catch (err) {
         console.error('Error loading withdrawals:', err)
+      }
+      
+      // Load tournament data if it exists
+      try {
+        tournament.value = await getTournamentByRace(race.value.id)
+        console.log('Tournament data loaded:', tournament.value)
+      } catch (err) {
+        console.log('No tournament found for this race:', err)
+        tournament.value = null
       }
     }
   } catch (err) {
@@ -2112,13 +2130,51 @@ const isWinner = (bracket, trackNumber) => {
   }
 }
 
-// Helper function to get proper tournament round names
-const getTournamentRoundName = (roundNumber, bracketGroup = 'winner') => {
+// Helper function to get standard tournament round names based on rounds from end
+const getStandardRoundName = (roundsFromEnd, bracketType = '') => {
+  const prefix = bracketType ? `${bracketType} ` : ''
+  
+  switch (roundsFromEnd) {
+    case 1: return `${prefix}Finals`
+    case 2: return `${prefix}Semifinals`
+    case 3: return `${prefix}Quarterfinals`
+    case 4: return `${prefix}Round of 16`
+    case 5: return `${prefix}Round of 32`
+    case 6: return `${prefix}Round of 64`
+    default: return `${prefix}Round ${roundsFromEnd}`
+  }
+}
+
+// Helper function to get proper tournament round names using Challonge round info
+const getTournamentRoundName = (roundNumber, bracketGroup = 'winner', challongeRound = null) => {
   if (bracketGroup === 'final') {
     return 'Championship'
   }
   
-  // For loser bracket, use proper tournament terminology
+  // Use Challonge round information if available
+  if (challongeRound !== null) {
+    if (challongeRound > 0) {
+      // Winner bracket (positive rounds) - determine names based on tournament structure
+      const maxWinnerRound = Math.max(...raceBrackets.value
+        .filter(b => b.challonge_round > 0)
+        .map(b => b.challonge_round))
+      
+      if (challongeRound === maxWinnerRound) {
+        return 'Finals'
+      } else if (challongeRound === maxWinnerRound - 1 && maxWinnerRound > 1) {
+        return 'Semifinals'
+      } else if (challongeRound === maxWinnerRound - 2 && maxWinnerRound > 2) {
+        return 'Quarterfinals'
+      } else {
+        return `Round ${challongeRound}`
+      }
+    } else if (challongeRound < 0) {
+      // Lower bracket (negative rounds) - use Challonge's terminology  
+      return `Losers Round ${Math.abs(challongeRound)}`
+    }
+  }
+  
+  // Fallback to internal logic for loser bracket
   if (bracketGroup === 'loser') {
     // Calculate expected loser bracket structure based on winner bracket
     const winnerBrackets = raceBrackets.value.filter(b => b.bracket_group === 'winner')
@@ -2135,19 +2191,7 @@ const getTournamentRoundName = (roundNumber, bracketGroup = 'winner') => {
     } else if (roundsFromEnd === 3) {
       return 'Loser Bracket Quarter-Finals'
     } else {
-      // For earlier rounds, estimate participants
-      const participantsInRound = Math.pow(2, Math.ceil(roundsFromEnd / 2))
-      
-      // Use proper tournament terminology for standard bracket sizes
-      if (participantsInRound === 4) {
-        return 'Loser Bracket Quarter-Finals'
-      } else if (participantsInRound === 8) {
-        return 'Loser Bracket Eighth-Finals'
-      } else if (participantsInRound === 16) {
-        return 'Loser Bracket Sixteenth-Finals'
-      } else {
-        return `Loser Bracket Last ${participantsInRound}`
-      }
+      return `Loser Bracket Round ${roundNumber}`
     }
   }
   
@@ -2187,9 +2231,8 @@ const formatHeatDisplayName = (heat) => {
     if (heat.bracket_group === 'final') {
       return 'Championship Match'
     } else if (heat.bracket_group && heat.round_number) {
-      const matchNum = heat.match_number || heat.heat_number || 1
-      const roundName = getTournamentRoundName(heat.round_number, heat.bracket_group)
-      return `${roundName} #${matchNum}`
+      const roundName = getTournamentRoundName(heat.round_number, heat.bracket_group, heat.challonge_round)
+      return roundName
     }
     return `Match ${heat.match_number || heat.heat_number}`
   }
@@ -2237,9 +2280,9 @@ const currentHeatType = computed(() => {
     // Create clear, non-repetitive naming using bracket data directly
     if (heat.bracket_group && heat.round_number) {
       const matchNum = heat.match_number || heat.heat_number || 1
-      const roundName = getTournamentRoundName(heat.round_number, heat.bracket_group)
+      const roundName = getTournamentRoundName(heat.round_number, heat.bracket_group, heat.challonge_round)
       const displayName = roundName
-      const description = `Match ${matchNum} of ${roundName}`
+      const description = `Match ${matchNum}`
       
       return {
         type: 'bracket',

@@ -24,19 +24,6 @@
         </NuxtLink>
       </div>
 
-      <!-- Access Denied -->
-      <div v-else-if="!authStore.isRaceAdmin" class="text-center py-12">
-        <i class="pi pi-ban text-6xl text-red-400 mb-4" />
-        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Access Denied</h2>
-        <p class="text-gray-600 mb-6">You need race admin privileges to manage race brackets.</p>
-        <NuxtLink to="/races">
-          <Button severity="primary">
-            <i class="pi pi-arrow-left mr-2" />
-            Back to All Races
-          </Button>
-        </NuxtLink>
-      </div>
-
       <!-- Brackets Interface -->
       <div v-else-if="race">
         <!-- Header -->
@@ -66,11 +53,53 @@
           </div>
         </div>
 
+        <!-- Challonge Tournament Bracket -->
+        <div class="mb-8">
+          <ChallongeBracket 
+            :race-slug="route.params.slug"
+            :race-id="race.id"
+            :show-admin-link="authStore.isRaceAdmin"
+          />
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Main Content -->
           <div class="lg:col-span-2 space-y-6">
-            <!-- Bracket Generation Controls -->
-            <Card>
+            <!-- Admin Controls -->
+            <Card v-if="authStore.isRaceAdmin" class="border-2 border-dashed border-blue-300">
+              <template #title>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-cog text-blue-600" />
+                  <span class="text-blue-900">Admin Controls</span>
+                </div>
+              </template>
+              <template #content>
+                <div class="space-y-4">
+                  <p class="text-blue-700">
+                    Manage tournament brackets and view administrative tools.
+                  </p>
+                  <div class="flex gap-3">
+                    <Button 
+                      @click="navigateTo(`/races/${route.params.slug}/admin/challonge`)"
+                      class="btn-primary"
+                    >
+                      <i class="pi pi-trophy mr-2" />
+                      Manage Challonge Tournament
+                    </Button>
+                    <Button 
+                      @click="navigateTo(`/races/${route.params.slug}/brackets`)"
+                      severity="secondary"
+                    >
+                      <i class="pi pi-sitemap mr-2" />
+                      Traditional Brackets
+                    </Button>
+                  </div>
+                </div>
+              </template>
+            </Card>
+
+            <!-- Legacy Bracket Generation Controls -->
+            <Card v-if="authStore.isRaceAdmin">
               <template #title>
                 <h2 class="text-xl font-bold text-black flex items-center gap-2">
                   <i class="pi pi-sitemap" />

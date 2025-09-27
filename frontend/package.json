@@ -27,6 +27,7 @@
     "@tiptap/starter-kit": "^3.2.0",
     "@tiptap/vue-3": "^3.2.0",
     "@types/jsonwebtoken": "^9.0.10",
+    "challonge": "^2.2.0",
     "jsonwebtoken": "^9.0.2",
     "nuxt": "^3.17.4",
     "pinia": "^3.0.2",

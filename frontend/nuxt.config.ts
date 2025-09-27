@@ -148,7 +148,8 @@ export default defineNuxtConfig({
         'Galleria',
         'TabMenu',
         'SplitButton',
-        'Paginator'
+        'Paginator',
+        'Menu'
       ]
     }
   },
@@ -159,10 +160,17 @@ export default defineNuxtConfig({
     redirect: false
   },
   runtimeConfig: {
+    // Private keys (only available on server-side)
+    challongeApiKey: process.env.CHALLONGE_API_KEY,
+    challongeUsername: process.env.CHALLONGE_USERNAME,
     public: {
       supabase: {
         url: process.env.SUPABASE_URL,
         anonKey: process.env.SUPABASE_ANON_KEY
+      },
+      // Public Challonge configuration
+      challonge: {
+        embedBaseUrl: 'https://challonge.com'
       }
     }
   }

@@ -17,6 +17,7 @@ import {
   createTimingSupabaseClient
 } from '~/server/utils/timing-auth'
 import { getRacePhase } from '~/server/utils/race-phase'
+import { syncBracketByChallongeMatchId } from '~/server/utils/bracket-generator'
 
 /**
  * Handle bracket completion - determine winner and generate next round brackets
@@ -64,32 +65,38 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
 
     console.log(`Bracket ${bracketId}: Winner is track ${winnerTrack} (${winnerRacerId})`)
 
-    // Get all brackets for this race to determine what to generate next
-    const { data: allBrackets } = await client
-      .from('brackets')
-      .select('*')
-      .eq('race_id', raceId)
-      .order('created_at')
-
-    if (!allBrackets) return
-
-    // Group by bracket group and round
-    const winnerBrackets = allBrackets.filter((b: any) => b.bracket_group === 'winner')
-    const loserBrackets = allBrackets.filter((b: any) => b.bracket_group === 'loser')
-    
-    // Check if current winner bracket round is complete
-    const currentRound = bracket.round_number
-    const currentRoundBrackets = winnerBrackets.filter((b: any) => b.round_number === currentRound)
-    const completedInRound = currentRoundBrackets.filter((b: any) => 
-      b.winner_racer_id !== null // Check for winner instead of times (handles byes)
-    )
-
-    console.log(`Round ${currentRound}: ${completedInRound.length}/${currentRoundBrackets.length} brackets complete`)
-
-    // If this round is complete, generate next rounds
-    if (completedInRound.length === currentRoundBrackets.length) {
-      await generateNextRounds(client, raceId, currentRoundBrackets, currentRound)
+    // Sync completed bracket to Challonge using match ID and regenerate brackets
+    if (bracket.challonge_match_id) {
+      syncBracketByChallongeMatchId(client, raceId, bracket.challonge_match_id)
+        .then(async () => {
+          console.log(`Bracket ${bracketId} synced successfully, regenerating brackets from Challonge`)
+          // Import the bracket generator function
+          const { generateBracketsFromChallonge } = await import('~/server/utils/bracket-generator')
+          
+          // Get tournament ID for this race
+          const { data: tournament } = await client
+            .from('challonge_tournaments')
+            .select('id')
+            .eq('race_id', raceId)
+            .eq('status', 'active')
+            .single()
+          
+          if (tournament) {
+            await generateBracketsFromChallonge(client, raceId, tournament.id)
+            console.log('Brackets regenerated from Challonge after sync')
+          }
+        })
+        .catch(error => {
+          console.error(`Failed to sync bracket ${bracketId} to Challonge match ${bracket.challonge_match_id}:`, error)
+          // Log but don't throw - timing operation should succeed even if sync fails
+        })
+    } else {
+      console.log(`Bracket ${bracketId} has no Challonge match ID - skipping sync`)
     }
+
+    // Note: Bracket generation is now handled by Challonge tournament structure
+    // We only record times here - the brackets are pre-generated from Challonge matches
+    console.log(`Bracket ${bracketId} completed - times recorded, winner determined, sync initiated`)
 
   } catch (error) {
     console.error('Error handling bracket completion:', error)
@@ -97,249 +104,6 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
   }
 }
 
-/**
- * Generate next round brackets for double elimination
- */
-async function generateNextRounds(client: any, raceId: string, completedBrackets: any[], currentRound: number) {
-  const newBrackets = []
-  
-  // Collect winners and losers from completed round
-  const winners = []
-  const losers = []
-  
-  for (const bracket of completedBrackets) {
-    if (bracket.winner_racer_id) {
-      winners.push({
-        racer_id: bracket.winner_racer_id,
-        source_bracket: bracket.id
-      })
-      
-      // Add loser to loser bracket (only if both racers were present)
-      if (bracket.track1_racer_id && bracket.track2_racer_id) {
-        const loserRacerId = bracket.winner_track === 1 ? bracket.track2_racer_id : bracket.track1_racer_id
-        losers.push({
-          racer_id: loserRacerId,
-          source_bracket: bracket.id
-        })
-      }
-    }
-  }
-
-  console.log(`Generating next rounds: ${winners.length} winners, ${losers.length} losers`)
-
-  // Check if next winner round already exists to prevent duplicates
-  const nextRound = currentRound + 1
-  const { data: existingNextRound } = await client
-    .from('brackets')
-    .select('id')
-    .eq('race_id', raceId)
-    .eq('bracket_group', 'winner')
-    .eq('round_number', nextRound)
-    .limit(1)
-
-  // Generate next winner bracket round if we have enough winners and round doesn't exist
-  if (winners.length >= 2 && (!existingNextRound || existingNextRound.length === 0)) {
-    // Remove duplicates from winners array
-    const uniqueWinners = []
-    const seenRacers = new Set()
-    
-    for (const winner of winners) {
-      if (!seenRacers.has(winner.racer_id)) {
-        seenRacers.add(winner.racer_id)
-        uniqueWinners.push(winner)
-      }
-    }
-    
-    let matchNumber = 1
-    for (let i = 0; i < Math.floor(uniqueWinners.length / 2); i++) {
-      newBrackets.push({
-        race_id: raceId,
-        track1_racer_id: uniqueWinners[i * 2].racer_id,
-        track2_racer_id: uniqueWinners[i * 2 + 1].racer_id,
-        bracket_type: 'double_elimination',
-        bracket_group: 'winner',
-        round_number: nextRound,
-        match_number: matchNumber++,
-        parent_bracket_winner_id: uniqueWinners[i * 2].source_bracket
-      })
-    }
-    
-    // Handle odd winner (bye)
-    if (uniqueWinners.length % 2 === 1) {
-      const byeWinner = uniqueWinners[uniqueWinners.length - 1]
-      newBrackets.push({
-        race_id: raceId,
-        track1_racer_id: byeWinner.racer_id,
-        track2_racer_id: null,
-        bracket_type: 'double_elimination',
-        bracket_group: 'winner',
-        round_number: nextRound,
-        match_number: matchNumber,
-        winner_track: 1,
-        winner_racer_id: byeWinner.racer_id,
-        parent_bracket_winner_id: byeWinner.source_bracket
-      })
-    }
-  }
-
-  // Generate loser bracket round if we have losers
-  if (losers.length >= 2) {
-    // Get current loser bracket round number
-    const { data: existingLoserBrackets } = await client
-      .from('brackets')
-      .select('round_number')
-      .eq('race_id', raceId)
-      .eq('bracket_group', 'loser')
-      .order('round_number', { ascending: false })
-      .limit(1)
-    
-    const nextLoserRound = existingLoserBrackets?.length > 0 ? 
-      existingLoserBrackets[0].round_number + 1 : 1
-
-    // Check if this loser round already exists
-    const { data: existingLoserRound } = await client
-      .from('brackets')
-      .select('id')
-      .eq('race_id', raceId)
-      .eq('bracket_group', 'loser')
-      .eq('round_number', nextLoserRound)
-      .limit(1)
-
-    if (!existingLoserRound || existingLoserRound.length === 0) {
-      // Remove duplicates from losers array
-      const uniqueLosers = []
-      const seenRacers = new Set()
-      
-      for (const loser of losers) {
-        if (!seenRacers.has(loser.racer_id)) {
-          seenRacers.add(loser.racer_id)
-          uniqueLosers.push(loser)
-        }
-      }
-
-      let loserMatchNumber = 1
-      for (let i = 0; i < Math.floor(uniqueLosers.length / 2); i++) {
-        newBrackets.push({
-          race_id: raceId,
-          track1_racer_id: uniqueLosers[i * 2].racer_id,
-          track2_racer_id: uniqueLosers[i * 2 + 1].racer_id,
-          bracket_type: 'double_elimination',
-          bracket_group: 'loser',
-          round_number: nextLoserRound,
-          match_number: loserMatchNumber++,
-          parent_bracket_loser_id: uniqueLosers[i * 2].source_bracket
-        })
-      }
-    }
-  }
-
-  // Check for championship final in double elimination
-  if (newBrackets.length === 0) {
-    // No new brackets generated - check if we need championship final or reset final
-    const { data: allBrackets } = await client
-      .from('brackets')
-      .select('*')
-      .eq('race_id', raceId)
-      .order('created_at')
-
-    if (allBrackets) {
-      const winnerBrackets = allBrackets.filter((b: any) => b.bracket_group === 'winner')
-      const loserBrackets = allBrackets.filter((b: any) => b.bracket_group === 'loser')
-      const finalBrackets = allBrackets.filter((b: any) => b.bracket_group === 'final')
-      
-      // Check if championship final exists and is completed
-      if (finalBrackets.length > 0) {
-        const championshipFinal = finalBrackets[0]
-        
-        // If championship final is completed, check who won
-        if (championshipFinal.winner_racer_id && championshipFinal.track1_time !== null && championshipFinal.track2_time !== null) {
-          const winnerChampion = getLastStandingRacer(winnerBrackets)
-          const loserChampion = getLastStandingRacer(loserBrackets)
-          
-          // In double elimination: if loser bracket champion beats winner bracket champion,
-          // the winner bracket champion gets a second chance (reset final)
-          if (championshipFinal.winner_racer_id === loserChampion && winnerChampion !== loserChampion) {
-            // Check if reset final already exists
-            const resetFinalExists = finalBrackets.some((f: any) => f.round_number === 2)
-            
-            if (!resetFinalExists) {
-              // Create reset final - winner bracket champion gets second chance
-              newBrackets.push({
-                race_id: raceId,
-                track1_racer_id: winnerChampion,
-                track2_racer_id: loserChampion,
-                bracket_type: 'double_elimination',
-                bracket_group: 'final',
-                round_number: 2,
-                match_number: 1
-              })
-              
-              console.log(`Generated reset final: ${winnerChampion} vs ${loserChampion} (winner bracket champion gets second chance)`)
-            }
-          }
-          // If winner bracket champion won the championship final, tournament is over
-          // No additional logic needed - tournament complete
-        }
-      } else {
-        // No championship final exists yet - check if we need to create one
-        const winnerChampion = getLastStandingRacer(winnerBrackets)
-        const loserChampion = getLastStandingRacer(loserBrackets)
-        
-        if (winnerChampion && loserChampion && winnerChampion !== loserChampion) {
-          // Create championship final
-          newBrackets.push({
-            race_id: raceId,
-            track1_racer_id: winnerChampion,
-            track2_racer_id: loserChampion,
-            bracket_type: 'double_elimination',
-            bracket_group: 'final',
-            round_number: 1,
-            match_number: 1
-          })
-          
-          console.log(`Generated championship final: ${winnerChampion} vs ${loserChampion}`)
-        }
-      }
-    }
-  }
-
-  // Insert new brackets
-  if (newBrackets.length > 0) {
-    const { error } = await client
-      .from('brackets')
-      .insert(newBrackets)
-
-    if (error) {
-      console.error('Error inserting new brackets:', error)
-    } else {
-      console.log(`Generated ${newBrackets.length} new bracket(s) for next round`)
-    }
-  }
-}
-
-// Helper function to find the last standing racer in a bracket group
-function getLastStandingRacer(brackets: any[]) {
-  if (!brackets || brackets.length === 0) return null
-  
-  // Find the most recent completed bracket (highest round number with results)
-  const completedBrackets = brackets.filter((b: any) => 
-    b.winner_racer_id !== null // Universal completion indicator
-  )
-  
-  if (completedBrackets.length === 0) return null
-  
-  // Sort by round number descending, then by created_at descending to get the most recent
-  completedBrackets.sort((a: any, b: any) => {
-    if (a.round_number !== b.round_number) {
-      return (b.round_number || 0) - (a.round_number || 0)
-    }
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-  })
-  
-  // The winner of the most recent bracket is the champion of this bracket group
-  const mostRecentBracket = completedBrackets[0]
-  return mostRecentBracket.winner_racer_id
-}
 
 export default defineEventHandler(async (event) => {
   // Validate API key
@@ -399,15 +163,14 @@ export default defineEventHandler(async (event) => {
         throw error
       }
     } else if (phase === 'brackets') {
-      // Bracket heat - find current bracket by sequential position
+      // Bracket heat - find current bracket by sequential position using Challonge ordering
       const { data: brackets } = await client
         .from('brackets')
         .select('id')
         .eq('race_id', activeRace.id)
-        .order('bracket_group', { ascending: true }) // winner before loser  
-        .order('round_number', { ascending: true })
+        .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+        .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
-        .order('created_at', { ascending: true }) // fallback
       
       const bracketIndex = heat_number - 1 // Convert heat number to 0-based index
       if (!brackets || !brackets[bracketIndex]) {
