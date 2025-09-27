@@ -1,4 +1,9 @@
-import type { ChallongeTournament, ChallongeTournamentFormData } from '~/types/database'
+import type { ChallongeTournament, ChallongeTournamentFormData, Race, Qualifier, Racer } from '~/types/database'
+
+interface CheckinWithRacer {
+  racer_id: string
+  racer: Racer
+}
 
 export const useChallonge = () => {
   const loading = ref(false)
@@ -87,7 +92,7 @@ export const useChallonge = () => {
     try {
       // Get race by slug
       const { data: raceData } = await $fetch(`/api/races/by-slug/${raceSlug}`)
-      const race = raceData
+      const race = raceData as Race
       
       // Use existing composables to get checkins and qualifiers
       const checkinsComposable = useCheckins()
@@ -104,9 +109,9 @@ export const useChallonge = () => {
       const qualifiers = qualifiersComposable.qualifiers
       
       // Process racers with their best qualifying times
-      const racersWithTimes = checkedInRacers.map(checkin => {
-        const racerQualifiers = qualifiers.value.filter(q => q.racer_id === checkin.racer_id)
-        const bestTime = racerQualifiers.length > 0 ? Math.min(...racerQualifiers.map(q => q.time)) : null
+      const racersWithTimes = (checkedInRacers as CheckinWithRacer[]).map(checkin => {
+        const racerQualifiers = (qualifiers.value as Qualifier[]).filter((q: Qualifier) => q.racer_id === checkin.racer_id)
+        const bestTime = racerQualifiers.length > 0 ? Math.min(...racerQualifiers.map((q: Qualifier) => q.time)) : null
         
         return {
           racer_id: checkin.racer_id,

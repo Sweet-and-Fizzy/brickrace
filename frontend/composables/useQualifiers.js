@@ -3,6 +3,9 @@
 // Global shared state for qualifiers (race-specific singleton pattern)
 const qualifierInstances = new Map()
 
+/**
+ * @param {string | null} [raceId=null] - The race ID
+ */
 export const useQualifiers = (raceId = null) => {
   // If no raceId provided, create instance without singleton
   if (!raceId) {

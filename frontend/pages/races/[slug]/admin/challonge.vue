@@ -35,9 +35,9 @@
         <i class="pi pi-exclamation-triangle text-4xl text-red-500 mb-4" />
         <p class="text-red-600 font-medium">{{ pageError }}</p>
         <Button 
-          @click="initializePage"
           class="mt-4"
           severity="secondary"
+          @click="initializePage"
         >
           <i class="pi pi-refresh mr-2" />
           Retry
@@ -87,7 +87,7 @@
               </div>
 
               <!-- Tournament Form -->
-              <form @submit.prevent="createChallongeTournament" class="space-y-4">
+              <form class="space-y-4" @submit.prevent="createChallongeTournament">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Tournament Name</label>
                   <InputText 
@@ -209,9 +209,9 @@
                     </div>
                   </div>
                   <Button 
-                    @click="addEligibleRacers"
                     :loading="challongeLoading"
                     class="btn-primary"
+                    @click="addEligibleRacers"
                   >
                     <i class="pi pi-plus mr-2" />
                     Add {{ eligibleRacers?.eligible_racers?.length || 0 }} Racers
@@ -249,10 +249,10 @@
                   </div>
                 </div>
                 <Button 
-                  @click="startChallongeTournament"
                   :loading="challongeLoading"
                   severity="success"
                   class="font-semibold"
+                  @click="startChallongeTournament"
                 >
                   <i class="pi pi-play mr-2" />
                   Start Tournament
@@ -276,15 +276,15 @@
                 <p class="text-gray-600 mb-6">The tournament brackets are now active and can be viewed by spectators.</p>
                 <div class="flex justify-center gap-3">
                   <Button 
-                    @click="openChallongeUrl"
                     class="btn-primary"
+                    @click="openChallongeUrl"
                   >
                     <i class="pi pi-external-link mr-2" />
                     View Live Bracket
                   </Button>
                   <Button 
-                    @click="navigateTo(`/races/${route.params.slug}/brackets`)"
                     severity="secondary"
+                    @click="navigateTo(`/races/${route.params.slug}/brackets`)"
                   >
                     <i class="pi pi-arrow-right mr-2" />
                     Back to Race Page
@@ -321,10 +321,10 @@
                       </div>
                     </div>
                     <Button
-                      @click="refreshSyncStatus"
                       :loading="syncLoading"
                       severity="secondary"
                       size="small"
+                      @click="refreshSyncStatus"
                     >
                       <i class="pi pi-refresh mr-2" />
                       Refresh
@@ -335,25 +335,25 @@
                 <!-- Manual Sync Controls -->
                 <div class="flex gap-3 flex-wrap">
                   <Button
-                    @click="manualSync(false)"
                     :loading="syncLoading"
                     severity="secondary"
+                    @click="manualSync(false)"
                   >
                     <i class="pi pi-sync mr-2" />
                     Sync Missing Brackets
                   </Button>
                   <Button
-                    @click="manualSync(true)"
                     :loading="syncLoading"
                     severity="warning"
+                    @click="manualSync(true)"
                   >
                     <i class="pi pi-replay mr-2" />
                     Force Re-sync All
                   </Button>
                   <Button
-                    @click="regenerateBrackets"
                     :loading="syncLoading"
                     severity="danger"
+                    @click="regenerateBrackets"
                   >
                     <i class="pi pi-refresh mr-2" />
                     Regenerate Brackets
@@ -566,7 +566,7 @@ const openChallongeUrl = () => {
 const formatDate = (dateString) => {
   if (!dateString) return 'Date not set'
   const date = new Date(dateString)
-  if (isNaN(date.getTime())) return 'Invalid date'
+  if (Number.isNaN(date.getTime())) return 'Invalid date'
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -577,7 +577,7 @@ const formatDate = (dateString) => {
 const formatTime = (dateString) => {
   if (!dateString) return 'N/A'
   const date = new Date(dateString)
-  if (isNaN(date.getTime())) return 'Invalid date'
+  if (Number.isNaN(date.getTime())) return 'Invalid date'
   return date.toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',

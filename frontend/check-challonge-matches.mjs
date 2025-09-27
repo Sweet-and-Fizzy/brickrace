@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* global fetch */
+
 // Check what matches Challonge actually has
 const API_BASE = 'http://localhost:3002/api'
 const TOURNAMENT_ID = '699efba4-0654-4e8d-936e-22a1f31eddcd'

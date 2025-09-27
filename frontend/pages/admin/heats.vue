@@ -450,7 +450,7 @@ const regenerateHeats = async () => {
     showSuccess('Heats regenerated successfully')
     track1Time.value = ''
     track2Time.value = ''
-  } catch (err) {
+  } catch {
     showError('Failed to regenerate heats')
   }
 }
@@ -460,7 +460,7 @@ const startNextHeat = async () => {
     try {
       await heats.startHeat(upcomingHeats.value[0].heat_number)
       showSuccess('Heat started')
-    } catch (err) {
+    } catch {
       showError('Failed to start heat')
     }
   }
@@ -470,7 +470,7 @@ const startSpecificHeat = async (heatNumber) => {
   try {
     await heats.startHeat(heatNumber)
     showSuccess('Heat started')
-  } catch (err) {
+  } catch {
     showError('Failed to start heat')
   }
 }
@@ -484,7 +484,7 @@ const completeHeat = async () => {
     showSuccess('Heat completed')
     track1Time.value = ''
     track2Time.value = ''
-  } catch (err) {
+  } catch {
     showError('Failed to complete heat')
   }
 }
@@ -495,20 +495,20 @@ const skipHeat = async () => {
     showSuccess('Heat skipped')
     track1Time.value = ''
     track2Time.value = ''
-  } catch (err) {
+  } catch {
     showError('Failed to skip heat')
   }
 }
 
 const setQualifyingMode = async (mode) => {
   try {
-    const { data } = await $fetch('/api/admin/qualifying-mode', {
+    await $fetch('/api/admin/qualifying-mode', {
       method: 'POST',
       body: { mode }
     })
     qualifyingMode.value = mode
     showSuccess(`Qualifying mode set to: ${mode}`)
-  } catch (err) {
+  } catch {
     showError('Failed to set qualifying mode')
   }
 }
@@ -588,7 +588,7 @@ const setAsCurrentHeat = async (heatNumber) => {
   try {
     await heats.startHeat(heatNumber)
     showSuccess(`Heat #${heatNumber} set as current`)
-  } catch (err) {
+  } catch {
     showError('Failed to set heat as current')
   }
 }

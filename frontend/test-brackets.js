@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* global fetch */
+
 /**
  * Test script for bracket system with mock race times
  * 
@@ -102,8 +104,8 @@ async function recordHeatTimes(heatNumber, track1Time, track2Time) {
     },
     body: JSON.stringify({
       heat_number: heatNumber,
-      track1_time: parseFloat(track1Time),
-      track2_time: parseFloat(track2Time),
+      track1_time: Number.parseFloat(track1Time),
+      track2_time: Number.parseFloat(track2Time),
       auto_advance: false // We'll control advancement manually for testing
     })
   })
@@ -111,8 +113,8 @@ async function recordHeatTimes(heatNumber, track1Time, track2Time) {
   console.log(`✓ ${result.message}`)
   
   // Determine winner
-  const winner = parseFloat(track1Time) < parseFloat(track2Time) ? 'Track 1' : 'Track 2'
-  const winTime = Math.min(parseFloat(track1Time), parseFloat(track2Time))
+  const winner = Number.parseFloat(track1Time) < Number.parseFloat(track2Time) ? 'Track 1' : 'Track 2'
+  const winTime = Math.min(Number.parseFloat(track1Time), Number.parseFloat(track2Time))
   console.log(`  🏆 Winner: ${winner} (${winTime}s)`)
   
   return result
@@ -140,7 +142,7 @@ async function simulateBracketRaces() {
     console.log('\n✅ Race is in brackets phase!')
     
     // Get timing status to see total brackets
-    const timingStatus = await getTimingStatus()
+    await getTimingStatus()
     
     // Simulate all bracket races
     let racesCompleted = 0

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* global fetch */
+
 /**
  * Tournament Timing Test Script
  * 
@@ -9,10 +11,9 @@
  * Usage: node test-tournament.js
  */
 
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
-import { readFileSync } from 'fs'
-import { join } from 'path'
+import { fileURLToPath } from 'node:url'
+import { dirname, join  } from 'node:path'
+import { readFileSync } from 'node:fs'
 
 const API_BASE_URL = 'http://localhost:3000' // Adjust if different
 
@@ -45,10 +46,10 @@ function getApiKey() {
 const API_KEY = getApiKey()
 
 // Default race time ranges - will be customized per racer
-const defaultTimeRange = { min: 2.0, max: 3.0 }
+// const defaultTimeRange = { min: 2.0, max: 3.0 }
 
 // Generate random time (realistic race times between 2-3 seconds)
-function generateTime(racerName) {
+function generateTime() {
   // Add some variation based on racer number for consistency
   const baseTime = 2.0 + Math.random() * 1.0 // 2.0 to 3.0 seconds
   const time = Math.round(baseTime * 100) / 100 // Round to 2 decimal places

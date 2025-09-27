@@ -16,15 +16,16 @@ interface BracketMatch {
   winner_track?: number
 }
 
-interface ChallongeMatch {
-  id: number
-  tournament_id: number
-  state: string
-  player1_id: number | null
-  player2_id: number | null
-  winner_id: number | null
-  round: number
-}
+// Commented out - not currently used
+// interface ChallongeMatch {
+//   id: number
+//   tournament_id: number
+//   state: string
+//   player1_id: number | null
+//   player2_id: number | null
+//   winner_id: number | null
+//   round: number
+// }
 
 interface ParticipantMapping {
   racer_id: string
@@ -94,7 +95,7 @@ export async function syncBracketToChallonge(
       return
     }
 
-    const participantMap = new Map(
+    const participantMap = new Map<string, string>(
       participants.map((p: ParticipantMapping) => [p.racer_id, p.challonge_participant_id])
     )
 
@@ -128,7 +129,7 @@ export async function syncBracketToChallonge(
       matchingMatch.match.id.toString(),
       {
         scores_csv: scoresCsv,
-        winner_id: parseInt(winnerChallongeId)
+        winner_id: Number.parseInt(winnerChallongeId as string)
       }
     )
 

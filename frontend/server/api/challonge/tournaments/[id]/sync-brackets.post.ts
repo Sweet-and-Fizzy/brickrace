@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
           syncResults.push({
             bracket_id: bracketId,
             status: 'error',
-            error: error.message
+            error: (error as Error).message
           })
         }
       }

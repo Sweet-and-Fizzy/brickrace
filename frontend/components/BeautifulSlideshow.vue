@@ -84,7 +84,7 @@ import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import 'swiper/css/effect-coverflow'
 
-const props = defineProps({
+defineProps({
   images: {
     type: Array,
     default: () => []
@@ -108,7 +108,7 @@ const onSwiper = (swiper) => {
   }
 }
 
-const onSlideChange = (swiper) => {
+const onSlideChange = () => {
   // Could emit events here if needed
 }
 

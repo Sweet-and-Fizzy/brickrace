@@ -8,8 +8,12 @@ interface ChallongeMatchData {
   player1_id: number | null
   player2_id: number | null
   winner_id: number | null
+  loser_id: number | null
+  started_at: string | null
+  completed_at: string | null
   round: number
   suggested_play_order?: number
+  scores_csv?: string
 }
 
 interface ParticipantMapping {
@@ -25,7 +29,15 @@ export async function generateBracketsFromChallonge(
   client: any,
   raceId: string,
   tournamentId: string
-): Promise<void> {
+): Promise<{
+  bracketsGenerated: number
+  tournamentStructure: {
+    totalMatches: number
+    winnerBracketMatches: number
+    loserBracketMatches: number
+    finalMatches: number
+  }
+}> {
   try {
     console.log(`Generating brackets from Challonge for tournament ${tournamentId}`)
 
@@ -84,8 +96,8 @@ export async function generateBracketsFromChallonge(
 
     // Sort matches by suggested play order (if available) or by round then ID
     const sortedMatches = challongeMatches.sort((a: any, b: any) => {
-      const matchA = a.match
-      const matchB = b.match
+      const matchA = a.match as ChallongeMatchData
+      const matchB = b.match as ChallongeMatchData
       
       // Use suggested_play_order if available
       if (matchA.suggested_play_order && matchB.suggested_play_order) {
@@ -101,7 +113,7 @@ export async function generateBracketsFromChallonge(
     })
 
     for (const challongeMatch of sortedMatches) {
-      const match = challongeMatch.match
+      const match = challongeMatch.match as ChallongeMatchData
 
       // Map Challonge participant IDs to racer IDs
       const track1RacerId = match.player1_id ? participantMap.get(match.player1_id.toString()) : null
@@ -162,7 +174,7 @@ export async function generateBracketsFromChallonge(
         
         // Try to parse scores if available (format: "score1-score2")
         if (match.scores_csv) {
-          const scores = match.scores_csv.split('-').map(s => parseFloat(s.trim()))
+          const scores = match.scores_csv.split('-').map((s: string) => Number.parseFloat(s.trim()))
           if (scores.length === 2 && !isNaN(scores[0]) && !isNaN(scores[1])) {
             track1Time = scores[0]
             track2Time = scores[1]
@@ -300,7 +312,7 @@ export async function syncBracketByChallongeMatchId(
       challongeMatchId,
       {
         scores_csv: scoresCsv,
-        winner_id: parseInt(winnerChallongeId)
+        winner_id: Number.parseInt(winnerChallongeId as string)
       }
     )
 

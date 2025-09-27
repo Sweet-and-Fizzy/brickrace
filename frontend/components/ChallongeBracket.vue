@@ -12,9 +12,9 @@
       <h3 class="text-xl font-semibold text-red-700 mb-2">Tournament Error</h3>
       <p class="text-red-600 mb-4">{{ error }}</p>
       <Button 
-        @click="refreshBracket"
         severity="secondary"
         size="small"
+        @click="refreshBracket"
       >
         <i class="pi pi-refresh mr-2" />
         Retry
@@ -43,9 +43,9 @@
             <Button 
               size="small" 
               severity="secondary"
-              @click="refreshBracket"
               :loading="refreshing"
               class="bg-white/20 border-white/30 text-white hover:bg-white/30"
+              @click="refreshBracket"
             >
               <i class="pi pi-refresh mr-1" />
               <span class="hidden sm:inline">Refresh</span>
@@ -53,8 +53,8 @@
             <Button 
               size="small" 
               severity="secondary"
-              @click="openFullBracket"
               class="bg-white/20 border-white/30 text-white hover:bg-white/30"
+              @click="openFullBracket"
             >
               <i class="pi pi-external-link mr-1" />
               <span class="hidden sm:inline">Full View</span>
@@ -97,8 +97,8 @@
           scrolling="auto" 
           allowtransparency="true"
           class="challonge-iframe"
-          @load="onIframeLoad"
           :class="{ 'opacity-50': refreshing }"
+          @load="onIframeLoad"
         />
         
         <!-- Iframe Loading Overlay -->
@@ -136,8 +136,8 @@
       <p class="text-gray-600 mb-4">The tournament bracket has not been created yet.</p>
       <div v-if="showAdminLink" class="mt-4">
         <Button 
-          @click="navigateTo(`/races/${raceSlug}/admin/challonge`)"
           class="btn-primary"
+          @click="navigateTo(`/races/${raceSlug}/admin/challonge`)"
         >
           <i class="pi pi-plus mr-2" />
           Create Tournament
@@ -148,7 +148,22 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
+import type { Race } from '~/types/database'
+
+// Types
+interface ChallongeTournament {
+  id: string
+  tournament_type: string
+  status: string
+  embed_url?: string
+  challonge_url: string
+}
+
+interface TournamentStatus {
+  participants?: {
+    count: number
+  }
+}
 
 // Props
 interface Props {
@@ -159,12 +174,12 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  raceId: undefined,
   autoRefresh: true,
   showAdminLink: true
 })
 
 // Composables
-const authStore = useAuthStore()
 const { getTournamentByRace, getTournamentStatus } = useChallonge()
 
 // State
@@ -172,8 +187,8 @@ const loading = ref(true)
 const refreshing = ref(false)
 const iframeLoading = ref(true)
 const error = ref<string | null>(null)
-const tournament = ref(null)
-const tournamentStatus = ref(null)
+const tournament = ref<ChallongeTournament | null>(null)
+const tournamentStatus = ref<TournamentStatus | null>(null)
 const lastUpdate = ref(new Date())
 
 // Auto-refresh interval
@@ -205,13 +220,13 @@ const loadTournament = async () => {
     let raceId = props.raceId
     if (!raceId) {
       const { data: raceData } = await $fetch(`/api/races/by-slug/${props.raceSlug}`)
-      raceId = raceData.id
+      raceId = (raceData as Race).id
     }
     
     // Get tournament data
     tournament.value = await getTournamentByRace(raceId)
     
-    if (tournament.value) {
+    if (tournament.value?.id) {
       // Get tournament status
       tournamentStatus.value = await getTournamentStatus(tournament.value.id)
       lastUpdate.value = new Date()

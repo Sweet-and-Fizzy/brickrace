@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+/* global fetch */
+
 // Simple script to sync and regenerate brackets from Challonge
 // Using built-in fetch (Node 18+)
 

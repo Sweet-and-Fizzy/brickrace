@@ -109,7 +109,7 @@ export default defineEventHandler(async (event) => {
   // Validate API key
   await requireTimingAuth(event)
 
-  const client = await createTimingSupabaseClient(event)
+  const client = await createTimingSupabaseClient()
   const body = await readBody(event)
 
   const { heat_number, track1_time, track2_time, auto_advance = true } = body
@@ -168,7 +168,7 @@ export default defineEventHandler(async (event) => {
         .from('brackets')
         .select('id')
         .eq('race_id', activeRace.id)
-        .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+        .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
         .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
       

@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   // Validate JWT token
   await requireTimingAuth(event)
 
-  const client = await createTimingSupabaseClient(event)
+  const client = await createTimingSupabaseClient()
 
   try {
     logTimingRequest(event, 'STATUS_CHECK')

@@ -165,7 +165,7 @@ async function main() {
         .insert({
           race_id: activeRace.id,
           racer_id: racer.id,
-          time: parseFloat(qualifyingTime),
+          time: Number.parseFloat(qualifyingTime),
           notes: 'Generated for bracket testing',
           status: 'completed'
         })

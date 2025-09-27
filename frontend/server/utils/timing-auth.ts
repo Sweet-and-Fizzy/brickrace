@@ -10,7 +10,7 @@ import { createClient } from '@supabase/supabase-js'
  * Creates an authenticated Supabase client using service role key
  * Perfect for hardware timing systems that need continuous operation
  */
-export async function createTimingSupabaseClient(event: any) {
+export async function createTimingSupabaseClient() {
   const supabaseUrl = process.env.SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
 

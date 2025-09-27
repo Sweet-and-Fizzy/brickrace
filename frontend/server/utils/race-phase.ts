@@ -187,7 +187,7 @@ export async function getCurrentHeat(
       )
       .eq('race_id', raceId)
       .is('winner_racer_id', null) // Only get brackets without a winner (incomplete)
-      .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+      .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
       .limit(1)
@@ -218,7 +218,7 @@ export async function getCurrentHeat(
         .from('brackets')
         .select('id')
         .eq('race_id', raceId)
-        .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+        .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
         .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
       
@@ -318,7 +318,7 @@ export async function getUpcomingHeats(
       )
       .eq('race_id', raceId)
       .is('winner_racer_id', null) // Only get brackets without a winner (incomplete)
-      .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+      .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
       .limit(count + 1) // +1 to skip current
@@ -332,7 +332,7 @@ export async function getUpcomingHeats(
         .from('brackets')
         .select('id')
         .eq('race_id', raceId)
-        .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+        .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
         .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
 

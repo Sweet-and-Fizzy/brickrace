@@ -354,7 +354,7 @@ export const challongeUtils = {
   generateTournamentUrl: (raceSlug: string): string => {
     const timestamp = Date.now()
     // Replace hyphens with underscores and remove any other invalid characters
-    const cleanSlug = raceSlug.replace(/[^a-zA-Z0-9_]/g, '_')
+    const cleanSlug = raceSlug.replace(/\W/g, '_')
     return `brick_race_${cleanSlug}_${timestamp}`
   },
 

@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
         track2_racer:racers!track2_racer_id(id, name, racer_number)
       `)
       .eq('race_id', tournament.race_id)
-      .order('challonge_suggested_play_order', { ascending: true, nullsLast: true })
+      .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
 

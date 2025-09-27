@@ -768,7 +768,7 @@ export const useRacers = () => {
   }
 
   // Check if current user can withdraw/reinstate a specific racer
-  const canUserWithdrawRacer = (racerId, raceId) => {
+  const canUserWithdrawRacer = (racerId) => {
     if (!authStore.userId) return false
 
     // Race admins can withdraw any racer

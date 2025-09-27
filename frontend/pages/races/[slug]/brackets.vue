@@ -80,15 +80,15 @@
                   </p>
                   <div class="flex gap-3">
                     <Button 
-                      @click="navigateTo(`/races/${route.params.slug}/admin/challonge`)"
                       class="btn-primary"
+                      @click="navigateTo(`/races/${route.params.slug}/admin/challonge`)"
                     >
                       <i class="pi pi-trophy mr-2" />
                       Manage Challonge Tournament
                     </Button>
                     <Button 
-                      @click="navigateTo(`/races/${route.params.slug}/brackets`)"
                       severity="secondary"
+                      @click="navigateTo(`/races/${route.params.slug}/brackets`)"
                     >
                       <i class="pi pi-sitemap mr-2" />
                       Traditional Brackets
@@ -610,15 +610,15 @@
                             label="Mark as Bye (No Advancement)"
                             severity="secondary" 
                             size="small"
-                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
+                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
                           />
                           <Button
                             label="Manual Selection..."
                             severity="primary"
                             size="small" 
-                            @click="showManualSelection(bracket)"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
+                            @click="showManualSelection(bracket)"
                           />
                         </div>
                       </div>
@@ -791,15 +791,15 @@
                             label="Mark as Bye (No Advancement)"
                             severity="secondary" 
                             size="small"
-                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
+                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
                           />
                           <Button
                             label="Manual Selection..."
                             severity="primary"
                             size="small" 
-                            @click="showManualSelection(bracket)"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
+                            @click="showManualSelection(bracket)"
                           />
                         </div>
                       </div>
@@ -850,7 +850,7 @@
               <template #content>
                 <div class="space-y-4">
                   <div
-                    v-for="(bracket, index) in finalBrackets"
+                    v-for="bracket in finalBrackets"
                     :key="bracket.id"
                     class="bg-gradient-to-br from-purple-50 via-pink-50 to-yellow-50 border border-purple-200 rounded-xl p-6 shadow-xl"
                   >
@@ -975,15 +975,15 @@
                             label="Mark as Bye (No Advancement)"
                             severity="secondary" 
                             size="small"
-                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
+                            @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
                           />
                           <Button
                             label="Manual Selection..."
                             severity="primary"
                             size="small" 
-                            @click="showManualSelection(bracket)"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
+                            @click="showManualSelection(bracket)"
                           />
                         </div>
                       </div>
@@ -1512,7 +1512,6 @@ const selectedBracketType = ref('double_elimination')
 
 // Use singleton composables
 const {
-  races,
   loading: racesLoading,
   initialize: initializeRaces,
   getRaceBySlug,
@@ -1763,17 +1762,18 @@ const canGenerateNextRound = computed(() => {
   )
 })
 
-const possibleRacerCounts = computed(() => {
-  const totalQualified = qualifiedRacers.value.length
-  const counts = []
-
-  // Generate even numbers from 4 up to total qualified racers
-  for (let i = 4; i <= totalQualified; i += 2) {
-    counts.push(i)
-  }
-
-  return counts
-})
+// Commented out - not currently used
+// const possibleRacerCounts = computed(() => {
+//   const totalQualified = qualifiedRacers.value.length
+//   const counts = []
+//
+//   // Generate even numbers from 4 up to total qualified racers
+//   for (let i = 4; i <= totalQualified; i += 2) {
+//     counts.push(i)
+//   }
+//
+//   return counts
+// })
 
 const winners = computed(() => {
   // Get all completed brackets by type

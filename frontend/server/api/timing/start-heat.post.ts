@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   // Validate API key
   await requireTimingAuth(event)
 
-  const client = await createTimingSupabaseClient(event)
+  const client = await createTimingSupabaseClient()
   const body = await readBody(event)
 
   const { heat_number } = body
