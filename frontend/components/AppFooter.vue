@@ -168,14 +168,14 @@
                 :href="sponsor.website_url"
                 :target="sponsor.website_url ? '_blank' : undefined"
                 :rel="sponsor.website_url ? 'noopener noreferrer' : undefined"
-                class="flex items-center justify-center p-2 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+                class="flex items-center justify-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
                 :class="{ 'cursor-default': !sponsor.website_url }"
               >
                 <img
                   v-if="sponsor.logo_url"
                   :src="sponsor.logo_url"
                   :alt="`${sponsor.name} logo`"
-                  class="h-8 max-w-24 object-contain"
+                  class="h-12 max-w-32 object-contain"
                 >
                 <span v-else class="text-gray-600 text-sm px-2">{{ sponsor.name }}</span>
               </a>
@@ -220,10 +220,11 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 
 // Sponsors
 const sponsorsStore = useSponsors()
+const { sponsors } = sponsorsStore
 
 // Show up to 6 sponsors in the footer
 const displaySponsors = computed(() => {
-  return sponsorsStore.sponsors.value.slice(0, 6)
+  return (sponsors.value || []).slice(0, 6)
 })
 
 // Initialize sponsors

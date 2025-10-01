@@ -1,7 +1,7 @@
 import type { Sponsor } from '~/types/database'
 
 export const useSponsors = () => {
-  const supabase = useSupabaseClient<any>()
+  const supabase = useSupabaseClient()
   const sponsors = ref<Sponsor[]>([])
   const loading = ref(false)
 
@@ -151,8 +151,8 @@ export const useSponsors = () => {
   }
 
   return {
-    sponsors: readonly(sponsors),
-    loading: readonly(loading),
+    sponsors,
+    loading,
     getActiveSponsors,
     getAllSponsors,
     createSponsor,

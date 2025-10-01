@@ -14,29 +14,29 @@
       />
 
       <div class="pb-16">
-      <!-- Loading State -->
-      <div v-if="sponsorsStore.loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-          v-for="i in 6"
-          :key="i"
-          class="bg-white rounded-lg border border-gray-200 p-6 animate-pulse"
-        >
-          <div class="flex items-center space-x-4 mb-4">
-            <div class="bg-gray-300 rounded-lg w-16 h-16"/>
-            <div class="flex-1 space-y-2">
-              <div class="h-4 bg-gray-300 rounded w-3/4"/>
-              <div class="h-3 bg-gray-200 rounded w-1/2"/>
+        <!-- Loading State -->
+        <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            v-for="i in 6"
+            :key="i"
+            class="bg-white rounded-lg border border-gray-200 p-6 animate-pulse"
+          >
+            <div class="flex items-center space-x-4 mb-4">
+              <div class="bg-gray-300 rounded-lg w-16 h-16"/>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-gray-300 rounded w-3/4"/>
+                <div class="h-3 bg-gray-200 rounded w-1/2"/>
+              </div>
+            </div>
+            <div class="space-y-2">
+              <div class="h-3 bg-gray-200 rounded"/>
+              <div class="h-3 bg-gray-200 rounded w-2/3"/>
             </div>
           </div>
-          <div class="space-y-2">
-            <div class="h-3 bg-gray-200 rounded"/>
-            <div class="h-3 bg-gray-200 rounded w-2/3"/>
-          </div>
         </div>
-      </div>
 
-      <!-- Sponsors Grid -->
-      <div v-else-if="sponsors.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Sponsors Grid -->
+        <div v-else-if="sponsors.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="sponsor in sponsors"
           :key="sponsor.id"
@@ -118,21 +118,21 @@
             </div>
           </div>
         </div>
-      </div>
+        </div>
 
-      <!-- Empty State -->
-      <div v-else class="text-center py-16">
-        <i class="pi pi-building text-gray-400 text-6xl mb-4"/>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No sponsors yet</h3>
-        <p class="text-gray-600 mb-6">Get started by adding your first sponsor.</p>
-        <Button
-          class="btn-primary"
-          @click="navigateTo('/admin/sponsors/add')"
-        >
-          <i class="pi pi-plus mr-2"/>
-          Add First Sponsor
-        </Button>
-      </div>
+        <!-- Empty State -->
+        <div v-else class="text-center py-16">
+          <i class="pi pi-building text-gray-400 text-6xl mb-4"/>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">No sponsors yet</h3>
+          <p class="text-gray-600 mb-6">Get started by adding your first sponsor.</p>
+          <Button
+            class="btn-primary"
+            @click="navigateTo('/admin/sponsors/add')"
+          >
+            <i class="pi pi-plus mr-2"/>
+            Add First Sponsor
+          </Button>
+        </div>
       </div>
     </div>
 
@@ -283,8 +283,8 @@ const selectedSponsor = ref(null)
 const updating = ref(false)
 const logoFile = ref(null)
 
-// Computed
-const sponsors = computed(() => sponsorsStore.sponsors.value)
+// Direct access to store refs (no computed)
+const { sponsors, loading } = sponsorsStore
 
 // Methods
 const formatDate = (dateString) => {

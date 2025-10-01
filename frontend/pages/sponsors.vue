@@ -2,15 +2,6 @@
   <div class="min-h-screen bg-white">
     <!-- Hero Section -->
     <div class="bg-white">
-      <!-- Hero Image -->
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <img
-          src="~/assets/img/brick_race_logo.jpg"
-          alt="The Great Holyoke Brick Race"
-          class="w-full h-64 md:h-80 lg:h-96 object-contain rounded-lg"
-        >
-      </div>
-
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="text-center">
           <h1 class="text-4xl md:text-5xl font-bold mb-6 text-black">Our Amazing Sponsors</h1>
@@ -25,7 +16,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
       <ClientOnly>
         <!-- Loading State -->
-        <div v-if="sponsorsStore.loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div
             v-for="i in 6"
             :key="i"
@@ -42,7 +33,7 @@
         </div>
 
         <!-- Sponsors Grid -->
-        <div v-else-if="sponsors.length > 0">
+        <div v-else-if="sponsors?.length > 0">
           <!-- Premium/Featured Sponsors (if we have high sponsorship amounts) -->
           <div v-if="premiumSponsors.length > 0" class="mb-16">
             <h2 class="text-2xl font-bold text-center text-black mb-8">Premier Sponsors</h2>
@@ -54,7 +45,7 @@
               >
                 <div class="flex flex-col items-center text-center space-y-4">
                   <!-- Logo -->
-                  <div class="w-32 h-32 flex items-center justify-center">
+                  <div class="w-48 h-48 flex items-center justify-center">
                     <img
                       v-if="sponsor.logo_url"
                       :src="sponsor.logo_url"
@@ -63,9 +54,9 @@
                     >
                     <div
                       v-else
-                      class="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200"
+                      class="w-36 h-36 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200"
                     >
-                      <i class="pi pi-building text-gray-400 text-2xl"/>
+                      <i class="pi pi-building text-gray-400 text-3xl"/>
                     </div>
                   </div>
 
@@ -101,7 +92,7 @@
               >
                 <div class="flex flex-col items-center text-center space-y-3">
                   <!-- Logo -->
-                  <div class="w-20 h-20 flex items-center justify-center">
+                  <div class="w-32 h-32 flex items-center justify-center">
                     <img
                       v-if="sponsor.logo_url"
                       :src="sponsor.logo_url"
@@ -110,9 +101,9 @@
                     >
                     <div
                       v-else
-                      class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200"
+                      class="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200"
                     >
-                      <i class="pi pi-building text-gray-400 text-lg"/>
+                      <i class="pi pi-building text-gray-400 text-xl"/>
                     </div>
                   </div>
 
@@ -148,8 +139,9 @@
               Interested in sponsoring The Great Holyoke Brick Race?
             </p>
             <Button
+              tag="a"
+              href="mailto:thegreatholyokebrickrace@gmail.com?subject=Sponsorship Inquiry&body=Hi! I am interested in learning more about sponsorship opportunities for The Great Holyoke Brick Race."
               class="btn-primary"
-              @click="navigateTo('/contact')"
             >
               <i class="pi pi-envelope mr-2"/>
               Contact Us About Sponsorship
@@ -158,7 +150,7 @@
         </div>
 
         <!-- Call to Action for Potential Sponsors -->
-        <div v-if="sponsors.length > 0" class="mt-16">
+        <div v-if="sponsors?.length > 0" class="mt-16">
           <Card class="border-2 border-brand-blue">
             <template #content>
               <div class="text-center space-y-6">
@@ -178,9 +170,10 @@
 
                 <div class="flex justify-center">
                   <Button
+                    tag="a"
+                    href="mailto:thegreatholyokebrickrace@gmail.com?subject=Sponsorship Opportunities&body=Hi! I would like to learn more about sponsorship opportunities for The Great Holyoke Brick Race."
                     size="large"
                     class="btn-primary font-semibold"
-                    @click="navigateTo('/contact')"
                   >
                     <i class="pi pi-envelope mr-2"/>
                     Learn About Sponsorship Opportunities
@@ -198,18 +191,18 @@
 <script setup>
 const sponsorsStore = useSponsors()
 
-// Computed
-const sponsors = computed(() => sponsorsStore.sponsors.value)
+// Direct access to reactive refs
+const { sponsors, loading } = sponsorsStore
 
 // Split sponsors by sponsorship level (if we want to feature higher-tier sponsors)
 const premiumSponsors = computed(() => {
-  return sponsors.value.filter(sponsor => 
+  return (sponsors.value || []).filter(sponsor => 
     sponsor.sponsorship_amount && sponsor.sponsorship_amount >= 1000
   )
 })
 
 const regularSponsors = computed(() => {
-  return sponsors.value.filter(sponsor => 
+  return (sponsors.value || []).filter(sponsor => 
     !sponsor.sponsorship_amount || sponsor.sponsorship_amount < 1000
   )
 })
