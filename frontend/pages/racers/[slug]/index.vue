@@ -171,6 +171,53 @@
               </template>
             </Card>
 
+            <!-- Tournament Podium Finishes -->
+            <Card v-if="podiumFinishes.length > 0">
+              <template #title>
+                <div class="flex items-center gap-2">
+                  <i class="pi pi-crown text-yellow-500" />
+                  Tournament Podium Finishes
+                </div>
+              </template>
+              <template #content>
+                <div class="grid gap-4">
+                  <div
+                    v-for="finish in podiumFinishes"
+                    :key="`${finish.race.id}-${finish.place}`"
+                    class="flex items-center gap-4 p-4 rounded-lg border-2"
+                    :class="{
+                      'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-300': finish.place === 1,
+                      'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-300': finish.place === 2,
+                      'bg-gradient-to-r from-amber-50 to-orange-100 border-amber-300': finish.place === 3
+                    }"
+                  >
+                    <div class="text-4xl">
+                      {{ finish.place === 1 ? '🏆' : finish.place === 2 ? '🥈' : '🥉' }}
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-1">
+                        <span class="font-bold text-lg">{{ finish.title }}</span>
+                        <Badge
+                          :value="finish.prize"
+                          :severity="finish.place === 1 ? 'success' : finish.place === 2 ? 'info' : 'warning'"
+                        />
+                      </div>
+                      <NuxtLink :to="`/races/${finish.race.slug}`" class="text-brand-blue hover:underline font-medium">
+                        {{ finish.race.name }}
+                      </NuxtLink>
+                      <div class="text-sm text-gray-600 mt-1">
+                        {{ finish.race.race_datetime ? new Date(finish.race.race_datetime).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        }) : 'Date not available' }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </Card>
+
             <!-- Performance History -->
             <Card v-if="racerQualifiers.length > 0">
               <template #title>
@@ -704,6 +751,8 @@ const loadRacer = async () => {
         if (process.env.NODE_ENV === 'development') {
           console.log('useRacers: Cached data is fresh, no need to refetch')
         }
+        // Still fetch podium finishes as they may change
+        await fetchPodiumFinishes()
         return
       }
 
@@ -713,10 +762,14 @@ const loadRacer = async () => {
       }
       try {
         racer.value = await fetchRacerDetailsBySlug(racerSlug)
+        // Fetch podium finishes after updating racer data
+        await fetchPodiumFinishes()
       } catch (fetchErr) {
         if (process.env.NODE_ENV === 'development') {
           console.warn('Failed to fetch fresh data, keeping cached data:', fetchErr)
         }
+        // Still try to fetch podium finishes with cached data
+        await fetchPodiumFinishes()
       }
       return
     }
@@ -727,6 +780,11 @@ const loadRacer = async () => {
       console.log('useRacers: No cached data, fetching fresh data for racer:', racerSlug)
     }
     racer.value = await fetchRacerDetailsBySlug(racerSlug)
+    
+    // Fetch podium finishes for this racer
+    if (racer.value) {
+      await fetchPodiumFinishes()
+    }
   } catch (err) {
     // Keep essential error logging for production debugging
     console.error('Error loading racer:', err)
@@ -1007,6 +1065,68 @@ const racerGalleryImages = computed(() => {
       alt: `${racer.value?.name} photo ${index + 1}`
     }))
 })
+
+// Podium finishes - check all races where this racer placed in top 3
+const podiumFinishes = ref([])
+
+const fetchPodiumFinishes = async () => {
+  if (!racer.value?.id) return
+  
+  try {
+    // Use the already initialized races from the composable
+    let races = allRaces.value
+    if (!races || races.length === 0) {
+      // If no races, try to initialize them
+      await initializeRaces()
+      races = allRaces.value
+      if (!races || races.length === 0) return
+    }
+    
+    const finishes = []
+    
+    // Check each race for this racer's podium finish
+    for (const race of races) {
+      try {
+        const winnersData = await $fetch(`/api/races/${race.id}/winners`)
+        if (winnersData.winners && winnersData.tournament_complete) {
+          // Find this racer in the winners
+          const finish = winnersData.winners.find(winner => 
+            winner.racer && winner.racer.id === racer.value.id
+          )
+          
+          if (finish) {
+            finishes.push({
+              race: race,
+              place: finish.place,
+              title: finish.title,
+              prize: finish.prize
+            })
+          }
+        }
+      } catch (error) {
+        // Skip races that don't have winner data
+      }
+    }
+    
+    // Sort by race date (most recent first) and then by place
+    finishes.sort((a, b) => {
+      // Handle date comparison more safely
+      const dateA = a.race.race_datetime ? new Date(a.race.race_datetime).getTime() : 0
+      const dateB = b.race.race_datetime ? new Date(b.race.race_datetime).getTime() : 0
+      
+      // If dates are valid and different, sort by date
+      if (!isNaN(dateA) && !isNaN(dateB) && dateA !== dateB) {
+        return dateB - dateA // Most recent first
+      }
+      // Otherwise sort by place (better place first)
+      return a.place - b.place
+    })
+    
+    podiumFinishes.value = finishes
+  } catch (error) {
+    console.error('Error fetching podium finishes:', error)
+  }
+}
 
 // Open gallery at specific index
 const openRacerGallery = (index) => {

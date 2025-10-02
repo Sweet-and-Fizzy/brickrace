@@ -52,16 +52,18 @@ export const useSponsors = () => {
 
   // Create a new sponsor
   const createSponsor = async (sponsorData: Partial<Sponsor>): Promise<Sponsor> => {
-    const { data, error } = await supabase
-      .from('sponsors')
-      .insert({
-        name: sponsorData.name!,
-        website_url: sponsorData.website_url,
-        logo_url: sponsorData.logo_url,
-        sponsorship_amount: sponsorData.sponsorship_amount || 0,
-        is_active: sponsorData.is_active ?? true,
-        display_order: sponsorData.display_order || 0
-      })
+    const insertData = {
+      name: sponsorData.name!,
+      website_url: sponsorData.website_url,
+      logo_url: sponsorData.logo_url,
+      sponsorship_amount: sponsorData.sponsorship_amount || 0,
+      is_active: sponsorData.is_active ?? true,
+      display_order: sponsorData.display_order || 0
+    }
+    
+    const { data, error } = await (supabase
+      .from('sponsors') as any)
+      .insert(insertData)
       .select()
       .single()
 
@@ -78,17 +80,19 @@ export const useSponsors = () => {
 
   // Update an existing sponsor
   const updateSponsor = async (id: string, updates: Partial<Sponsor>): Promise<Sponsor> => {
-    const { data, error } = await supabase
-      .from('sponsors')
-      .update({
-        name: updates.name,
-        website_url: updates.website_url,
-        logo_url: updates.logo_url,
-        sponsorship_amount: updates.sponsorship_amount,
-        is_active: updates.is_active,
-        display_order: updates.display_order,
-        updated_at: new Date().toISOString()
-      })
+    const updateData = {
+      name: updates.name,
+      website_url: updates.website_url,
+      logo_url: updates.logo_url,
+      sponsorship_amount: updates.sponsorship_amount,
+      is_active: updates.is_active,
+      display_order: updates.display_order,
+      updated_at: new Date().toISOString()
+    }
+    
+    const { data, error } = await (supabase
+      .from('sponsors') as any)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single()

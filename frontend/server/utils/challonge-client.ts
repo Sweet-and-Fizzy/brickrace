@@ -45,6 +45,7 @@ export interface ChallongeApiParticipant {
     seed: number
     active: boolean
     misc: string | null
+    final_rank: number | null
   }
 }
 

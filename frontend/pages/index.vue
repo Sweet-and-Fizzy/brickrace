@@ -106,7 +106,7 @@
             </div>
             <h3 class="font-bold text-lg mb-2">Spectators Welcome</h3>
             <p class="text-gray-600 text-sm">
-              Join over 1,000 spectators who attend this beloved annual event
+              Join the crowd of spectators who attend this beloved annual event
             </p>
           </div>
 
@@ -114,12 +114,12 @@
           <div class="text-center">
             <div class="flex justify-center mb-3">
               <div class="w-12 h-12 bg-brand-gold rounded-full flex items-center justify-center">
-                <i class="pi pi-shopping-bag text-white text-xl" />
+                <i class="pi pi-star text-white text-xl" />
               </div>
             </div>
-            <h3 class="font-bold text-lg mb-2">Food & Refreshments</h3>
+            <h3 class="font-bold text-lg mb-2">Food</h3>
             <p class="text-gray-600 text-sm">
-              Food trucks and local vendors provide delicious options throughout the event
+              Enjoy delicious options from Batch, Holyoke Hummus, The Grill, Comfort Bagel, and Wake the Dead Donuts
             </p>
           </div>
 
@@ -132,7 +132,7 @@
             </div>
             <h3 class="font-bold text-lg mb-2">Family Friendly</h3>
             <p class="text-gray-600 text-sm">
-              A fun community event perfect for all ages and backgrounds
+              A fun event perfect for all ages. We'll have Legos, street chalk, and a face painter
             </p>
           </div>
         </div>

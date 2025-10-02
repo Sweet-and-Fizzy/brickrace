@@ -4,7 +4,7 @@
 const qualifierInstances = new Map()
 
 /**
- * @param {string | null} [raceId=null] - The race ID
+ * @param {string | null} [raceId] - The race ID
  */
 export const useQualifiers = (raceId = null) => {
   // If no raceId provided, create instance without singleton

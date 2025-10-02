@@ -168,14 +168,14 @@
                 :href="sponsor.website_url"
                 :target="sponsor.website_url ? '_blank' : undefined"
                 :rel="sponsor.website_url ? 'noopener noreferrer' : undefined"
-                class="flex items-center justify-center p-3 bg-white rounded-lg hover:bg-gray-100 transition-colors"
+                class="flex items-center justify-center w-40 h-20 p-3 bg-white border-2 border-black hover:shadow-md transition-all duration-200"
                 :class="{ 'cursor-default': !sponsor.website_url }"
               >
                 <img
                   v-if="sponsor.logo_url"
                   :src="sponsor.logo_url"
                   :alt="`${sponsor.name} logo`"
-                  class="h-12 max-w-32 object-contain"
+                  class="w-full h-full object-contain"
                 >
                 <span v-else class="text-gray-600 text-sm px-2">{{ sponsor.name }}</span>
               </a>

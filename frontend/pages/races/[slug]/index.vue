@@ -177,14 +177,6 @@
             <!-- Desktop: Horizontal Steps -->
             <div class="hidden md:block px-2">
               <Steps :model="raceSteps" :active-step="currentStep" class="mb-4" />
-              <div class="text-center mt-4">
-                <p class="text-sm text-gray-600">
-                  Current Status:
-                  <span class="font-semibold">{{
-                    raceSteps[currentStep]?.label || 'Unknown'
-                  }}</span>
-                </p>
-              </div>
             </div>
 
             <!-- Mobile: Vertical Timeline -->
@@ -1406,39 +1398,17 @@ const totalBracketsByType = computed(() => {
   return byType
 })
 
+// Race phase from API - computed to wait for race to load
+const { data: racePhaseData } = await useLazyFetch(() => race.value?.id ? `/api/races/${race.value.id}/phase` : null, {
+  server: false,
+  key: () => race.value?.id ? `race-${race.value.id}-phase` : 'no-race',
+  default: () => ({ phase: 'not_started' })
+})
+
+// Tournament results - hide since Challonge displays results
 const tournamentResults = computed(() => {
-  const results = { double_elimination: null }
-
-  // Check for double elimination tournament completion
-  const bracketType = 'double_elimination'
-  const typeBrackets = raceBrackets.value.filter((b) => b.bracket_type === bracketType)
-  const typeCompleted = completedBracketsByType.value[bracketType] || 0
-  const typeTotal = totalBracketsByType.value[bracketType] || 0
-  const typeWinners = winners.value.filter((w) => w.bracket_type === bracketType)
-
-  if (
-    typeBrackets.length > 0 &&
-    typeCompleted === typeTotal &&
-    typeWinners.length === 1 &&
-    typeTotal >= 1
-  ) {
-    const champion = typeWinners[0]
-    const placings = getTournamentPlacings(bracketType)
-
-    results[bracketType] = {
-      first: {
-        ...champion,
-        bracket_type: bracketType,
-        racer_name: champion.racer_name,
-        racer_number: champion.racer_number,
-        winning_time: champion.winning_time
-      },
-      second: placings.second,
-      third: placings.third
-    }
-  }
-
-  return results
+  // Since Challonge now displays results properly, we don't need our own results display
+  return { double_elimination: null }
 })
 
 // Race timeline events
@@ -1485,16 +1455,13 @@ const raceEvents = computed(() => {
     })
   }
 
-  // Tournament completion
-  const completedTournaments = Object.values(tournamentResults.value).filter(
-    (result) => result !== null
-  )
-  if (completedTournaments.length > 0) {
+  // Tournament completion - check race phase
+  if (racePhaseData.value?.phase === 'complete') {
     events.push({
       type: 'completed',
       icon: 'pi pi-trophy',
       title: 'Tournament Complete',
-      description: `${completedTournaments.length} tournament(s) finished`,
+      description: 'Winners determined - see results above',
       date: new Date().toISOString() // Use current time as completion time
     })
   }
@@ -1530,11 +1497,8 @@ const raceSteps = computed(() => [
 const currentStep = computed(() => {
   if (!race.value) return 0
 
-  // Tournament complete
-  const completedTournaments = Object.values(tournamentResults.value).filter(
-    (result) => result !== null
-  )
-  if (completedTournaments.length > 0) return 4
+  // Tournament complete - check race phase
+  if (racePhaseData.value?.phase === 'complete') return 4
 
   // Brackets phase - if any brackets exist
   if (raceBrackets.value.length > 0) return 3

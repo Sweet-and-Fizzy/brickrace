@@ -20,13 +20,13 @@
           <div
             v-for="i in 6"
             :key="i"
-            class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 animate-pulse"
+            class="bg-white shadow-sm border-2 border-black overflow-hidden animate-pulse"
           >
-            <div class="flex flex-col items-center space-y-4">
-              <div class="bg-gray-300 rounded-lg w-24 h-24"/>
-              <div class="space-y-2 w-full">
-                <div class="h-4 bg-gray-300 rounded w-3/4 mx-auto"/>
-                <div class="h-3 bg-gray-200 rounded w-1/2 mx-auto"/>
+            <div class="flex flex-col h-full">
+              <div class="w-full h-48 p-4 bg-gray-200"/>
+              <div class="bg-black p-3">
+                <div class="h-4 bg-gray-600 w-3/4 mx-auto mb-2"/>
+                <div class="h-3 bg-gray-500 w-1/2 mx-auto"/>
               </div>
             </div>
           </div>
@@ -41,46 +41,48 @@
               <div
                 v-for="sponsor in premiumSponsors"
                 :key="sponsor.id"
-                class="bg-white rounded-lg shadow-lg border-2 border-brand-gold p-8 hover:shadow-xl transition-shadow"
+                class="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 border-2 border-black overflow-hidden"
               >
-                <div class="flex flex-col items-center text-center space-y-4">
+                <div class="flex flex-col h-full">
                   <!-- Logo -->
-                  <div class="w-48 h-48 flex items-center justify-center">
+                  <div class="w-full h-64 p-6 flex items-center justify-center bg-white">
                     <img
                       v-if="sponsor.logo_url"
                       :src="sponsor.logo_url"
                       :alt="`${sponsor.name} logo`"
-                      class="max-w-full max-h-full object-contain"
+                      class="w-full h-full object-contain"
                     >
                     <div
                       v-else
-                      class="w-36 h-36 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200"
+                      class="w-full h-full bg-gray-100 flex items-center justify-center"
                     >
-                      <i class="pi pi-building text-gray-400 text-3xl"/>
+                      <i class="pi pi-building text-gray-400 text-4xl"/>
                     </div>
                   </div>
 
-                  <!-- Name -->
-                  <h3 class="text-xl font-semibold text-black">{{ sponsor.name }}</h3>
+                  <!-- Name and Website -->
+                  <div class="bg-black text-white p-4 text-center">
+                    <h3 class="text-xl font-semibold mb-2">{{ sponsor.name }}</h3>
 
-                  <!-- Website Link -->
-                  <a
-                    v-if="sponsor.website_url"
-                    :href="sponsor.website_url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-brand-blue hover:text-brand-green transition-colors flex items-center"
-                  >
-                    <i class="pi pi-external-link mr-2"/>
-                    Visit Website
-                  </a>
+                    <!-- Website Link -->
+                    <a
+                      v-if="sponsor.website_url"
+                      :href="sponsor.website_url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-brand-gold hover:text-white transition-colors inline-flex items-center text-sm"
+                    >
+                      <i class="pi pi-external-link mr-2"/>
+                      Visit Website
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Regular Sponsors -->
-          <div v-if="regularSponsors.length > 0">
+          <div v-if="regularSponsors.length > 0 || premiumSponsors.length > 0">
             <h2 class="text-2xl font-bold text-center text-black mb-8">
               {{ premiumSponsors.length > 0 ? 'Supporting Sponsors' : 'Our Sponsors' }}
             </h2>
@@ -88,39 +90,66 @@
               <div
                 v-for="sponsor in regularSponsors"
                 :key="sponsor.id"
-                class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                class="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 border-2 border-black overflow-hidden"
               >
-                <div class="flex flex-col items-center text-center space-y-3">
+                <div class="flex flex-col h-full">
                   <!-- Logo -->
-                  <div class="w-32 h-32 flex items-center justify-center">
+                  <div class="w-full h-48 p-4 flex items-center justify-center bg-white">
                     <img
                       v-if="sponsor.logo_url"
                       :src="sponsor.logo_url"
                       :alt="`${sponsor.name} logo`"
-                      class="max-w-full max-h-full object-contain"
+                      class="w-full h-full object-contain"
                     >
                     <div
                       v-else
-                      class="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200"
+                      class="w-full h-full bg-gray-100 flex items-center justify-center"
                     >
-                      <i class="pi pi-building text-gray-400 text-xl"/>
+                      <i class="pi pi-building text-gray-400 text-3xl"/>
                     </div>
                   </div>
 
-                  <!-- Name -->
-                  <h3 class="text-lg font-medium text-black">{{ sponsor.name }}</h3>
+                  <!-- Name and Website -->
+                  <div class="bg-black text-white p-3 text-center">
+                    <h3 class="text-lg font-semibold mb-1">{{ sponsor.name }}</h3>
 
-                  <!-- Website Link -->
-                  <a
-                    v-if="sponsor.website_url"
-                    :href="sponsor.website_url"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-sm text-brand-blue hover:text-brand-green transition-colors flex items-center"
-                  >
-                    <i class="pi pi-external-link mr-1 text-xs"/>
-                    Visit Website
-                  </a>
+                    <!-- Website Link -->
+                    <a
+                      v-if="sponsor.website_url"
+                      :href="sponsor.website_url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-sm text-brand-gold hover:text-white transition-colors inline-flex items-center"
+                    >
+                      <i class="pi pi-external-link mr-1 text-xs"/>
+                      Visit Website
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Become a Sponsor Card -->
+              <div class="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 border-2 border-brand-blue overflow-hidden">
+                <div class="flex flex-col h-full">
+                  <!-- Icon and Description -->
+                  <div class="w-full h-48 p-4 flex flex-col items-center justify-center bg-white text-center">
+                    <div class="bg-brand-blue rounded-full w-20 h-20 flex items-center justify-center mb-3">
+                      <i class="pi pi-heart text-3xl text-white"/>
+                    </div>
+                    <p class="text-sm text-gray-600">Support creativity and community spirit!</p>
+                  </div>
+
+                  <!-- Call to Action -->
+                  <div class="bg-brand-blue text-white p-3 text-center">
+                    <h3 class="text-lg font-semibold mb-1">Become a Sponsor</h3>
+                    <a
+                      href="mailto:thegreatholyokebrickrace@gmail.com?subject=Sponsorship Opportunities"
+                      class="text-sm text-brand-gold hover:text-white transition-colors inline-flex items-center"
+                    >
+                      <i class="pi pi-envelope mr-1 text-xs"/>
+                      Contact Us
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -147,41 +176,6 @@
               Contact Us About Sponsorship
             </Button>
           </div>
-        </div>
-
-        <!-- Call to Action for Potential Sponsors -->
-        <div v-if="sponsors?.length > 0" class="mt-16">
-          <Card class="border-2 border-brand-blue">
-            <template #content>
-              <div class="text-center space-y-6">
-                <div class="flex justify-center">
-                  <div class="bg-brand-blue rounded-full w-16 h-16 flex items-center justify-center">
-                    <i class="pi pi-handshake text-2xl text-white"/>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 class="text-2xl font-bold text-black mb-4">Become a Sponsor</h3>
-                  <p class="text-lg text-gray-700 mb-6">
-                    Join our community of sponsors and help support this unique celebration of creativity,
-                    engineering, and community spirit. Your sponsorship helps make the magic happen!
-                  </p>
-                </div>
-
-                <div class="flex justify-center">
-                  <Button
-                    tag="a"
-                    href="mailto:thegreatholyokebrickrace@gmail.com?subject=Sponsorship Opportunities&body=Hi! I would like to learn more about sponsorship opportunities for The Great Holyoke Brick Race."
-                    size="large"
-                    class="btn-primary font-semibold"
-                  >
-                    <i class="pi pi-envelope mr-2"/>
-                    Learn About Sponsorship Opportunities
-                  </Button>
-                </div>
-              </div>
-            </template>
-          </Card>
         </div>
       </ClientOnly>
     </div>
