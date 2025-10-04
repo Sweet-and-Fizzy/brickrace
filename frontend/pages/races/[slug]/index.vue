@@ -1847,8 +1847,6 @@ const currentHeatType = computed(() => {
 
 // Current heat data for display
 const currentHeatData = computed(() => {
-  // Minimal debug logging
-
   // If we should show completed heat results, prioritize that
   if (race.value?.active && showCompletedHeatResults.value && recentlyCompletedHeat.value) {
     if (!currentRaceHeat.value || currentRaceHeat.value.id === race.value.id) {

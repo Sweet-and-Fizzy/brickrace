@@ -136,10 +136,10 @@ export default defineEventHandler(async (event) => {
       auto_advance
     })
 
-    // Get active race
+    // Get active race with qualifying_mode
     const { data: activeRace } = await client
       .from('races')
-      .select('id')
+      .select('id, qualifying_mode')
       .eq('active', true)
       .single()
 
@@ -161,6 +161,34 @@ export default defineEventHandler(async (event) => {
 
       if (error) {
         throw error
+      }
+
+      // Auto-generate more heats if in auto mode and running low
+      if (activeRace.qualifying_mode === 'auto') {
+        // Count upcoming scheduled heats
+        const { count: upcomingCount } = await client
+          .from('qualifiers')
+          .select('id', { count: 'exact', head: true })
+          .eq('race_id', activeRace.id)
+          .eq('status', 'scheduled')
+
+        console.log(`🔍 Auto-gen check: mode=${activeRace.qualifying_mode}, upcoming=${upcomingCount}`)
+
+        // If fewer than 3 upcoming heats, generate more (maintains buffer of 2-3 upcoming after current heat starts)
+        if (upcomingCount !== null && upcomingCount < 3) {
+          try {
+            console.log(`🎯 Triggering auto-generation (${upcomingCount} upcoming heats)`)
+            await client.rpc('add_qualifier_heats', {
+              target_race_id: activeRace.id
+            })
+            logTimingRequest(event, 'AUTO_GENERATED_HEATS', {
+              reason: `Only ${upcomingCount} upcoming heats remaining`
+            })
+          } catch (genError) {
+            // Log but don't fail the request if auto-generation fails
+            console.error('❌ Failed to auto-generate heats:', genError)
+          }
+        }
       }
     } else if (phase === 'brackets') {
       // Bracket heat - find current bracket by sequential position using Challonge ordering

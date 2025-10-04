@@ -142,27 +142,21 @@ export async function getRacePhase(
   raceId: string
 ): Promise<RacePhase> {
   try {
-    console.log(`🔍 getRacePhase called for race ${raceId}`)
-    
     // Check if there are any qualifiers
     const { data: qualifiers, error: qualError } = await client
       .from('qualifiers')
       .select('id, status')
       .eq('race_id', raceId)
-      .limit(10)
 
     if (qualError) throw qualError
-    console.log(`📋 Found ${qualifiers?.length || 0} qualifiers`)
 
     // Check if there are any brackets
     const { data: brackets, error: bracketError } = await client
       .from('brackets')
       .select('id, track1_time, track2_time, winner_racer_id')
       .eq('race_id', raceId)
-      .limit(10)
 
     if (bracketError) throw bracketError
-    console.log(`🏆 Found ${brackets?.length || 0} brackets`)
 
     // No qualifiers and no brackets = check if there's a Challonge tournament anyway
     if ((!qualifiers || qualifiers.length === 0) && (!brackets || brackets.length === 0)) {
@@ -246,10 +240,16 @@ export async function getRacePhase(
     // If we have qualifiers but no brackets, we're in qualifying phase
     if (qualifiers && qualifiers.length > 0) {
       // Check if there are any incomplete qualifiers
-      const hasIncomplete = qualifiers.some(
-        q => q.status === 'scheduled' || q.status === 'in_progress'
-      )
-      
+      // More efficient: just check if at least 1 incomplete exists
+      const { data: incompleteQualifiers } = await client
+        .from('qualifiers')
+        .select('id')
+        .eq('race_id', raceId)
+        .in('status', ['scheduled', 'in_progress'])
+        .limit(1)
+
+      const hasIncomplete = incompleteQualifiers && incompleteQualifiers.length > 0
+
       return hasIncomplete ? 'qualifying' : 'brackets' // If qualifying done, ready for brackets
     }
 
@@ -268,7 +268,6 @@ export async function getCurrentHeat(
   raceId: string,
   phase: RacePhase
 ) {
-  console.log('🚀 getCurrentHeat called with phase:', phase)
   
   // If tournament is complete, return null (no current heat)
   if (phase === 'complete') {
@@ -276,7 +275,7 @@ export async function getCurrentHeat(
   }
   
   if (phase === 'qualifying') {
-    // Get current qualifier heat
+    // Get current qualifier heat (in_progress first, then scheduled)
     const { data: currentHeat } = await client
       .from('qualifiers')
       .select(
@@ -301,6 +300,43 @@ export async function getCurrentHeat(
         heat_number: typedCurrentHeat[0].heat_number,
         type: 'qualifier',
         racers: typedCurrentHeat.map((q) => ({
+          track_number: q.track_number,
+          racer_id: q.racer_id,
+          racer_name: q.racer?.name,
+          racer_number: q.racer?.racer_number,
+          racer_image_url: q.racer?.image_url,
+          time: q.time
+        }))
+      }
+    }
+
+    // If no in_progress heat, get the first scheduled heat
+    const { data: scheduledHeat } = await client
+      .from('qualifiers')
+      .select(
+        `
+        *,
+        racer:racers(
+          id,
+          name,
+          racer_number,
+          image_url
+        )
+      `
+      )
+      .eq('race_id', raceId)
+      .eq('status', 'scheduled')
+      .order('heat_number', { ascending: true })
+      .order('track_number')
+      .limit(2)
+
+    const typedScheduledHeat = scheduledHeat as QualifierRecord[] | null
+
+    if (typedScheduledHeat && typedScheduledHeat.length > 0) {
+      return {
+        heat_number: typedScheduledHeat[0].heat_number,
+        type: 'qualifier',
+        racers: typedScheduledHeat.map((q) => ({
           track_number: q.track_number,
           racer_id: q.racer_id,
           racer_name: q.racer?.name,
@@ -341,18 +377,54 @@ export async function getCurrentHeat(
 
     const typedCurrentBracket = currentBracket as BracketRecord | null
 
-    console.log('🔍 getCurrentHeat debug:', {
-      found_bracket: !!typedCurrentBracket,
-      bracket_id: typedCurrentBracket?.id,
-      track1_racer_id: typedCurrentBracket?.track1_racer_id,
-      track2_racer_id: typedCurrentBracket?.track2_racer_id,
-      winner_racer_id: typedCurrentBracket?.winner_racer_id
-    })
-
     if (!typedCurrentBracket) {
-      // No current bracket found - check if new matches exist on Challonge
-      console.log('No current bracket found, checking for new Challonge matches...')
-      
+      // No current bracket found - check if there are any scheduled qualifiers we should show instead
+      const { data: scheduledQualifiers, error: qualError } = await client
+        .from('qualifiers')
+        .select(
+          `
+          *,
+          racer:racers(
+            id,
+            name,
+            racer_number,
+            image_url
+          )
+        `
+        )
+        .eq('race_id', raceId)
+        .in('status', ['scheduled', 'in_progress']) // Also include in_progress
+        .order('heat_number', { ascending: true })
+        .order('track_number')
+        .limit(2)
+
+      console.log('📊 Incomplete qualifiers result:', {
+        count: scheduledQualifiers?.length || 0,
+        error: qualError?.message,
+        first_heat: scheduledQualifiers?.[0]?.heat_number,
+        first_status: scheduledQualifiers?.[0]?.status
+      })
+
+      const typedScheduledQualifiers = scheduledQualifiers as QualifierRecord[] | null
+
+      if (typedScheduledQualifiers && typedScheduledQualifiers.length > 0) {
+        console.log('✅ Found scheduled qualifiers, showing those instead of brackets')
+        return {
+          heat_number: typedScheduledQualifiers[0].heat_number,
+          type: 'qualifier',
+          racers: typedScheduledQualifiers.map((q) => ({
+            track_number: q.track_number,
+            racer_id: q.racer_id,
+            racer_name: q.racer?.name,
+            racer_number: q.racer?.racer_number,
+            racer_image_url: q.racer?.image_url,
+            time: q.time
+          }))
+        }
+      }
+
+      console.log('❌ No scheduled qualifiers, trying Challonge sync...')
+
       try {
         await autoSyncNewChallongeMatches(client, raceId)
         
@@ -541,31 +613,54 @@ export async function getUpcomingHeats(
   count: number = 2
 ) {
   if (phase === 'qualifying') {
-    // Use existing RPC function for qualifier heats
-    const { data: nextHeats } = await client.rpc('get_next_heats', { heat_count: count })
-    
-    if (nextHeats) {
+    // Get upcoming qualifiers directly (more reliable than RPC)
+    const { data: upcomingQualifiers } = await client
+      .from('qualifiers')
+      .select(`
+        *,
+        racer:racers(
+          id,
+          name,
+          racer_number,
+          image_url
+        )
+      `)
+      .eq('race_id', raceId)
+      .in('status', ['scheduled', 'in_progress'])
+      .order('heat_number', { ascending: true })
+      .order('track_number')
+
+    if (upcomingQualifiers && upcomingQualifiers.length > 0) {
+      // First, get the current heat to know what to exclude
+      const currentHeat = await getCurrentHeat(client, raceId, phase)
+      const currentHeatNumber = currentHeat?.heat_number
+
       // Group by heat number
-      const grouped = (nextHeats as NextHeatRecord[]).reduce((acc: Record<number, any>, heat: NextHeatRecord) => {
-        if (!acc[heat.heat_number]) {
-          acc[heat.heat_number] = {
-            heat_number: heat.heat_number,
+      const grouped: Record<number, any> = {}
+      upcomingQualifiers.forEach((q) => {
+        if (!grouped[q.heat_number]) {
+          grouped[q.heat_number] = {
+            heat_number: q.heat_number,
             type: 'qualifier',
-            scheduled_order: heat.scheduled_order,
             racers: []
           }
         }
-        acc[heat.heat_number].racers.push({
-          track_number: heat.track_number,
-          racer_id: heat.racer_id,
-          racer_name: heat.racer_name,
-          racer_number: heat.racer_number,
-          racer_image_url: heat.racer_image_url
+        grouped[q.heat_number].racers.push({
+          track_number: q.track_number,
+          racer_id: q.racer_id,
+          racer_name: q.racer?.name,
+          racer_number: q.racer?.racer_number,
+          racer_image_url: q.racer?.image_url
         })
-        return acc
-      }, {})
-      
-      return Object.values(grouped)
+      })
+
+      const heatsArray = Object.values(grouped)
+        .sort((a, b) => a.heat_number - b.heat_number)
+        // Filter out current heat
+        .filter(heat => heat.heat_number !== currentHeatNumber)
+
+      // Return the next heats
+      return heatsArray.slice(0, count)
     }
   } else if (phase === 'brackets') {
     // Get upcoming brackets (ones without times)

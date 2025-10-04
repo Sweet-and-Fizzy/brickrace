@@ -147,6 +147,7 @@
         </div>
       </div>
 
+
       <!-- Error Display -->
       <div v-if="error" class="bg-red-50/20 p-4 rounded-lg mb-6">
         <p class="text-red-800">{{ error }}</p>
@@ -289,6 +290,48 @@
         <NuxtLink to="/races" class="mt-2 inline-block text-blue-600 hover:text-blue-800">
           Manage Races →
         </NuxtLink>
+      </div>
+
+      <!-- Danger Zone - Reset Options -->
+      <div v-if="currentRace" class="mt-8 p-4 border-2 border-red-500 rounded-lg bg-red-50">
+        <h3 class="text-lg font-bold text-red-700 mb-3">
+          <i class="pi pi-exclamation-triangle mr-2"/>
+          Danger Zone - Reset Options
+        </h3>
+        
+        <div class="space-y-4">
+          <!-- Clear Scheduled Heats -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <p class="font-medium text-gray-900">Clear Scheduled Heats</p>
+              <p class="text-sm text-gray-600">Remove all upcoming scheduled heats (keeps completed ones)</p>
+            </div>
+            <button 
+              :disabled="loading"
+              @click="confirmClearScheduledHeats"
+              class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 whitespace-nowrap"
+            >
+              <i class="pi pi-trash mr-2"/>
+              Clear Scheduled
+            </button>
+          </div>
+
+          <!-- Reset Everything -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-red-300">
+            <div>
+              <p class="font-medium text-gray-900">Reset All Qualifiers</p>
+              <p class="text-sm text-gray-600">Delete ALL qualifier data and start fresh (cannot be undone)</p>
+            </div>
+            <button 
+              :disabled="loading"
+              @click="confirmResetAllQualifiers"
+              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 whitespace-nowrap"
+            >
+              <i class="pi pi-exclamation-circle mr-2"/>
+              Reset Everything
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Manual Heat Creation Dialog -->
@@ -446,12 +489,12 @@ const { currentRace, currentHeat, upcomingHeats, loading, error } = heats
 // Methods
 const regenerateHeats = async () => {
   try {
-    await heats.regenerateQualifiers()
-    showSuccess('Heats regenerated successfully')
+    await heats.addAdditionalHeats()
+    showSuccess('Additional heats generated successfully')
     track1Time.value = ''
     track2Time.value = ''
   } catch {
-    showError('Failed to regenerate heats')
+    showError('Failed to generate additional heats')
   }
 }
 
@@ -545,6 +588,63 @@ const fetchAvailableRacers = async () => {
   } catch (err) {
     console.error('Failed to fetch available racers:', err)
     showError('Failed to load available racers')
+  }
+}
+
+// Reset Methods
+const confirmClearScheduledHeats = () => {
+  if (confirm('Are you sure you want to clear all scheduled heats? This will remove all upcoming heats but keep completed ones.')) {
+    clearScheduledHeats()
+  }
+}
+
+const confirmResetAllQualifiers = () => {
+  if (confirm('⚠️ WARNING: This will DELETE ALL qualifier data including completed heats and times!\n\nThis action cannot be undone. Are you absolutely sure?')) {
+    if (confirm('Please confirm once more: Delete ALL qualifier data for this race?')) {
+      resetAllQualifiers()
+    }
+  }
+}
+
+const clearScheduledHeats = async () => {
+  if (!currentRace.value) return
+  
+  try {
+    loading.value = true
+    const { data } = await $fetch(`/api/admin/races/${currentRace.value.id}/clear-scheduled-heats`, {
+      method: 'POST'
+    })
+    
+    showSuccess('Scheduled heats cleared successfully')
+    // Refresh the heats data
+    await heats.fetchCurrentRaceData()
+    await fetchQualifyingStats()
+  } catch (err) {
+    console.error('Failed to clear scheduled heats:', err)
+    showError('Failed to clear scheduled heats: ' + (err.data?.message || err.message))
+  } finally {
+    loading.value = false
+  }
+}
+
+const resetAllQualifiers = async () => {
+  if (!currentRace.value) return
+  
+  try {
+    loading.value = true
+    const { data } = await $fetch(`/api/admin/races/${currentRace.value.id}/reset-qualifiers`, {
+      method: 'POST'
+    })
+    
+    showSuccess('All qualifier data has been reset')
+    // Refresh everything
+    await heats.fetchCurrentRaceData()
+    await fetchQualifyingStats()
+  } catch (err) {
+    console.error('Failed to reset qualifiers:', err)
+    showError('Failed to reset qualifiers: ' + (err.data?.message || err.message))
+  } finally {
+    loading.value = false
   }
 }
 

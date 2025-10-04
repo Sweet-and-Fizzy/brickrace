@@ -315,6 +315,34 @@ export const useHeats = () => {
     }
   }
 
+  // Add additional heats (continues from existing)
+  const addAdditionalHeats = async (raceId = null) => {
+    loading.value = true
+    error.value = null
+
+    try {
+      const response = await $fetch('/api/qualifiers/add-heats', {
+        method: 'POST',
+        body: { race_id: raceId }
+      })
+
+      if (response.error) {
+        throw new Error(response.error)
+      }
+
+      // Refresh current data
+      await fetchCurrentRaceData()
+
+      return response.data
+    } catch (err) {
+      console.error('Error adding additional heats:', err)
+      error.value = err.message
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   // Regenerate qualifiers
   const regenerateQualifiers = async (raceId = null) => {
     loading.value = true
@@ -485,6 +513,7 @@ export const useHeats = () => {
     fetchCurrentRaceData,
     updateHeatTimes,
     editQualifier,
+    addAdditionalHeats,
     regenerateQualifiers,
     startHeat,
     completeCurrentHeat,
