@@ -1,0 +1,31 @@
+{
+  "name": "brickrace-mqtt-server",
+  "version": "1.0.0",
+  "description": "MQTT server for BrickRace timing system",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node index.ts",
+    "watch": "nodemon --exec ts-node index.ts",
+    "watch:tsc": "tsc --watch"
+  },
+  "keywords": [
+    "mqtt",
+    "brickrace",
+    "timing",
+    "race"
+  ],
+  "author": "BrickRace Team",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "mqtt": "^5.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.8",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
