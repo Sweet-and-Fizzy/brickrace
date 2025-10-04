@@ -55,7 +55,7 @@
 
         <!-- Challonge Tournament Bracket -->
         <div class="mb-8">
-          <ChallongeBracket 
+          <ChallongeBracket
             :race-slug="route.params.slug"
             :race-id="race.id"
             :show-admin-link="authStore.isRaceAdmin"
@@ -79,14 +79,14 @@
                     Manage tournament brackets and view administrative tools.
                   </p>
                   <div class="flex gap-3">
-                    <Button 
+                    <Button
                       class="btn-primary"
                       @click="navigateTo(`/races/${route.params.slug}/admin/challonge`)"
                     >
                       <i class="pi pi-trophy mr-2" />
                       Manage Challonge Tournament
                     </Button>
-                    <Button 
+                    <Button
                       severity="secondary"
                       @click="navigateTo(`/races/${route.params.slug}/brackets`)"
                     >
@@ -502,6 +502,41 @@
                           Winner R{{ bracket.round_number }}
                         </div>
                         <h3 class="text-xl font-bold text-black">Match #{{ index + 1 }}</h3>
+                        <!-- Best of 3 indicator -->
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-semibold"
+                        >
+                          Best of 3
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Round Progress for Best of 3 -->
+                    <div
+                      v-if="bracket.match_format === 'best_of_3'"
+                      class="mb-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200"
+                    >
+                      <div class="flex items-center justify-between text-sm">
+                        <span class="font-medium text-purple-800">Round Progress:</span>
+                        <div class="flex items-center gap-2">
+                          <span class="text-blue-600 font-semibold">
+                            {{ bracket.track1_racer_name || 'Player 1' }}:
+                            {{ bracket.rounds_won_track1 || 0 }}
+                          </span>
+                          <span class="text-gray-400">-</span>
+                          <span class="text-red-600 font-semibold">
+                            {{ bracket.track2_racer_name || 'Player 2' }}:
+                            {{ bracket.rounds_won_track2 || 0 }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="mt-2 text-xs text-purple-600">
+                        {{
+                          bracket.is_completed
+                            ? 'Match Complete!'
+                            : `Current Round: ${bracket.current_round || 1}`
+                        }}
                       </div>
                     </div>
                     <!-- Bracket Race Content -->
@@ -597,18 +632,28 @@
                     </div>
 
                     <!-- Double Withdrawal Resolution -->
-                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                    <div
+                      v-if="
+                        !bracket.is_forfeit &&
+                        !bracket.winner_racer_id &&
+                        isBothRacersWithdrawn(bracket) &&
+                        authStore.isRaceAdmin
+                      "
+                      class="mt-4 text-center"
+                    >
                       <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
                         <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
                           <i class="pi pi-exclamation-triangle text-lg" />
                           <span class="font-bold">DOUBLE WITHDRAWAL</span>
                         </div>
-                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
-                        
+                        <p class="text-sm text-red-600 mb-4">
+                          Both racers have withdrawn. Admin intervention required.
+                        </p>
+
                         <div class="flex flex-col gap-2">
                           <Button
                             label="Mark as Bye (No Advancement)"
-                            severity="secondary" 
+                            severity="secondary"
                             size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
@@ -616,7 +661,7 @@
                           <Button
                             label="Manual Selection..."
                             severity="primary"
-                            size="small" 
+                            size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="showManualSelection(bracket)"
                           />
@@ -683,6 +728,41 @@
                         <h3 class="text-xl font-bold text-black">
                           Elimination Match #{{ index + 1 }}
                         </h3>
+                        <!-- Best of 3 indicator -->
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-semibold"
+                        >
+                          Best of 3
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Round Progress for Best of 3 -->
+                    <div
+                      v-if="bracket.match_format === 'best_of_3'"
+                      class="mb-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200"
+                    >
+                      <div class="flex items-center justify-between text-sm">
+                        <span class="font-medium text-purple-800">Round Progress:</span>
+                        <div class="flex items-center gap-2">
+                          <span class="text-blue-600 font-semibold">
+                            {{ bracket.track1_racer_name || 'Player 1' }}:
+                            {{ bracket.rounds_won_track1 || 0 }}
+                          </span>
+                          <span class="text-gray-400">-</span>
+                          <span class="text-red-600 font-semibold">
+                            {{ bracket.track2_racer_name || 'Player 2' }}:
+                            {{ bracket.rounds_won_track2 || 0 }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="mt-2 text-xs text-purple-600">
+                        {{
+                          bracket.is_completed
+                            ? 'Match Complete!'
+                            : `Current Round: ${bracket.current_round || 1}`
+                        }}
                       </div>
                     </div>
                     <!-- Similar bracket content but for loser bracket -->
@@ -778,18 +858,28 @@
                     </div>
 
                     <!-- Double Withdrawal Resolution -->
-                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                    <div
+                      v-if="
+                        !bracket.is_forfeit &&
+                        !bracket.winner_racer_id &&
+                        isBothRacersWithdrawn(bracket) &&
+                        authStore.isRaceAdmin
+                      "
+                      class="mt-4 text-center"
+                    >
                       <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
                         <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
                           <i class="pi pi-exclamation-triangle text-lg" />
                           <span class="font-bold">DOUBLE WITHDRAWAL</span>
                         </div>
-                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
-                        
+                        <p class="text-sm text-red-600 mb-4">
+                          Both racers have withdrawn. Admin intervention required.
+                        </p>
+
                         <div class="flex flex-col gap-2">
                           <Button
                             label="Mark as Bye (No Advancement)"
-                            severity="secondary" 
+                            severity="secondary"
                             size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
@@ -797,7 +887,7 @@
                           <Button
                             label="Manual Selection..."
                             severity="primary"
-                            size="small" 
+                            size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="showManualSelection(bracket)"
                           />
@@ -962,18 +1052,28 @@
                     </div>
 
                     <!-- Double Withdrawal Resolution -->
-                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                    <div
+                      v-if="
+                        !bracket.is_forfeit &&
+                        !bracket.winner_racer_id &&
+                        isBothRacersWithdrawn(bracket) &&
+                        authStore.isRaceAdmin
+                      "
+                      class="mt-4 text-center"
+                    >
                       <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
                         <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
                           <i class="pi pi-exclamation-triangle text-lg" />
                           <span class="font-bold">DOUBLE WITHDRAWAL</span>
                         </div>
-                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
-                        
+                        <p class="text-sm text-red-600 mb-4">
+                          Both racers have withdrawn. Admin intervention required.
+                        </p>
+
                         <div class="flex flex-col gap-2">
                           <Button
                             label="Mark as Bye (No Advancement)"
-                            severity="secondary" 
+                            severity="secondary"
                             size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
@@ -981,7 +1081,7 @@
                           <Button
                             label="Manual Selection..."
                             severity="primary"
-                            size="small" 
+                            size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="showManualSelection(bracket)"
                           />
@@ -1062,7 +1162,13 @@
                               v-if="bracket.bracket_group"
                               class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold capitalize"
                             >
-                              {{ bracket.bracket_group === 'winner' ? 'Winner Bracket' : bracket.bracket_group === 'loser' ? 'Loser Bracket' : 'Finals' }}
+                              {{
+                                bracket.bracket_group === 'winner'
+                                  ? 'Winner Bracket'
+                                  : bracket.bracket_group === 'loser'
+                                    ? 'Loser Bracket'
+                                    : 'Finals'
+                              }}
                             </div>
                             <div
                               v-if="bracket.round_number"
@@ -1538,7 +1644,7 @@ const race = ref(null)
 const raceBrackets = computed(() => {
   const brackets = race.value ? getBracketsForRace(race.value.id) : []
   // Map the bracket data to include flattened racer names
-  return brackets.map(b => ({
+  return brackets.map((b) => ({
     ...b,
     track1_racer_name: b.track1_racer?.name || null,
     track1_racer_number: b.track1_racer?.racer_number || null,
@@ -1975,7 +2081,9 @@ const getTournamentPlacings = (bracketType) => {
 
     // Best time among semi-final losers gets third place
     if (semiFinalLosers.length > 0) {
-      thirdPlace = semiFinalLosers.reduce((best, current) => (current.time < best.time ? current : best))
+      thirdPlace = semiFinalLosers.reduce((best, current) =>
+        current.time < best.time ? current : best
+      )
     }
   }
 
@@ -2026,7 +2134,7 @@ const loadEligibleRacers = async () => {
 
     checkedInCount.value = checkedIn || 0
     withdrawnCount.value = withdrawn || 0
-    withdrawnRacers.value = new Set((withdrawnData || []).map(w => w.racer_id))
+    withdrawnRacers.value = new Set((withdrawnData || []).map((w) => w.racer_id))
   } catch (err) {
     console.error('Error loading eligible racers:', err)
   }
@@ -2115,7 +2223,12 @@ const generateBrackets = async () => {
         race_id: race.value.id,
         track1_racer_id: fastest.racer_id,
         track2_racer_id: slowest.racer_id,
-        bracket_type: selectedBracketType.value
+        bracket_type: selectedBracketType.value,
+        match_format: 'best_of_3', // Use best-of-3 format
+        total_rounds: 3,
+        current_round: 1,
+        rounds_won_track1: 0,
+        rounds_won_track2: 0
       })
     }
 
@@ -2410,8 +2523,10 @@ const cancelEdit = (bracket, track) => {
 // Check if both racers in a bracket are withdrawn
 const isBothRacersWithdrawn = (bracket) => {
   if (!bracket.track1_racer_id || !bracket.track2_racer_id) return false
-  return withdrawnRacers.value.has(bracket.track1_racer_id) && 
-         withdrawnRacers.value.has(bracket.track2_racer_id)
+  return (
+    withdrawnRacers.value.has(bracket.track1_racer_id) &&
+    withdrawnRacers.value.has(bracket.track2_racer_id)
+  )
 }
 
 // Get previous round losers who could advance
@@ -2436,10 +2551,10 @@ const showManualSelection = (bracket) => {
 const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = null, reason = '') => {
   try {
     resolvingDoubleWithdrawal.value = bracket.id
-    
+
     // For now, we'll implement a simple forfeit-based resolution
     // In a full implementation, this would call database functions to properly restructure
-    
+
     if (action === 'admin_choice' && replacementRacerId) {
       // Update bracket to advance the chosen racer
       const { error } = await supabase
@@ -2451,9 +2566,9 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
           forfeit_reason: `Double withdrawal resolved: ${reason || 'Admin selection'}`
         })
         .eq('id', bracket.id)
-      
+
       if (error) throw error
-      
+
       toast.add({
         severity: 'success',
         summary: 'Resolution Complete',
@@ -2469,9 +2584,9 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
           is_forfeit: true // Mark as resolved to prevent showing double withdrawal warning
         })
         .eq('id', bracket.id)
-      
+
       if (error) throw error
-      
+
       toast.add({
         severity: 'info',
         summary: 'Marked as Bye',
@@ -2479,10 +2594,9 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
         life: 3000
       })
     }
-    
+
     // Refresh brackets
     await initializeBrackets()
-    
   } catch (err) {
     console.error('Error resolving double withdrawal:', err)
     toast.add({

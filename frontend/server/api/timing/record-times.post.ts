@@ -27,11 +27,13 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
     // Get the completed bracket with all details
     const { data: bracket, error: bracketError } = await client
       .from('brackets')
-      .select(`
+      .select(
+        `
         *,
         track1_racer:racers!track1_racer_id(id, name, racer_number),
         track2_racer:racers!track2_racer_id(id, name, racer_number)
-      `)
+      `
+      )
       .eq('id', bracketId)
       .single()
 
@@ -41,7 +43,7 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
 
     // Determine winner and loser
     let winnerRacerId, loserRacerId, winnerTrack, loserTrack
-    
+
     if (bracket.track1_time < bracket.track2_time) {
       winnerRacerId = bracket.track1_racer_id
       loserRacerId = bracket.track2_racer_id
@@ -69,10 +71,12 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
     if (bracket.challonge_match_id) {
       syncBracketByChallongeMatchId(client, raceId, bracket.challonge_match_id)
         .then(async () => {
-          console.log(`Bracket ${bracketId} synced successfully, regenerating brackets from Challonge`)
+          console.log(
+            `Bracket ${bracketId} synced successfully, regenerating brackets from Challonge`
+          )
           // Import the bracket generator function
           const { generateBracketsFromChallonge } = await import('~/server/utils/bracket-generator')
-          
+
           // Get tournament ID for this race
           const { data: tournament } = await client
             .from('challonge_tournaments')
@@ -80,14 +84,17 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
             .eq('race_id', raceId)
             .eq('status', 'active')
             .single()
-          
+
           if (tournament) {
             await generateBracketsFromChallonge(client, raceId, tournament.id)
             console.log('Brackets regenerated from Challonge after sync')
           }
         })
-        .catch(error => {
-          console.error(`Failed to sync bracket ${bracketId} to Challonge match ${bracket.challonge_match_id}:`, error)
+        .catch((error) => {
+          console.error(
+            `Failed to sync bracket ${bracketId} to Challonge match ${bracket.challonge_match_id}:`,
+            error
+          )
           // Log but don't throw - timing operation should succeed even if sync fails
         })
     } else {
@@ -96,14 +103,154 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
 
     // Note: Bracket generation is now handled by Challonge tournament structure
     // We only record times here - the brackets are pre-generated from Challonge matches
-    console.log(`Bracket ${bracketId} completed - times recorded, winner determined, sync initiated`)
-
+    console.log(
+      `Bracket ${bracketId} completed - times recorded, winner determined, sync initiated`
+    )
   } catch (error) {
     console.error('Error handling bracket completion:', error)
     // Don't throw - we don't want to fail the timing recording
   }
 }
 
+/**
+ * Handle times for single race format brackets (legacy)
+ */
+async function handleSingleBracketTimes(
+  client: any,
+  bracketId: string,
+  track1_time?: number,
+  track2_time?: number,
+  raceId?: string
+) {
+  // Update bracket times
+  const updates: any = {}
+  if (track1_time !== undefined) updates.track1_time = track1_time
+  if (track2_time !== undefined) updates.track2_time = track2_time
+
+  const { error } = await client.from('brackets').update(updates).eq('id', bracketId)
+
+  if (error) {
+    throw error
+  }
+
+  // Get the updated bracket to check if both times are now recorded
+  const { data: updatedBracket } = await client
+    .from('brackets')
+    .select('track1_time, track2_time, winner_racer_id')
+    .eq('id', bracketId)
+    .single()
+
+  // Check if both times are now recorded and determine winner + generate next round
+  if (
+    updatedBracket &&
+    updatedBracket.track1_time !== null &&
+    updatedBracket.track2_time !== null &&
+    !updatedBracket.winner_racer_id &&
+    raceId
+  ) {
+    await handleBracketCompletion(client, raceId, bracketId)
+  }
+}
+
+/**
+ * Handle times for best-of-3 format brackets
+ */
+async function handleBestOf3BracketTimes(
+  client: any,
+  bracket: any,
+  track1_time?: number,
+  track2_time?: number
+) {
+  const currentRound = bracket.current_round || 1
+
+  // Get the current round details
+  const { data: roundData, error: roundError } = await client
+    .from('bracket_rounds')
+    .select('*')
+    .eq('bracket_id', bracket.id)
+    .eq('round_number', currentRound)
+    .single()
+
+  if (roundError || !roundData) {
+    throw new Error(`Current round ${currentRound} not found for bracket ${bracket.id}`)
+  }
+
+  // Update round times based on track assignments
+  const updates: any = {}
+
+  if (track1_time !== undefined) {
+    // Find which racer is assigned to track 1 in this round
+    if (roundData.racer1_track === 1) {
+      updates.racer1_time = track1_time
+    } else if (roundData.racer2_track === 1) {
+      updates.racer2_time = track1_time
+    }
+  }
+
+  if (track2_time !== undefined) {
+    // Find which racer is assigned to track 2 in this round
+    if (roundData.racer1_track === 2) {
+      updates.racer1_time = track2_time
+    } else if (roundData.racer2_track === 2) {
+      updates.racer2_time = track2_time
+    }
+  }
+
+  if (Object.keys(updates).length === 0) {
+    throw new Error('No valid track assignments found for provided times')
+  }
+
+  // Update the round with the new times
+  const { error: updateError } = await client
+    .from('bracket_rounds')
+    .update(updates)
+    .eq('id', roundData.id)
+
+  if (updateError) {
+    throw updateError
+  }
+
+  // Get updated round data
+  const updatedRound = { ...roundData, ...updates }
+
+  // Check if both times are recorded for this round
+  if (updatedRound.racer1_time && updatedRound.racer2_time && !updatedRound.completed_at) {
+    await completeBestOf3Round(client, updatedRound)
+  }
+}
+
+/**
+ * Complete a round in best-of-3 format and check for match completion
+ */
+async function completeBestOf3Round(client: any, roundData: any) {
+  // Determine winner of this round
+  let winnerRacerId, winnerTrack
+  if (roundData.racer1_time < roundData.racer2_time) {
+    winnerRacerId = roundData.racer1_id
+    winnerTrack = roundData.racer1_track
+  } else {
+    winnerRacerId = roundData.racer2_id
+    winnerTrack = roundData.racer2_track
+  }
+
+  // Update round with winner and completion time
+  const { error: roundUpdateError } = await client
+    .from('bracket_rounds')
+    .update({
+      winner_racer_id: winnerRacerId,
+      winner_track: winnerTrack,
+      completed_at: new Date().toISOString()
+    })
+    .eq('id', roundData.id)
+
+  if (roundUpdateError) {
+    throw roundUpdateError
+  }
+
+  console.log(`🎯 Round ${roundData.round_number} completed: Winner = ${winnerRacerId}`)
+
+  // The database trigger will automatically update the bracket's win counts and determine overall winner
+}
 
 export default defineEventHandler(async (event) => {
   // Validate API key
@@ -172,7 +319,9 @@ export default defineEventHandler(async (event) => {
           .eq('race_id', activeRace.id)
           .eq('status', 'scheduled')
 
-        console.log(`🔍 Auto-gen check: mode=${activeRace.qualifying_mode}, upcoming=${upcomingCount}`)
+        console.log(
+          `🔍 Auto-gen check: mode=${activeRace.qualifying_mode}, upcoming=${upcomingCount}`
+        )
 
         // If fewer than 3 upcoming heats, generate more (maintains buffer of 2-3 upcoming after current heat starts)
         if (upcomingCount !== null && upcomingCount < 3) {
@@ -194,53 +343,34 @@ export default defineEventHandler(async (event) => {
       // Bracket heat - find current bracket by sequential position using Challonge ordering
       const { data: brackets } = await client
         .from('brackets')
-        .select('id')
+        .select('id, match_format, current_round, track1_racer_id, track2_racer_id')
         .eq('race_id', activeRace.id)
         .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
         .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
-      
+
       const bracketIndex = heat_number - 1 // Convert heat number to 0-based index
       if (!brackets || !brackets[bracketIndex]) {
         throw new Error(`Bracket not found for heat number ${heat_number}`)
       }
 
-      const bracketId = brackets[bracketIndex].id
+      const bracket = brackets[bracketIndex]
 
-      // Update bracket times
-      const updates: any = {}
-      if (track1_time !== undefined) updates.track1_time = track1_time
-      if (track2_time !== undefined) updates.track2_time = track2_time
-
-      const { error } = await client
-        .from('brackets')
-        .update(updates)
-        .eq('id', bracketId)
-
-      if (error) {
-        throw error
+      // Handle different match formats
+      if (bracket.match_format === 'best_of_3') {
+        await handleBestOf3BracketTimes(client, bracket, track1_time, track2_time)
+      } else {
+        // Legacy single race format
+        await handleSingleBracketTimes(client, bracket.id, track1_time, track2_time, activeRace.id)
       }
 
       logTimingRequest(event, 'BRACKET_TIMES_RECORDED', {
-        bracket_id: bracketId,
+        bracket_id: bracket.id,
+        match_format: bracket.match_format,
+        current_round: bracket.current_round,
         track1_time,
         track2_time
       })
-
-      // Get the updated bracket to check if both times are now recorded
-      const { data: updatedBracket } = await client
-        .from('brackets')
-        .select('track1_time, track2_time, winner_racer_id')
-        .eq('id', bracketId)
-        .single()
-
-      // Check if both times are now recorded and determine winner + generate next round
-      if (updatedBracket && 
-          updatedBracket.track1_time !== null && 
-          updatedBracket.track2_time !== null && 
-          !updatedBracket.winner_racer_id) {
-        await handleBracketCompletion(client, activeRace.id, bracketId)
-      }
     }
 
     let nextHeatInfo = null

@@ -71,16 +71,49 @@ export async function syncBracketToChallonge(
     // Get the completed bracket with full details
     const { data: bracket } = await client
       .from('brackets')
-      .select(`
+      .select(
+        `
         *,
         track1_racer:racers!track1_racer_id(id, name, racer_number),
         track2_racer:racers!track2_racer_id(id, name, racer_number)
-      `)
+      `
+      )
       .eq('id', bracketId)
       .single()
 
-    if (!bracket || !bracket.track1_time || !bracket.track2_time) {
-      console.log('Bracket not ready for sync - missing times')
+    if (!bracket) {
+      console.log('Bracket not found')
+      return
+    }
+
+    // Check if bracket is ready for sync based on format
+    let isReadyForSync = false
+    let scoresCsv = ''
+    let winnerRacerId = ''
+
+    if (bracket.match_format === 'best_of_3') {
+      // For best-of-3, check if overall match is complete
+      if (bracket.is_completed && bracket.winner_racer_id) {
+        isReadyForSync = true
+        winnerRacerId = bracket.winner_racer_id
+
+        // Create scores in format "rounds_won_player1-rounds_won_player2"
+        const player1Wins = bracket.rounds_won_track1 || 0
+        const player2Wins = bracket.rounds_won_track2 || 0
+        scoresCsv = `${player1Wins}-${player2Wins}`
+      }
+    } else {
+      // Legacy single race format
+      if (bracket.track1_time && bracket.track2_time) {
+        isReadyForSync = true
+        const isTrack1Winner = bracket.track1_time < bracket.track2_time
+        winnerRacerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
+        scoresCsv = `${bracket.track1_time.toFixed(3)}-${bracket.track2_time.toFixed(3)}`
+      }
+    }
+
+    if (!isReadyForSync) {
+      console.log('Bracket not ready for sync - match not complete')
       return
     }
 
@@ -110,18 +143,13 @@ export async function syncBracketToChallonge(
       return
     }
 
-    // Determine winner and loser
-    const isTrack1Winner = bracket.track1_time < bracket.track2_time
-    const winnerRacerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
+    // Get winner's Challonge participant ID
     const winnerChallongeId = participantMap.get(winnerRacerId)
 
     if (!winnerChallongeId) {
       console.log('Winner participant mapping not found for racer:', winnerRacerId)
       return
     }
-
-    // Format scores for Challonge (faster time wins)
-    const scoresCsv = `${bracket.track1_time.toFixed(3)}-${bracket.track2_time.toFixed(3)}`
 
     // Update the Challonge match
     await challongeApi.updateMatch(
@@ -133,23 +161,25 @@ export async function syncBracketToChallonge(
       }
     )
 
-    console.log(`Successfully synced bracket ${bracketId} to Challonge match ${matchingMatch.match.id}`)
+    console.log(
+      `Successfully synced bracket ${bracketId} to Challonge match ${matchingMatch.match.id}`
+    )
     console.log(`Winner: ${winnerChallongeId}, Scores: ${scoresCsv}`)
 
     // Store sync record for tracking
-    await client
-      .from('challonge_match_sync')
-      .upsert({
+    await client.from('challonge_match_sync').upsert(
+      {
         bracket_id: bracketId,
         challonge_tournament_id: tournament.id,
         challonge_match_id: matchingMatch.match.id.toString(),
         synced_at: new Date().toISOString(),
         winner_participant_id: winnerChallongeId,
         scores_csv: scoresCsv
-      }, {
+      },
+      {
         onConflict: 'bracket_id'
-      })
-
+      }
+    )
   } catch (error) {
     console.error('Error syncing bracket to Challonge:', error)
     // Don't throw - we don't want to fail the timing operation
@@ -164,9 +194,12 @@ function findMatchingChallongeMatch(
   challongeMatches: any[],
   participantMap: Map<string, string>
 ): any | null {
-  
-  const track1ChallongeId = bracket.track1_racer_id ? participantMap.get(bracket.track1_racer_id) : null
-  const track2ChallongeId = bracket.track2_racer_id ? participantMap.get(bracket.track2_racer_id) : null
+  const track1ChallongeId = bracket.track1_racer_id
+    ? participantMap.get(bracket.track1_racer_id)
+    : null
+  const track2ChallongeId = bracket.track2_racer_id
+    ? participantMap.get(bracket.track2_racer_id)
+    : null
 
   if (!track1ChallongeId || !track2ChallongeId) {
     return null
@@ -176,7 +209,7 @@ function findMatchingChallongeMatch(
   return challongeMatches.find((match: any) => {
     const player1 = match.match.player1_id?.toString()
     const player2 = match.match.player2_id?.toString()
-    
+
     return (
       (player1 === track1ChallongeId && player2 === track2ChallongeId) ||
       (player1 === track2ChallongeId && player2 === track1ChallongeId)
@@ -188,10 +221,7 @@ function findMatchingChallongeMatch(
  * Sync all completed brackets for a race to Challonge
  * Useful for bulk sync or recovery scenarios
  */
-export async function syncAllBracketsToChallonge(
-  client: any,
-  raceId: string
-): Promise<void> {
+export async function syncAllBracketsToChallonge(client: any, raceId: string): Promise<void> {
   try {
     console.log(`Starting bulk sync for race ${raceId}`)
 
@@ -215,11 +245,10 @@ export async function syncAllBracketsToChallonge(
     for (const bracket of completedBrackets) {
       await syncBracketToChallonge(client, raceId, bracket.id)
       // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
 
     console.log(`Bulk sync completed for race ${raceId}`)
-
   } catch (error) {
     console.error('Error in bulk sync:', error)
     throw error
