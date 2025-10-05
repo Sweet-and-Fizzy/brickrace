@@ -1,7 +1,7 @@
 // Direct HTTP client for Challonge API v1
 const createChallongeHttpClient = () => {
   const config = useRuntimeConfig()
-  
+
   if (!config.challongeApiKey) {
     throw new Error('CHALLONGE_API_KEY is required but not configured')
   }
@@ -69,24 +69,64 @@ export const challongeApi = {
   // Tournament operations
   createTournament: async (params: any): Promise<ChallongeApiTournament> => {
     const client = createChallongeHttpClient()
-    
+
     try {
-      console.log('Creating tournament with params:', params)
-      
+      // Accept either a flat tournament object or an object with a `tournament` key
+      const raw = params?.tournament ?? params
+
+      // Map camelCase to Challonge snake_case and keep only supported fields
+      const payload: Record<string, any> = {
+        name: raw?.name,
+        url: raw?.url,
+        description: raw?.description,
+        // tournament_type accepts values like 'single elimination' | 'double elimination' | 'round robin' | 'swiss'
+        tournament_type: raw?.tournament_type ?? raw?.tournamentType,
+        hold_third_place_match: raw?.hold_third_place_match ?? raw?.holdThirdPlaceMatch,
+        accept_attachments: raw?.accept_attachments ?? raw?.acceptAttachments,
+        hide_forum: raw?.hide_forum ?? raw?.hideForum,
+        show_rounds: raw?.show_rounds ?? raw?.showRounds,
+        // Prefer explicit control of open signup (false blocks public signups)
+        open_signup:
+          typeof raw?.open_signup === 'boolean'
+            ? raw.open_signup
+            : raw?.signupsRestricted
+              ? false
+              : undefined
+      }
+
+      console.log('Creating tournament with payload:', payload)
+
+      // Basic validation to catch issues before hitting Challonge
+      if (!payload?.name || !payload?.url) {
+        throw new Error('Challonge API Error: Missing required fields: name and/or url')
+      }
+
       const response = await fetch(`${client.baseURL}/tournaments.json`, {
         method: 'POST',
         headers: {
-          'Authorization': client.authHeader,
+          Authorization: client.authHeader,
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json'
         },
-        body: JSON.stringify({ tournament: params })
+        body: JSON.stringify({ tournament: payload })
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error(`HTTP ${response.status}: ${errorText}`)
-        throw new Error(`HTTP ${response.status}: ${errorText}`)
+        // Try to parse Challonge error body which often looks like { errors: ["..."] }
+        let message = `HTTP ${response.status}`
+        try {
+          const errJson = await response.json()
+          if (Array.isArray(errJson?.errors)) {
+            message += `: ${errJson.errors.join(', ')}`
+          } else {
+            message += `: ${JSON.stringify(errJson)}`
+          }
+        } catch {
+          const errorText = await response.text()
+          message += `: ${errorText}`
+        }
+        console.error(message)
+        throw new Error(`Challonge API Error: ${message}`)
       }
 
       const data = await response.json()
@@ -100,16 +140,16 @@ export const challongeApi = {
 
   startTournament: async (tournamentId: string): Promise<ChallongeApiTournament> => {
     const client = createChallongeHttpClient()
-    
+
     try {
       console.log(`Starting tournament ${tournamentId}`)
-      
+
       const response = await fetch(`${client.baseURL}/tournaments/${tournamentId}/start.json`, {
         method: 'POST',
         headers: {
-          'Authorization': client.authHeader,
+          Authorization: client.authHeader,
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json'
         }
       })
 
@@ -130,16 +170,16 @@ export const challongeApi = {
 
   finalizeTournament: async (tournamentId: string): Promise<ChallongeApiTournament> => {
     const client = createChallongeHttpClient()
-    
+
     try {
       console.log(`Finalizing tournament ${tournamentId}`)
-      
+
       const response = await fetch(`${client.baseURL}/tournaments/${tournamentId}/finalize.json`, {
         method: 'POST',
         headers: {
-          'Authorization': client.authHeader,
+          Authorization: client.authHeader,
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json'
         }
       })
 
@@ -160,16 +200,16 @@ export const challongeApi = {
 
   getTournament: async (tournamentId: string): Promise<ChallongeApiTournament> => {
     const client = createChallongeHttpClient()
-    
+
     try {
       console.log(`Getting tournament ${tournamentId}`)
-      
+
       const response = await fetch(`${client.baseURL}/tournaments/${tournamentId}.json`, {
         method: 'GET',
         headers: {
-          'Authorization': client.authHeader,
+          Authorization: client.authHeader,
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json'
         }
       })
 
@@ -189,23 +229,29 @@ export const challongeApi = {
   },
 
   // Participant operations - bulk add using individual create calls with direct HTTP
-  bulkAddParticipants: async (tournamentId: string, participants: any[]): Promise<ChallongeApiParticipant[]> => {
+  bulkAddParticipants: async (
+    tournamentId: string,
+    participants: any[]
+  ): Promise<ChallongeApiParticipant[]> => {
     const client = createChallongeHttpClient()
     const results: ChallongeApiParticipant[] = []
-    
+
     for (const participant of participants) {
       try {
         console.log(`Adding participant ${participant.name} to tournament ${tournamentId}`)
-        
-        const response = await fetch(`${client.baseURL}/tournaments/${tournamentId}/participants.json`, {
-          method: 'POST',
-          headers: {
-            'Authorization': client.authHeader,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ participant })
-        })
+
+        const response = await fetch(
+          `${client.baseURL}/tournaments/${tournamentId}/participants.json`,
+          {
+            method: 'POST',
+            headers: {
+              Authorization: client.authHeader,
+              'Content-Type': 'application/json',
+              Accept: 'application/json'
+            },
+            body: JSON.stringify({ participant })
+          }
+        )
 
         if (!response.ok) {
           const errorText = await response.text()
@@ -221,25 +267,31 @@ export const challongeApi = {
         // Continue with other participants even if one fails
       }
     }
-    
+
     return results
   },
 
-  addParticipant: async (tournamentId: string, participant: any): Promise<ChallongeApiParticipant> => {
+  addParticipant: async (
+    tournamentId: string,
+    participant: any
+  ): Promise<ChallongeApiParticipant> => {
     const client = createChallongeHttpClient()
-    
+
     try {
       console.log(`Adding participant ${participant.name} to tournament ${tournamentId}`)
-      
-      const response = await fetch(`${client.baseURL}/tournaments/${tournamentId}/participants.json`, {
-        method: 'POST',
-        headers: {
-          'Authorization': client.authHeader,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ participant })
-      })
+
+      const response = await fetch(
+        `${client.baseURL}/tournaments/${tournamentId}/participants.json`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: client.authHeader,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({ participant })
+        }
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -258,18 +310,21 @@ export const challongeApi = {
 
   getParticipants: async (tournamentId: string): Promise<ChallongeApiParticipant[]> => {
     const client = createChallongeHttpClient()
-    
+
     try {
       console.log(`Getting participants for tournament ${tournamentId}`)
-      
-      const response = await fetch(`${client.baseURL}/tournaments/${tournamentId}/participants.json`, {
-        method: 'GET',
-        headers: {
-          'Authorization': client.authHeader,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+
+      const response = await fetch(
+        `${client.baseURL}/tournaments/${tournamentId}/participants.json`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: client.authHeader,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          }
         }
-      })
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -289,16 +344,16 @@ export const challongeApi = {
   // Match operations
   getMatches: async (tournamentId: string): Promise<ChallongeApiMatch[]> => {
     const client = createChallongeHttpClient()
-    
+
     try {
       console.log(`Getting matches for tournament ${tournamentId}`)
-      
+
       const response = await fetch(`${client.baseURL}/tournaments/${tournamentId}/matches.json`, {
         method: 'GET',
         headers: {
-          'Authorization': client.authHeader,
+          Authorization: client.authHeader,
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          Accept: 'application/json'
         }
       })
 
@@ -317,21 +372,28 @@ export const challongeApi = {
     }
   },
 
-  updateMatch: async (tournamentId: string, matchId: string, matchData: any): Promise<ChallongeApiMatch> => {
+  updateMatch: async (
+    tournamentId: string,
+    matchId: string,
+    matchData: any
+  ): Promise<ChallongeApiMatch> => {
     const client = createChallongeHttpClient()
-    
+
     try {
       console.log(`Updating match ${matchId} in tournament ${tournamentId}`)
-      
-      const response = await fetch(`${client.baseURL}/tournaments/${tournamentId}/matches/${matchId}.json`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': client.authHeader,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ match: matchData })
-      })
+
+      const response = await fetch(
+        `${client.baseURL}/tournaments/${tournamentId}/matches/${matchId}.json`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: client.authHeader,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({ match: matchData })
+        }
+      )
 
       if (!response.ok) {
         const errorText = await response.text()
@@ -378,14 +440,14 @@ export const challongeUtils = {
   generateEmbedUrl: (challongeUrl: string, options: any = {}): string => {
     const config = useRuntimeConfig()
     const baseUrl = `${config.public.challonge.embedBaseUrl}/${challongeUrl}/module`
-    
+
     const defaultOptions = {
       multiplier: '0.9',
       match_width_multiplier: '1.2',
       show_final_results: '1',
       theme: '1'
     }
-    
+
     const params = new URLSearchParams({ ...defaultOptions, ...options })
     return `${baseUrl}?${params.toString()}`
   }
