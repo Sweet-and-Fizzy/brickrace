@@ -54,7 +54,7 @@ export async function generateBracketsFromChallonge(
 
     // Get Challonge matches
     const challongeMatches = await challongeApi.getMatches(tournament.challonge_tournament_id)
-    
+
     if (!challongeMatches || challongeMatches.length === 0) {
       throw new Error('No matches found in Challonge tournament')
     }
@@ -63,10 +63,11 @@ export async function generateBracketsFromChallonge(
     console.log('=== CHALLONGE MATCH STRUCTURE DEBUG ===')
     challongeMatches.forEach((m: any, i: number) => {
       const match = m.match
-      console.log(`Match ${i + 1}: ID=${match.id}, Round=${match.round}, Player1=${match.player1_id}, Player2=${match.player2_id}`)
+      console.log(
+        `Match ${i + 1}: ID=${match.id}, Round=${match.round}, Player1=${match.player1_id}, Player2=${match.player2_id}`
+      )
     })
     console.log('=== END DEBUG ===')
-    
 
     // Get participant mappings
     const { data: participants } = await client
@@ -85,10 +86,7 @@ export async function generateBracketsFromChallonge(
 
     // Clear existing brackets for this race
     console.log(`Clearing existing brackets for race ${raceId}`)
-    await client
-      .from('brackets')
-      .delete()
-      .eq('race_id', raceId)
+    await client.from('brackets').delete().eq('race_id', raceId)
 
     // Generate internal brackets from Challonge matches
     const newBrackets = []
@@ -98,17 +96,17 @@ export async function generateBracketsFromChallonge(
     const sortedMatches = challongeMatches.sort((a: any, b: any) => {
       const matchA = a.match as ChallongeMatchData
       const matchB = b.match as ChallongeMatchData
-      
+
       // Use suggested_play_order if available
       if (matchA.suggested_play_order && matchB.suggested_play_order) {
         return matchA.suggested_play_order - matchB.suggested_play_order
       }
-      
+
       // Fall back to round then ID
       if (matchA.round !== matchB.round) {
         return matchA.round - matchB.round
       }
-      
+
       return matchA.id - matchB.id
     })
 
@@ -116,28 +114,32 @@ export async function generateBracketsFromChallonge(
       const match = challongeMatch.match as ChallongeMatchData
 
       // Map Challonge participant IDs to racer IDs
-      const track1RacerId = match.player1_id ? participantMap.get(match.player1_id.toString()) : null
-      const track2RacerId = match.player2_id ? participantMap.get(match.player2_id.toString()) : null
+      const track1RacerId = match.player1_id
+        ? participantMap.get(match.player1_id.toString())
+        : null
+      const track2RacerId = match.player2_id
+        ? participantMap.get(match.player2_id.toString())
+        : null
 
       // Determine bracket group based on Challonge round structure
       let bracketGroup = 'winner'
-      
+
       if (match.round < 0) {
         // Negative rounds are loser bracket
         bracketGroup = 'loser'
       } else if (match.round > 0) {
         // Positive rounds are winner bracket
         bracketGroup = 'winner'
-        
+
         // For double elimination, determine if this is a championship final
         if (tournament.tournament_type === 'double_elimination') {
           // Find the highest round number in the tournament
           const maxRound = Math.max(...sortedMatches.map((m: any) => m.match.round))
-          
+
           // The championship final is typically the highest round
           // AND there should be only 1 match in that round
           const finalRoundMatches = sortedMatches.filter((m: any) => m.match.round === maxRound)
-          
+
           if (match.round === maxRound && finalRoundMatches.length === 1) {
             bracketGroup = 'final'
           }
@@ -160,18 +162,18 @@ export async function generateBracketsFromChallonge(
       let winnerTrack = null
       let track1Time = null
       let track2Time = null
-      
+
       if (match.state === 'complete' && match.winner_id) {
         // Map Challonge winner to our racer
         winnerRacerId = participantMap.get(match.winner_id.toString())
-        
+
         // Determine which track won
         if (match.winner_id === match.player1_id) {
           winnerTrack = 1
         } else if (match.winner_id === match.player2_id) {
           winnerTrack = 2
         }
-        
+
         // Try to parse scores if available (format: "score1-score2")
         if (match.scores_csv) {
           const scores = match.scores_csv.split('-').map((s: string) => Number.parseFloat(s.trim()))
@@ -180,10 +182,12 @@ export async function generateBracketsFromChallonge(
             track2Time = scores[1]
           }
         }
-        
-        console.log(`Importing completed match ${match.id}: Winner=${winnerRacerId}, Track=${winnerTrack}, Scores=${match.scores_csv}`)
+
+        console.log(
+          `Importing completed match ${match.id}: Winner=${winnerRacerId}, Track=${winnerTrack}, Scores=${match.scores_csv}`
+        )
       }
-      
+
       const bracket = {
         race_id: raceId,
         track1_racer_id: track1RacerId,
@@ -202,16 +206,16 @@ export async function generateBracketsFromChallonge(
         winner_track: winnerTrack
       }
 
-      console.log(`Creating bracket: Challonge Round ${match.round} -> Internal Round ${internalRound}, Group: ${bracketGroup}, Match: ${matchNumber}`)
+      console.log(
+        `Creating bracket: Challonge Round ${match.round} -> Internal Round ${internalRound}, Group: ${bracketGroup}, Match: ${matchNumber}`
+      )
       matchNumber++
       newBrackets.push(bracket)
     }
 
     // Insert new brackets
     if (newBrackets.length > 0) {
-      const { error: insertError } = await client
-        .from('brackets')
-        .insert(newBrackets)
+      const { error: insertError } = await client.from('brackets').insert(newBrackets)
 
       if (insertError) {
         console.error('Error inserting generated brackets:', insertError)
@@ -219,6 +223,70 @@ export async function generateBracketsFromChallonge(
       }
 
       console.log(`Generated ${newBrackets.length} brackets from Challonge tournament`)
+    }
+
+    // Fetch inserted brackets to add best-of-3 round scaffolding
+    const { data: insertedBrackets } = await client
+      .from('brackets')
+      .select('id, track1_racer_id, track2_racer_id')
+      .eq('race_id', raceId)
+
+    if (insertedBrackets && insertedBrackets.length > 0) {
+      for (const b of insertedBrackets) {
+        // Set match to best-of-3 with defaults if not already configured
+        await client
+          .from('brackets')
+          .update({
+            match_format: 'best_of_3',
+            total_rounds: 3,
+            current_round: 1,
+            is_completed: false
+          })
+          .eq('id', b.id)
+
+        // Check if rounds already exist to prevent duplicates
+        const { count: existingRounds } = await client
+          .from('bracket_rounds')
+          .select('id', { count: 'exact', head: true })
+          .eq('bracket_id', b.id)
+
+        if (!existingRounds || existingRounds === 0) {
+          // Create 3 rounds with track switching (R1: 1 vs 2, R2: 2 vs 1, R3: 1 vs 2)
+          const rounds = [
+            {
+              bracket_id: b.id,
+              round_number: 1,
+              racer1_id: b.track1_racer_id,
+              racer2_id: b.track2_racer_id,
+              racer1_track: 1,
+              racer2_track: 2
+            },
+            {
+              bracket_id: b.id,
+              round_number: 2,
+              racer1_id: b.track1_racer_id,
+              racer2_id: b.track2_racer_id,
+              racer1_track: 2,
+              racer2_track: 1
+            },
+            {
+              bracket_id: b.id,
+              round_number: 3,
+              racer1_id: b.track1_racer_id,
+              racer2_id: b.track2_racer_id,
+              racer1_track: 1,
+              racer2_track: 2
+            }
+          ]
+
+          const { error: roundsInsertError } = await client.from('bracket_rounds').insert(rounds)
+
+          if (roundsInsertError) {
+            console.error('Error creating bracket rounds:', roundsInsertError)
+            throw roundsInsertError
+          }
+        }
+      }
     }
 
     return {
@@ -230,7 +298,6 @@ export async function generateBracketsFromChallonge(
         finalMatches: challongeMatches.filter((m: any) => m.match.round === 1).length
       }
     }
-
   } catch (error) {
     console.error('Error generating brackets from Challonge:', error)
     throw error
@@ -251,11 +318,13 @@ export async function syncBracketByChallongeMatchId(
     // Get the bracket that corresponds to this Challonge match
     const { data: bracket } = await client
       .from('brackets')
-      .select(`
+      .select(
+        `
         *,
         track1_racer:racers!track1_racer_id(id, name, racer_number),
         track2_racer:racers!track2_racer_id(id, name, racer_number)
-      `)
+      `
+      )
       .eq('race_id', raceId)
       .eq('challonge_match_id', challongeMatchId)
       .single()
@@ -307,31 +376,27 @@ export async function syncBracketByChallongeMatchId(
     const scoresCsv = `${bracket.track1_time.toFixed(3)}-${bracket.track2_time.toFixed(3)}`
 
     // Update Challonge match
-    await challongeApi.updateMatch(
-      tournament.challonge_tournament_id,
-      challongeMatchId,
-      {
-        scores_csv: scoresCsv,
-        winner_id: Number.parseInt(winnerChallongeId as string)
-      }
-    )
+    await challongeApi.updateMatch(tournament.challonge_tournament_id, challongeMatchId, {
+      scores_csv: scoresCsv,
+      winner_id: Number.parseInt(winnerChallongeId as string)
+    })
 
     console.log(`Successfully synced bracket to Challonge match ${challongeMatchId}`)
 
     // Store sync record
-    await client
-      .from('challonge_match_sync')
-      .upsert({
+    await client.from('challonge_match_sync').upsert(
+      {
         bracket_id: bracket.id,
         challonge_tournament_id: tournament.id,
         challonge_match_id: challongeMatchId,
         synced_at: new Date().toISOString(),
         winner_participant_id: winnerChallongeId,
         scores_csv: scoresCsv
-      }, {
+      },
+      {
         onConflict: 'bracket_id'
-      })
-
+      }
+    )
   } catch (error) {
     console.error('Error syncing bracket by Challonge match ID:', error)
     throw error

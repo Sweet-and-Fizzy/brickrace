@@ -158,6 +158,7 @@ async function handleSingleBracketTimes(
 async function handleBestOf3BracketTimes(
   client: any,
   bracket: any,
+  raceId: string,
   track1_time?: number,
   track2_time?: number
 ) {
@@ -216,6 +217,99 @@ async function handleBestOf3BracketTimes(
   // Check if both times are recorded for this round
   if (updatedRound.racer1_time && updatedRound.racer2_time && !updatedRound.completed_at) {
     await completeBestOf3Round(client, updatedRound)
+
+    // After completing a round, check if match is now decided (2 wins)
+    const { data: updatedBracket } = await client
+      .from('brackets')
+      .select('id, rounds_won_track1, rounds_won_track2, is_completed, challonge_match_id')
+      .eq('id', bracket.id)
+      .single()
+
+    if (
+      updatedBracket &&
+      (updatedBracket.is_completed ||
+        (updatedBracket.rounds_won_track1 && updatedBracket.rounds_won_track1 >= 2) ||
+        (updatedBracket.rounds_won_track2 && updatedBracket.rounds_won_track2 >= 2))
+    ) {
+      // Sync completed match to Challonge, then regenerate next brackets
+      if (updatedBracket.challonge_match_id) {
+        try {
+          await syncBracketByChallongeMatchId(client, raceId, updatedBracket.challonge_match_id)
+
+          const { data: tournament } = await client
+            .from('challonge_tournaments')
+            .select('id')
+            .eq('race_id', raceId)
+            .eq('status', 'active')
+            .single()
+
+          if (tournament) {
+            const { generateBracketsFromChallonge } = await import(
+              '~/server/utils/bracket-generator'
+            )
+            await generateBracketsFromChallonge(client, raceId, tournament.id)
+          }
+        } catch (e) {
+          console.error('Post-round completion sync/regenerate failed:', e)
+        }
+      }
+    }
+  }
+}
+
+// Ensure best-of-3 scaffold exists on a bracket (idempotent)
+async function ensureBestOf3Scaffold(client: any, bracket: any) {
+  try {
+    // Update bracket flags if needed
+    if (bracket.match_format !== 'best_of_3' || !bracket.total_rounds) {
+      await client
+        .from('brackets')
+        .update({
+          match_format: 'best_of_3',
+          total_rounds: 3,
+          current_round: bracket.current_round || 1,
+          is_completed: false
+        })
+        .eq('id', bracket.id)
+    }
+
+    // Create rounds if missing
+    const { count } = await client
+      .from('bracket_rounds')
+      .select('id', { count: 'exact', head: true })
+      .eq('bracket_id', bracket.id)
+
+    if (!count || count === 0) {
+      const rounds = [
+        {
+          bracket_id: bracket.id,
+          round_number: 1,
+          racer1_id: bracket.track1_racer_id,
+          racer2_id: bracket.track2_racer_id,
+          racer1_track: 1,
+          racer2_track: 2
+        },
+        {
+          bracket_id: bracket.id,
+          round_number: 2,
+          racer1_id: bracket.track1_racer_id,
+          racer2_id: bracket.track2_racer_id,
+          racer1_track: 2,
+          racer2_track: 1
+        },
+        {
+          bracket_id: bracket.id,
+          round_number: 3,
+          racer1_id: bracket.track1_racer_id,
+          racer2_id: bracket.track2_racer_id,
+          racer1_track: 1,
+          racer2_track: 2
+        }
+      ]
+      await client.from('bracket_rounds').insert(rounds)
+    }
+  } catch (e) {
+    console.error('Failed to ensure best-of-3 scaffold:', e)
   }
 }
 
@@ -356,9 +450,18 @@ export default defineEventHandler(async (event) => {
 
       const bracket = brackets[bracketIndex]
 
+      // Ensure best-of-3 structure exists (idempotent)
+      await ensureBestOf3Scaffold(client, bracket)
+      // Refresh bracket flags after potential update
+      const { data: refreshed } = await client
+        .from('brackets')
+        .select('id, match_format, current_round, track1_racer_id, track2_racer_id')
+        .eq('id', bracket.id)
+        .single()
+
       // Handle different match formats
-      if (bracket.match_format === 'best_of_3') {
-        await handleBestOf3BracketTimes(client, bracket, track1_time, track2_time)
+      if (refreshed?.match_format === 'best_of_3') {
+        await handleBestOf3BracketTimes(client, refreshed, activeRace.id, track1_time, track2_time)
       } else {
         // Legacy single race format
         await handleSingleBracketTimes(client, bracket.id, track1_time, track2_time, activeRace.id)
