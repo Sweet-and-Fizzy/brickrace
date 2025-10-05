@@ -1,6 +1,7 @@
 -- Add policies for qualifiers operations
 
 -- Allow race admins to insert qualifiers
+drop policy if exists "Race admins can insert qualifiers" on public.qualifiers;
 create policy "Race admins can insert qualifiers" on public.qualifiers
   for insert 
   with check (
@@ -10,6 +11,7 @@ create policy "Race admins can insert qualifiers" on public.qualifiers
   );
 
 -- Allow race admins to delete qualifiers
+drop policy if exists "Race admins can delete qualifiers" on public.qualifiers;
 create policy "Race admins can delete qualifiers" on public.qualifiers
   for delete 
   using (
@@ -19,6 +21,7 @@ create policy "Race admins can delete qualifiers" on public.qualifiers
   );
 
 -- Allow race admins to update qualifiers if needed
+drop policy if exists "Race admins can update qualifiers" on public.qualifiers;
 create policy "Race admins can update qualifiers" on public.qualifiers
   for update 
   using (

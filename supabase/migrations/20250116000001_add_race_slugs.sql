@@ -1,9 +1,9 @@
 -- Add slug field to races table for SEO-friendly URLs
 ALTER TABLE races 
-ADD COLUMN slug TEXT UNIQUE;
+ADD COLUMN IF NOT EXISTS slug TEXT UNIQUE;
 
 -- Create index for faster slug lookups
-CREATE INDEX idx_races_slug ON races(slug);
+CREATE INDEX IF NOT EXISTS idx_races_slug ON races(slug);
 
 -- Function to generate a slug from text
 CREATE OR REPLACE FUNCTION generate_slug(input_text TEXT)
@@ -79,7 +79,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER races_slug_trigger
-BEFORE INSERT OR UPDATE ON races
-FOR EACH ROW
-EXECUTE FUNCTION auto_generate_race_slug();
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_trigger t
+    JOIN pg_class c ON c.oid = t.tgrelid
+    WHERE t.tgname = 'races_slug_trigger' AND c.relname = 'races'
+  ) THEN
+    CREATE TRIGGER races_slug_trigger
+    BEFORE INSERT OR UPDATE ON races
+    FOR EACH ROW
+    EXECUTE FUNCTION auto_generate_race_slug();
+  END IF;
+END$$;

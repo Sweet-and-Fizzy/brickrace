@@ -112,10 +112,27 @@ BEGIN
     test_race_id := existing_race_id;
     RAISE NOTICE 'Using existing race: 2024 Championship Derby';
   ELSE
-    -- Insert new race
-    INSERT INTO public.races (name, date) 
-    VALUES ('2024 Championship Derby', '2024-07-15')
-    RETURNING id INTO test_race_id;
+    -- Insert new race using race_datetime (prefer) or fallback to legacy date if present
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = 'races' AND column_name = 'race_datetime'
+    ) THEN
+      INSERT INTO public.races (name, race_datetime) 
+      VALUES ('2024 Championship Derby', '2024-07-15 12:00:00+00')
+      RETURNING id INTO test_race_id;
+    ELSIF EXISTS (
+      SELECT 1 FROM information_schema.columns 
+      WHERE table_schema = 'public' AND table_name = 'races' AND column_name = 'date'
+    ) THEN
+      INSERT INTO public.races (name, date) 
+      VALUES ('2024 Championship Derby', '2024-07-15')
+      RETURNING id INTO test_race_id;
+    ELSE
+      -- If neither column exists (unlikely), create a race with just a name
+      INSERT INTO public.races (name)
+      VALUES ('2024 Championship Derby')
+      RETURNING id INTO test_race_id;
+    END IF;
     RAISE NOTICE 'Created new race: 2024 Championship Derby';
   END IF;
   

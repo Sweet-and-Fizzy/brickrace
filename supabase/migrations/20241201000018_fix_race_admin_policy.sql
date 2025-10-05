@@ -10,6 +10,7 @@ CREATE POLICY "Race admins can update race active status" ON public.races
   );
 
 -- Also allow race admins to insert new races
+DROP POLICY IF EXISTS "Race admins can insert races" ON public.races;
 CREATE POLICY "Race admins can insert races" ON public.races
   FOR INSERT WITH CHECK (
     auth.jwt() ->> 'role' = 'race_admin' OR
@@ -17,6 +18,7 @@ CREATE POLICY "Race admins can insert races" ON public.races
   );
 
 -- Allow race admins to delete races
+DROP POLICY IF EXISTS "Race admins can delete races" ON public.races;
 CREATE POLICY "Race admins can delete races" ON public.races
   FOR DELETE USING (
     auth.jwt() ->> 'role' = 'race_admin' OR

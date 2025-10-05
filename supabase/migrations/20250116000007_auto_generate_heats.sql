@@ -3,7 +3,7 @@
 
 -- Add qualifying mode to races table
 ALTER TABLE public.races 
-ADD COLUMN qualifying_mode text DEFAULT 'auto' CHECK (qualifying_mode IN ('auto', 'manual', 'brackets'));
+ADD COLUMN IF NOT EXISTS qualifying_mode text DEFAULT 'auto' CHECK (qualifying_mode IN ('auto', 'manual', 'brackets'));
 
 -- Comment for the column
 COMMENT ON COLUMN public.races.qualifying_mode IS 'Controls heat generation: auto=generate after each completion, manual=admin controlled, brackets=qualifying finished';

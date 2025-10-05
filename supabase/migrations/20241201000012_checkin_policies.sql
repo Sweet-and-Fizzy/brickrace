@@ -1,6 +1,7 @@
 -- Add policies for checkin operations
 
 -- Allow race admins to insert checkins
+drop policy if exists "Race admins can insert checkins" on public.checkins;
 create policy "Race admins can insert checkins" on public.checkins
   for insert 
   with check (
@@ -10,6 +11,7 @@ create policy "Race admins can insert checkins" on public.checkins
   );
 
 -- Allow race admins to delete checkins (for checkout functionality)
+drop policy if exists "Race admins can delete checkins" on public.checkins;
 create policy "Race admins can delete checkins" on public.checkins
   for delete 
   using (
@@ -19,6 +21,7 @@ create policy "Race admins can delete checkins" on public.checkins
   );
 
 -- Allow race admins to update checkins if needed
+drop policy if exists "Race admins can update checkins" on public.checkins;
 create policy "Race admins can update checkins" on public.checkins
   for update 
   using (

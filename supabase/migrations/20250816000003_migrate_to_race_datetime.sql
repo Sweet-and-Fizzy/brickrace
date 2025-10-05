@@ -3,19 +3,35 @@
 
 -- Add new datetime column
 ALTER TABLE public.races 
-ADD COLUMN race_datetime timestamp with time zone;
+ADD COLUMN IF NOT EXISTS race_datetime timestamp with time zone;
 
 -- Migrate existing data (convert date to datetime with default 12:00 PM)
-UPDATE public.races 
-SET race_datetime = (date || ' 12:00:00')::timestamp with time zone 
-WHERE date IS NOT NULL;
+DO $$
+BEGIN
+	IF EXISTS (
+		SELECT 1 FROM information_schema.columns 
+		WHERE table_schema = 'public' AND table_name = 'races' AND column_name = 'date'
+	) THEN
+		UPDATE public.races 
+		SET race_datetime = (date || ' 12:00:00')::timestamp with time zone 
+		WHERE date IS NOT NULL;
+	END IF;
+END $$;
 
 -- Drop the active_race view temporarily (it depends on the date column)
 DROP VIEW IF EXISTS public.active_race;
 
 -- Drop the old date column
-ALTER TABLE public.races 
-DROP COLUMN date;
+DO $$
+BEGIN
+	IF EXISTS (
+		SELECT 1 FROM information_schema.columns 
+		WHERE table_schema = 'public' AND table_name = 'races' AND column_name = 'date'
+	) THEN
+		ALTER TABLE public.races 
+		DROP COLUMN date;
+	END IF;
+END $$;
 
 -- Recreate the active_race view (now works with race_datetime)
 CREATE OR REPLACE VIEW public.active_race AS

@@ -1,13 +1,13 @@
 -- Update qualifiers table to support heat/round system
 ALTER TABLE public.qualifiers 
-ADD COLUMN heat_number integer,
-ADD COLUMN track_number integer CHECK (track_number IN (1, 2)),
-ADD COLUMN status text DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'in_progress', 'completed', 'cancelled')),
-ADD COLUMN scheduled_order integer;
+ADD COLUMN IF NOT EXISTS heat_number integer,
+ADD COLUMN IF NOT EXISTS track_number integer CHECK (track_number IN (1, 2)),
+ADD COLUMN IF NOT EXISTS status text DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'in_progress', 'completed', 'cancelled')),
+ADD COLUMN IF NOT EXISTS scheduled_order integer;
 
 -- Create index for efficient querying
-CREATE INDEX idx_qualifiers_race_heat ON public.qualifiers(race_id, heat_number, scheduled_order);
-CREATE INDEX idx_qualifiers_race_status ON public.qualifiers(race_id, status);
+CREATE INDEX IF NOT EXISTS idx_qualifiers_race_heat ON public.qualifiers(race_id, heat_number, scheduled_order);
+CREATE INDEX IF NOT EXISTS idx_qualifiers_race_status ON public.qualifiers(race_id, status);
 
 -- Create a view for the current heat
 CREATE OR REPLACE VIEW public.current_heat AS
@@ -202,6 +202,7 @@ GRANT EXECUTE ON FUNCTION public.start_heat TO authenticated;
 GRANT EXECUTE ON FUNCTION public.complete_heat TO authenticated;
 
 -- Add RLS policies for the new functions (admin only)
+DROP POLICY IF EXISTS "Only race admins can generate heats" ON public.qualifiers;
 CREATE POLICY "Only race admins can generate heats" ON public.qualifiers
     FOR INSERT
     WITH CHECK (
@@ -212,6 +213,7 @@ CREATE POLICY "Only race admins can generate heats" ON public.qualifiers
         )
     );
 
+DROP POLICY IF EXISTS "Only race admins can update qualifier status" ON public.qualifiers;
 CREATE POLICY "Only race admins can update qualifier status" ON public.qualifiers
     FOR UPDATE
     USING (
