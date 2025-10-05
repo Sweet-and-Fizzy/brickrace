@@ -1,18 +1,18 @@
 <template>
   <div class="min-h-screen bg-white">
-    <div class="container mx-auto px-4 pt-0 pb-12 max-w-2xl">
+    <div class="container mx-auto px-4 pt-8 pb-12 max-w-2xl">
       <!-- Header -->
-      <div class="flex items-center gap-8 mb-12">
-        <div class="flex-shrink-0">
+      <div class="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 mb-12">
+        <div class="flex-shrink-0 w-full sm:w-auto">
           <img
             src="~/assets/img/brickracer.jpg"
             alt="Brick Racer"
-            class="w-64 h-48 object-contain"
+            class="w-full sm:w-64 h-48 object-contain mx-auto"
           >
         </div>
-        <div class="flex-1">
-          <h1 class="text-4xl font-bold text-black mb-4">Add New Racer</h1>
-          <p class="text-lg text-gray-600">
+        <div class="flex-1 text-center sm:text-left">
+          <h1 class="text-3xl sm:text-4xl font-bold text-black mb-4">Add New Racer</h1>
+          <p class="text-base sm:text-lg text-gray-600">
             Create a new custom gravity-powered vehicle for the competition
           </p>
         </div>
@@ -42,18 +42,18 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start">
               <Button
                 type="submit"
                 :loading="loading"
                 :disabled="!form.name || !authStore.isAuthenticated"
                 icon="pi pi-plus"
-                class="btn-primary w-full"
+                class="btn-primary w-full sm:w-auto"
               >
                 <span>Create Racer</span>
               </Button>
 
-              <NuxtLink to="/racers" class="w-full">
+              <NuxtLink to="/racers" class="w-full sm:w-auto">
                 <Button type="button" class="btn-secondary w-full"><span>Cancel</span></Button>
               </NuxtLink>
             </div>
