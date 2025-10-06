@@ -212,7 +212,7 @@
               <!-- Action Buttons -->
               <div class="flex flex-col-reverse sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start">
                 <NuxtLink :to="`/racers/${racer.slug}`" class="w-full sm:w-auto">
-                  <Button type="button" class="btn-secondary w-full">
+                  <Button type="button" class="btn-secondary w-full sm:w-auto">
                     <span>Cancel</span>
                   </Button>
                 </NuxtLink>
@@ -221,10 +221,9 @@
                   type="submit"
                   :loading="loading"
                   icon="pi pi-save"
+                  label="Update Racer"
                   class="btn-primary w-full sm:w-auto"
-                >
-                  <span>Update Racer</span>
-                </Button>
+                />
               </div>
             </form>
           </template>

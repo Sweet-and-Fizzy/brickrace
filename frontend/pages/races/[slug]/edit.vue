@@ -173,7 +173,7 @@
                     severity="secondary"
                     outlined
                     label="Cancel"
-                    class="w-full"
+                    class="w-full sm:w-auto"
                   />
                 </NuxtLink>
               </div>

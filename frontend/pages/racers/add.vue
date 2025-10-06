@@ -48,13 +48,12 @@
                 :loading="loading"
                 :disabled="!form.name || !authStore.isAuthenticated"
                 icon="pi pi-plus"
+                label="Create Racer"
                 class="btn-primary w-full sm:w-auto"
-              >
-                <span>Create Racer</span>
-              </Button>
+              />
 
               <NuxtLink to="/racers" class="w-full sm:w-auto">
-                <Button type="button" class="btn-secondary w-full"><span>Cancel</span></Button>
+                <Button type="button" class="btn-secondary w-full sm:w-auto"><span>Cancel</span></Button>
               </NuxtLink>
             </div>
           </form>

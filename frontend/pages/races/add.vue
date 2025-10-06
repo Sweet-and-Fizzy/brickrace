@@ -162,12 +162,11 @@
                   type="submit"
                   :loading="loading"
                   icon="pi pi-plus"
+                  label="Create Race"
                   class="btn-primary w-full sm:w-auto"
-                >
-                  <span>Create Race</span>
-                </Button>
+                />
                 <NuxtLink to="/races" class="w-full sm:w-auto">
-                  <Button type="button" class="btn-secondary w-full"><span>Cancel</span></Button>
+                  <Button type="button" class="btn-secondary w-full sm:w-auto"><span>Cancel</span></Button>
                 </NuxtLink>
               </div>
             </form>
