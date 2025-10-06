@@ -398,6 +398,12 @@ export async function refreshUpcomingParticipants(
                 racer2_track: 2
               }
             ])
+          } else {
+            // Update existing rounds to ensure racer IDs match current bracket participants
+            await c
+              .from('bracket_rounds')
+              .update({ racer1_id: track1RacerId, racer2_id: track2RacerId })
+              .eq('bracket_id', bracket.id)
           }
         }
       }
