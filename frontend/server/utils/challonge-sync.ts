@@ -227,7 +227,10 @@ function findMatchingChallongeMatch(
  * Sync all completed brackets for a race to Challonge
  * Useful for bulk sync or recovery scenarios
  */
-export async function syncAllBracketsToChallonge(client: SupabaseClient, raceId: string): Promise<void> {
+export async function syncAllBracketsToChallonge(
+  client: SupabaseClient,
+  raceId: string
+): Promise<void> {
   try {
     console.log(`Starting bulk sync for race ${raceId}`)
 
@@ -237,7 +240,9 @@ export async function syncAllBracketsToChallonge(client: SupabaseClient, raceId:
       .from('brackets')
       .select('id')
       .eq('race_id', raceId)
-      .or('is_completed.eq.true,and(track1_time.not.is.null,track2_time.not.is.null),winner_racer_id.not.is.null')
+      .or(
+        'is_completed.eq.true,and(track1_time.not.is.null,track2_time.not.is.null),winner_racer_id.not.is.null'
+      )
 
     if (!completedBrackets || completedBrackets.length === 0) {
       console.log('No completed brackets found for race')
@@ -275,7 +280,10 @@ export async function syncAllBracketsToChallonge(client: SupabaseClient, raceId:
  * Refresh internal brackets' participant slots (track1/track2) from Challonge matches
  * so that next matches are populated once Challonge advances them.
  */
-export async function refreshUpcomingParticipants(client: SupabaseClient, tournamentId: string): Promise<void> {
+export async function refreshUpcomingParticipants(
+  client: SupabaseClient,
+  tournamentId: string
+): Promise<void> {
   try {
     // Load tournament external ID
     const { data: tournament } = await client

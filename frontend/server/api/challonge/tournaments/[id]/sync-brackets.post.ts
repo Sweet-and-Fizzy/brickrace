@@ -46,15 +46,12 @@ export default defineEventHandler(async (event) => {
     if (bracket_ids && Array.isArray(bracket_ids)) {
       // Sync specific brackets
       console.log(`Manual sync requested for ${bracket_ids.length} specific brackets`)
-      
+
       for (const bracketId of bracket_ids) {
         try {
           // If force_resync is true, delete existing sync record first
           if (force_resync) {
-            await typedClient
-              .from('challonge_match_sync')
-              .delete()
-              .eq('bracket_id', bracketId)
+            await typedClient.from('challonge_match_sync').delete().eq('bracket_id', bracketId)
           }
 
           await syncBracketToChallonge(typedClient, t.race_id, bracketId)
@@ -74,19 +71,19 @@ export default defineEventHandler(async (event) => {
     } else {
       // Sync all completed brackets for the race
       console.log(`Manual bulk sync requested for race ${tournament.race_id}`)
-      
+
       if (force_resync) {
         // Clear all existing sync records for this tournament
         await typedClient
           .from('challonge_match_sync')
           .delete()
           .eq('challonge_tournament_id', tournamentId)
-        
+
         console.log('Cleared existing sync records for force resync')
       }
 
       await syncAllBracketsToChallonge(typedClient, t.race_id)
-      
+
       // Get sync summary
       const { data: syncedBrackets } = await typedClient
         .from('challonge_match_sync')
@@ -108,7 +105,9 @@ export default defineEventHandler(async (event) => {
       .from('brackets')
       .select('id')
       .eq('race_id', t.race_id)
-      .or('is_completed.eq.true,and(track1_time.not.is.null,track2_time.not.is.null),winner_racer_id.not.is.null')
+      .or(
+        'is_completed.eq.true,and(track1_time.not.is.null,track2_time.not.is.null),winner_racer_id.not.is.null'
+      )
 
     const totalCompleted = completedBrackets?.length || 0
     const totalSynced = allSyncRecords?.length || 0
@@ -120,7 +119,8 @@ export default defineEventHandler(async (event) => {
         // Legacy keys expected by UI
         total_completed: totalCompleted,
         total_synced: totalSynced,
-        sync_coverage: totalCompleted > 0 ? ((totalSynced / totalCompleted) * 100).toFixed(1) + '%' : '0%',
+        sync_coverage:
+          totalCompleted > 0 ? ((totalSynced / totalCompleted) * 100).toFixed(1) + '%' : '0%',
         // Also include verbose keys for future use
         total_completed_brackets: totalCompleted,
         total_synced_brackets: totalSynced
@@ -128,10 +128,9 @@ export default defineEventHandler(async (event) => {
       sync_results: syncResults,
       sync_records: allSyncRecords
     }
-
   } catch (error: unknown) {
     console.error('Manual bracket sync error:', error)
-    
+
     // Re-throw createError instances
     if (typeof error === 'object' && error && 'statusCode' in error) {
       throw error as { statusCode: number }

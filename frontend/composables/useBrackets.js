@@ -487,7 +487,7 @@ export const useBrackets = () => {
       })
       .eq('id', roundData.id)
 
-  if (roundUpdateError) throw roundUpdateError
+    if (roundUpdateError) throw roundUpdateError
 
     notifications.success('Round Complete', `Round ${roundData.round_number} winner determined!`)
 

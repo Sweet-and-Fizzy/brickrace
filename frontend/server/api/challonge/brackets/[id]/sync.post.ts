@@ -20,7 +20,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Bracket not found' })
   }
 
-  await syncBracketToChallonge(client, (bracket as { race_id: string }).race_id, bracketId as string)
+  await syncBracketToChallonge(
+    client,
+    (bracket as { race_id: string }).race_id,
+    bracketId as string
+  )
 
   return { success: true }
 })
