@@ -47,17 +47,12 @@ export async function syncBracketToChallonge(
     const c: any = client
     console.log(`Starting Challonge sync for bracket ${bracketId}`)
 
-    // Check if this bracket has already been synced
-    const { data: existingSync } = await c
+    // Load previous sync (do not early-return; we will verify remote state instead)
+    const { data: previousSync } = await c
       .from('challonge_match_sync')
-      .select('id, synced_at')
+      .select('id, synced_at, challonge_match_id, winner_participant_id, scores_csv')
       .eq('bracket_id', bracketId)
       .single()
-
-    if (existingSync) {
-      console.log(`Bracket ${bracketId} already synced at ${existingSync.synced_at}`)
-      return
-    }
 
     // Get tournament for this race
     const { data: tournament } = await c
@@ -147,6 +142,17 @@ export async function syncBracketToChallonge(
       return
     }
 
+    // If we have a previous sync record, check if Challonge already reflects it; if so, skip
+    if (previousSync) {
+      const remoteWinner = matchingMatch.match.winner_id?.toString() || null
+      const expectedWinner = previousSync.winner_participant_id || null
+      // challonge API response doesn't always echo scores_csv; we only compare winner
+      if (remoteWinner === expectedWinner) {
+        console.log(`Challonge already reflects sync for bracket ${bracketId}; skipping update`)
+        return
+      }
+    }
+
     // Get winner's Challonge participant ID
     const winnerChallongeId = participantMap.get(winnerRacerId)
 
@@ -211,18 +217,34 @@ function findMatchingChallongeMatch(
   if (!track1ChallongeId || !track2ChallongeId) {
     return null
   }
+  // Prefer exact challonge_match_id if bracket carries it
+  const preferredId = (bracket as any)?.challonge_match_id
+  if (preferredId) {
+    const exact = challongeMatches.find((m) => m.match.id.toString() === preferredId)
+    if (exact) return exact
+  }
 
-  // Find a match where both participants match (regardless of which side they're on)
-  const found = challongeMatches.find((match) => {
-    const player1 = match.match.player1_id?.toString()
-    const player2 = match.match.player2_id?.toString()
-
+  // Collect candidate matches where both participants match (side-agnostic)
+  const candidates = challongeMatches.filter((m) => {
+    const player1 = m.match.player1_id?.toString()
+    const player2 = m.match.player2_id?.toString()
     return (
       (player1 === track1ChallongeId && player2 === track2ChallongeId) ||
       (player1 === track2ChallongeId && player2 === track1ChallongeId)
     )
   })
-  return found ?? null
+
+  if (candidates.length === 0) return null
+
+  // Prefer a non-complete match first (for finals/reset scenarios)
+  const open = candidates.find((c) => c.match.state !== 'complete')
+  if (open) return open
+
+  // Otherwise return the most recent by round, then id
+  candidates.sort((a, b) =>
+    a.match.round === b.match.round ? a.match.id - b.match.id : a.match.round - b.match.round
+  )
+  return candidates[candidates.length - 1]
 }
 
 /**
