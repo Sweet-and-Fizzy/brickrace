@@ -547,12 +547,12 @@
                           </div>
                           <div v-if="bracket.track1_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track1_racer_name }}
+                              {{ trackRacerName(bracket, 1) || bracket.track1_racer_name }}
                             </div>
                             <div
                               class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track1_racer_number }}
+                              #{{ trackRacerNumber(bracket, 1) || bracket.track1_racer_number }}
                             </div>
                             <div v-if="bracket.track1_time" class="text-lg font-bold text-blue-600">
                               {{ formatTime(bracket.track1_time) }}
@@ -595,12 +595,12 @@
                           </div>
                           <div v-if="bracket.track2_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track2_racer_name }}
+                              {{ trackRacerName(bracket, 2) || bracket.track2_racer_name }}
                             </div>
                             <div
                               class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track2_racer_number }}
+                              #{{ trackRacerNumber(bracket, 2) || bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-red-600">
                               {{ formatTime(bracket.track2_time) }}
@@ -772,12 +772,12 @@
                           </div>
                           <div v-if="bracket.track1_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track1_racer_name }}
+                              {{ trackRacerName(bracket, 1) || bracket.track1_racer_name }}
                             </div>
                             <div
                               class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track1_racer_number }}
+                              #{{ trackRacerNumber(bracket, 1) || bracket.track1_racer_number }}
                             </div>
                             <div v-if="bracket.track1_time" class="text-lg font-bold text-blue-600">
                               {{ formatTime(bracket.track1_time) }}
@@ -820,12 +820,12 @@
                           </div>
                           <div v-if="bracket.track2_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track2_racer_name }}
+                              {{ trackRacerName(bracket, 2) || bracket.track2_racer_name }}
                             </div>
                             <div
                               class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track2_racer_number }}
+                              #{{ trackRacerNumber(bracket, 2) || bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-red-600">
                               {{ formatTime(bracket.track2_time) }}
@@ -960,12 +960,12 @@
                           </div>
                           <div v-if="bracket.track1_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track1_racer_name }}
+                              {{ trackRacerName(bracket, 1) || bracket.track1_racer_name }}
                             </div>
                             <div
                               class="bg-purple-50 text-purple-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track1_racer_number }}
+                              #{{ trackRacerNumber(bracket, 1) || bracket.track1_racer_number }}
                             </div>
                             <div
                               v-if="bracket.track1_time"
@@ -1013,12 +1013,12 @@
                           </div>
                           <div v-if="bracket.track2_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track2_racer_name }}
+                              {{ trackRacerName(bracket, 2) || bracket.track2_racer_name }}
                             </div>
                             <div
                               class="bg-pink-50 text-pink-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track2_racer_number }}
+                              #{{ trackRacerNumber(bracket, 2) || bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-pink-600">
                               {{ formatTime(bracket.track2_time) }}
@@ -1196,14 +1196,16 @@
                             </div>
                             <div v-if="bracket.track1_racer_name">
                               <RacerLink
-                                :racer-id="bracket.track1_racer_id"
-                                :racer-name="bracket.track1_racer_name"
+                                :racer-id="trackRacerId(bracket, 1) || bracket.track1_racer_id"
+                                :racer-name="
+                                  trackRacerName(bracket, 1) || bracket.track1_racer_name
+                                "
                                 class="font-bold text-xl text-black hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
                               />
                               <div
                                 class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                               >
-                                #{{ bracket.track1_racer_number }}
+                                #{{ trackRacerNumber(bracket, 1) || bracket.track1_racer_number }}
                               </div>
                               <div class="mt-3">
                                 <div class="bg-blue-50 rounded-lg p-3">
@@ -1272,14 +1274,16 @@
                             </div>
                             <div v-if="bracket.track2_racer_name">
                               <RacerLink
-                                :racer-id="bracket.track2_racer_id"
-                                :racer-name="bracket.track2_racer_name"
+                                :racer-id="trackRacerId(bracket, 2) || bracket.track2_racer_id"
+                                :racer-name="
+                                  trackRacerName(bracket, 2) || bracket.track2_racer_name
+                                "
                                 class="font-bold text-xl text-black hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
                               />
                               <div
                                 class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                               >
-                                #{{ bracket.track2_racer_number }}
+                                #{{ trackRacerNumber(bracket, 2) || bracket.track2_racer_number }}
                               </div>
                               <div class="mt-3">
                                 <div class="bg-red-50 rounded-lg p-3">
@@ -1481,7 +1485,8 @@ const {
   getEligibleRacers,
   forfeitRacer,
   clearBrackets,
-  recordTime: recordTimeComposable
+  recordTime: recordTimeComposable,
+  getCurrentRound
 } = useBrackets()
 
 // Reactive data
@@ -1512,6 +1517,53 @@ const checkedInCount = ref(0)
 const withdrawnCount = ref(0)
 const withdrawnRacers = ref(new Set())
 const resolvingDoubleWithdrawal = ref(null) // Track which bracket is being resolved
+
+// Current round data per bracket (for best-of-3 track flipping)
+const currentRounds = ref({})
+
+// Load and cache the current round info for a bracket
+const loadCurrentRound = async (bracket) => {
+  try {
+    if (!bracket || bracket.match_format !== 'best_of_3') return
+    const data = await getCurrentRound(bracket.id)
+    if (data) {
+      currentRounds.value = { ...currentRounds.value, [bracket.id]: data }
+    }
+  } catch (e) {
+    console.warn('Failed to load current round for bracket', bracket?.id, e?.message || e)
+  }
+}
+
+// Helper to resolve which racer is on a given track for the current round
+const getTrackDisplay = (bracket, track) => {
+  const base = (racerNum) =>
+    racerNum === 1
+      ? {
+          id: bracket?.track1_racer_id,
+          name: bracket?.track1_racer_name,
+          number: bracket?.track1_racer_number
+        }
+      : {
+          id: bracket?.track2_racer_id,
+          name: bracket?.track2_racer_name,
+          number: bracket?.track2_racer_number
+        }
+
+  if (bracket?.match_format === 'best_of_3') {
+    const cr = currentRounds.value[bracket.id]
+    if (cr) {
+      // racer1_id always maps to bracket.track1_racer_*, racer2_id to track2
+      if (cr.racer1_track === track) return base(1)
+      if (cr.racer2_track === track) return base(2)
+    }
+  }
+  // Fallback to static assignment
+  return track === 1 ? base(1) : base(2)
+}
+
+const trackRacerName = (bracket, track) => getTrackDisplay(bracket, track)?.name || null
+const trackRacerNumber = (bracket, track) => getTrackDisplay(bracket, track)?.number || null
+const trackRacerId = (bracket, track) => getTrackDisplay(bracket, track)?.id || null
 
 // Breadcrumb navigation
 const breadcrumbItems = computed(() => [
@@ -2177,7 +2229,9 @@ const recordTime = async (bracket, track) => {
     const inputKey = bracket.id + `_track${track}`
     bracketTimes.value[inputKey] = undefined
 
-    const racerName = track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
+    const racerName =
+      trackRacerName(bracket, track) ||
+      (track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name)
 
     toast.add({
       severity: 'success',
@@ -2288,7 +2342,9 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
 
 // Handle forfeit with confirmation
 const handleForfeit = (bracket, track) => {
-  const racerName = track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
+  const racerName =
+    trackRacerName(bracket, track) ||
+    (track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name)
 
   confirm.require({
     message: `Are you sure ${racerName} wants to forfeit this race?`,
@@ -2334,6 +2390,7 @@ const confirmClearBrackets = () => {
       try {
         await clearBrackets(race.value.id)
         await loadEligibleRacers() // Refresh counts
+        currentRounds.value = {}
       } finally {
         clearingBrackets.value = false
       }
@@ -2345,7 +2402,28 @@ const confirmClearBrackets = () => {
 onMounted(async () => {
   await authStore.initAuth()
   await initializeData()
+  // Preload current round for best-of-3 brackets
+  for (const b of raceBrackets.value) {
+    if (b.match_format === 'best_of_3') {
+      loadCurrentRound(b)
+    }
+  }
 })
+
+// Keep current round data fresh when brackets change
+watch(
+  () =>
+    raceBrackets.value.map((b) => ({ id: b.id, cur: b.current_round, completed: b.is_completed })),
+  async (list) => {
+    for (const item of list) {
+      const bracket = raceBrackets.value.find((b) => b.id === item.id)
+      if (bracket && bracket.match_format === 'best_of_3') {
+        await loadCurrentRound(bracket)
+      }
+    }
+  },
+  { deep: true }
+)
 
 // Page head
 useHead({
