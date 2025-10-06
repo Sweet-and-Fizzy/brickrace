@@ -494,7 +494,9 @@
                         >
                           Winner R{{ bracket.round_number }}
                         </div>
-                        <h3 class="text-xl font-bold text-black">Match #{{ index + 1 }}</h3>
+                        <h3 class="text-xl font-bold text-black">
+                          Match #{{ bracket.match_number || index + 1 }}
+                        </h3>
                         <!-- Best of 3 indicator -->
                         <div
                           v-if="bracket.match_format === 'best_of_3'"
@@ -724,7 +726,7 @@
                           Loser R{{ bracket.round_number }}
                         </div>
                         <h3 class="text-xl font-bold text-black">
-                          Elimination Match #{{ index + 1 }}
+                          Elimination Match #{{ bracket.match_number || index + 1 }}
                         </h3>
                         <!-- Best of 3 indicator -->
                         <div
@@ -1194,7 +1196,9 @@
                               }}
                             </div>
                           </div>
-                          <h3 class="text-xl font-bold text-black">Bracket #{{ index + 1 }}</h3>
+                          <h3 class="text-xl font-bold text-black">
+                            Match #{{ bracket.match_number || index + 1 }}
+                          </h3>
                         </div>
                         <Button
                           v-tooltip.top="'Delete Bracket'"

@@ -308,7 +308,15 @@ export async function refreshUpcomingParticipants(
       ])
     )
 
-    // For each match, ensure our bracket row has correct racer assignments
+    // Pre-compute Challonge natural order (or suggested_play_order if present)
+    const orderById = new Map<string, number>()
+    matches.forEach((mm: any, idx: number) => {
+      const mid = mm.match.id.toString()
+      const spo = (mm.match as any).suggested_play_order
+      orderById.set(mid, typeof spo === 'number' && spo > 0 ? spo : idx + 1)
+    })
+
+    // For each match, ensure our bracket row has correct racer assignments and match_number
     for (const m of matches) {
       const match = m.match
       const challongeMatchId = match.id.toString()
@@ -329,19 +337,132 @@ export async function refreshUpcomingParticipants(
         ? participantToRacer.get(match.player2_id.toString()) || null
         : null
 
-      // Only update if values differ and participants are determined
+      // Build updates: participant slots and match_number if missing/misaligned
+      const updates: any = {}
       if (
         (track1RacerId && track1RacerId !== bracket.track1_racer_id) ||
         (track2RacerId && track2RacerId !== bracket.track2_racer_id)
       ) {
-        await c
+        updates.track1_racer_id = track1RacerId
+        updates.track2_racer_id = track2RacerId
+      }
+
+      const desiredOrder = orderById.get(challongeMatchId) || null
+      if (desiredOrder && (!('match_number' in bracket) || bracket.match_number !== desiredOrder)) {
+        updates.match_number = desiredOrder
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await c.from('brackets').update(updates).eq('id', bracket.id)
+      }
+
+      // Ensure best-of-3 bracket rounds exist when both participants are known
+      if (track1RacerId && track2RacerId) {
+        const { data: fullBracket } = await c
           .from('brackets')
-          .update({ track1_racer_id: track1RacerId, track2_racer_id: track2RacerId })
+          .select('id, match_format')
           .eq('id', bracket.id)
+          .single()
+
+        if (fullBracket && fullBracket.match_format === 'best_of_3') {
+          const { data: existingRounds } = await c
+            .from('bracket_rounds')
+            .select('id')
+            .eq('bracket_id', bracket.id)
+            .limit(1)
+
+          if (!existingRounds || existingRounds.length === 0) {
+            await c.from('bracket_rounds').insert([
+              {
+                bracket_id: bracket.id,
+                round_number: 1,
+                racer1_id: track1RacerId,
+                racer2_id: track2RacerId,
+                racer1_track: 1,
+                racer2_track: 2
+              },
+              {
+                bracket_id: bracket.id,
+                round_number: 2,
+                racer1_id: track1RacerId,
+                racer2_id: track2RacerId,
+                racer1_track: 2,
+                racer2_track: 1
+              },
+              {
+                bracket_id: bracket.id,
+                round_number: 3,
+                racer1_id: track1RacerId,
+                racer2_id: track2RacerId,
+                racer1_track: 1,
+                racer2_track: 2
+              }
+            ])
+          }
+        }
       }
     }
   } catch (err) {
     console.error('Error refreshing upcoming participants from Challonge:', err)
     // non-fatal
+  }
+}
+
+/**
+ * Seed internal brackets from Challonge matches for a race.
+ */
+export async function seedBracketsFromChallonge(client: any, raceId: string): Promise<void> {
+  try {
+    const c: any = client
+
+    const { data: tournament } = await c
+      .from('challonge_tournaments')
+      .select('id, challonge_tournament_id, status')
+      .eq('race_id', raceId)
+      .eq('status', 'active')
+      .single()
+
+    if (!tournament) return
+
+    const matches = await challongeApi.getMatches(tournament.challonge_tournament_id)
+
+    const { data: existing } = await c
+      .from('brackets')
+      .select('id, challonge_match_id')
+      .eq('race_id', raceId)
+
+    const existingSet = new Set<string>((existing || []).map((b: any) => b.challonge_match_id))
+
+    const toInsert: any[] = []
+    matches.forEach((m: any, idx: number) => {
+      const match = m.match
+      const challongeMatchId = match.id.toString()
+      if (existingSet.has(challongeMatchId)) return
+
+      const group = match.round < 0 ? 'loser' : 'winner'
+      const roundNumber = Math.abs(match.round)
+      const suggestedOrder = (match as any).suggested_play_order
+      const matchNumber =
+        typeof suggestedOrder === 'number' && suggestedOrder > 0 ? suggestedOrder : idx + 1
+
+      toInsert.push({
+        race_id: raceId,
+        bracket_type: 'double_elimination',
+        bracket_group: group,
+        round_number: roundNumber,
+        match_number: matchNumber,
+        match_format: 'best_of_3',
+        total_rounds: 3,
+        current_round: 1,
+        challonge_match_id: challongeMatchId,
+        challonge_round: match.round
+      })
+    })
+
+    if (toInsert.length > 0) {
+      await c.from('brackets').insert(toInsert)
+    }
+  } catch (err) {
+    console.error('Error seeding brackets from Challonge:', err)
   }
 }

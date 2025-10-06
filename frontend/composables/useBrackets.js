@@ -1244,23 +1244,21 @@ export const useBrackets = () => {
     return state.brackets.value
       .filter((b) => b.race_id === raceId)
       .sort((a, b) => {
-        // Sort by bracket_group first (winner before loser)
-        if (a.bracket_group !== b.bracket_group) {
-          if (a.bracket_group === 'winner') return -1
-          if (b.bracket_group === 'winner') return 1
-        }
+        // Primary: Challonge-derived overall order (match_number when present)
+        const aNum = typeof a.match_number === 'number' ? a.match_number : null
+        const bNum = typeof b.match_number === 'number' ? b.match_number : null
+        if (aNum !== null && bNum !== null) return aNum - bNum
+        if (aNum !== null) return -1
+        if (bNum !== null) return 1
 
-        // Then by round_number
-        if (a.round_number !== b.round_number) {
-          return a.round_number - b.round_number
-        }
+        // Secondary: Challonge match id if available (as number)
+        const aMid = a.challonge_match_id ? Number.parseInt(a.challonge_match_id, 10) : null
+        const bMid = b.challonge_match_id ? Number.parseInt(b.challonge_match_id, 10) : null
+        if (aMid !== null && bMid !== null) return aMid - bMid
+        if (aMid !== null) return -1
+        if (bMid !== null) return 1
 
-        // Then by match_number
-        if (a.match_number !== null && b.match_number !== null) {
-          return a.match_number - b.match_number
-        }
-
-        // Fallback to creation time for brackets without match_number
+        // Tertiary: created_at to keep a stable order
         return new Date(a.created_at) - new Date(b.created_at)
       })
   }
