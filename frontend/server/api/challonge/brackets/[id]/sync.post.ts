@@ -1,9 +1,10 @@
 import { serverSupabaseClient } from '#supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { syncBracketToChallonge } from '~/server/utils/challonge-sync'
 
 export default defineEventHandler(async (event) => {
   const bracketId = getRouterParam(event, 'id')
-  const client = await serverSupabaseClient(event)
+  const client = (await serverSupabaseClient(event)) as unknown as SupabaseClient
 
   if (!bracketId) {
     throw createError({ statusCode: 400, statusMessage: 'Bracket ID is required' })

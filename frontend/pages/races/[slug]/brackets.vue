@@ -502,6 +502,12 @@
                         >
                           Best of 3
                         </div>
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold"
+                        >
+                          Round {{ bracket.current_round || 1 }}/{{ bracket.total_rounds || 3 }}
+                        </div>
                       </div>
                     </div>
 
@@ -727,6 +733,12 @@
                         >
                           Best of 3
                         </div>
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold"
+                        >
+                          Round {{ bracket.current_round || 1 }}/{{ bracket.total_rounds || 3 }}
+                        </div>
                       </div>
                     </div>
 
@@ -943,6 +955,12 @@
                           FINAL
                         </div>
                         <h3 class="text-xl font-bold text-black">Championship Match</h3>
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold"
+                        >
+                          Round {{ bracket.current_round || 1 }}/{{ bracket.total_rounds || 3 }}
+                        </div>
                       </div>
                     </div>
                     <!-- Championship bracket content -->
@@ -1165,6 +1183,15 @@
                               class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
                             >
                               Round {{ bracket.round_number }}
+                            </div>
+                            <!-- Per-match round for best-of-3 -->
+                            <div
+                              v-if="bracket.match_format === 'best_of_3'"
+                              class="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold"
+                            >
+                              Match Round {{ bracket.current_round || 1 }}/{{
+                                bracket.total_rounds || 3
+                              }}
                             </div>
                           </div>
                           <h3 class="text-xl font-bold text-black">Bracket #{{ index + 1 }}</h3>

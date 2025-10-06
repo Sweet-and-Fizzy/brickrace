@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Automatic sync utility for internal brackets to Challonge tournaments
 import { challongeApi } from './challonge-client'
 import type { ChallongeApiMatch } from './challonge-client'
-import type { SupabaseClient } from '@supabase/supabase-js'
+// Note: We accept a loosely-typed Supabase client here to interop with Nuxt's serverSupabaseClient
 
 interface BracketMatch {
   id: string
@@ -38,15 +39,16 @@ interface ParticipantMapping {
  * Sync a completed bracket result to its corresponding Challonge match
  */
 export async function syncBracketToChallonge(
-  client: SupabaseClient,
+  client: any,
   raceId: string,
   bracketId: string
 ): Promise<void> {
   try {
+    const c: any = client
     console.log(`Starting Challonge sync for bracket ${bracketId}`)
 
     // Check if this bracket has already been synced
-    const { data: existingSync } = await client
+    const { data: existingSync } = await c
       .from('challonge_match_sync')
       .select('id, synced_at')
       .eq('bracket_id', bracketId)
@@ -58,7 +60,7 @@ export async function syncBracketToChallonge(
     }
 
     // Get tournament for this race
-    const { data: tournament } = await client
+    const { data: tournament } = await c
       .from('challonge_tournaments')
       .select('*')
       .eq('race_id', raceId)
@@ -71,7 +73,7 @@ export async function syncBracketToChallonge(
     }
 
     // Get the completed bracket with full details
-    const { data: bracket } = await client
+    const { data: bracket } = await c
       .from('brackets')
       .select(
         `
@@ -120,7 +122,7 @@ export async function syncBracketToChallonge(
     }
 
     // Get participant mappings to convert racer IDs to Challonge participant IDs
-    const { data: participants } = await client
+    const { data: participants } = await c
       .from('challonge_participants')
       .select('racer_id, challonge_participant_id')
       .eq('challonge_tournament_id', tournament.id)
@@ -169,7 +171,7 @@ export async function syncBracketToChallonge(
     console.log(`Winner: ${winnerChallongeId}, Scores: ${scoresCsv}`)
 
     // Store sync record for tracking
-    await client.from('challonge_match_sync').upsert(
+    await c.from('challonge_match_sync').upsert(
       {
         bracket_id: bracketId,
         challonge_tournament_id: tournament.id,
@@ -184,7 +186,7 @@ export async function syncBracketToChallonge(
     )
 
     // After reporting the result, refresh upcoming Challonge assignments into internal brackets
-    await refreshUpcomingParticipants(client, tournament.id)
+    await refreshUpcomingParticipants(c, tournament.id)
   } catch (error) {
     console.error('Error syncing bracket to Challonge:', error)
     // Don't throw - we don't want to fail the timing operation
@@ -227,16 +229,14 @@ function findMatchingChallongeMatch(
  * Sync all completed brackets for a race to Challonge
  * Useful for bulk sync or recovery scenarios
  */
-export async function syncAllBracketsToChallonge(
-  client: SupabaseClient,
-  raceId: string
-): Promise<void> {
+export async function syncAllBracketsToChallonge(client: any, raceId: string): Promise<void> {
   try {
+    const c: any = client
     console.log(`Starting bulk sync for race ${raceId}`)
 
     // Get all completed brackets for this race
     // Consider a bracket ready if either legacy single (both times present) or best-of-3 completed
-    const { data: completedBrackets } = await client
+    const { data: completedBrackets } = await c
       .from('brackets')
       .select('id')
       .eq('race_id', raceId)
@@ -253,7 +253,7 @@ export async function syncAllBracketsToChallonge(
 
     // Sync each bracket
     for (const bracket of completedBrackets) {
-      await syncBracketToChallonge(client, raceId, bracket.id)
+      await syncBracketToChallonge(c, raceId, bracket.id)
       // Small delay to avoid rate limiting
       await new Promise((resolve) => setTimeout(resolve, 100))
     }
@@ -261,14 +261,14 @@ export async function syncAllBracketsToChallonge(
     console.log(`Bulk sync completed for race ${raceId}`)
 
     // Also refresh upcoming participants based on latest Challonge bracket state
-    const { data: tournament } = await client
+    const { data: tournament } = await c
       .from('challonge_tournaments')
       .select('id')
       .eq('race_id', raceId)
       .eq('status', 'active')
       .single()
     if (tournament) {
-      await refreshUpcomingParticipants(client, tournament.id)
+      await refreshUpcomingParticipants(c, tournament.id)
     }
   } catch (error) {
     console.error('Error in bulk sync:', error)
@@ -281,12 +281,13 @@ export async function syncAllBracketsToChallonge(
  * so that next matches are populated once Challonge advances them.
  */
 export async function refreshUpcomingParticipants(
-  client: SupabaseClient,
+  client: any,
   tournamentId: string
 ): Promise<void> {
   try {
+    const c: any = client
     // Load tournament external ID
-    const { data: tournament } = await client
+    const { data: tournament } = await c
       .from('challonge_tournaments')
       .select('id, challonge_tournament_id')
       .eq('id', tournamentId)
@@ -295,7 +296,7 @@ export async function refreshUpcomingParticipants(
 
     // Fetch all matches and participant mapping
     const matches = await challongeApi.getMatches(tournament.challonge_tournament_id)
-    const { data: mappings } = await client
+    const { data: mappings } = await c
       .from('challonge_participants')
       .select('challonge_participant_id, racer_id')
       .eq('challonge_tournament_id', tournamentId)
@@ -313,7 +314,7 @@ export async function refreshUpcomingParticipants(
       const challongeMatchId = match.id.toString()
 
       // Find internal bracket row by challonge_match_id
-      const { data: bracket } = await client
+      const { data: bracket } = await c
         .from('brackets')
         .select('id, track1_racer_id, track2_racer_id')
         .eq('challonge_match_id', challongeMatchId)
@@ -333,7 +334,7 @@ export async function refreshUpcomingParticipants(
         (track1RacerId && track1RacerId !== bracket.track1_racer_id) ||
         (track2RacerId && track2RacerId !== bracket.track2_racer_id)
       ) {
-        await client
+        await c
           .from('brackets')
           .update({ track1_racer_id: track1RacerId, track2_racer_id: track2RacerId })
           .eq('id', bracket.id)

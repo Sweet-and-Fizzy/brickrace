@@ -738,7 +738,13 @@ export const useBrackets = () => {
             bracket_type: 'double_elimination',
             bracket_group: 'winner',
             round_number: nextWinnerRound,
-            match_number: matchNumber++
+            match_number: matchNumber++,
+            // Ensure best-of-3 carries forward
+            match_format: 'best_of_3',
+            total_rounds: 3,
+            current_round: 1,
+            rounds_won_track1: 0,
+            rounds_won_track2: 0
           }
           console.log(
             `🏆 BRACKET DEBUG: Adding winner bracket - round ${nextWinnerRound}, match ${bracket.match_number}`
@@ -757,6 +763,9 @@ export const useBrackets = () => {
             bracket_group: 'winner',
             round_number: nextWinnerRound,
             match_number: matchNumber,
+            match_format: 'best_of_3',
+            total_rounds: 3,
+            current_round: 1,
             winner_track: 1,
             winner_racer_id: byeWinner.racer_id
           })
@@ -778,7 +787,12 @@ export const useBrackets = () => {
             bracket_type: 'double_elimination',
             bracket_group: 'loser',
             round_number: nextLoserRound,
-            match_number: loserMatchNumber++
+            match_number: loserMatchNumber++,
+            match_format: 'best_of_3',
+            total_rounds: 3,
+            current_round: 1,
+            rounds_won_track1: 0,
+            rounds_won_track2: 0
           }
           console.log(
             `🏁 BRACKET DEBUG: Adding loser bracket - round ${nextLoserRound}, match ${bracket.match_number}`
@@ -798,6 +812,18 @@ export const useBrackets = () => {
         }
 
         console.log('✅ BRACKET DEBUG: Successfully inserted brackets:', data)
+
+        // Create initial rounds for best-of-3 brackets with both racers present
+        try {
+          const bo3Brackets = (data || []).filter(
+            (b) => b.match_format === 'best_of_3' && b.track2_racer_id !== null
+          )
+          if (bo3Brackets.length > 0) {
+            await createInitialRoundsForBrackets(bo3Brackets)
+          }
+        } catch (e) {
+          console.warn('Failed to create initial rounds for next brackets:', e?.message || e)
+        }
 
         notifications.info(
           'Next Round Generated',
