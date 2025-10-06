@@ -1,10 +1,12 @@
 import { serverSupabaseClient } from '#supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
 import { syncAllBracketsToChallonge, syncBracketToChallonge } from '~/server/utils/challonge-sync'
 
 export default defineEventHandler(async (event) => {
   const tournamentId = getRouterParam(event, 'id')
   const body = await readBody(event)
   const client = await serverSupabaseClient(event)
+  const typedClient = client as unknown as SupabaseClient
 
   if (!tournamentId) {
     throw createError({
@@ -15,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Get tournament data and verify it exists
-    const { data: tournament, error: tournamentError } = await client
+    const { data: tournament, error: tournamentError } = await typedClient
       .from('challonge_tournaments')
       .select('race_id, status, challonge_tournament_id')
       .eq('id', tournamentId)
@@ -28,7 +30,8 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    if (tournament.status !== 'active') {
+    const t = tournament as { race_id: string; status: string; challonge_tournament_id: string }
+    if (t.status !== 'active') {
       throw createError({
         statusCode: 400,
         statusMessage: 'Can only sync brackets for active tournaments'
@@ -48,13 +51,13 @@ export default defineEventHandler(async (event) => {
         try {
           // If force_resync is true, delete existing sync record first
           if (force_resync) {
-            await client
+            await typedClient
               .from('challonge_match_sync')
               .delete()
               .eq('bracket_id', bracketId)
           }
 
-          await syncBracketToChallonge(client, tournament.race_id, bracketId)
+          await syncBracketToChallonge(typedClient, t.race_id, bracketId)
           syncResults.push({
             bracket_id: bracketId,
             status: 'success'
@@ -74,7 +77,7 @@ export default defineEventHandler(async (event) => {
       
       if (force_resync) {
         // Clear all existing sync records for this tournament
-        await client
+        await typedClient
           .from('challonge_match_sync')
           .delete()
           .eq('challonge_tournament_id', tournamentId)
@@ -82,10 +85,10 @@ export default defineEventHandler(async (event) => {
         console.log('Cleared existing sync records for force resync')
       }
 
-      await syncAllBracketsToChallonge(client, tournament.race_id)
+      await syncAllBracketsToChallonge(typedClient, t.race_id)
       
       // Get sync summary
-      const { data: syncedBrackets } = await client
+      const { data: syncedBrackets } = await typedClient
         .from('challonge_match_sync')
         .select('bracket_id, synced_at')
         .eq('challonge_tournament_id', tournamentId)
@@ -94,19 +97,18 @@ export default defineEventHandler(async (event) => {
     }
 
     // Get final sync status
-    const { data: allSyncRecords } = await client
+    const { data: allSyncRecords } = await typedClient
       .from('challonge_match_sync')
       .select('bracket_id, synced_at, scores_csv')
       .eq('challonge_tournament_id', tournamentId)
       .order('synced_at', { ascending: false })
 
-    const { data: completedBrackets } = await client
+    // Count completed brackets across both formats
+    const { data: completedBrackets } = await typedClient
       .from('brackets')
       .select('id')
-      .eq('race_id', tournament.race_id)
-      .not('track1_time', 'is', null)
-      .not('track2_time', 'is', null)
-      .not('winner_racer_id', 'is', null)
+      .eq('race_id', t.race_id)
+      .or('is_completed.eq.true,and(track1_time.not.is.null,track2_time.not.is.null),winner_racer_id.not.is.null')
 
     const totalCompleted = completedBrackets?.length || 0
     const totalSynced = allSyncRecords?.length || 0
@@ -115,26 +117,34 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: 'Bracket sync completed',
       summary: {
+        // Legacy keys expected by UI
+        total_completed: totalCompleted,
+        total_synced: totalSynced,
+        sync_coverage: totalCompleted > 0 ? ((totalSynced / totalCompleted) * 100).toFixed(1) + '%' : '0%',
+        // Also include verbose keys for future use
         total_completed_brackets: totalCompleted,
-        total_synced_brackets: totalSynced,
-        sync_coverage: totalCompleted > 0 ? (totalSynced / totalCompleted * 100).toFixed(1) + '%' : '0%'
+        total_synced_brackets: totalSynced
       },
       sync_results: syncResults,
       sync_records: allSyncRecords
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Manual bracket sync error:', error)
     
     // Re-throw createError instances
-    if (error.statusCode) {
-      throw error
+    if (typeof error === 'object' && error && 'statusCode' in error) {
+      throw error as { statusCode: number }
     }
 
     // Generic error fallback
+    const message =
+      typeof error === 'object' && error && 'message' in error
+        ? String((error as { message?: string }).message)
+        : 'Failed to sync brackets'
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || 'Failed to sync brackets'
+      statusMessage: message
     })
   }
 })

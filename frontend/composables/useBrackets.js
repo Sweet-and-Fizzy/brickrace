@@ -393,6 +393,12 @@ export const useBrackets = () => {
 
       if (updatedBracket.track1_time && updatedBracket.track2_time) {
         await determineWinner(updatedBracket)
+        // After setting winner, trigger Challonge sync for this bracket
+        try {
+          await $fetch(`/api/challonge/brackets/${bracketId}/sync`, { method: 'POST' })
+        } catch (e) {
+          console.warn('Challonge sync failed (single race):', e?.message || e)
+        }
       }
 
       // Update local state
@@ -429,13 +435,11 @@ export const useBrackets = () => {
     }
 
     // Determine which racer this time belongs to based on track assignment
-    let updateField, racerId
+    let updateField
     if (roundData.racer1_track === track) {
       updateField = 'racer1_time'
-      racerId = roundData.racer1_id
     } else if (roundData.racer2_track === track) {
       updateField = 'racer2_time'
-      racerId = roundData.racer2_id
     } else {
       throw new Error('Invalid track for this round')
     }
@@ -483,9 +487,23 @@ export const useBrackets = () => {
       })
       .eq('id', roundData.id)
 
-    if (roundUpdateError) throw roundUpdateError
+  if (roundUpdateError) throw roundUpdateError
 
     notifications.success('Round Complete', `Round ${roundData.round_number} winner determined!`)
+
+    // If this completion decides the match (trigger updates on bracket via DB trigger), attempt Challonge sync
+    try {
+      const { data: parentBracket } = await supabase
+        .from('brackets')
+        .select('id, is_completed')
+        .eq('id', roundData.bracket_id)
+        .single()
+      if (parentBracket?.is_completed) {
+        await $fetch(`/api/challonge/brackets/${roundData.bracket_id}/sync`, { method: 'POST' })
+      }
+    } catch (e) {
+      console.warn('Challonge sync failed (round complete):', e?.message || e)
+    }
   }
 
   // Get current round data for a bracket
@@ -556,6 +574,12 @@ export const useBrackets = () => {
 
       // Check if we should generate next round brackets
       await checkAndGenerateNextRound(bracket?.race_id)
+
+      try {
+        await $fetch(`/api/challonge/brackets/${bracketId}/sync`, { method: 'POST' })
+      } catch (e) {
+        console.warn('Challonge sync failed (forfeit):', e?.message || e)
+      }
 
       return true
     } catch (err) {
