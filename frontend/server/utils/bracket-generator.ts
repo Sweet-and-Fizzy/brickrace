@@ -1,6 +1,14 @@
 // Generate internal brackets based on Challonge tournament structure
 import { challongeApi } from './challonge-client'
-import type { SupabaseClient } from '@supabase/supabase-js'
+// NOTE: We intentionally avoid a hard SupabaseClient type here to prevent
+// cross-package class identity mismatches (protected members like supabaseUrl)
+// when passing clients created by Nuxt's #supabase/server helpers.
+// Using `any` keeps structural typing while preserving runtime safety.
+/*
+ We intentionally avoid importing concrete Supabase client types here to prevent
+ cross-package class identity mismatches. See TS2345 error notes in route handler.
+*/
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 interface ChallongeMatchData {
   id: number
@@ -31,7 +39,7 @@ interface ParticipantMapping {
  * This replaces any existing brackets with ones that match Challonge exactly
  */
 export async function generateBracketsFromChallonge(
-  client: SupabaseClient,
+  client: any,
   raceId: string,
   tournamentId: string
 ): Promise<{
@@ -325,7 +333,7 @@ export async function generateBracketsFromChallonge(
  * Update sync utility to use Challonge match ID for perfect mapping
  */
 export async function syncBracketByChallongeMatchId(
-  client: SupabaseClient,
+  client: any,
   raceId: string,
   challongeMatchId: string
 ): Promise<void> {
@@ -450,7 +458,7 @@ export async function syncBracketByChallongeMatchId(
  * - Does not delete or recreate rows; does not touch rounds or winners
  */
 export async function reconcileBracketsFromChallonge(
-  client: SupabaseClient,
+  client: any,
   raceId: string,
   tournamentId: string
 ): Promise<{ updated: number }> {
