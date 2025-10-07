@@ -23,6 +23,20 @@
             </Message>
             <Message v-else-if="errors.general" severity="error" :closable="true" @close="errors.general = ''">
               {{ errors.general }}
+              <div v-if="errors.general.includes('Email verification required')" class="mt-3">
+                <Button 
+                  @click="resendVerificationEmail" 
+                  :loading="resendingEmail"
+                  class="btn-secondary"
+                  size="small"
+                >
+                  <i class="pi pi-envelope mr-2" />
+                  <span>Resend Verification Email</span>
+                </Button>
+              </div>
+            </Message>
+            <Message v-if="verificationEmailSent" severity="success" :closable="true" @close="verificationEmailSent = false">
+              ✅ Verification email sent! Please check your inbox (and spam folder).
             </Message>
             
             <!-- Social Login Buttons -->
@@ -130,6 +144,8 @@ const errors = reactive({
 
 const loading = ref(false)
 const socialLoading = ref('')
+const resendingEmail = ref(false)
+const verificationEmailSent = ref(false)
 
 const clearErrors = () => {
   errors.email = ''
@@ -190,7 +206,7 @@ const handleLogin = async () => {
       // Handle specific Supabase auth errors
       if (error.message.includes('Email not confirmed')) {
         errors.general =
-          'Please check your email and click the confirmation link before signing in.'
+          '📧 Email verification required. Please check your inbox and click the confirmation link we sent you before signing in.'
       } else if (error.message.includes('Invalid login credentials')) {
         errors.general = 'Invalid email or password. Please try again.'
       } else {
@@ -201,6 +217,39 @@ const handleLogin = async () => {
     }
   } finally {
     loading.value = false
+  }
+}
+
+const resendVerificationEmail = async () => {
+  if (!form.email) {
+    errors.email = 'Please enter your email address first'
+    return
+  }
+
+  resendingEmail.value = true
+  verificationEmailSent.value = false
+
+  try {
+    const supabase = useSupabaseClient()
+    
+    // Supabase requires us to use the resend method with type 'signup'
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: form.email
+    })
+
+    if (error) {
+      console.error('Resend verification error:', error)
+      errors.general = `Failed to resend email: ${error.message}`
+    } else {
+      verificationEmailSent.value = true
+      errors.general = '' // Clear the error message
+    }
+  } catch (error) {
+    console.error('Resend error:', error)
+    errors.general = 'Failed to resend verification email. Please try again.'
+  } finally {
+    resendingEmail.value = false
   }
 }
 
