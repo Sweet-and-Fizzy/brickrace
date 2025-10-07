@@ -182,87 +182,87 @@ BEGIN
 END $$;
 
 -- Create qualifying times (multiple runs per racer with realistic spread)
-DO $$
-DECLARE
-  test_race_id uuid;
-  racer_times record;
-  target_racer_id uuid;
-  existing_qualifier_count integer;
-BEGIN
-  -- Get the race ID from temp table
-  SELECT race_id INTO test_race_id FROM temp_race_info LIMIT 1;
+-- DO $$
+-- DECLARE
+--   test_race_id uuid;
+--   racer_times record;
+--   target_racer_id uuid;
+--   existing_qualifier_count integer;
+-- BEGIN
+--   -- Get the race ID from temp table
+--   SELECT race_id INTO test_race_id FROM temp_race_info LIMIT 1;
   
-  -- Only add qualifying times if they don't already exist for these racers
-  FOR racer_times IN 
-    SELECT * FROM (VALUES
-      ('Lightning McQueen', ARRAY[2.845, 2.901, 2.867], ARRAY['09:15:00', '10:45:00', '11:30:00']),
-      ('Speed Racer', ARRAY[2.923, 2.956, 2.889], ARRAY['09:20:00', '10:50:00', '11:35:00']),
-      ('Turbo', ARRAY[2.934, 2.987], ARRAY['09:25:00', '10:55:00']),
-      ('The Flash', ARRAY[2.978, 3.012, 2.945], ARRAY['09:30:00', '11:00:00', '11:40:00']),
-      ('Sonic', ARRAY[3.034, 3.067], ARRAY['09:35:00', '11:05:00']),
-      ('Road Runner', ARRAY[3.089, 3.123, 3.156], ARRAY['09:40:00', '11:10:00', '11:45:00']),
-      ('Dash Parr', ARRAY[3.178, 3.201], ARRAY['09:45:00', '11:15:00']),
-      ('Quicksilver', ARRAY[3.234, 3.267, 3.289], ARRAY['09:50:00', '11:20:00', '11:50:00']),
-      ('Speedy Gonzales', ARRAY[3.312, 3.345], ARRAY['09:55:00', '11:25:00']),
-      ('Blaze', ARRAY[3.378, 3.401, 3.423], ARRAY['10:00:00', '11:30:00', '11:55:00']),
-      ('Hot Wheels', ARRAY[3.456, 3.489], ARRAY['10:05:00', '11:35:00']),
-      ('Rocket Racer', ARRAY[3.512, 3.545, 3.578], ARRAY['10:10:00', '11:40:00', '12:00:00'])
-    ) AS t(racer_name, times, time_stamps)
-  LOOP
-    -- Get racer ID
-    SELECT id INTO target_racer_id 
-    FROM public.racers 
-    WHERE name = racer_times.racer_name 
-    LIMIT 1;
+--   -- Only add qualifying times if they don't already exist for these racers
+--   FOR racer_times IN 
+--     SELECT * FROM (VALUES
+--       ('Lightning McQueen', ARRAY[2.845, 2.901, 2.867], ARRAY['09:15:00', '10:45:00', '11:30:00']),
+--       ('Speed Racer', ARRAY[2.923, 2.956, 2.889], ARRAY['09:20:00', '10:50:00', '11:35:00']),
+--       ('Turbo', ARRAY[2.934, 2.987], ARRAY['09:25:00', '10:55:00']),
+--       ('The Flash', ARRAY[2.978, 3.012, 2.945], ARRAY['09:30:00', '11:00:00', '11:40:00']),
+--       ('Sonic', ARRAY[3.034, 3.067], ARRAY['09:35:00', '11:05:00']),
+--       ('Road Runner', ARRAY[3.089, 3.123, 3.156], ARRAY['09:40:00', '11:10:00', '11:45:00']),
+--       ('Dash Parr', ARRAY[3.178, 3.201], ARRAY['09:45:00', '11:15:00']),
+--       ('Quicksilver', ARRAY[3.234, 3.267, 3.289], ARRAY['09:50:00', '11:20:00', '11:50:00']),
+--       ('Speedy Gonzales', ARRAY[3.312, 3.345], ARRAY['09:55:00', '11:25:00']),
+--       ('Blaze', ARRAY[3.378, 3.401, 3.423], ARRAY['10:00:00', '11:30:00', '11:55:00']),
+--       ('Hot Wheels', ARRAY[3.456, 3.489], ARRAY['10:05:00', '11:35:00']),
+--       ('Rocket Racer', ARRAY[3.512, 3.545, 3.578], ARRAY['10:10:00', '11:40:00', '12:00:00'])
+--     ) AS t(racer_name, times, time_stamps)
+--   LOOP
+--     -- Get racer ID
+--     SELECT id INTO target_racer_id 
+--     FROM public.racers 
+--     WHERE name = racer_times.racer_name 
+--     LIMIT 1;
     
-    IF target_racer_id IS NOT NULL THEN
-      -- Check if this racer already has qualifying times for this race
-      SELECT COUNT(*) INTO existing_qualifier_count
-      FROM public.qualifiers 
-      WHERE racer_id = target_racer_id AND race_id = test_race_id;
+--     IF target_racer_id IS NOT NULL THEN
+--       -- Check if this racer already has qualifying times for this race
+--       SELECT COUNT(*) INTO existing_qualifier_count
+--       FROM public.qualifiers 
+--       WHERE racer_id = target_racer_id AND race_id = test_race_id;
       
-      IF existing_qualifier_count = 0 THEN
-        -- Insert qualifying times for this racer with realistic timestamps
-        FOR i IN 1..array_length(racer_times.times, 1) LOOP
-          INSERT INTO public.qualifiers (racer_id, race_id, time, created_at)
-          VALUES (
-            target_racer_id, 
-            test_race_id, 
-            racer_times.times[i],
-            ('2024-07-15 ' || racer_times.time_stamps[i] || '+00')::timestamp with time zone
-          );
-        END LOOP;
+--       IF existing_qualifier_count = 0 THEN
+--         -- Insert qualifying times for this racer with realistic timestamps
+--         FOR i IN 1..array_length(racer_times.times, 1) LOOP
+--           INSERT INTO public.qualifiers (racer_id, race_id, time, created_at)
+--           VALUES (
+--             target_racer_id, 
+--             test_race_id, 
+--             racer_times.times[i],
+--             ('2024-07-15 ' || racer_times.time_stamps[i] || '+00')::timestamp with time zone
+--           );
+--         END LOOP;
         
-        RAISE NOTICE 'Added % qualifying times for: %', array_length(racer_times.times, 1), racer_times.racer_name;
-      ELSE
-        -- Update existing qualifying times with realistic timestamps
-        DECLARE
-          existing_qualifier record;
-          time_index integer := 1;
-        BEGIN
-          FOR existing_qualifier IN 
-            SELECT id FROM public.qualifiers 
-            WHERE racer_id = target_racer_id AND race_id = test_race_id
-            ORDER BY time ASC
-          LOOP
-            -- Only update if we have a timestamp for this run
-            IF time_index <= array_length(racer_times.time_stamps, 1) THEN
-              UPDATE public.qualifiers 
-              SET created_at = ('2024-07-15 ' || racer_times.time_stamps[time_index] || '+00')::timestamp with time zone
-              WHERE id = existing_qualifier.id;
+--         RAISE NOTICE 'Added % qualifying times for: %', array_length(racer_times.times, 1), racer_times.racer_name;
+--       ELSE
+--         -- Update existing qualifying times with realistic timestamps
+--         DECLARE
+--           existing_qualifier record;
+--           time_index integer := 1;
+--         BEGIN
+--           FOR existing_qualifier IN 
+--             SELECT id FROM public.qualifiers 
+--             WHERE racer_id = target_racer_id AND race_id = test_race_id
+--             ORDER BY time ASC
+--           LOOP
+--             -- Only update if we have a timestamp for this run
+--             IF time_index <= array_length(racer_times.time_stamps, 1) THEN
+--               UPDATE public.qualifiers 
+--               SET created_at = ('2024-07-15 ' || racer_times.time_stamps[time_index] || '+00')::timestamp with time zone
+--               WHERE id = existing_qualifier.id;
               
-              time_index := time_index + 1;
-            END IF;
-          END LOOP;
+--               time_index := time_index + 1;
+--             END IF;
+--           END LOOP;
           
-          RAISE NOTICE 'Updated timestamps for % existing qualifying times for: %', existing_qualifier_count, racer_times.racer_name;
-        END;
-      END IF;
-    END IF;
+--           RAISE NOTICE 'Updated timestamps for % existing qualifying times for: %', existing_qualifier_count, racer_times.racer_name;
+--         END;
+--       END IF;
+--     END IF;
     
-    target_racer_id := NULL;
-  END LOOP;
+--     target_racer_id := NULL;
+--   END LOOP;
   
-  -- Clean up temp table
-  DROP TABLE IF EXISTS temp_race_info;
-END $$;
+--   -- Clean up temp table
+--   DROP TABLE IF EXISTS temp_race_info;
+-- END $$;
