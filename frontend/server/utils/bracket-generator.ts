@@ -1,5 +1,6 @@
 // Generate internal brackets based on Challonge tournament structure
 import { challongeApi } from './challonge-client'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 interface ChallongeMatchData {
   id: number
@@ -16,6 +17,10 @@ interface ChallongeMatchData {
   scores_csv?: string
 }
 
+interface ChallongeMatchRecord {
+  match: ChallongeMatchData
+}
+
 interface ParticipantMapping {
   challonge_participant_id: string
   racer_id: string
@@ -26,7 +31,7 @@ interface ParticipantMapping {
  * This replaces any existing brackets with ones that match Challonge exactly
  */
 export async function generateBracketsFromChallonge(
-  client: any,
+  client: SupabaseClient,
   raceId: string,
   tournamentId: string
 ): Promise<{
@@ -53,7 +58,9 @@ export async function generateBracketsFromChallonge(
     }
 
     // Get Challonge matches
-    const challongeMatches = await challongeApi.getMatches(tournament.challonge_tournament_id)
+    const challongeMatches = (await challongeApi.getMatches(
+      tournament.challonge_tournament_id
+    )) as ChallongeMatchRecord[]
 
     if (!challongeMatches || challongeMatches.length === 0) {
       throw new Error('No matches found in Challonge tournament')
@@ -61,7 +68,7 @@ export async function generateBracketsFromChallonge(
 
     // Debug: Log the Challonge match structure
     console.log('=== CHALLONGE MATCH STRUCTURE DEBUG ===')
-    challongeMatches.forEach((m: any, i: number) => {
+    challongeMatches.forEach((m: ChallongeMatchRecord, i: number) => {
       const match = m.match
       console.log(
         `Match ${i + 1}: ID=${match.id}, Round=${match.round}, Player1=${match.player1_id}, Player2=${match.player2_id}`
@@ -93,22 +100,24 @@ export async function generateBracketsFromChallonge(
     let matchNumber = 1
 
     // Sort matches by suggested play order (if available) or by round then ID
-    const sortedMatches = challongeMatches.sort((a: any, b: any) => {
-      const matchA = a.match as ChallongeMatchData
-      const matchB = b.match as ChallongeMatchData
+    const sortedMatches = challongeMatches.sort(
+      (a: ChallongeMatchRecord, b: ChallongeMatchRecord) => {
+        const matchA = a.match
+        const matchB = b.match
 
-      // Use suggested_play_order if available
-      if (matchA.suggested_play_order && matchB.suggested_play_order) {
-        return matchA.suggested_play_order - matchB.suggested_play_order
+        // Use suggested_play_order if available
+        if (matchA.suggested_play_order && matchB.suggested_play_order) {
+          return matchA.suggested_play_order - matchB.suggested_play_order
+        }
+
+        // Fall back to round then ID
+        if (matchA.round !== matchB.round) {
+          return matchA.round - matchB.round
+        }
+
+        return matchA.id - matchB.id
       }
-
-      // Fall back to round then ID
-      if (matchA.round !== matchB.round) {
-        return matchA.round - matchB.round
-      }
-
-      return matchA.id - matchB.id
-    })
+    )
 
     for (const challongeMatch of sortedMatches) {
       const match = challongeMatch.match as ChallongeMatchData
@@ -134,11 +143,15 @@ export async function generateBracketsFromChallonge(
         // For double elimination, determine if this is a championship final
         if (tournament.tournament_type === 'double_elimination') {
           // Find the highest round number in the tournament
-          const maxRound = Math.max(...sortedMatches.map((m: any) => m.match.round))
+          const maxRound = Math.max(
+            ...sortedMatches.map((m: ChallongeMatchRecord) => m.match.round)
+          )
 
           // The championship final is typically the highest round
           // AND there should be only 1 match in that round
-          const finalRoundMatches = sortedMatches.filter((m: any) => m.match.round === maxRound)
+          const finalRoundMatches = sortedMatches.filter(
+            (m: ChallongeMatchRecord) => m.match.round === maxRound
+          )
 
           if (match.round === maxRound && finalRoundMatches.length === 1) {
             bracketGroup = 'final'
@@ -177,7 +190,7 @@ export async function generateBracketsFromChallonge(
         // Try to parse scores if available (format: "score1-score2")
         if (match.scores_csv) {
           const scores = match.scores_csv.split('-').map((s: string) => Number.parseFloat(s.trim()))
-          if (scores.length === 2 && !isNaN(scores[0]) && !isNaN(scores[1])) {
+          if (scores.length === 2 && !Number.isNaN(scores[0]) && !Number.isNaN(scores[1])) {
             track1Time = scores[0]
             track2Time = scores[1]
           }
@@ -293,9 +306,13 @@ export async function generateBracketsFromChallonge(
       bracketsGenerated: newBrackets.length,
       tournamentStructure: {
         totalMatches: challongeMatches.length,
-        winnerBracketMatches: challongeMatches.filter((m: any) => m.match.round > 0).length,
-        loserBracketMatches: challongeMatches.filter((m: any) => m.match.round < 0).length,
-        finalMatches: challongeMatches.filter((m: any) => m.match.round === 1).length
+        winnerBracketMatches: challongeMatches.filter(
+          (m: ChallongeMatchRecord) => m.match.round > 0
+        ).length,
+        loserBracketMatches: challongeMatches.filter((m: ChallongeMatchRecord) => m.match.round < 0)
+          .length,
+        finalMatches: challongeMatches.filter((m: ChallongeMatchRecord) => m.match.round === 1)
+          .length
       }
     }
   } catch (error) {
@@ -308,7 +325,7 @@ export async function generateBracketsFromChallonge(
  * Update sync utility to use Challonge match ID for perfect mapping
  */
 export async function syncBracketByChallongeMatchId(
-  client: any,
+  client: SupabaseClient,
   raceId: string,
   challongeMatchId: string
 ): Promise<void> {
@@ -334,10 +351,11 @@ export async function syncBracketByChallongeMatchId(
       return
     }
 
-    if (!bracket.track1_time || !bracket.track2_time) {
-      console.log(`Bracket for match ${challongeMatchId} not ready for sync - missing times`)
-      return
-    }
+    // Ensure we have a winner and some form of score
+    const hasRoundWins =
+      typeof bracket.rounds_won_track1 === 'number' || typeof bracket.rounds_won_track2 === 'number'
+    const hasTimes =
+      typeof bracket.track1_time === 'number' && typeof bracket.track2_time === 'number'
 
     // Get tournament info
     const { data: tournament } = await client
@@ -358,14 +376,30 @@ export async function syncBracketByChallongeMatchId(
       .select('racer_id, challonge_participant_id')
       .eq('challonge_tournament_id', tournament.id)
 
-    const participantMap = new Map(
-      participants?.map((p: any) => [p.racer_id, p.challonge_participant_id]) || []
+    type ParticipantRow = { racer_id: string; challonge_participant_id: string }
+    const participantMap = new Map<string, string>(
+      (participants as ParticipantRow[] | null)?.map((p) => [
+        p.racer_id,
+        p.challonge_participant_id
+      ]) || []
     )
 
     // Determine winner
-    const isTrack1Winner = bracket.track1_time < bracket.track2_time
-    const winnerRacerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
-    const winnerChallongeId = participantMap.get(winnerRacerId)
+    // Determine winner racer id
+    let winnerRacerId = bracket.winner_racer_id
+    if (!winnerRacerId) {
+      if (hasTimes) {
+        winnerRacerId =
+          bracket.track1_time < bracket.track2_time
+            ? bracket.track1_racer_id
+            : bracket.track2_racer_id
+      } else if (hasRoundWins) {
+        const t1 = bracket.rounds_won_track1 || 0
+        const t2 = bracket.rounds_won_track2 || 0
+        winnerRacerId = t1 > t2 ? bracket.track1_racer_id : bracket.track2_racer_id
+      }
+    }
+    const winnerChallongeId = winnerRacerId ? participantMap.get(winnerRacerId) : undefined
 
     if (!winnerChallongeId) {
       console.log('Winner participant mapping not found')
@@ -373,7 +407,14 @@ export async function syncBracketByChallongeMatchId(
     }
 
     // Format scores
-    const scoresCsv = `${bracket.track1_time.toFixed(3)}-${bracket.track2_time.toFixed(3)}`
+    let scoresCsv = '1-0'
+    if (bracket.match_format === 'best_of_3' && hasRoundWins) {
+      const t1 = (bracket.rounds_won_track1 ?? 0).toString()
+      const t2 = (bracket.rounds_won_track2 ?? 0).toString()
+      scoresCsv = `${t1}-${t2}`
+    } else if (hasTimes) {
+      scoresCsv = `${Number(bracket.track1_time).toFixed(3)}-${Number(bracket.track2_time).toFixed(3)}`
+    }
 
     // Update Challonge match
     await challongeApi.updateMatch(tournament.challonge_tournament_id, challongeMatchId, {
@@ -401,4 +442,98 @@ export async function syncBracketByChallongeMatchId(
     console.error('Error syncing bracket by Challonge match ID:', error)
     throw error
   }
+}
+
+/**
+ * Non-destructive reconciliation from Challonge:
+ * - Updates participant assignments and ordering for existing brackets
+ * - Does not delete or recreate rows; does not touch rounds or winners
+ */
+export async function reconcileBracketsFromChallonge(
+  client: SupabaseClient,
+  raceId: string,
+  tournamentId: string
+): Promise<{ updated: number }> {
+  let updated = 0
+  // Get tournament challonge ID
+  const { data: tournament } = await client
+    .from('challonge_tournaments')
+    .select('challonge_tournament_id')
+    .eq('id', tournamentId)
+    .single()
+
+  if (!tournament) {
+    console.log('No tournament found for reconcile')
+    return { updated }
+  }
+
+  const challongeMatches = (await challongeApi.getMatches(
+    tournament.challonge_tournament_id
+  )) as ChallongeMatchRecord[]
+
+  // participant mapping
+  const { data: participants } = await client
+    .from('challonge_participants')
+    .select('challonge_participant_id, racer_id')
+    .eq('challonge_tournament_id', tournamentId)
+
+  type ParticipantRow = { challonge_participant_id: string; racer_id: string }
+  const pmap = new Map<string, string>(
+    (participants as ParticipantRow[] | null)?.map((p) => [
+      p.challonge_participant_id,
+      p.racer_id
+    ]) || []
+  )
+
+  for (const rec of challongeMatches) {
+    const match = rec.match
+    const track1RacerId = match.player1_id ? pmap.get(match.player1_id.toString()) : null
+    const track2RacerId = match.player2_id ? pmap.get(match.player2_id.toString()) : null
+
+    const challongeId = match.id.toString()
+    const { data: existing } = await client
+      .from('brackets')
+      .select(
+        'id, track1_racer_id, track2_racer_id, challonge_suggested_play_order, challonge_round, winner_racer_id'
+      )
+      .eq('race_id', raceId)
+      .eq('challonge_match_id', challongeId)
+      .single()
+
+    if (!existing) continue
+
+    const updates: Partial<{
+      track1_racer_id: string | null
+      track2_racer_id: string | null
+      challonge_suggested_play_order: number | null
+      challonge_round: number
+    }> = {}
+
+    // Only update participants on matches not yet decided (avoid overwriting completed data)
+    const isCompleted = Boolean(existing.winner_racer_id)
+    if (!isCompleted) {
+      if (track1RacerId && track1RacerId !== existing.track1_racer_id) {
+        updates.track1_racer_id = track1RacerId
+      }
+      if (track2RacerId && track2RacerId !== existing.track2_racer_id) {
+        updates.track2_racer_id = track2RacerId
+      }
+    }
+
+    const suggested = match.suggested_play_order ?? null
+    if (suggested !== existing.challonge_suggested_play_order) {
+      updates.challonge_suggested_play_order = suggested
+    }
+    if (match.round !== existing.challonge_round) {
+      updates.challonge_round = match.round
+    }
+
+    if (Object.keys(updates).length > 0) {
+      await client.from('brackets').update(updates).eq('id', existing.id)
+      updated++
+    }
+  }
+
+  console.log(`Reconcile updated ${updated} bracket(s) from Challonge`)
+  return { updated }
 }

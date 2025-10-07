@@ -17,12 +17,17 @@ import {
   createTimingSupabaseClient
 } from '~/server/utils/timing-auth'
 import { getRacePhase } from '~/server/utils/race-phase'
-import { syncBracketByChallongeMatchId } from '~/server/utils/bracket-generator'
+import {
+  syncBracketByChallongeMatchId,
+  reconcileBracketsFromChallonge
+} from '~/server/utils/bracket-generator'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Bracket as BracketRow } from '~/types/database'
 
 /**
  * Handle bracket completion - determine winner and generate next round brackets
  */
-async function handleBracketCompletion(client: any, raceId: string, bracketId: string) {
+async function handleBracketCompletion(client: SupabaseClient, raceId: string, bracketId: string) {
   try {
     // Get the completed bracket with all details
     const { data: bracket, error: bracketError } = await client
@@ -41,19 +46,16 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
       throw new Error('Failed to get bracket details')
     }
 
-    // Determine winner and loser
-    let winnerRacerId, loserRacerId, winnerTrack, loserTrack
+    // Determine winner
+    let winnerRacerId: string | null = null
+    let winnerTrack: 1 | 2 = 1
 
     if (bracket.track1_time < bracket.track2_time) {
       winnerRacerId = bracket.track1_racer_id
-      loserRacerId = bracket.track2_racer_id
       winnerTrack = 1
-      loserTrack = 2
     } else {
       winnerRacerId = bracket.track2_racer_id
-      loserRacerId = bracket.track1_racer_id
       winnerTrack = 2
-      loserTrack = 1
     }
 
     // Update bracket with winner
@@ -74,20 +76,15 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
           console.log(
             `Bracket ${bracketId} synced successfully, regenerating brackets from Challonge`
           )
-          // Import the bracket generator function
-          const { generateBracketsFromChallonge } = await import('~/server/utils/bracket-generator')
-
-          // Get tournament ID for this race
+          // Non-destructive reconcile: update future matches' participants/order
           const { data: tournament } = await client
             .from('challonge_tournaments')
             .select('id')
             .eq('race_id', raceId)
             .eq('status', 'active')
             .single()
-
           if (tournament) {
-            await generateBracketsFromChallonge(client, raceId, tournament.id)
-            console.log('Brackets regenerated from Challonge after sync')
+            await reconcileBracketsFromChallonge(client, raceId, tournament.id)
           }
         })
         .catch((error) => {
@@ -116,14 +113,14 @@ async function handleBracketCompletion(client: any, raceId: string, bracketId: s
  * Handle times for single race format brackets (legacy)
  */
 async function handleSingleBracketTimes(
-  client: any,
+  client: SupabaseClient,
   bracketId: string,
   track1_time?: number,
   track2_time?: number,
   raceId?: string
 ) {
   // Update bracket times
-  const updates: any = {}
+  const updates: Partial<Pick<BracketRow, 'track1_time' | 'track2_time'>> = {}
   if (track1_time !== undefined) updates.track1_time = track1_time
   if (track2_time !== undefined) updates.track2_time = track2_time
 
@@ -156,8 +153,8 @@ async function handleSingleBracketTimes(
  * Handle times for best-of-3 format brackets
  */
 async function handleBestOf3BracketTimes(
-  client: any,
-  bracket: any,
+  client: SupabaseClient,
+  bracket: Pick<BracketRow, 'id' | 'current_round' | 'track1_racer_id' | 'track2_racer_id'>,
   raceId: string,
   track1_time?: number,
   track2_time?: number
@@ -177,7 +174,7 @@ async function handleBestOf3BracketTimes(
   }
 
   // Update round times based on track assignments
-  const updates: any = {}
+  const updates: Partial<{ racer1_time: number; racer2_time: number }> = {}
 
   if (track1_time !== undefined) {
     // Find which racer is assigned to track 1 in this round
@@ -215,7 +212,11 @@ async function handleBestOf3BracketTimes(
   const updatedRound = { ...roundData, ...updates }
 
   // Check if both times are recorded for this round
-  if (updatedRound.racer1_time && updatedRound.racer2_time && !updatedRound.completed_at) {
+  if (
+    updatedRound.racer1_time != null &&
+    updatedRound.racer2_time != null &&
+    !updatedRound.completed_at
+  ) {
     await completeBestOf3Round(client, updatedRound)
 
     // After completing a round, check if match is now decided (2 wins)
@@ -235,42 +236,47 @@ async function handleBestOf3BracketTimes(
       if (updatedBracket.challonge_match_id) {
         try {
           await syncBracketByChallongeMatchId(client, raceId, updatedBracket.challonge_match_id)
-
+          // Non-destructive reconcile of future matches
           const { data: tournament } = await client
             .from('challonge_tournaments')
             .select('id')
             .eq('race_id', raceId)
             .eq('status', 'active')
             .single()
-
           if (tournament) {
-            const { generateBracketsFromChallonge } = await import(
-              '~/server/utils/bracket-generator'
-            )
-            await generateBracketsFromChallonge(client, raceId, tournament.id)
+            await reconcileBracketsFromChallonge(client, raceId, tournament.id)
           }
         } catch (e) {
           console.error('Post-round completion sync/regenerate failed:', e)
         }
       }
+    } else {
+      // Not decided yet; advance bracket.current_round to the next incomplete round
+      await advanceBestOf3ToNextRound(client, bracket.id)
     }
   }
 }
 
 // Ensure best-of-3 scaffold exists on a bracket (idempotent)
-async function ensureBestOf3Scaffold(client: any, bracket: any) {
+async function ensureBestOf3Scaffold(
+  client: SupabaseClient,
+  bracket: Pick<
+    BracketRow,
+    'id' | 'match_format' | 'total_rounds' | 'track1_racer_id' | 'track2_racer_id'
+  >
+) {
   try {
     // Update bracket flags if needed
-    if (bracket.match_format !== 'best_of_3' || !bracket.total_rounds) {
-      await client
-        .from('brackets')
-        .update({
-          match_format: 'best_of_3',
-          total_rounds: 3,
-          current_round: bracket.current_round || 1,
-          is_completed: false
-        })
-        .eq('id', bracket.id)
+    const updates: Partial<{ match_format: string; total_rounds: number }> = {}
+    if (bracket.match_format !== 'best_of_3') {
+      updates.match_format = 'best_of_3'
+    }
+    if (!bracket.total_rounds) {
+      updates.total_rounds = 3
+    }
+    // IMPORTANT: Do NOT reset current_round or is_completed here; that caused round resets
+    if (Object.keys(updates).length > 0) {
+      await client.from('brackets').update(updates).eq('id', bracket.id)
     }
 
     // Create rounds if missing
@@ -316,16 +322,58 @@ async function ensureBestOf3Scaffold(client: any, bracket: any) {
 /**
  * Complete a round in best-of-3 format and check for match completion
  */
-async function completeBestOf3Round(client: any, roundData: any) {
-  // Determine winner of this round
-  let winnerRacerId, winnerTrack
-  if (roundData.racer1_time < roundData.racer2_time) {
-    winnerRacerId = roundData.racer1_id
-    winnerTrack = roundData.racer1_track
-  } else {
-    winnerRacerId = roundData.racer2_id
-    winnerTrack = roundData.racer2_track
+async function completeBestOf3Round(
+  client: SupabaseClient,
+  roundData: {
+    id: string
+    bracket_id: string
+    round_number: number
+    racer1_id: string
+    racer2_id: string
+    racer1_track: 1 | 2
+    racer2_track: 1 | 2
+    racer1_time: number | string
+    racer2_time: number | string
   }
+) {
+  // Determine winner of this round by racer slot (not physical track)
+  const t1 = Number(roundData.racer1_time)
+  const t2 = Number(roundData.racer2_time)
+  const winnerIsRacer1 = t1 < t2
+
+  // Fetch current bracket participants to avoid relying on possibly-null round racer ids
+  const { data: br, error: brErr } = await client
+    .from('brackets')
+    .select('track1_racer_id, track2_racer_id')
+    .eq('id', roundData.bracket_id)
+    .single()
+  if (brErr) throw brErr
+
+  // Backfill round participants if missing (idempotent)
+  try {
+    if (!roundData.racer1_id && br?.track1_racer_id) {
+      await client
+        .from('bracket_rounds')
+        .update({ racer1_id: br.track1_racer_id })
+        .eq('id', roundData.id)
+        .is('racer1_id', null)
+    }
+    if (!roundData.racer2_id && br?.track2_racer_id) {
+      await client
+        .from('bracket_rounds')
+        .update({ racer2_id: br.track2_racer_id })
+        .eq('id', roundData.id)
+        .is('racer2_id', null)
+    }
+  } catch (e) {
+    console.warn('Unable to backfill round participant ids (non-fatal):', e)
+  }
+
+  // Winner racer id comes from the round slot winner; winnerTrack is the physical track for logging only
+  const winnerRacerId = winnerIsRacer1
+    ? roundData.racer1_id || br?.track1_racer_id
+    : roundData.racer2_id || br?.track2_racer_id
+  const winnerTrack: 1 | 2 = winnerIsRacer1 ? roundData.racer1_track : roundData.racer2_track
 
   // Update round with winner and completion time
   const { error: roundUpdateError } = await client
@@ -344,6 +392,29 @@ async function completeBestOf3Round(client: any, roundData: any) {
   console.log(`🎯 Round ${roundData.round_number} completed: Winner = ${winnerRacerId}`)
 
   // The database trigger will automatically update the bracket's win counts and determine overall winner
+}
+
+// After completing a round, advance the bracket to the next incomplete round
+async function advanceBestOf3ToNextRound(client: SupabaseClient, bracketId: string): Promise<void> {
+  try {
+    const { data: nextRounds } = await client
+      .from('bracket_rounds')
+      .select('round_number')
+      .eq('bracket_id', bracketId)
+      .is('completed_at', null)
+      .order('round_number', { ascending: true })
+      .limit(1)
+
+    const nextRound = Array.isArray(nextRounds) && nextRounds.length > 0 ? nextRounds[0] : null
+    if (nextRound?.round_number) {
+      await client
+        .from('brackets')
+        .update({ current_round: nextRound.round_number })
+        .eq('id', bracketId)
+    }
+  } catch (e) {
+    console.error('Failed to advance to next round:', e)
+  }
 }
 
 export default defineEventHandler(async (event) => {
@@ -392,6 +463,9 @@ export default defineEventHandler(async (event) => {
     const phase = await getRacePhase(client, activeRace.id)
 
     // Handle based on phase (heat numbers are now sequential for both qualifiers and brackets)
+    let nextHeatNumber: number | null = null
+    let nextHeatStarted = false
+
     if (phase === 'qualifying') {
       // Qualifier heat
       const { error } = await client.rpc('complete_heat', {
@@ -433,21 +507,116 @@ export default defineEventHandler(async (event) => {
           }
         }
       }
+
+      // Only auto-advance in qualifying
+      if (auto_advance) {
+        try {
+          const { data: nextHeat } = await client
+            .from('qualifiers')
+            .select('heat_number')
+            .eq('race_id', activeRace.id)
+            .eq('status', 'scheduled')
+            .order('scheduled_order')
+            .limit(1)
+            .single()
+
+          if (nextHeat) {
+            await client.rpc('start_heat', { heat_num: nextHeat.heat_number })
+            nextHeatNumber = nextHeat.heat_number
+            nextHeatStarted = true
+            logTimingRequest(event, 'AUTO_START_NEXT_HEAT', {
+              completed_heat: heat_number,
+              next_heat: nextHeat.heat_number
+            })
+          }
+        } catch (e) {
+          const detail = e instanceof Error ? e.message : String(e)
+          logTimingRequest(event, 'AUTO_ADVANCE_WARNING', {
+            heat_number,
+            error: 'No next qualifier heat available or failed to start',
+            detail
+          })
+        }
+      }
     } else if (phase === 'brackets') {
       // Bracket heat - find current bracket by sequential position using Challonge ordering
       const { data: brackets } = await client
         .from('brackets')
-        .select('id, match_format, current_round, track1_racer_id, track2_racer_id')
+        .select(
+          'id, match_format, total_rounds, current_round, is_completed, rounds_won_track1, rounds_won_track2, winner_racer_id, track1_racer_id, track2_racer_id'
+        )
         .eq('race_id', activeRace.id)
         .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
         .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
 
-      const bracketIndex = heat_number - 1 // Convert heat number to 0-based index
-      if (!brackets || !brackets[bracketIndex]) {
-        throw new Error(`Bracket not found for heat number ${heat_number}`)
+      let bracketIndex = heat_number - 1 // Convert heat number to 0-based index
+      if (!brackets || brackets.length === 0) {
+        throw new Error('No brackets found for active race')
       }
 
+      // Helper to determine if bracket is complete
+      const isComplete = (
+        b: Pick<
+          BracketRow,
+          | 'match_format'
+          | 'is_completed'
+          | 'rounds_won_track1'
+          | 'rounds_won_track2'
+          | 'winner_racer_id'
+        >
+      ) => {
+        if (b.match_format === 'best_of_3') {
+          return (
+            Boolean(b.is_completed) ||
+            (typeof b.rounds_won_track1 === 'number' && b.rounds_won_track1 >= 2) ||
+            (typeof b.rounds_won_track2 === 'number' && b.rounds_won_track2 >= 2)
+          )
+        }
+        return Boolean(b.winner_racer_id)
+      }
+
+      // If provided heat_number points to a completed bracket, or is out of range, redirect to next incomplete bracket
+      let targetIndex: number | null = null
+      if (
+        bracketIndex >= 0 &&
+        bracketIndex < brackets.length &&
+        !isComplete(brackets[bracketIndex])
+      ) {
+        targetIndex = bracketIndex
+      } else {
+        // Find the first incomplete bracket at or after the hinted index
+        for (let i = Math.max(0, bracketIndex); i < brackets.length; i++) {
+          if (!isComplete(brackets[i])) {
+            targetIndex = i
+            break
+          }
+        }
+        // If none ahead, try from the beginning
+        if (targetIndex === null) {
+          for (let i = 0; i < brackets.length; i++) {
+            if (!isComplete(brackets[i])) {
+              targetIndex = i
+              break
+            }
+          }
+        }
+      }
+
+      if (targetIndex === null) {
+        // Tournament appears complete; no-op but respond gracefully
+        logTimingRequest(event, 'BRACKETS_COMPLETE_OR_NO_NEXT', { submitted_heat: heat_number })
+        return {
+          success: true,
+          message: `No remaining brackets to record. Submission ignored.`,
+          heat_number,
+          times: { track1: track1_time, track2: track2_time },
+          next_heat_started: false,
+          next_heat_number: null
+        }
+      }
+
+      bracketIndex = targetIndex
       const bracket = brackets[bracketIndex]
 
       // Ensure best-of-3 structure exists (idempotent)
@@ -455,7 +624,9 @@ export default defineEventHandler(async (event) => {
       // Refresh bracket flags after potential update
       const { data: refreshed } = await client
         .from('brackets')
-        .select('id, match_format, current_round, track1_racer_id, track2_racer_id')
+        .select(
+          'id, match_format, total_rounds, current_round, is_completed, track1_racer_id, track2_racer_id'
+        )
         .eq('id', bracket.id)
         .single()
 
@@ -474,40 +645,65 @@ export default defineEventHandler(async (event) => {
         track1_time,
         track2_time
       })
-    }
 
-    let nextHeatInfo = null
-
-    // If auto_advance is enabled, start the next heat automatically
-    if (auto_advance) {
+      // Compute next_heat_number mapping for bracket mode
       try {
-        const { data: nextHeat } = await client
-          .from('qualifiers')
-          .select('heat_number')
-          .eq(
-            'race_id',
-            (await client.from('races').select('id').eq('active', true).single()).data?.id
+        // Refresh this bracket state to evaluate completion
+        const { data: updatedBracket } = await client
+          .from('brackets')
+          .select(
+            'id, match_format, is_completed, winner_racer_id, rounds_won_track1, rounds_won_track2'
           )
-          .eq('status', 'scheduled')
-          .order('scheduled_order')
-          .limit(1)
+          .eq('id', bracket.id)
           .single()
 
-        if (nextHeat) {
-          await client.rpc('start_heat', { heat_num: nextHeat.heat_number })
-          nextHeatInfo = nextHeat
+        const isBestOf3 = updatedBracket?.match_format === 'best_of_3'
+        const isMatchComplete = isBestOf3
+          ? Boolean(updatedBracket?.is_completed) ||
+            (typeof updatedBracket?.rounds_won_track1 === 'number' &&
+              updatedBracket.rounds_won_track1 >= 2) ||
+            (typeof updatedBracket?.rounds_won_track2 === 'number' &&
+              updatedBracket.rounds_won_track2 >= 2)
+          : Boolean(updatedBracket?.winner_racer_id)
 
-          logTimingRequest(event, 'AUTO_START_NEXT_HEAT', {
-            completed_heat: heat_number,
-            next_heat: nextHeat.heat_number
-          })
+        if (!isMatchComplete) {
+          // Stay on the same bracket until the match is complete
+          nextHeatNumber = heat_number
+        } else {
+          // Find next incomplete bracket in ordered list
+          const { data: ordered } = await client
+            .from('brackets')
+            .select(
+              'id, match_format, is_completed, winner_racer_id, rounds_won_track1, rounds_won_track2'
+            )
+            .eq('race_id', activeRace.id)
+            .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
+            .order('challonge_round', { ascending: true })
+            .order('match_number', { ascending: true })
+
+          if (ordered && ordered.length > 0) {
+            let foundIndex: number | null = null
+            for (let i = bracketIndex + 1; i < ordered.length; i++) {
+              const b = ordered[i]
+              const bIsBo3 = b.match_format === 'best_of_3'
+              const bComplete = bIsBo3
+                ? Boolean(b.is_completed) ||
+                  (typeof b.rounds_won_track1 === 'number' && b.rounds_won_track1 >= 2) ||
+                  (typeof b.rounds_won_track2 === 'number' && b.rounds_won_track2 >= 2)
+                : Boolean(b.winner_racer_id)
+              if (!bComplete) {
+                foundIndex = i
+                break
+              }
+            }
+            nextHeatNumber = foundIndex !== null ? foundIndex + 1 : null
+          } else {
+            nextHeatNumber = null
+          }
         }
-      } catch (nextHeatError) {
-        // Don't fail the main operation if auto-advance fails
-        logTimingRequest(event, 'AUTO_ADVANCE_WARNING', {
-          heat_number,
-          error: 'No next heat available or failed to start'
-        })
+      } catch (e) {
+        console.error('Failed to compute next bracket heat number:', e)
+        nextHeatNumber = null
       }
     }
 
@@ -515,7 +711,8 @@ export default defineEventHandler(async (event) => {
       heat_number,
       track1_time,
       track2_time,
-      next_heat_started: !!nextHeatInfo
+      next_heat_started: nextHeatStarted,
+      next_heat_number: nextHeatNumber
     })
 
     return {
@@ -526,20 +723,21 @@ export default defineEventHandler(async (event) => {
         track1: track1_time,
         track2: track2_time
       },
-      next_heat_started: !!nextHeatInfo,
-      next_heat_number: nextHeatInfo?.heat_number || null
+      next_heat_started: nextHeatStarted,
+      next_heat_number: nextHeatNumber
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
     logTimingRequest(event, 'RECORD_TIMES_ERROR', {
       heat_number,
       track1_time,
       track2_time,
-      error: error.message
+      error: message
     })
 
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || 'Failed to record heat times'
+      statusMessage: message || 'Failed to record heat times'
     })
   }
 })
