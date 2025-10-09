@@ -157,18 +157,17 @@
               </div>
 
               <!-- Submit Button -->
-              <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
-                <NuxtLink to="/races" class="flex-1">
-                  <Button type="button" class="btn-secondary w-full"><span>Cancel</span></Button>
-                </NuxtLink>
+              <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start">
                 <Button
                   type="submit"
                   :loading="loading"
                   icon="pi pi-plus"
-                  class="btn-primary flex-1"
-                >
-                  <span>Create Race</span>
-                </Button>
+                  label="Create Race"
+                  class="btn-primary w-full sm:w-auto"
+                />
+                <NuxtLink to="/races" class="w-full sm:w-auto">
+                  <Button type="button" class="btn-secondary w-full sm:w-auto"><span>Cancel</span></Button>
+                </NuxtLink>
               </div>
             </form>
           </div>

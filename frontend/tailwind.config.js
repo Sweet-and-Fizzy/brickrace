@@ -8,7 +8,6 @@ export default {
     './nuxt.config.{js,ts}',
     './app.vue'
   ],
-  darkMode: ['class', '.app-dark'],
   theme: {
     extend: {
       colors: {

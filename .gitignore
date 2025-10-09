@@ -40,3 +40,10 @@ backend/uploads/*
 
 # Archive
 archive/
+
+# Database backups
+backups/
+
+# Supabase
+frontend/supabase/.temp/
+supabase/migrations/archive/

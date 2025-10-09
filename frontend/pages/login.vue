@@ -17,6 +17,28 @@
       <Card class="mt-8">
         <template #content>
           <div class="space-y-6">
+            <!-- Success/Error Messages -->
+            <Message v-if="errors.general && errors.general.includes('verified')" severity="success" :closable="false">
+              {{ errors.general }}
+            </Message>
+            <Message v-else-if="errors.general" severity="error" :closable="true" @close="errors.general = ''">
+              {{ errors.general }}
+              <div v-if="errors.general.includes('Email verification required')" class="mt-3">
+                <Button 
+                  @click="resendVerificationEmail" 
+                  :loading="resendingEmail"
+                  class="btn-secondary"
+                  size="small"
+                >
+                  <i class="pi pi-envelope mr-2" />
+                  <span>Resend Verification Email</span>
+                </Button>
+              </div>
+            </Message>
+            <Message v-if="verificationEmailSent" severity="success" :closable="true" @close="verificationEmailSent = false">
+              ✅ Verification email sent! Please check your inbox (and spam folder).
+            </Message>
+            
             <!-- Social Login Buttons -->
             <div class="space-y-3">
               <Button
@@ -122,6 +144,8 @@ const errors = reactive({
 
 const loading = ref(false)
 const socialLoading = ref('')
+const resendingEmail = ref(false)
+const verificationEmailSent = ref(false)
 
 const clearErrors = () => {
   errors.email = ''
@@ -145,6 +169,28 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
+    // First, refresh the session to handle post-email-verification state
+    const supabase = useSupabaseClient()
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+    
+    if (sessionError) {
+      console.error('Session refresh error:', sessionError)
+    }
+    
+    // If already authenticated (e.g., after email verification), just redirect
+    if (session?.user && session.user.email === form.email) {
+      authStore.user = session.user
+      authStore.session = session
+      await router.push(redirectTo)
+      return
+    }
+    
+    // If session exists but email doesn't match, sign out first
+    if (session?.user && session.user.email !== form.email) {
+      await supabase.auth.signOut()
+    }
+
+    // Proceed with login
     await authStore.login({
       email: form.email,
       password: form.password
@@ -160,7 +206,7 @@ const handleLogin = async () => {
       // Handle specific Supabase auth errors
       if (error.message.includes('Email not confirmed')) {
         errors.general =
-          'Please check your email and click the confirmation link before signing in.'
+          '📧 Email verification required. Please check your inbox and click the confirmation link we sent you before signing in.'
       } else if (error.message.includes('Invalid login credentials')) {
         errors.general = 'Invalid email or password. Please try again.'
       } else {
@@ -171,6 +217,39 @@ const handleLogin = async () => {
     }
   } finally {
     loading.value = false
+  }
+}
+
+const resendVerificationEmail = async () => {
+  if (!form.email) {
+    errors.email = 'Please enter your email address first'
+    return
+  }
+
+  resendingEmail.value = true
+  verificationEmailSent.value = false
+
+  try {
+    const supabase = useSupabaseClient()
+    
+    // Supabase requires us to use the resend method with type 'signup'
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: form.email
+    })
+
+    if (error) {
+      console.error('Resend verification error:', error)
+      errors.general = `Failed to resend email: ${error.message}`
+    } else {
+      verificationEmailSent.value = true
+      errors.general = '' // Clear the error message
+    }
+  } catch (error) {
+    console.error('Resend error:', error)
+    errors.general = 'Failed to resend verification email. Please try again.'
+  } finally {
+    resendingEmail.value = false
   }
 }
 
@@ -191,9 +270,33 @@ const handleSocialLogin = async (provider) => {
 }
 
 // Redirect if already authenticated
-onMounted(() => {
-  authStore.initAuth()
-  if (authStore.isAuthenticated) {
+onMounted(async () => {
+  await authStore.initAuth()
+  
+  // Check if coming from email verification
+  const hashParams = new URLSearchParams(window.location.hash.substring(1))
+  const type = hashParams.get('type')
+  
+  if (type === 'email') {
+    // User just verified their email
+    errors.general = 'Email verified successfully! Click Sign in to continue.'
+    
+    // Refresh the session to pick up the verification
+    const supabase = useSupabaseClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    
+    if (session?.user) {
+      // If we got a session, update the store
+      authStore.user = session.user
+      authStore.session = session
+      
+      // Auto-redirect after email verification
+      setTimeout(() => {
+        router.push(redirectTo)
+      }, 1500) // Give user time to see the success message
+    }
+  } else if (authStore.isAuthenticated) {
+    // Already logged in, redirect
     router.push(redirectTo)
   }
 })

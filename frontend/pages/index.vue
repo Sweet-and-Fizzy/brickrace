@@ -22,6 +22,17 @@
           </div>
         </div>
 
+        <!-- Call to Action Button -->
+        <div class="text-center mb-8">
+          <NuxtLink to="/racers/add">
+            <Button 
+              label="Register Your Racer" 
+              class="btn-primary text-lg px-8 py-3"
+              size="large"
+            />
+          </NuxtLink>
+        </div>
+
         <!-- Race Description and Map Section -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           <!-- Race Description -->
