@@ -58,7 +58,7 @@ void loop() {
 
     if (inByte == '\n' || inByte == '\r') {
       if (serialBuffer.length() > 0) {
-        if (serialBuffer == "0") {
+        if (serialBuffer == "reset") {
           // Reset for next race
           started = false;
           elapsedMillis = 0;
@@ -70,6 +70,9 @@ void loop() {
           matrix.writeDisplay();
           matrix2.clear();
           matrix2.writeDisplay();
+        } else if(serialBuffer == "go") {
+          started = true;
+          startMillis = millis();
         } else if (serialBuffer.startsWith("1:")) {
           // Racer 1 finished, parse time
           racer1Time = serialBuffer.substring(2).toInt();
