@@ -113,8 +113,8 @@ BEGIN
     RAISE NOTICE 'Using existing race: 2024 Championship Derby';
   ELSE
     -- Insert new race
-    INSERT INTO public.races (name, date) 
-    VALUES ('2024 Championship Derby', '2024-07-15')
+    INSERT INTO public.races (name, slug, race_datetime, active)
+    VALUES ('2024 Championship Derby', '2024-championship-derby', '2024-07-15 10:00:00+00', true)
     RETURNING id INTO test_race_id;
     RAISE NOTICE 'Created new race: 2024 Championship Derby';
   END IF;
