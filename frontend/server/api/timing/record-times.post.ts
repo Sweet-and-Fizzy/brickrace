@@ -510,22 +510,63 @@ async function completeBestOf3Round(
 }
 
 // After completing a round, advance the bracket to the next incomplete round
+// If all rounds are complete and tied, create a new tiebreaker round
 async function advanceBestOf3ToNextRound(client: SupabaseClient, bracketId: string): Promise<void> {
   try {
-    const { data: nextRounds } = await client
-      .from('bracket_rounds')
-      .select('round_number')
-      .eq('bracket_id', bracketId)
-      .is('completed_at', null)
-      .order('round_number', { ascending: true })
-      .limit(1)
+    // Get bracket info and all rounds
+    const { data: bracket } = await client
+      .from('brackets')
+      .select('id, track1_racer_id, track2_racer_id, rounds_won_track1, rounds_won_track2')
+      .eq('id', bracketId)
+      .single()
 
-    const nextRound = Array.isArray(nextRounds) && nextRounds.length > 0 ? nextRounds[0] : null
-    if (nextRound?.round_number) {
+    if (!bracket) return
+
+    const { data: allRounds } = await client
+      .from('bracket_rounds')
+      .select('round_number, completed_at')
+      .eq('bracket_id', bracketId)
+      .order('round_number', { ascending: true })
+
+    const rounds = allRounds || []
+    const incompleteRounds = rounds.filter((r) => !r.completed_at)
+
+    // If there are incomplete rounds, advance to the next one
+    if (incompleteRounds.length > 0) {
       await client
         .from('brackets')
-        .update({ current_round: nextRound.round_number })
+        .update({ current_round: incompleteRounds[0].round_number })
         .eq('id', bracketId)
+      return
+    }
+
+    // All rounds complete - check if tied
+    const w1 = bracket.rounds_won_track1 || 0
+    const w2 = bracket.rounds_won_track2 || 0
+
+    // If tied (neither has 2 wins), create a new tiebreaker round
+    if (w1 < 2 && w2 < 2) {
+      const nextRoundNumber = rounds.length + 1
+      console.log(`🎲 Creating tiebreaker round ${nextRoundNumber} (score: ${w1}-${w2})`)
+
+      // Alternate tracks for fairness: odd rounds use 1-2, even rounds use 2-1
+      const useAlternate = nextRoundNumber % 2 === 0
+
+      await client.from('bracket_rounds').insert({
+        bracket_id: bracketId,
+        round_number: nextRoundNumber,
+        racer1_id: bracket.track1_racer_id,
+        racer2_id: bracket.track2_racer_id,
+        racer1_track: useAlternate ? 2 : 1,
+        racer2_track: useAlternate ? 1 : 2
+      })
+
+      await client
+        .from('brackets')
+        .update({ current_round: nextRoundNumber })
+        .eq('id', bracketId)
+
+      console.log(`✅ Tiebreaker round ${nextRoundNumber} created`)
     }
   } catch (e) {
     console.error('Failed to advance to next round:', e)
