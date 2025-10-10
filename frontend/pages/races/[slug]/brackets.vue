@@ -2372,10 +2372,16 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
 }
 
 // Handle forfeit with confirmation
-const handleForfeit = (bracket, track) => {
+const handleForfeit = (bracket, displayTrack) => {
+  // Map display track (which can flip each round in best-of-3) to the bracket's original track
+  // Determine the racer currently shown on this display track
+  const forfeitingRacerId = trackRacerId(bracket, displayTrack)
+  // Resolve to bracket-level track: 1 if matches track1_racer_id, else 2
+  const bracketTrack = forfeitingRacerId && forfeitingRacerId === bracket.track1_racer_id ? 1 : 2
+
   const racerName =
-    trackRacerName(bracket, track) ||
-    (track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name)
+    trackRacerName(bracket, displayTrack) ||
+    (bracketTrack === 1 ? bracket.track1_racer_name : bracket.track2_racer_name)
 
   confirm.require({
     message: `Are you sure ${racerName} wants to forfeit this race?`,
@@ -2386,11 +2392,11 @@ const handleForfeit = (bracket, track) => {
     acceptLabel: 'Forfeit',
     accept: async () => {
       try {
-        await forfeitRacer(bracket.id, track, `${racerName} forfeited`)
+        await forfeitRacer(bracket.id, bracketTrack, `${racerName} forfeited`)
         toast.add({
           severity: 'info',
           summary: 'Forfeit Recorded',
-          detail: `${racerName} has forfeited the race`,
+          detail: `${racerName} has forfeited the match`,
           life: 3000
         })
       } catch (err) {
