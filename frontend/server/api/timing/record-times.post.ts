@@ -513,6 +513,8 @@ async function completeBestOf3Round(
 // If all rounds are complete and tied, create a new tiebreaker round
 async function advanceBestOf3ToNextRound(client: SupabaseClient, bracketId: string): Promise<void> {
   try {
+    console.log(`🔄 advanceBestOf3ToNextRound called for bracket ${bracketId}`)
+
     // Get bracket info and all rounds
     const { data: bracket } = await client
       .from('brackets')
@@ -520,7 +522,14 @@ async function advanceBestOf3ToNextRound(client: SupabaseClient, bracketId: stri
       .eq('id', bracketId)
       .single()
 
-    if (!bracket) return
+    if (!bracket) {
+      console.log('❌ Bracket not found')
+      return
+    }
+
+    console.log(
+      `📊 Bracket wins: track1=${bracket.rounds_won_track1}, track2=${bracket.rounds_won_track2}`
+    )
 
     const { data: allRounds } = await client
       .from('bracket_rounds')
@@ -531,11 +540,20 @@ async function advanceBestOf3ToNextRound(client: SupabaseClient, bracketId: stri
     const rounds = allRounds || []
     const incompleteRounds = rounds.filter((r) => !r.completed_at)
 
+    console.log(`📋 Total rounds: ${rounds.length}, Incomplete: ${incompleteRounds.length}`)
+
     // If there are incomplete rounds, advance to the next one
     if (incompleteRounds.length > 0) {
+      const nextIncompleteRound = incompleteRounds[0].round_number
+      console.log(`⏭️ Advancing to incomplete round ${nextIncompleteRound}`)
+
+      // Update current_round and ensure total_rounds is at least as high
       await client
         .from('brackets')
-        .update({ current_round: incompleteRounds[0].round_number })
+        .update({
+          current_round: nextIncompleteRound,
+          total_rounds: Math.max(rounds.length, nextIncompleteRound)
+        })
         .eq('id', bracketId)
       return
     }
@@ -543,6 +561,10 @@ async function advanceBestOf3ToNextRound(client: SupabaseClient, bracketId: stri
     // All rounds complete - check if tied
     const w1 = bracket.rounds_won_track1 || 0
     const w2 = bracket.rounds_won_track2 || 0
+
+    console.log(
+      `✅ All rounds complete. Checking tiebreaker: w1=${w1}, w2=${w2}, condition: ${w1 < 2 && w2 < 2}`
+    )
 
     // If tied (neither has 2 wins), create a new tiebreaker round
     if (w1 < 2 && w2 < 2) {
@@ -561,9 +583,13 @@ async function advanceBestOf3ToNextRound(client: SupabaseClient, bracketId: stri
         racer2_track: useAlternate ? 1 : 2
       })
 
+      // Update bracket: set current_round and increase total_rounds
       await client
         .from('brackets')
-        .update({ current_round: nextRoundNumber })
+        .update({
+          current_round: nextRoundNumber,
+          total_rounds: nextRoundNumber
+        })
         .eq('id', bracketId)
 
       console.log(`✅ Tiebreaker round ${nextRoundNumber} created`)

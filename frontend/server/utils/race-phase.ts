@@ -64,8 +64,6 @@ async function autoFinalizeChallongeTournament(
   raceId: string
 ): Promise<void> {
   try {
-    console.log('🏁 Auto-finalizing Challonge tournament...')
-
     // Get the tournament for this race
     const { data: tournament } = await client
       .from('challonge_tournaments')
@@ -75,7 +73,6 @@ async function autoFinalizeChallongeTournament(
       .single()
 
     if (!tournament) {
-      console.log('No active Challonge tournament found for auto-finalization')
       return
     }
 
@@ -87,7 +84,6 @@ async function autoFinalizeChallongeTournament(
     const hasRankings = participants.some((p) => p.participant.final_rank !== null)
 
     if (hasRankings) {
-      console.log('✅ Tournament already finalized with rankings')
       // Still save rankings even if already finalized (in case we missed it before)
       await saveFinalRankings(client, tournament.id, tournament.challonge_tournament_id)
 
@@ -97,12 +93,14 @@ async function autoFinalizeChallongeTournament(
         .update({ status: 'finalized' })
         .eq('id', tournament.id)
 
+      // Assign bracket placement awards to top 3
+      await assignBracketPlacementAwards(client, raceId, tournament.id)
+
       return
     }
 
     // Finalize the tournament
     await challongeApi.finalizeTournament(tournament.challonge_tournament_id)
-    console.log(`✅ Auto-finalized tournament ${tournament.challonge_tournament_id}`)
 
     // Save final rankings to our database
     await saveFinalRankings(client, tournament.id, tournament.challonge_tournament_id)
@@ -113,10 +111,77 @@ async function autoFinalizeChallongeTournament(
       .update({ status: 'finalized' })
       .eq('id', tournament.id)
 
-    console.log('✅ Final rankings saved to database')
+    // Assign bracket placement awards to top 3
+    await assignBracketPlacementAwards(client, raceId, tournament.id)
   } catch (error) {
-    console.error('❌ Auto-finalization failed:', error)
+    console.error('Error auto-finalizing tournament:', error)
     throw error
+  }
+}
+
+/**
+ * Assign bracket placement awards to top 3 finishers
+ */
+async function assignBracketPlacementAwards(
+  client: SupabaseClient<any>,
+  raceId: string,
+  tournamentId: string
+): Promise<void> {
+  try {
+    // Get award definitions for 1st, 2nd, 3rd place
+    const { data: awardDefs } = await client
+      .from('award_definitions')
+      .select('id, name')
+      .in('name', ['1st Place - Bracket Champion', '2nd Place - Runner-Up', '3rd Place'])
+
+    if (!awardDefs || awardDefs.length === 0) {
+      return
+    }
+
+    // Create a map of rank to award definition
+    const awardMap = new Map<number, string>()
+    for (const award of awardDefs) {
+      if (award.name.startsWith('1st')) awardMap.set(1, award.id)
+      else if (award.name.startsWith('2nd')) awardMap.set(2, award.id)
+      else if (award.name.startsWith('3rd')) awardMap.set(3, award.id)
+    }
+
+    // Get top 3 finishers from challonge_participants
+    const { data: topFinishers } = await client
+      .from('challonge_participants')
+      .select('racer_id, final_rank')
+      .eq('challonge_tournament_id', tournamentId)
+      .in('final_rank', [1, 2, 3])
+      .order('final_rank', { ascending: true })
+
+    if (!topFinishers || topFinishers.length === 0) {
+      return
+    }
+
+    // Create award_winners records (upsert to avoid duplicates)
+    const awardWinners = topFinishers
+      .filter((f) => f.final_rank && awardMap.has(f.final_rank))
+      .map((f) => ({
+        race_id: raceId,
+        racer_id: f.racer_id,
+        award_definition_id: awardMap.get(f.final_rank)!
+      }))
+
+    if (awardWinners.length > 0) {
+      // Delete existing bracket placement awards for this race first
+      const awardDefIds = Array.from(awardMap.values())
+      await client
+        .from('awards')
+        .delete()
+        .eq('race_id', raceId)
+        .in('award_definition_id', awardDefIds)
+
+      // Insert new awards
+      await client.from('awards').insert(awardWinners)
+    }
+  } catch (error) {
+    console.error('Error assigning bracket placement awards:', error)
+    // Don't throw - this is best-effort
   }
 }
 

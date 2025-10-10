@@ -265,6 +265,89 @@
           </template>
         </Card>
 
+        <!-- Bracket Placement Awards -->
+        <Card v-if="bracketAwards.length > 0" class="mb-8">
+          <template #title>
+            <h2 class="text-xl font-bold text-black flex items-center gap-2">
+              <i class="pi pi-trophy text-yellow-500" />
+              Tournament Winners
+            </h2>
+          </template>
+          <template #content>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div
+                v-for="award in bracketAwards"
+                :key="award.id"
+                class="border-2 rounded-lg p-4 text-center"
+                :class="{
+                  'border-yellow-500 bg-gradient-to-br from-yellow-50 to-yellow-100':
+                    award.award_definition?.name?.startsWith('1st'),
+                  'border-gray-400 bg-gradient-to-br from-gray-50 to-gray-100':
+                    award.award_definition?.name?.startsWith('2nd'),
+                  'border-amber-600 bg-gradient-to-br from-amber-50 to-orange-100':
+                    award.award_definition?.name?.startsWith('3rd')
+                }"
+              >
+                <!-- Award Image or Medal Icon -->
+                <div class="mb-3">
+                  <div v-if="award.award_definition?.image_url" class="flex justify-center mb-2">
+                    <img
+                      :src="award.award_definition.image_url"
+                      :alt="award.award_definition.name"
+                      class="w-24 h-24 object-contain"
+                    />
+                  </div>
+                  <div v-else class="text-4xl mb-2">
+                    <span v-if="award.award_definition?.name?.startsWith('1st')">🏆</span>
+                    <span v-else-if="award.award_definition?.name?.startsWith('2nd')">🥈</span>
+                    <span v-else-if="award.award_definition?.name?.startsWith('3rd')">🥉</span>
+                  </div>
+                </div>
+
+                <!-- Award Name -->
+                <h3 class="font-bold text-lg mb-3 text-black">
+                  {{ award.award_definition?.name }}
+                </h3>
+
+                <!-- Racer Image -->
+                <div class="flex justify-center mb-3">
+                  <img
+                    v-if="award.racer?.image_url"
+                    :src="award.racer.image_url"
+                    :alt="award.racer.name"
+                    class="w-20 h-20 object-cover rounded-lg border-2 border-gray-300"
+                  />
+                  <div
+                    v-else
+                    class="w-20 h-20 bg-gray-200 rounded-lg border-2 border-gray-300 flex items-center justify-center"
+                  >
+                    <i class="pi pi-car text-2xl text-gray-400" />
+                  </div>
+                </div>
+
+                <!-- Winner Info -->
+                <RacerLink
+                  :racer-id="award.racer?.id"
+                  :racer-name="award.racer?.name"
+                  class="font-bold text-xl text-black hover:text-brand-blue hover:underline transition-colors duration-200 block mb-1"
+                />
+                <div
+                  class="inline-block px-3 py-1 rounded-full text-sm font-semibold"
+                  :class="{
+                    'bg-yellow-600/20 text-yellow-900':
+                      award.award_definition?.name?.startsWith('1st'),
+                    'bg-gray-500/20 text-gray-800': award.award_definition?.name?.startsWith('2nd'),
+                    'bg-amber-700/20 text-amber-900':
+                      award.award_definition?.name?.startsWith('3rd')
+                  }"
+                >
+                  #{{ award.racer?.racer_number }}
+                </div>
+              </div>
+            </div>
+          </template>
+        </Card>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <!-- Main Content -->
           <div class="lg:col-span-2 space-y-6">
@@ -1195,7 +1278,12 @@ const raceBrackets = computed(() => {
 
 const { racers: checkinsRacers, getCheckinsForRace, initialize: initializeCheckins } = useCheckins()
 
-const { voteableAwards, getAwardLeaderboard, initialize: initializeAwards } = useAwards()
+const {
+  voteableAwards,
+  getAwardLeaderboard,
+  getAwardsByRace,
+  initialize: initializeAwards
+} = useAwards()
 
 // Photo management
 const { getPhotosByRace, allPhotos, initialize: initializePhotos } = usePhotos()
@@ -1613,6 +1701,32 @@ const awardLeaderboards = computed(() => {
     leaderboards[award.id] = getAwardLeaderboard(award.id, race.value.id)
   })
   return leaderboards
+})
+
+// Bracket placement awards for the current race
+const bracketAwards = computed(() => {
+  if (!race.value?.id) return []
+
+  const raceAwards = getAwardsByRace(race.value.id)
+
+  // Filter to only bracket placement awards and sort by place (1st, 2nd, 3rd)
+  return raceAwards
+    .filter(
+      (award) =>
+        award.award_definition?.name?.includes('1st Place - Bracket Champion') ||
+        award.award_definition?.name?.includes('2nd Place - Runner-Up') ||
+        award.award_definition?.name?.includes('3rd Place')
+    )
+    .sort((a, b) => {
+      // Sort order: 1st, 2nd, 3rd
+      const getOrder = (name) => {
+        if (name?.includes('1st')) return 1
+        if (name?.includes('2nd')) return 2
+        if (name?.includes('3rd')) return 3
+        return 4
+      }
+      return getOrder(a.award_definition?.name) - getOrder(b.award_definition?.name)
+    })
 })
 
 // Helper function to get bracket match number

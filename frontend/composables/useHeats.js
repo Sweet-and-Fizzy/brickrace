@@ -522,7 +522,11 @@ export const useHeats = () => {
               console.log('🏁 Bracket completed, capturing results before next heat loads')
               try {
                 // Guard against repeated triggers for the same bracket completion
-                const completedKey = getHeatKey({ type: 'bracket', bracket_id: newRow.id, heat_number: null })
+                const completedKey = getHeatKey({
+                  type: 'bracket',
+                  bracket_id: newRow.id,
+                  heat_number: null
+                })
                 if (!completedKey || lastCompletedKey.value === completedKey) {
                   // Already displayed this completion; skip
                 } else {
