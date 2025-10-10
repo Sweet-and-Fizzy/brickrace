@@ -764,7 +764,7 @@ export default defineEventHandler(async (event) => {
         throw new Error('No brackets found for active race')
       }
 
-      // Helper to determine if bracket is complete
+      // Helper to determine if bracket is complete - simply check if it has a winner
       const isComplete = (
         b: Pick<
           BracketRow,
@@ -775,13 +775,6 @@ export default defineEventHandler(async (event) => {
           | 'winner_racer_id'
         >
       ) => {
-        if (b.match_format === 'best_of_3') {
-          return (
-            Boolean(b.is_completed) ||
-            (typeof b.rounds_won_track1 === 'number' && b.rounds_won_track1 >= 2) ||
-            (typeof b.rounds_won_track2 === 'number' && b.rounds_won_track2 >= 2)
-          )
-        }
         return Boolean(b.winner_racer_id)
       }
 
@@ -866,14 +859,8 @@ export default defineEventHandler(async (event) => {
           .eq('id', bracket.id)
           .single()
 
-        const isBestOf3 = updatedBracket?.match_format === 'best_of_3'
-        const isMatchComplete = isBestOf3
-          ? Boolean(updatedBracket?.is_completed) ||
-            (typeof updatedBracket?.rounds_won_track1 === 'number' &&
-              updatedBracket.rounds_won_track1 >= 2) ||
-            (typeof updatedBracket?.rounds_won_track2 === 'number' &&
-              updatedBracket.rounds_won_track2 >= 2)
-          : Boolean(updatedBracket?.winner_racer_id)
+        // A match is complete if it has a winner (regardless of how it was determined)
+        const isMatchComplete = Boolean(updatedBracket?.winner_racer_id)
 
         if (!isMatchComplete) {
           // Stay on the same bracket until the match is complete
@@ -894,12 +881,8 @@ export default defineEventHandler(async (event) => {
             let foundIndex: number | null = null
             for (let i = bracketIndex + 1; i < ordered.length; i++) {
               const b = ordered[i]
-              const bIsBo3 = b.match_format === 'best_of_3'
-              const bComplete = bIsBo3
-                ? Boolean(b.is_completed) ||
-                  (typeof b.rounds_won_track1 === 'number' && b.rounds_won_track1 >= 2) ||
-                  (typeof b.rounds_won_track2 === 'number' && b.rounds_won_track2 >= 2)
-                : Boolean(b.winner_racer_id)
+              // A bracket is complete if it has a winner
+              const bComplete = Boolean(b.winner_racer_id)
               if (!bComplete) {
                 foundIndex = i
                 break

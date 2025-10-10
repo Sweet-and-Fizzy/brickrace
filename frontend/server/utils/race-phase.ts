@@ -358,7 +358,7 @@ export async function getCurrentHeat(
       }
     }
   } else if (phase === 'brackets') {
-    // Get current bracket (first one without both times, ordered by Challonge play order)
+    // Get current bracket (first one without winner, ordered by Challonge play order)
     const { data: currentBracket } = await client
       .from('brackets')
       .select(
@@ -379,8 +379,7 @@ export async function getCurrentHeat(
       `
       )
       .eq('race_id', raceId)
-      .is('winner_racer_id', null) // Incomplete by winner
-      .eq('is_completed', false) // Not marked complete (covers forfeit-completed)
+      .is('winner_racer_id', null) // No winner assigned
       .or('is_forfeit.is.null,is_forfeit.eq.false') // Not forfeited
       .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
@@ -388,9 +387,153 @@ export async function getCurrentHeat(
       .limit(1)
       .single()
 
+    console.log(
+      '🎯 Current bracket found:',
+      currentBracket
+        ? {
+            id: currentBracket.id,
+            match_number: currentBracket.match_number,
+            winner_racer_id: currentBracket.winner_racer_id,
+            is_forfeit: currentBracket.is_forfeit,
+            track1_racer_id: currentBracket.track1_racer_id,
+            track2_racer_id: currentBracket.track2_racer_id
+          }
+        : 'None'
+    )
+
     const typedCurrentBracket = currentBracket as BracketRecord | null
 
+    if (typedCurrentBracket) {
+      // Check if this bracket needs to be auto-completed as a bye
+      // This can happen when upstream matches are forfeited but Challonge sync hasn't completed yet
+      let needsByeCompletion =
+        !typedCurrentBracket.winner_racer_id &&
+        ((typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id) ||
+          (!typedCurrentBracket.track1_racer_id && typedCurrentBracket.track2_racer_id))
+
+      // Also check if either racer has been withdrawn from the tournament
+      if (
+        !needsByeCompletion &&
+        !typedCurrentBracket.winner_racer_id &&
+        typedCurrentBracket.track1_racer_id &&
+        typedCurrentBracket.track2_racer_id
+      ) {
+        const { data: withdrawals } = await client
+          .from('race_withdrawals')
+          .select('racer_id')
+          .eq('race_id', raceId)
+          .in('racer_id', [
+            typedCurrentBracket.track1_racer_id,
+            typedCurrentBracket.track2_racer_id
+          ])
+
+        const withdrawnRacerIds = withdrawals?.map((w) => w.racer_id) || []
+
+        if (withdrawnRacerIds.length === 1) {
+          // One racer withdrawn - the other gets a bye
+          needsByeCompletion = true
+          console.log(
+            `🚪 One racer withdrawn from match ${typedCurrentBracket.match_number}, awarding bye to remaining racer`
+          )
+        } else if (withdrawnRacerIds.length === 2) {
+          // Both racers withdrawn - match should be forfeited
+          console.log(
+            `🚫 Both racers withdrawn from match ${typedCurrentBracket.match_number}, forfeiting match`
+          )
+          await client
+            .from('brackets')
+            .update({
+              is_forfeit: true,
+              is_completed: true
+            })
+            .eq('id', typedCurrentBracket.id)
+
+          // Recursively get the next bracket after forfeiting
+          return getCurrentHeat(client, raceId, phase)
+        }
+      }
+
+      if (needsByeCompletion) {
+        console.log(
+          `🏃 Auto-completing bye bracket ${typedCurrentBracket.id} (match ${typedCurrentBracket.match_number})`
+        )
+
+        // Determine winner based on who is still in the tournament
+        let winnerId, winnerTrack
+
+        if (typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id) {
+          // Track 1 has racer, track 2 empty
+          winnerId = typedCurrentBracket.track1_racer_id
+          winnerTrack = 1
+        } else if (!typedCurrentBracket.track1_racer_id && typedCurrentBracket.track2_racer_id) {
+          // Track 2 has racer, track 1 empty
+          winnerId = typedCurrentBracket.track2_racer_id
+          winnerTrack = 2
+        } else {
+          // Both tracks have racers, but one is withdrawn - check withdrawals
+          const { data: withdrawals } = await client
+            .from('race_withdrawals')
+            .select('racer_id')
+            .eq('race_id', raceId)
+            .in('racer_id', [
+              typedCurrentBracket.track1_racer_id,
+              typedCurrentBracket.track2_racer_id
+            ])
+
+          const withdrawnRacerIds = withdrawals?.map((w) => w.racer_id) || []
+
+          if (withdrawnRacerIds.includes(typedCurrentBracket.track1_racer_id)) {
+            // Track 1 racer withdrawn, track 2 wins
+            winnerId = typedCurrentBracket.track2_racer_id
+            winnerTrack = 2
+          } else {
+            // Track 2 racer withdrawn, track 1 wins
+            winnerId = typedCurrentBracket.track1_racer_id
+            winnerTrack = 1
+          }
+        }
+
+        await client
+          .from('brackets')
+          .update({
+            winner_track: winnerTrack,
+            winner_racer_id: winnerId,
+            is_completed: true,
+            rounds_won_track1: winnerTrack === 1 ? 2 : 0,
+            rounds_won_track2: winnerTrack === 2 ? 2 : 0
+          })
+          .eq('id', typedCurrentBracket.id)
+
+        // Recursively get the next bracket after auto-completing this bye
+        return getCurrentHeat(client, raceId, phase)
+      }
+    }
+
     if (!typedCurrentBracket) {
+      // No current bracket found - trigger Challonge reconciliation first
+      console.log('❌ No current bracket found, triggering Challonge reconciliation...')
+
+      try {
+        // Get tournament and trigger reconciliation
+        const { data: tournament } = await client
+          .from('challonge_tournaments')
+          .select('id')
+          .eq('race_id', raceId)
+          .eq('status', 'active')
+          .single()
+
+        if (tournament) {
+          const { reconcileBracketsFromChallonge } = await import('./bracket-generator')
+          await reconcileBracketsFromChallonge(client, raceId, tournament.id)
+          console.log('✅ Challonge reconciliation completed, retrying...')
+
+          // Retry getting current bracket after reconciliation
+          return getCurrentHeat(client, raceId, phase)
+        }
+      } catch (reconcileError) {
+        console.error('Failed to reconcile from Challonge:', reconcileError)
+        // Continue with fallback logic
+      }
       // No current bracket found - check if there are any scheduled qualifiers we should show instead
       const { data: scheduledQualifiers, error: qualError } = await client
         .from('qualifiers')
@@ -463,7 +606,6 @@ export async function getCurrentHeat(
           )
           .eq('race_id', raceId)
           .is('winner_racer_id', null)
-          .eq('is_completed', false)
           .or('is_forfeit.is.null,is_forfeit.eq.false')
           .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
           .order('challonge_round', { ascending: true })
@@ -477,16 +619,21 @@ export async function getCurrentHeat(
           const newBracket = retryBracket as BracketRecord
 
           if (
-            newBracket.track1_racer_id &&
-            !newBracket.track2_racer_id &&
-            !newBracket.winner_racer_id
+            !newBracket.winner_racer_id &&
+            ((newBracket.track1_racer_id && !newBracket.track2_racer_id) ||
+              (!newBracket.track1_racer_id && newBracket.track2_racer_id))
           ) {
-            // Auto-complete the bye
+            // Auto-complete bye (mark completed with 2-0 win for Bo3)
+            const winnerTrack = newBracket.track1_racer_id ? 1 : 2
+            const winnerId = newBracket.track1_racer_id || newBracket.track2_racer_id
             await client
               .from('brackets')
               .update({
-                winner_track: 1,
-                winner_racer_id: newBracket.track1_racer_id
+                winner_track: winnerTrack,
+                winner_racer_id: winnerId,
+                is_completed: true,
+                rounds_won_track1: winnerTrack === 1 ? 2 : 0,
+                rounds_won_track2: winnerTrack === 2 ? 2 : 0
               })
               .eq('id', newBracket.id)
 
@@ -568,16 +715,21 @@ export async function getCurrentHeat(
 
       // Check if this is a bye match (only one racer) and auto-complete if needed
       if (
-        typedCurrentBracket.track1_racer_id &&
-        !typedCurrentBracket.track2_racer_id &&
-        !typedCurrentBracket.winner_racer_id
+        !typedCurrentBracket.winner_racer_id &&
+        ((typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id) ||
+          (!typedCurrentBracket.track1_racer_id && typedCurrentBracket.track2_racer_id))
       ) {
-        // Auto-complete the bye
+        // Auto-complete bye (mark completed with 2-0 win for Bo3)
+        const winnerTrack = typedCurrentBracket.track1_racer_id ? 1 : 2
+        const winnerId = typedCurrentBracket.track1_racer_id || typedCurrentBracket.track2_racer_id
         await client
           .from('brackets')
           .update({
-            winner_track: 1,
-            winner_racer_id: typedCurrentBracket.track1_racer_id
+            winner_track: winnerTrack,
+            winner_racer_id: winnerId,
+            is_completed: true,
+            rounds_won_track1: winnerTrack === 1 ? 2 : 0,
+            rounds_won_track2: winnerTrack === 2 ? 2 : 0
           })
           .eq('id', typedCurrentBracket.id)
 
@@ -737,7 +889,6 @@ export async function getUpcomingHeats(
       )
       .eq('race_id', raceId)
       .is('winner_racer_id', null)
-      .eq('is_completed', false)
       .or('is_forfeit.is.null,is_forfeit.eq.false')
       .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
@@ -746,7 +897,17 @@ export async function getUpcomingHeats(
 
     if (upcomingBrackets && upcomingBrackets.length > 1) {
       // Skip the first one (that's the current bracket)
-      const nextBrackets = upcomingBrackets.slice(1)
+      // Skip bye brackets (single participant, no winner yet) so we don't queue them
+      const nextBrackets = upcomingBrackets
+        .slice(1)
+        .filter(
+          (b) =>
+            !(
+              !b.winner_racer_id &&
+              ((b.track1_racer_id && !b.track2_racer_id) ||
+                (!b.track1_racer_id && b.track2_racer_id))
+            )
+        )
 
       // Get all brackets for numbering (using Challonge ordering)
       const { data: allBrackets } = await client
