@@ -69,7 +69,7 @@ async function autoFinalizeChallongeTournament(
     // Get the tournament for this race
     const { data: tournament } = await client
       .from('challonge_tournaments')
-      .select('challonge_tournament_id, status')
+      .select('id, challonge_tournament_id, status')
       .eq('race_id', raceId)
       .eq('status', 'active')
       .single()
@@ -87,17 +87,72 @@ async function autoFinalizeChallongeTournament(
     const hasRankings = participants.some((p) => p.participant.final_rank !== null)
 
     if (hasRankings) {
-      console.log('✅ Tournament already finalized')
+      console.log('✅ Tournament already finalized with rankings')
+      // Still save rankings even if already finalized (in case we missed it before)
+      await saveFinalRankings(client, tournament.id, tournament.challonge_tournament_id)
+
+      // Update tournament status to finalized in our database
+      await client
+        .from('challonge_tournaments')
+        .update({ status: 'finalized' })
+        .eq('id', tournament.id)
+
       return
     }
 
     // Finalize the tournament
     await challongeApi.finalizeTournament(tournament.challonge_tournament_id)
-
     console.log(`✅ Auto-finalized tournament ${tournament.challonge_tournament_id}`)
+
+    // Save final rankings to our database
+    await saveFinalRankings(client, tournament.id, tournament.challonge_tournament_id)
+
+    // Update tournament status to finalized
+    await client
+      .from('challonge_tournaments')
+      .update({ status: 'finalized' })
+      .eq('id', tournament.id)
+
+    console.log('✅ Final rankings saved to database')
   } catch (error) {
     console.error('❌ Auto-finalization failed:', error)
     throw error
+  }
+}
+
+/**
+ * Save final rankings from Challonge to our database
+ */
+async function saveFinalRankings(
+  client: SupabaseClient<any>,
+  tournamentId: string,
+  challongeTournamentId: string
+): Promise<void> {
+  try {
+    const { challongeApi } = await import('./challonge-client')
+
+    // Get participants with final rankings from Challonge
+    const participants = await challongeApi.getParticipants(challongeTournamentId)
+
+    // Update each participant's final_rank in our database
+    for (const challongeParticipant of participants) {
+      const participantData = challongeParticipant.participant
+
+      if (participantData.final_rank !== null) {
+        await client
+          .from('challonge_participants')
+          .update({ final_rank: participantData.final_rank })
+          .eq('challonge_tournament_id', tournamentId)
+          .eq('challonge_participant_id', String(participantData.id))
+
+        console.log(
+          `Saved final_rank ${participantData.final_rank} for participant ${participantData.id}`
+        )
+      }
+    }
+  } catch (error) {
+    console.error('Error saving final rankings:', error)
+    // Don't throw - this is best-effort
   }
 }
 
