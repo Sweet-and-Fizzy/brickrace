@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
   try {
     // Convert slug back to race name (replace hyphens with spaces)
     const raceName = slug.replace(/-/g, ' ')
-    
+
     const { data: race, error } = await client
       .from('races')
       .select('*')

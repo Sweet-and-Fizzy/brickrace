@@ -1,4 +1,10 @@
-import type { ChallongeTournament, ChallongeTournamentFormData, Race, Qualifier, Racer } from '~/types/database'
+import type {
+  ChallongeTournament,
+  ChallongeTournamentFormData,
+  Race,
+  Qualifier,
+  Racer
+} from '~/types/database'
 
 interface CheckinWithRacer {
   racer_id: string
@@ -13,13 +19,13 @@ export const useChallonge = () => {
   const createTournament = async (raceId: string, tournamentData: ChallongeTournamentFormData) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await $fetch('/api/challonge/tournaments/create', {
         method: 'POST',
-        body: { 
-          raceId, 
-          ...tournamentData 
+        body: {
+          raceId,
+          ...tournamentData
         }
       })
       return response
@@ -35,7 +41,7 @@ export const useChallonge = () => {
   const addParticipants = async (tournamentId: string, racers: any[]) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await $fetch(`/api/challonge/tournaments/${tournamentId}/participants`, {
         method: 'POST',
@@ -54,7 +60,7 @@ export const useChallonge = () => {
   const startTournament = async (tournamentId: string) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const response = await $fetch(`/api/challonge/tournaments/${tournamentId}/start`, {
         method: 'POST'
@@ -72,7 +78,7 @@ export const useChallonge = () => {
   const getTournamentStatus = async (tournamentId: string) => {
     loading.value = true
     error.value = null
-    
+
     try {
       const data = await $fetch(`/api/challonge/tournaments/${tournamentId}/status`)
       return data
@@ -88,31 +94,36 @@ export const useChallonge = () => {
   const getEligibleRacers = async (raceSlug: string) => {
     loading.value = true
     error.value = null
-    
+
     try {
       // Get race by slug
       const { data: raceData } = await $fetch(`/api/races/by-slug/${raceSlug}`)
       const race = raceData as Race
-      
+
       // Use existing composables to get checkins and qualifiers
       const checkinsComposable = useCheckins()
       const qualifiersComposable = useQualifiers(race.id)
-      
+
       // Initialize and fetch data
       await checkinsComposable.initialize(race.id)
       await qualifiersComposable.fetchQualifiers()
-      
+
       // Get checked-in racers
       const checkedInRacers = checkinsComposable.getCheckinsForRace(race.id)
-      
+
       // Get qualifiers data
       const qualifiers = qualifiersComposable.qualifiers
-      
+
       // Process racers with their best qualifying times
-      const racersWithTimes = (checkedInRacers as CheckinWithRacer[]).map(checkin => {
-        const racerQualifiers = (qualifiers.value as Qualifier[]).filter((q: Qualifier) => q.racer_id === checkin.racer_id)
-        const bestTime = racerQualifiers.length > 0 ? Math.min(...racerQualifiers.map((q: Qualifier) => q.time)) : null
-        
+      const racersWithTimes = (checkedInRacers as CheckinWithRacer[]).map((checkin) => {
+        const racerQualifiers = (qualifiers.value as Qualifier[]).filter(
+          (q: Qualifier) => q.racer_id === checkin.racer_id
+        )
+        const bestTime =
+          racerQualifiers.length > 0
+            ? Math.min(...racerQualifiers.map((q: Qualifier) => q.time))
+            : null
+
         return {
           racer_id: checkin.racer_id,
           racer_number: checkin.racer.racer_number,
@@ -123,12 +134,12 @@ export const useChallonge = () => {
           qualified: bestTime !== null
         }
       })
-      
+
       // Filter to only qualified racers and sort by best time
       const qualifiedRacers = racersWithTimes
-        .filter(racer => racer.qualified)
+        .filter((racer) => racer.qualified)
         .sort((a, b) => a.best_time! - b.best_time!)
-      
+
       return {
         race: {
           id: race.id,
@@ -175,7 +186,7 @@ export const useChallonge = () => {
     // State
     loading: readonly(loading),
     error: readonly(error),
-    
+
     // Methods
     createTournament,
     addParticipants,

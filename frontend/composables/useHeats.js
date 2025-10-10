@@ -73,9 +73,13 @@ export const useHeats = () => {
     }
 
     // For brackets, also check if bracket_id changed (more precise than heat_number)
-    if (previousHeat && newHeat &&
-      previousHeat.type === 'bracket' && newHeat.type === 'bracket' &&
-      previousHeat.bracket_id !== newHeat.bracket_id) {
+    if (
+      previousHeat &&
+      newHeat &&
+      previousHeat.type === 'bracket' &&
+      newHeat.type === 'bracket' &&
+      previousHeat.bracket_id !== newHeat.bracket_id
+    ) {
       return previousHeat
     }
 
@@ -83,7 +87,11 @@ export const useHeats = () => {
   }
 
   // Fetch completed heat results with times (handles both qualifiers and brackets)
-  const fetchCompletedHeatResults = async (heatNumber, heatType = 'qualifier', bracketId = null) => {
+  const fetchCompletedHeatResults = async (
+    heatNumber,
+    heatType = 'qualifier',
+    bracketId = null
+  ) => {
     if (!currentRace.value) return null
 
     try {
@@ -91,7 +99,8 @@ export const useHeats = () => {
         // Get the completed bracket data with racer information
         let query = supabase
           .from('brackets')
-          .select(`
+          .select(
+            `
             *,
             track1_racer:racers!track1_racer_id(
               id,
@@ -105,7 +114,8 @@ export const useHeats = () => {
               racer_number,
               image_url
             )
-          `)
+          `
+          )
           .eq('race_id', currentRace.value.id)
           .not('track1_time', 'is', null)
           .not('track2_time', 'is', null)
@@ -159,7 +169,7 @@ export const useHeats = () => {
                 time: completedBracket.track2_time,
                 is_winner: completedBracket.winner_track === 2
               }
-            ].filter(r => r.racer_id) // Filter out null racers
+            ].filter((r) => r.racer_id) // Filter out null racers
           }
         }
 
@@ -459,7 +469,10 @@ export const useHeats = () => {
                   newRow.id
                 )
                 if (completedBracketWithResults) {
-                  console.log('Successfully captured completed bracket results:', completedBracketWithResults)
+                  console.log(
+                    'Successfully captured completed bracket results:',
+                    completedBracketWithResults
+                  )
                   startCompletedHeatDisplay(completedBracketWithResults)
                 }
               } catch (err) {
@@ -477,12 +490,9 @@ export const useHeats = () => {
               'rounds_won_track2',
               'is_completed'
             ]
-            const changed = fieldsThatAffectDisplay.some(
-              (f) => oldRow?.[f] !== newRow?.[f]
-            )
+            const changed = fieldsThatAffectDisplay.some((f) => oldRow?.[f] !== newRow?.[f])
             const affectsCurrent =
-              currentHeat.value?.type === 'bracket' &&
-              currentHeat.value?.bracket_id === newRow.id
+              currentHeat.value?.type === 'bracket' && currentHeat.value?.bracket_id === newRow.id
 
             if (changed && affectsCurrent) {
               console.log('🎯 Bracket round/score changed for current match — refreshing heat')

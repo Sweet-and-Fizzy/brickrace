@@ -1,9 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <PageHeader
-      title="Add New Sponsor"
-      subtitle="Create a new sponsor entry for the race"
-    />
+    <PageHeader title="Add New Sponsor" subtitle="Create a new sponsor entry for the race" />
 
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
       <Card>
@@ -37,14 +34,15 @@
                   v-model="form.website_url"
                   placeholder="https://example.com"
                 />
-                <small class="text-gray-500">
-                  Optional: Link to sponsor's website
-                </small>
+                <small class="text-gray-500"> Optional: Link to sponsor's website </small>
               </div>
 
               <!-- Sponsorship Amount -->
               <div class="field">
-                <label for="sponsorship_amount" class="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  for="sponsorship_amount"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Sponsorship Amount
                 </label>
                 <InputNumber
@@ -72,19 +70,13 @@
                   :min="0"
                   placeholder="0"
                 />
-                <small class="text-gray-500">
-                  Lower numbers appear first (0 = first)
-                </small>
+                <small class="text-gray-500"> Lower numbers appear first (0 = first) </small>
               </div>
 
               <!-- Status -->
               <div class="field col-span-2">
                 <div class="flex items-center">
-                  <Checkbox
-                    id="is_active"
-                    v-model="form.is_active"
-                    binary
-                  />
+                  <Checkbox id="is_active" v-model="form.is_active" binary />
                   <label for="is_active" class="ml-2 text-sm font-medium text-gray-700">
                     Active (visible on public pages)
                   </label>
@@ -93,19 +85,17 @@
 
               <!-- Logo Upload -->
               <div class="field col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Sponsor Logo
-                </label>
-                
+                <label class="block text-sm font-medium text-gray-700 mb-2"> Sponsor Logo </label>
+
                 <!-- Preview -->
                 <div v-if="logoPreview" class="mb-4">
                   <img
                     :src="logoPreview"
                     :alt="form.name"
                     class="h-24 object-contain rounded-lg border border-gray-200 bg-white p-2"
-                  >
+                  />
                 </div>
-                
+
                 <!-- Upload -->
                 <FileUpload
                   mode="basic"
@@ -117,18 +107,15 @@
                   @select="onLogoSelect"
                 />
                 <small class="text-gray-500 block">
-                  Maximum file size: 5MB. Recommended: PNG or JPG with transparent background for best display.
+                  Maximum file size: 5MB. Recommended: PNG or JPG with transparent background for
+                  best display.
                 </small>
               </div>
             </div>
 
             <!-- Actions -->
             <div class="flex justify-between items-center pt-6 border-t border-gray-200">
-              <Button
-                label="Cancel"
-                severity="secondary"
-                @click="navigateTo('/admin/sponsors')"
-              />
+              <Button label="Cancel" severity="secondary" @click="navigateTo('/admin/sponsors')" />
               <div class="flex space-x-3">
                 <Button
                   type="submit"
@@ -172,7 +159,7 @@ const onLogoSelect = (event) => {
   const file = event.files[0]
   if (file) {
     logoFile.value = file
-    
+
     // Create preview
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -184,7 +171,7 @@ const onLogoSelect = (event) => {
 
 const createSponsor = async () => {
   submitted.value = true
-  
+
   // Validation
   if (!form.value.name.trim()) {
     toast.add({
@@ -197,7 +184,7 @@ const createSponsor = async () => {
   }
 
   creating.value = true
-  
+
   try {
     let logoUrl = null
 

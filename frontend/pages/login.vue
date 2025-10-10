@@ -18,27 +18,41 @@
         <template #content>
           <div class="space-y-6">
             <!-- Success/Error Messages -->
-            <Message v-if="errors.general && errors.general.includes('verified')" severity="success" :closable="false">
+            <Message
+              v-if="errors.general && errors.general.includes('verified')"
+              severity="success"
+              :closable="false"
+            >
               {{ errors.general }}
             </Message>
-            <Message v-else-if="errors.general" severity="error" :closable="true" @close="errors.general = ''">
+            <Message
+              v-else-if="errors.general"
+              severity="error"
+              :closable="true"
+              @close="errors.general = ''"
+            >
               {{ errors.general }}
               <div v-if="errors.general.includes('Email verification required')" class="mt-3">
-                <Button 
-                  @click="resendVerificationEmail" 
+                <Button
                   :loading="resendingEmail"
                   class="btn-secondary"
                   size="small"
+                  @click="resendVerificationEmail"
                 >
                   <i class="pi pi-envelope mr-2" />
                   <span>Resend Verification Email</span>
                 </Button>
               </div>
             </Message>
-            <Message v-if="verificationEmailSent" severity="success" :closable="true" @close="verificationEmailSent = false">
+            <Message
+              v-if="verificationEmailSent"
+              severity="success"
+              :closable="true"
+              @close="verificationEmailSent = false"
+            >
               ✅ Verification email sent! Please check your inbox (and spam folder).
             </Message>
-            
+
             <!-- Social Login Buttons -->
             <div class="space-y-3">
               <Button
@@ -171,12 +185,15 @@ const handleLogin = async () => {
   try {
     // First, refresh the session to handle post-email-verification state
     const supabase = useSupabaseClient()
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    
+    const {
+      data: { session },
+      error: sessionError
+    } = await supabase.auth.getSession()
+
     if (sessionError) {
       console.error('Session refresh error:', sessionError)
     }
-    
+
     // If already authenticated (e.g., after email verification), just redirect
     if (session?.user && session.user.email === form.email) {
       authStore.user = session.user
@@ -184,7 +201,7 @@ const handleLogin = async () => {
       await router.push(redirectTo)
       return
     }
-    
+
     // If session exists but email doesn't match, sign out first
     if (session?.user && session.user.email !== form.email) {
       await supabase.auth.signOut()
@@ -231,7 +248,7 @@ const resendVerificationEmail = async () => {
 
   try {
     const supabase = useSupabaseClient()
-    
+
     // Supabase requires us to use the resend method with type 'signup'
     const { error } = await supabase.auth.resend({
       type: 'signup',
@@ -272,24 +289,26 @@ const handleSocialLogin = async (provider) => {
 // Redirect if already authenticated
 onMounted(async () => {
   await authStore.initAuth()
-  
+
   // Check if coming from email verification
   const hashParams = new URLSearchParams(window.location.hash.substring(1))
   const type = hashParams.get('type')
-  
+
   if (type === 'email') {
     // User just verified their email
     errors.general = 'Email verified successfully! Click Sign in to continue.'
-    
+
     // Refresh the session to pick up the verification
     const supabase = useSupabaseClient()
-    const { data: { session } } = await supabase.auth.getSession()
-    
+    const {
+      data: { session }
+    } = await supabase.auth.getSession()
+
     if (session?.user) {
       // If we got a session, update the store
       authStore.user = session.user
       authStore.session = session
-      
+
       // Auto-redirect after email verification
       setTimeout(() => {
         router.push(redirectTo)

@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-white">
+    <ConfirmDialog />
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -191,12 +192,14 @@
 <script setup>
 import { useAuthStore } from '~/stores/auth'
 import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 import { useCheckins } from '~/composables/useCheckins'
 import { useRaces } from '~/composables/useRaces'
 
 const route = useRoute()
 const authStore = useAuthStore()
 const toast = useToast()
+const confirm = useConfirm()
 const supabase = useSupabaseClient()
 
 // Use checkins composable
@@ -215,6 +218,7 @@ const { getRaceBySlug, fetchRaceBySlug, initialize: initializeRaces } = useRaces
 
 // Use racers composable for withdrawal functionality
 const {
+  previewWithdrawalImpact,
   withdrawRacerFromRace,
   reinstateRacerToRace,
   isRacerWithdrawnFromRace,
@@ -283,33 +287,124 @@ const toggleWithdrawal = async (racer) => {
         life: 3000
       })
     } else {
-      // Withdraw racer
-      const result = await withdrawRacerFromRace(racer.id, race.value.id, 'Withdrawn by race admin')
-      withdrawnRacers.value.add(racer.id)
+      // Preview withdrawal impact before confirming
+      const preview = await previewWithdrawalImpact(racer.id, race.value.id)
 
-      // Debug: Log the full result
-      console.log('Withdrawal result:', result)
-
-      // Build detailed message about heat impact
-      let detailMessage = `${racer.name} has been withdrawn from the race`
-      if (result.heatChanges) {
-        const changes = result.heatChanges
-        console.log('Heat changes:', changes)
-        if (changes.scheduled_heats_removed > 0) {
-          detailMessage += `. Removed from ${changes.scheduled_heats_removed} scheduled heat(s)`
-        }
-        if (changes.completed_heats_preserved > 0) {
-          detailMessage += `. ${changes.completed_heats_preserved} completed result(s) preserved`
-        }
-      } else {
-        detailMessage += ` (No heat information returned)`
+      // Check if already withdrawn
+      if (preview.already_withdrawn) {
+        withdrawnRacers.value.add(racer.id)
+        toast.add({
+          severity: 'info',
+          summary: 'Already Withdrawn',
+          detail: `${racer.name} is already withdrawn from this race`,
+          life: 3000
+        })
+        processingWithdrawal.value = null
+        return
       }
 
-      toast.add({
-        severity: 'info',
-        summary: 'Racer Withdrawn',
-        detail: detailMessage,
-        life: 5000
+      // Build impact message for confirmation dialog (plain text)
+      const impact = preview.impact
+      const bracketImpact = preview.bracket_impact
+      const impactLines = []
+
+      // Heat impact
+      if (impact) {
+        const scheduled = impact.scheduled_heats_to_remove || 0
+        const inProgress = impact.in_progress_heats_to_continue || 0
+        const completed = impact.completed_heats_to_preserve || 0
+
+        if (scheduled > 0) {
+          impactLines.push(`• ${scheduled} scheduled heat(s) will be removed`)
+        }
+        if (inProgress > 0) {
+          impactLines.push(`• ${inProgress} in-progress heat(s) will continue`)
+        }
+        if (completed > 0) {
+          impactLines.push(`• ${completed} completed result(s) will be preserved`)
+        }
+
+        if (scheduled === 0 && inProgress === 0 && completed === 0) {
+          impactLines.push('No heats will be affected.')
+        }
+      } else {
+        impactLines.push('No heats will be affected.')
+      }
+
+      // Bracket impact
+      if (bracketImpact) {
+        const totalForfeits = bracketImpact.total_forfeits || 0
+        if (totalForfeits > 0) {
+          impactLines.push(`• ${totalForfeits} bracket match(es) will be forfeited`)
+        }
+      }
+
+      const impactMessage =
+        impactLines.join('\n') + '\n\nThis action cannot be easily undone. Continue?'
+
+      // Show confirmation dialog
+      confirm.require({
+        message: impactMessage,
+        header: `Withdraw ${racer.name}?`,
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Yes, Withdraw',
+        rejectLabel: 'Cancel',
+        accept: async () => {
+          try {
+            // Perform the actual withdrawal
+            const result = await withdrawRacerFromRace(
+              racer.id,
+              race.value.id,
+              'Withdrawn by race admin'
+            )
+            withdrawnRacers.value.add(racer.id)
+
+            // Build detailed message about heat and bracket impact
+            let detailMessage = `${racer.name} has been withdrawn from the race`
+            const details = []
+
+            if (result.heatChanges) {
+              const changes = result.heatChanges
+              if (changes.scheduled_heats_removed > 0) {
+                details.push(`${changes.scheduled_heats_removed} scheduled heat(s) removed`)
+              }
+              if (changes.completed_heats_preserved > 0) {
+                details.push(`${changes.completed_heats_preserved} completed heat(s) preserved`)
+              }
+            }
+
+            if (result.bracketChanges) {
+              const changes = result.bracketChanges
+              const totalForfeits =
+                (changes.bracket_rounds_forfeited || 0) + (changes.brackets_forfeited || 0)
+              if (totalForfeits > 0) {
+                details.push(`${totalForfeits} bracket match(es) forfeited`)
+              }
+            }
+
+            if (details.length > 0) {
+              detailMessage += '. ' + details.join(', ')
+            }
+
+            toast.add({
+              severity: 'info',
+              summary: 'Racer Withdrawn',
+              detail: detailMessage,
+              life: 6000
+            })
+          } catch (err) {
+            console.error('Error withdrawing racer:', err)
+            toast.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to withdraw racer',
+              life: 5000
+            })
+          }
+        },
+        reject: () => {
+          // User cancelled, do nothing
+        }
       })
     }
   } catch (err) {

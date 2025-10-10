@@ -330,6 +330,16 @@ export async function refreshUpcomingParticipants(
       ])
     )
 
+    // Get withdrawn racers for this race to skip them
+    const { data: withdrawnRacers } = await c
+      .from('race_withdrawals')
+      .select('racer_id')
+      .eq('race_id', tournament.race_id)
+
+    const withdrawnRacerIds = new Set(
+      (withdrawnRacers || []).map((w: { racer_id: string }) => w.racer_id)
+    )
+
     // Pre-compute Challonge natural order (or suggested_play_order if present)
     const orderById = new Map<string, number>()
     matches.forEach((mm: any, idx: number) => {
@@ -358,6 +368,15 @@ export async function refreshUpcomingParticipants(
       const track2RacerId = match.player2_id
         ? participantToRacer.get(match.player2_id.toString()) || null
         : null
+
+      // Skip withdrawn racers - don't add them to brackets
+      if (
+        (track1RacerId && withdrawnRacerIds.has(track1RacerId)) ||
+        (track2RacerId && withdrawnRacerIds.has(track2RacerId))
+      ) {
+        console.log(`Skipping bracket update for withdrawn racer in match ${challongeMatchId}`)
+        continue
+      }
 
       // Build updates: participant slots and match_number if missing/misaligned
       const updates: any = {}

@@ -1,5 +1,6 @@
 <template>
   <div class="min-h-screen bg-white">
+    <ConfirmDialog />
     <div class="container mx-auto px-4 py-8">
       <!-- Breadcrumb Navigation -->
       <BreadcrumbWrapper :items="breadcrumbItems" />
@@ -172,9 +173,12 @@
                     :key="`${finish.race.id}-${finish.place}`"
                     class="flex items-center gap-4 p-4 rounded-lg border-2"
                     :class="{
-                      'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-300': finish.place === 1,
-                      'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-300': finish.place === 2,
-                      'bg-gradient-to-r from-amber-50 to-orange-100 border-amber-300': finish.place === 3
+                      'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-300':
+                        finish.place === 1,
+                      'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-300':
+                        finish.place === 2,
+                      'bg-gradient-to-r from-amber-50 to-orange-100 border-amber-300':
+                        finish.place === 3
                     }"
                   >
                     <div class="text-4xl">
@@ -185,18 +189,27 @@
                         <span class="font-bold text-lg">{{ finish.title }}</span>
                         <Badge
                           :value="finish.prize"
-                          :severity="finish.place === 1 ? 'success' : finish.place === 2 ? 'info' : 'warning'"
+                          :severity="
+                            finish.place === 1 ? 'success' : finish.place === 2 ? 'info' : 'warning'
+                          "
                         />
                       </div>
-                      <NuxtLink :to="`/races/${finish.race.slug}`" class="text-brand-blue hover:underline font-medium">
+                      <NuxtLink
+                        :to="`/races/${finish.race.slug}`"
+                        class="text-brand-blue hover:underline font-medium"
+                      >
                         {{ finish.race.name }}
                       </NuxtLink>
                       <div class="text-sm text-gray-600 mt-1">
-                        {{ finish.race.race_datetime ? new Date(finish.race.race_datetime).toLocaleDateString('en-US', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        }) : 'Date not available' }}
+                        {{
+                          finish.race.race_datetime
+                            ? new Date(finish.race.race_datetime).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })
+                            : 'Date not available'
+                        }}
                       </div>
                     </div>
                   </div>
@@ -274,109 +287,166 @@
               <template #content>
                 <div class="space-y-4">
                   <div
-                    v-for="bracket in racer.brackets"
+                    v-for="bracket in sortedBrackets"
                     :key="bracket.id"
                     class="p-4 bg-gray-50 rounded-lg border border-gray-200"
                   >
                     <div class="flex items-center justify-between mb-3">
-                      <div class="flex items-center gap-2">
-                        <Badge
-                          :value="bracket.bracket_type"
-                          :severity="bracket.bracket_type === 'Fastest' ? 'success' : 'info'"
-                        />
-                        <span class="text-sm text-gray-600">{{ bracket.races?.name }}</span>
+                      <div class="flex flex-col gap-1">
+                        <span class="text-sm font-semibold text-gray-800">{{
+                          getRaceName(bracket.races?.name)
+                        }}</span>
+                        <div class="flex items-center gap-2">
+                          <Badge :value="getBracketStage(bracket)" severity="info" size="small" />
+                          <Badge
+                            v-if="bracket.is_completed && bracket.winner_racer_id"
+                            :value="`${bracket.rounds_won_track1 || 0} - ${bracket.rounds_won_track2 || 0}`"
+                            severity="success"
+                            size="small"
+                            class="font-mono"
+                          />
+                        </div>
                       </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                      <!-- Track 1 -->
+                    <!-- Show individual rounds -->
+                    <div v-if="bracket.bracket_rounds?.length" class="space-y-3">
                       <div
-                        :class="[
-                          'relative text-center p-3 rounded border transition-all',
-                          bracket.track1_racer_id === racer.id
-                            ? 'bg-red-50/30 border-red-300 ring-2 ring-red-400/50'
-                            : isTrack1Winner(bracket)
-                              ? 'bg-green-50/30 border-green-300'
-                              : 'bg-white border-gray-200'
-                        ]"
+                        v-for="round in bracket.bracket_rounds
+                          .filter((r) => r.racer1_time || r.racer2_time || r.is_forfeit)
+                          .sort((a, b) => a.round_number - b.round_number)"
+                        :key="round.id"
                       >
-                        <!-- Winner Crown -->
-                        <div
-                          v-if="isTrack1Winner(bracket)"
-                          class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white"
-                        >
-                          <i class="pi pi-crown text-xs text-yellow-800" />
+                        <div class="text-xs font-semibold text-gray-600 mb-1">
+                          Round {{ round.round_number }}
                         </div>
+                        <div class="grid grid-cols-2 gap-2">
+                          <!-- Racer 1 -->
+                          <div
+                            :class="[
+                              'p-2 rounded border',
+                              round.racer1_id === racer.id
+                                ? 'bg-red-50/30 border-red-300 ring-1 ring-red-400/50'
+                                : round.winner_racer_id === round.racer1_id && round.racer1_time
+                                  ? 'bg-green-50/30 border-green-300'
+                                  : 'bg-white border-gray-200'
+                            ]"
+                          >
+                            <div class="flex items-center justify-between mb-1">
+                              <span
+                                :class="[
+                                  'text-xs font-medium',
+                                  round.racer1_id === racer.id ? 'text-red-900' : 'text-gray-900'
+                                ]"
+                              >
+                                {{ bracket.track1_racer?.name || 'Unknown' }}
+                              </span>
+                              <span class="text-xs text-gray-500">T{{ round.racer1_track }}</span>
+                            </div>
+                            <div class="text-center">
+                              <Badge
+                                v-if="round.racer1_time"
+                                :value="formatTime(round.racer1_time)"
+                                :severity="
+                                  round.winner_racer_id === round.racer1_id
+                                    ? 'success'
+                                    : 'secondary'
+                                "
+                                size="small"
+                                class="font-mono"
+                              />
+                              <Badge
+                                v-else-if="
+                                  round.is_forfeit &&
+                                  round.winner_racer_id &&
+                                  round.winner_racer_id !== round.racer1_id
+                                "
+                                value="Forfeit"
+                                severity="warning"
+                                size="small"
+                              />
+                              <span v-else class="text-xs text-gray-400">-</span>
+                            </div>
+                          </div>
 
-                        <!-- Current Racer Badge -->
-                        <div
-                          v-if="bracket.track1_racer_id === racer.id"
-                          class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center border-2 border-white shadow-md"
-                        >
-                          <i class="pi pi-user text-xs text-white" />
+                          <!-- Racer 2 -->
+                          <div
+                            :class="[
+                              'p-2 rounded border',
+                              round.racer2_id === racer.id
+                                ? 'bg-red-50/30 border-red-300 ring-1 ring-red-400/50'
+                                : round.winner_racer_id === round.racer2_id && round.racer2_time
+                                  ? 'bg-green-50/30 border-green-300'
+                                  : 'bg-white border-gray-200'
+                            ]"
+                          >
+                            <div class="flex items-center justify-between mb-1">
+                              <span
+                                :class="[
+                                  'text-xs font-medium',
+                                  round.racer2_id === racer.id ? 'text-red-900' : 'text-gray-900'
+                                ]"
+                              >
+                                {{ bracket.track2_racer?.name || 'Unknown' }}
+                              </span>
+                              <span class="text-xs text-gray-500">T{{ round.racer2_track }}</span>
+                            </div>
+                            <div class="text-center">
+                              <Badge
+                                v-if="round.racer2_time"
+                                :value="formatTime(round.racer2_time)"
+                                :severity="
+                                  round.winner_racer_id === round.racer2_id
+                                    ? 'success'
+                                    : 'secondary'
+                                "
+                                size="small"
+                                class="font-mono"
+                              />
+                              <Badge
+                                v-else-if="
+                                  round.is_forfeit &&
+                                  round.winner_racer_id &&
+                                  round.winner_racer_id !== round.racer2_id
+                                "
+                                value="Forfeit"
+                                severity="warning"
+                                size="small"
+                              />
+                              <span v-else class="text-xs text-gray-400">-</span>
+                            </div>
+                          </div>
                         </div>
-
-                        <div
-                          :class="[
-                            'font-medium mb-1',
-                            bracket.track1_racer_id === racer.id ? 'text-red-900' : 'text-black'
-                          ]"
-                        >
-                          {{ bracket.track1_racer?.name || 'Unknown' }}
-                        </div>
-                        <div class="text-sm text-gray-600 mb-2">Track 1</div>
-                        <Badge
-                          v-if="bracket.track1_time"
-                          :value="formatTime(bracket.track1_time)"
-                          :severity="getBracketResultSeverity(bracket, 1, racer.id)"
-                          class="font-mono"
-                        />
-                        <span v-else class="text-gray-400">No time</span>
                       </div>
+                    </div>
 
-                      <!-- Track 2 -->
-                      <div
-                        :class="[
-                          'relative text-center p-3 rounded border transition-all',
-                          bracket.track2_racer_id === racer.id
-                            ? 'bg-red-50/30 border-red-300 ring-2 ring-red-400/50'
-                            : isTrack2Winner(bracket)
-                              ? 'bg-green-50/30 border-green-300'
-                              : 'bg-white border-gray-200'
-                        ]"
-                      >
-                        <!-- Winner Crown -->
+                    <!-- Overall winner display -->
+                    <div v-if="bracket.is_completed" class="mt-3 pt-3 border-t">
+                      <div class="text-center">
                         <div
-                          v-if="isTrack2Winner(bracket)"
-                          class="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-white"
+                          v-if="bracket.is_forfeit && !bracket.winner_racer_id"
+                          class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-100 text-gray-800"
                         >
-                          <i class="pi pi-crown text-xs text-yellow-800" />
+                          <i class="pi pi-ban text-gray-500" />
+                          <span class="font-semibold text-sm">Both Withdrawn</span>
                         </div>
-
-                        <!-- Current Racer Badge -->
                         <div
-                          v-if="bracket.track2_racer_id === racer.id"
-                          class="absolute -top-2 -left-2 w-6 h-6 bg-gradient-to-br from-red-500 to-orange-600 rounded-full flex items-center justify-center border-2 border-white shadow-md"
-                        >
-                          <i class="pi pi-user text-xs text-white" />
-                        </div>
-
-                        <div
+                          v-else-if="bracket.winner_racer_id"
                           :class="[
-                            'font-medium mb-1',
-                            bracket.track2_racer_id === racer.id ? 'text-red-900' : 'text-black'
+                            'inline-flex items-center gap-2 px-3 py-1 rounded-lg',
+                            bracket.winner_racer_id === racer.id
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
                           ]"
                         >
-                          {{ bracket.track2_racer?.name || 'Unknown' }}
+                          <i
+                            v-if="bracket.winner_racer_id === racer.id"
+                            class="pi pi-trophy text-yellow-500"
+                          />
+                          <span class="font-semibold text-sm">
+                            {{ bracket.winner_racer_id === racer.id ? 'Winner' : 'Runner Up' }}
+                          </span>
                         </div>
-                        <div class="text-sm text-gray-600 mb-2">Track 2</div>
-                        <Badge
-                          v-if="bracket.track2_time"
-                          :value="formatTime(bracket.track2_time)"
-                          :severity="getBracketResultSeverity(bracket, 2, racer.id)"
-                          class="font-mono"
-                        />
-                        <span v-else class="text-gray-400">No time</span>
                       </div>
                     </div>
                   </div>
@@ -403,7 +473,7 @@
                     :alt="item.alt"
                     class="max-w-full max-h-full object-contain"
                     style="max-height: 80vh; max-width: 90vw"
-                  >
+                  />
                 </div>
               </template>
             </Galleria>
@@ -448,7 +518,7 @@
                         :src="award.award_definition.image_url"
                         :alt="award.award_definition.name"
                         class="w-full aspect-square object-cover rounded border border-gray-300"
-                      >
+                      />
                       <div
                         v-else
                         class="w-full aspect-square bg-gray-100 rounded border border-gray-300 flex items-center justify-center"
@@ -599,37 +669,41 @@
                     :key="checkin.id"
                     class="p-3 bg-gray-50 rounded-lg border border-gray-200"
                     :class="{
-                      'border-red-200 bg-red-50/20': activeRace && checkin.race?.id === activeRace.id && isWithdrawn(checkin.race?.id)
+                      'border-red-200 bg-red-50/20':
+                        activeRace &&
+                        checkin.race?.id === activeRace.id &&
+                        isWithdrawn(checkin.race?.id)
                     }"
                   >
                     <div class="flex items-center justify-between mb-2">
                       <span class="font-medium text-black">
                         {{ checkin.race?.name || 'Unknown Race' }}
                       </span>
-                      
+
                       <!-- Withdrawal Status Badge (only for active race) -->
-                      <div v-if="activeRace && checkin.race?.id === activeRace.id" class="flex items-center gap-2">
+                      <div
+                        v-if="activeRace && checkin.race?.id === activeRace.id"
+                        class="flex items-center gap-2"
+                      >
                         <Badge
                           v-if="isWithdrawn(checkin.race?.id)"
                           value="Withdrawn"
                           severity="warning"
                           class="text-xs"
                         />
-                        <Badge
-                          v-else
-                          value="Active"
-                          severity="success"
-                          class="text-xs"
-                        />
+                        <Badge v-else value="Active" severity="success" class="text-xs" />
                       </div>
                     </div>
-                    
+
                     <p class="text-sm text-gray-600 mb-3">
                       {{ formatCheckinTime(checkin.time) }}
                     </p>
-                    
+
                     <!-- Withdrawal Control (only for race owner and the currently active race) -->
-                    <div v-if="canEdit && activeRace && checkin.race?.id === activeRace.id" class="mt-3">
+                    <div
+                      v-if="canEdit && activeRace && checkin.race?.id === activeRace.id"
+                      class="mt-3"
+                    >
                       <Button
                         :loading="processingWithdrawal === checkin.race?.id"
                         :severity="isWithdrawn(checkin.race?.id) ? 'success' : 'warning'"
@@ -638,12 +712,11 @@
                         size="small"
                         @click="toggleWithdrawal(checkin)"
                       >
-                        <i 
-                          v-if="isWithdrawn(checkin.race?.id)" 
-                          class="pi pi-user-plus mr-2" 
-                        />
+                        <i v-if="isWithdrawn(checkin.race?.id)" class="pi pi-user-plus mr-2" />
                         <i v-else class="pi pi-user-minus mr-2" />
-                        {{ isWithdrawn(checkin.race?.id) ? 'Reinstate to Race' : 'Withdraw from Race' }}
+                        {{
+                          isWithdrawn(checkin.race?.id) ? 'Reinstate to Race' : 'Withdraw from Race'
+                        }}
                       </Button>
                     </div>
                   </div>
@@ -659,9 +732,11 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
+import { useConfirm } from 'primevue/useconfirm'
 
 const route = useRoute()
 const authStore = useAuthStore()
+const confirm = useConfirm()
 const racerSlug = route.params.slug
 
 const racer = ref(null)
@@ -673,6 +748,7 @@ const {
   getRacerBySlug,
   fetchRacerDetailsBySlug,
   isDetailedDataFresh,
+  previewWithdrawalImpact,
   withdrawRacerFromRace,
   reinstateRacerToRace,
   isRacerWithdrawnFromRace,
@@ -766,7 +842,7 @@ const loadRacer = async () => {
       console.log('useRacers: No cached data, fetching fresh data for racer:', racerSlug)
     }
     racer.value = await fetchRacerDetailsBySlug(racerSlug)
-    
+
     // Fetch podium finishes for this racer
     if (racer.value) {
       await fetchPodiumFinishes()
@@ -782,24 +858,11 @@ const loadRacer = async () => {
 
 // Computed properties
 
-// Get live qualifiers for this racer
+// Get qualifiers for this racer from the racer details
 const racerQualifiers = computed(() => {
-  if (!allQualifiers.value || !racer.value) return []
-  // Filter for this racer and only completed qualifiers with valid times
-  const filtered = allQualifiers.value.filter(
-    (q) => q.racer_id === racer.value.id && q.status === 'completed' && q.time && q.time > 0
-  )
-  if (process.env.NODE_ENV === 'development') {
-    console.log(
-      'Racer detail: Total qualifiers:',
-      allQualifiers.value.length,
-      'For racer:',
-      racer.value?.id,
-      'Filtered:',
-      filtered.length
-    )
-  }
-  return filtered
+  if (!racer.value?.qualifiers) return []
+  // Filter for qualifiers with valid times
+  return racer.value.qualifiers.filter((q) => q.time && q.time > 0)
 })
 
 // Sorted qualifiers based on selected sort option
@@ -918,32 +981,24 @@ const totalVotes = computed(() => {
   return racerVoteCounts.value.reduce((total, voteCount) => total + voteCount.vote_count, 0)
 })
 
-// Get live checkins for this racer
+// Get checkins for this racer from the racer details
 const racerCheckins = computed(() => {
-  if (!allCheckins.value || !racer.value) return []
-  const filtered = allCheckins.value.filter((c) => c.racer_id === racer.value.id)
+  if (!racer.value?.checkins) return []
   if (process.env.NODE_ENV === 'development') {
-    console.log(
-      'Racer detail: Total checkins:',
-      allCheckins.value.length,
-      'For racer:',
-      racer.value?.id,
-      'Filtered:',
-      filtered.length
-    )
+    console.log('Racer detail: Total checkins:', racer.value.checkins.length)
   }
-  return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Most recent first
+  return racer.value.checkins.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Most recent first
 })
 
 // Load withdrawal status for the active race only
 const loadWithdrawalStatus = async () => {
   if (!racer.value?.id || !activeRace.value?.id) return
-  
+
   try {
     // Only check withdrawal status for the active race
     const isWithdrawnFromRace = await isRacerWithdrawnFromRace(racer.value.id, activeRace.value.id)
     withdrawalStatus.value.set(activeRace.value.id, isWithdrawnFromRace)
-    
+
     // Trigger reactivity
     withdrawalStatus.value = new Map(withdrawalStatus.value)
   } catch (err) {
@@ -959,20 +1014,20 @@ const isWithdrawn = (raceId) => {
 // Toggle withdrawal status for a racer in a specific race
 const toggleWithdrawal = async (checkin) => {
   if (!checkin.race || processingWithdrawal.value === checkin.race.id) return
-  
+
   processingWithdrawal.value = checkin.race.id
-  
+
   try {
     const isCurrentlyWithdrawn = isWithdrawn(checkin.race.id)
-    
+
     if (isCurrentlyWithdrawn) {
       // Reinstate racer
       await reinstateRacerToRace(racer.value.id, checkin.race.id)
-      
+
       // Update cache
       withdrawalStatus.value.set(checkin.race.id, false)
       withdrawalStatus.value = new Map(withdrawalStatus.value)
-      
+
       toast.add({
         severity: 'success',
         summary: 'Racer Reinstated',
@@ -980,18 +1035,97 @@ const toggleWithdrawal = async (checkin) => {
         life: 3000
       })
     } else {
-      // Withdraw racer
-      await withdrawRacerFromRace(racer.value.id, checkin.race.id, 'Withdrawn by racer owner')
-      
-      // Update cache
-      withdrawalStatus.value.set(checkin.race.id, true)
-      withdrawalStatus.value = new Map(withdrawalStatus.value)
-      
-      toast.add({
-        severity: 'info',
-        summary: 'Racer Withdrawn',
-        detail: `${racer.value.name} has been withdrawn from ${checkin.race.name}`,
-        life: 3000
+      // Preview withdrawal impact before confirming
+      const preview = await previewWithdrawalImpact(racer.value.id, checkin.race.id)
+
+      // Check if already withdrawn
+      if (preview.already_withdrawn) {
+        withdrawalStatus.value.set(checkin.race.id, true)
+        withdrawalStatus.value = new Map(withdrawalStatus.value)
+        toast.add({
+          severity: 'info',
+          summary: 'Already Withdrawn',
+          detail: `${racer.value.name} is already withdrawn from this race`,
+          life: 3000
+        })
+        processingWithdrawal.value = null
+        return
+      }
+
+      // Build impact message for confirmation dialog (plain text)
+      const impact = preview.impact
+      const bracketImpact = preview.bracket_impact
+      const impactLines = []
+
+      // Heat impact
+      if (impact) {
+        const scheduled = impact.scheduled_heats_to_remove || 0
+        const inProgress = impact.in_progress_heats_to_continue || 0
+        const completed = impact.completed_heats_to_preserve || 0
+
+        if (scheduled > 0) {
+          impactLines.push(`• ${scheduled} scheduled heat(s) will be removed`)
+        }
+        if (inProgress > 0) {
+          impactLines.push(`• ${inProgress} in-progress heat(s) will continue`)
+        }
+        if (completed > 0) {
+          impactLines.push(`• ${completed} completed result(s) will be preserved`)
+        }
+
+        if (scheduled === 0 && inProgress === 0 && completed === 0) {
+          impactLines.push('No heats will be affected.')
+        }
+      } else {
+        impactLines.push('No heats will be affected.')
+      }
+
+      // Bracket impact
+      if (bracketImpact) {
+        const totalForfeits = bracketImpact.total_forfeits || 0
+        if (totalForfeits > 0) {
+          impactLines.push(`• ${totalForfeits} bracket match(es) will be forfeited`)
+        }
+      }
+
+      const impactMessage =
+        impactLines.join('\n') + '\n\nThis action cannot be easily undone. Continue?'
+
+      // Show confirmation dialog
+      confirm.require({
+        message: impactMessage,
+        header: `Withdraw ${racer.value.name} from ${checkin.race.name}?`,
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Yes, Withdraw',
+        rejectLabel: 'Cancel',
+        accept: async () => {
+          try {
+            // Perform the actual withdrawal
+            await withdrawRacerFromRace(racer.value.id, checkin.race.id, 'Withdrawn by racer owner')
+
+            // Update cache
+            withdrawalStatus.value.set(checkin.race.id, true)
+            withdrawalStatus.value = new Map(withdrawalStatus.value)
+
+            toast.add({
+              severity: 'info',
+              summary: 'Racer Withdrawn',
+              detail: `${racer.value.name} has been withdrawn from ${checkin.race.name}`,
+              life: 3000
+            })
+          } catch (err) {
+            console.error('Error withdrawing racer:', err)
+            toast.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: err.message || 'Failed to withdraw racer',
+              life: 5000
+            })
+          }
+        },
+        reject: () => {
+          // User cancelled, do nothing
+        }
       })
     }
   } catch (err) {
@@ -1052,12 +1186,26 @@ const racerGalleryImages = computed(() => {
     }))
 })
 
+// Sort brackets by competition order (match_number)
+const sortedBrackets = computed(() => {
+  if (!racer.value?.brackets) return []
+
+  return [...racer.value.brackets].sort((a, b) => {
+    // Sort by match_number (Challonge suggested play order)
+    if (a.match_number && b.match_number) {
+      return a.match_number - b.match_number
+    }
+    // Fallback to created_at if no match_number
+    return new Date(a.created_at) - new Date(b.created_at)
+  })
+})
+
 // Podium finishes - check all races where this racer placed in top 3
 const podiumFinishes = ref([])
 
 const fetchPodiumFinishes = async () => {
   if (!racer.value?.id) return
-  
+
   try {
     // Use the already initialized races from the composable
     let races = allRaces.value
@@ -1067,19 +1215,19 @@ const fetchPodiumFinishes = async () => {
       races = allRaces.value
       if (!races || races.length === 0) return
     }
-    
+
     const finishes = []
-    
+
     // Check each race for this racer's podium finish
     for (const race of races) {
       try {
         const winnersData = await $fetch(`/api/races/${race.id}/winners`)
         if (winnersData.winners && winnersData.tournament_complete) {
           // Find this racer in the winners
-          const finish = winnersData.winners.find(winner => 
-            winner.racer && winner.racer.id === racer.value.id
+          const finish = winnersData.winners.find(
+            (winner) => winner.racer && winner.racer.id === racer.value.id
           )
-          
+
           if (finish) {
             finishes.push({
               race: race,
@@ -1089,28 +1237,28 @@ const fetchPodiumFinishes = async () => {
             })
           }
         }
-      } catch (error) {
+      } catch {
         // Skip races that don't have winner data
       }
     }
-    
+
     // Sort by race date (most recent first) and then by place
     finishes.sort((a, b) => {
       // Handle date comparison more safely
       const dateA = a.race.race_datetime ? new Date(a.race.race_datetime).getTime() : 0
       const dateB = b.race.race_datetime ? new Date(b.race.race_datetime).getTime() : 0
-      
+
       // If dates are valid and different, sort by date
-      if (!isNaN(dateA) && !isNaN(dateB) && dateA !== dateB) {
+      if (!Number.isNaN(dateA) && !Number.isNaN(dateB) && dateA !== dateB) {
         return dateB - dateA // Most recent first
       }
       // Otherwise sort by place (better place first)
       return a.place - b.place
     })
-    
+
     podiumFinishes.value = finishes
-  } catch (error) {
-    console.error('Error fetching podium finishes:', error)
+  } catch (err) {
+    console.error('Error fetching podium finishes:', err)
   }
 }
 
@@ -1138,6 +1286,37 @@ const formatCheckinTime = (checkinTime) => {
   })
 }
 
+const getRaceName = (raceName) => {
+  if (!raceName) return 'Unknown Race'
+  // Remove bracket type prefixes from race names
+  return raceName.replace(/^(double_elimination|single_elimination)/i, '').trim()
+}
+
+const getBracketStage = (bracket) => {
+  if (!bracket) return 'Unknown'
+
+  // Check for finals bracket
+  if (bracket.bracket_group === 'final') {
+    return 'Grand Finals'
+  }
+
+  // For winner's and loser's brackets, use round number and challonge_round
+  const group = bracket.bracket_group === 'winner' ? "Winner's" : "Loser's"
+  const roundNum = bracket.round_number || 1
+
+  // Determine stage based on round number (this is an approximation)
+  // In double elimination, finals are typically the last rounds
+  if (bracket.challonge_round === -1) {
+    return `${group} Finals`
+  } else if (bracket.challonge_round === -2) {
+    return `${group} Semi-Finals`
+  } else if (roundNum === 1) {
+    return `${group} Round 1`
+  } else {
+    return `${group} Round ${roundNum}`
+  }
+}
+
 const getBadgeSeverity = (time, allQualifiers) => {
   if (!time) return 'secondary'
 
@@ -1157,63 +1336,6 @@ const getBadgeSeverity = (time, allQualifiers) => {
   if (currentTime === worstTime && times.length > 1) return 'danger'
   if (currentTime <= bestTime * 1.1) return 'info'
   return 'secondary'
-}
-
-const getBracketResultSeverity = (bracket, track, racerId) => {
-  if (!bracket.track1_time || !bracket.track2_time) return 'secondary'
-
-  const time1 = Number.parseFloat(bracket.track1_time)
-  const time2 = Number.parseFloat(bracket.track2_time)
-
-  // Determine which racer this is
-  const isTrack1 =
-    (track === 1 && bracket.track1_racer_id === racerId) ||
-    (track === 2 && bracket.track2_racer_id === racerId)
-  const isTrack2 =
-    (track === 1 && bracket.track2_racer_id === racerId) ||
-    (track === 2 && bracket.track1_racer_id === racerId)
-
-  if (!isTrack1 && !isTrack2) return 'secondary'
-
-  // For Fastest bracket: lower time wins
-  // For Slowest bracket: higher time wins
-  if (bracket.bracket_type === 'Fastest') {
-    const winnerTime = Math.min(time1, time2)
-    const currentTime = track === 1 ? time1 : time2
-    return currentTime === winnerTime ? 'success' : 'danger'
-  } else {
-    const winnerTime = Math.max(time1, time2)
-    const currentTime = track === 1 ? time1 : time2
-    return currentTime === winnerTime ? 'success' : 'danger'
-  }
-}
-
-// Check if track 1 racer is the winner
-const isTrack1Winner = (bracket) => {
-  if (!bracket.track1_time || !bracket.track2_time) return false
-
-  const time1 = Number.parseFloat(bracket.track1_time)
-  const time2 = Number.parseFloat(bracket.track2_time)
-
-  if (bracket.bracket_type === 'Fastest') {
-    return time1 < time2
-  } else {
-    return time1 > time2
-  }
-}
-
-// Check if track 2 racer is the winner
-const isTrack2Winner = (bracket) => {
-  if (!bracket.track1_time || !bracket.track2_time) return false
-
-  const time1 = Number.parseFloat(bracket.track1_time)
-  const time2 = Number.parseFloat(bracket.track2_time)
-
-  if (bracket.bracket_type === 'Fastest') {
-    return time2 < time1
-  } else {
-    return time2 > time1
-  }
 }
 
 // Initialize auth and fetch data
@@ -1245,25 +1367,31 @@ onMounted(async () => {
 
   // Run initialization in background
   if (initPromises.length > 0) {
-    Promise.all(initPromises).then(() => {
-      // Load withdrawal status after checkins are loaded
-      nextTick(() => {
-        loadWithdrawalStatus()
+    Promise.all(initPromises)
+      .then(() => {
+        // Load withdrawal status after checkins are loaded
+        nextTick(() => {
+          loadWithdrawalStatus()
+        })
       })
-    }).catch((err) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('Background initialization failed:', err)
-      }
-    })
+      .catch((err) => {
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('Background initialization failed:', err)
+        }
+      })
   }
 })
 
 // Watch for changes in activeRace to reload withdrawal status
-watch([activeRace, racer], () => {
-  if (activeRace.value?.id && racer.value?.id) {
-    loadWithdrawalStatus()
-  }
-}, { deep: true })
+watch(
+  [activeRace, racer],
+  () => {
+    if (activeRace.value?.id && racer.value?.id) {
+      loadWithdrawalStatus()
+    }
+  },
+  { deep: true }
+)
 
 // Note: Removed cleanup calls to prevent composable reloading on navigation
 // Composables will manage their own lifecycle and subscriptions

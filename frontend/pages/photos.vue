@@ -237,7 +237,7 @@
             :alt="item.alt"
             class="max-w-full max-h-full object-contain"
             style="max-height: 85vh"
-          >
+          />
         </div>
       </template>
 
@@ -247,7 +247,7 @@
             :src="item.thumbnailImageSrc"
             :alt="item.alt"
             class="w-16 h-16 object-cover rounded"
-          >
+          />
         </div>
       </template>
 

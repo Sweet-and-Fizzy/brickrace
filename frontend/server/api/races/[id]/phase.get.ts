@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 
   try {
     const phase = await getRacePhase(client as any, raceId)
-    
+
     return {
       phase,
       race_id: raceId,

@@ -28,7 +28,7 @@
                   :src="currentHeat.racers[0].racer_image_url"
                   :alt="currentHeat.racers[0].racer_name"
                   class="w-32 h-32 rounded-lg object-cover mx-auto shadow-md"
-                >
+                />
                 <div
                   v-else
                   class="w-32 h-32 bg-gray-200 rounded-lg mx-auto flex items-center justify-center"
@@ -56,7 +56,7 @@
                   :src="currentHeat.racers[1].racer_image_url"
                   :alt="currentHeat.racers[1].racer_name"
                   class="w-32 h-32 rounded-lg object-cover mx-auto shadow-md"
-                >
+                />
                 <div
                   v-else
                   class="w-32 h-32 bg-gray-200 rounded-lg mx-auto flex items-center justify-center"
@@ -99,7 +99,7 @@
                     :src="racer.racer_image_url"
                     :alt="racer.racer_name"
                     class="w-10 h-10 rounded-full object-cover"
-                  >
+                  />
                   <div
                     v-else
                     class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center"

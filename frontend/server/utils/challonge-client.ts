@@ -341,6 +341,82 @@ export const challongeApi = {
     }
   },
 
+  updateParticipant: async (
+    tournamentId: string,
+    participantId: string,
+    participantData: any
+  ): Promise<ChallongeApiParticipant> => {
+    const client = createChallongeHttpClient()
+
+    try {
+      console.log(`Updating participant ${participantId} in tournament ${tournamentId}`)
+
+      const response = await fetch(
+        `${client.baseURL}/tournaments/${tournamentId}/participants/${participantId}.json`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: client.authHeader,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          },
+          body: JSON.stringify({ participant: participantData })
+        }
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error(`HTTP ${response.status}: ${errorText}`)
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
+      }
+
+      const data = await response.json()
+      console.log(`Successfully updated participant ${participantId}`)
+      return data
+    } catch (error) {
+      console.error(`Failed to update participant ${participantId}:`, error)
+      throw error
+    }
+  },
+
+  deleteParticipant: async (
+    tournamentId: string,
+    participantId: string
+  ): Promise<ChallongeApiParticipant> => {
+    const client = createChallongeHttpClient()
+
+    try {
+      console.log(`Deleting participant ${participantId} from tournament ${tournamentId}`)
+
+      const response = await fetch(
+        `${client.baseURL}/tournaments/${tournamentId}/participants/${participantId}.json`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: client.authHeader,
+            'Content-Type': 'application/json',
+            Accept: 'application/json'
+          }
+        }
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error(`HTTP ${response.status}: ${errorText}`)
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
+      }
+
+      const data = await response.json()
+      console.log(
+        `Successfully deleted participant ${participantId} (marked inactive if tournament started)`
+      )
+      return data
+    } catch (error) {
+      console.error(`Failed to delete participant ${participantId}:`, error)
+      throw error
+    }
+  },
+
   // Match operations
   getMatches: async (tournamentId: string): Promise<ChallongeApiMatch[]> => {
     const client = createChallongeHttpClient()

@@ -1130,7 +1130,7 @@ const qualifiers = computed(() => {
 })
 const formatTime = (time) => qualifiersComposable.value?.formatTime(time) || 'N/A'
 
-const { getBracketsForRace, getTotalRounds, initialize: initializeBrackets } = useBrackets()
+const { getBracketsForRace, initialize: initializeBrackets } = useBrackets()
 const { getRaceWithdrawals } = useRacers()
 
 // Withdrawals state
@@ -1205,9 +1205,7 @@ const {
   currentRace: currentRaceHeat,
   currentHeat,
   upcomingHeats,
-  loading: heatsLoading,
   initialize: initializeHeats,
-  fetchCurrentRaceData,
   recentlyCompletedHeat,
   showCompletedHeatResults
 } = useHeats()
@@ -1307,10 +1305,8 @@ const getRaceData = async () => {
 const completedQualifiers = computed(() => {
   if (!qualifiers.value) return []
 
-  // Only show completed qualifying runs with valid times
-  return qualifiers.value.filter(
-    (q) => q.status === 'completed' && q.time && q.time > 0 && !isNaN(q.time)
-  )
+  // Only show qualifying runs with valid times
+  return qualifiers.value.filter((q) => q.time && q.time > 0 && !Number.isNaN(q.time))
 })
 
 const sortedQualifiers = computed(() => {
@@ -1341,7 +1337,7 @@ const fastestTime = computed(() => {
   // Filter out invalid times (0, null, NaN) and only include valid times
   const validTimes = qualifiers.value
     .map((q) => Number.parseFloat(q.time))
-    .filter((time) => time > 0 && !isNaN(time))
+    .filter((time) => time > 0 && !Number.isNaN(time))
 
   if (validTimes.length === 0) return null
 
@@ -1355,101 +1351,12 @@ const slowestTime = computed(() => {
   // Filter out invalid times (0, null, NaN) and only include valid times
   const validTimes = qualifiers.value
     .map((q) => Number.parseFloat(q.time))
-    .filter((time) => time > 0 && !isNaN(time))
+    .filter((time) => time > 0 && !Number.isNaN(time))
 
   if (validTimes.length === 0) return null
 
   const slowest = Math.max(...validTimes)
   return formatTime(slowest)
-})
-
-const winners = computed(() => {
-  // Get all completed brackets for this race by type
-  const completedBrackets = raceBrackets.value.filter(
-    (b) => b.track1_time && b.track2_time && b.track1_time !== b.track2_time
-  )
-
-  // Group by bracket type and find the most recent round for each type
-  const bracketsByType = { double_elimination: [] }
-  completedBrackets.forEach((bracket) => {
-    if (bracket.bracket_type) {
-      if (!bracketsByType[bracket.bracket_type]) {
-        bracketsByType[bracket.bracket_type] = []
-      }
-      bracketsByType[bracket.bracket_type].push(bracket)
-    }
-  })
-
-  const currentRoundWinners = []
-
-  // For each bracket type, find the current round winners
-  Object.keys(bracketsByType).forEach((bracketType) => {
-    const typeBrackets = bracketsByType[bracketType]
-    if (typeBrackets.length === 0) return
-
-    // Sort brackets by creation time to identify rounds
-    const sortedBrackets = typeBrackets.sort(
-      (a, b) => new Date(a.created_at) - new Date(b.created_at)
-    )
-
-    // Find brackets that don't have their racers as winners in later brackets
-    const activeWinners = []
-
-    sortedBrackets.forEach((bracket) => {
-      const isTrack1Winner = bracket.track1_time < bracket.track2_time
-
-      const winnerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
-      const winnerName = isTrack1Winner ? bracket.track1_racer_name : bracket.track2_racer_name
-      const winnerNumber = isTrack1Winner
-        ? bracket.track1_racer_number
-        : bracket.track2_racer_number
-      const winningTime = isTrack1Winner ? bracket.track1_time : bracket.track2_time
-
-      // Check if this winner appears in any later bracket (meaning they advanced)
-      const appearsInLaterBracket = sortedBrackets.some((laterBracket) => {
-        return (
-          new Date(laterBracket.created_at) > new Date(bracket.created_at) &&
-          (laterBracket.track1_racer_id === winnerId || laterBracket.track2_racer_id === winnerId)
-        )
-      })
-
-      // If winner doesn't appear in later brackets, they're a current round winner
-      if (!appearsInLaterBracket) {
-        activeWinners.push({
-          racer_id: winnerId,
-          racer_name: winnerName,
-          racer_number: winnerNumber,
-          winning_time: winningTime,
-          bracket_id: bracket.id,
-          bracket_type: bracketType
-        })
-      }
-    })
-
-    currentRoundWinners.push(...activeWinners)
-  })
-
-  return currentRoundWinners.sort((a, b) => a.winning_time - b.winning_time)
-})
-
-const completedBracketsByType = computed(() => {
-  const byType = { double_elimination: 0 }
-  raceBrackets.value.forEach((b) => {
-    if (b.track1_time && b.track2_time && b.bracket_type) {
-      byType[b.bracket_type] = (byType[b.bracket_type] || 0) + 1
-    }
-  })
-  return byType
-})
-
-const totalBracketsByType = computed(() => {
-  const byType = { double_elimination: 0 }
-  raceBrackets.value.forEach((b) => {
-    if (b.bracket_type) {
-      byType[b.bracket_type] = (byType[b.bracket_type] || 0) + 1
-    }
-  })
-  return byType
 })
 
 // Race phase from API - computed to wait for race to load

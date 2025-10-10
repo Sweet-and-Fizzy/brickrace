@@ -47,7 +47,7 @@
                           :src="slotProps.option.image_url"
                           :alt="slotProps.option.name"
                           class="w-10 h-10 rounded-full object-cover border-2 border-gray-200"
-                        >
+                        />
                         <div
                           v-else
                           class="w-10 h-10 bg-white text-gray-800 flex items-center justify-center text-xs font-semibold border-2 border-gray-300 shadow-sm"
@@ -176,7 +176,7 @@
                               :src="getCurrentImage(racer)"
                               :alt="racer.name"
                               class="w-full h-48 object-cover transition-all duration-300 ease-in-out"
-                            >
+                            />
                           </div>
 
                           <!-- Glass Effect Navigation Arrows -->

@@ -22,114 +22,117 @@
             class="bg-white rounded-lg border border-gray-200 p-6 animate-pulse"
           >
             <div class="flex items-center space-x-4 mb-4">
-              <div class="bg-gray-300 rounded-lg w-16 h-16"/>
+              <div class="bg-gray-300 rounded-lg w-16 h-16" />
               <div class="flex-1 space-y-2">
-                <div class="h-4 bg-gray-300 rounded w-3/4"/>
-                <div class="h-3 bg-gray-200 rounded w-1/2"/>
+                <div class="h-4 bg-gray-300 rounded w-3/4" />
+                <div class="h-3 bg-gray-200 rounded w-1/2" />
               </div>
             </div>
             <div class="space-y-2">
-              <div class="h-3 bg-gray-200 rounded"/>
-              <div class="h-3 bg-gray-200 rounded w-2/3"/>
+              <div class="h-3 bg-gray-200 rounded" />
+              <div class="h-3 bg-gray-200 rounded w-2/3" />
             </div>
           </div>
         </div>
 
         <!-- Sponsors Grid -->
-        <div v-else-if="sponsors.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
-          v-for="sponsor in sponsors"
-          :key="sponsor.id"
-          class="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+          v-else-if="sponsors.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          <div class="p-6">
-            <!-- Header with Logo and Basic Info -->
-            <div class="flex items-start space-x-4 mb-4">
-              <!-- Logo -->
-              <div class="flex-shrink-0">
-                <img
-                  v-if="sponsor.logo_url"
-                  :src="sponsor.logo_url"
-                  :alt="`${sponsor.name} logo`"
-                  class="w-16 h-16 object-contain rounded-lg border border-gray-200"
-                >
-                <div
-                  v-else
-                  class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200"
-                >
-                  <i class="pi pi-image text-gray-400 text-xl"/>
-                </div>
-              </div>
-
-              <!-- Info -->
-              <div class="flex-1 min-w-0">
-                <h3 class="text-lg font-semibold text-gray-900 truncate">
-                  {{ sponsor.name }}
-                </h3>
-                <p v-if="sponsor.website_url" class="text-sm text-blue-600 hover:text-blue-800 truncate">
-                  <a :href="sponsor.website_url" target="_blank" class="flex items-center">
-                    <i class="pi pi-external-link mr-1"/>
-                    {{ sponsor.website_url.replace(/^https?:\/\//, '') }}
-                  </a>
-                </p>
-                <div class="flex items-center mt-2">
-                  <Badge
-                    :value="sponsor.is_active ? 'Active' : 'Inactive'"
-                    :severity="sponsor.is_active ? 'success' : 'secondary'"
+          <div
+            v-for="sponsor in sponsors"
+            :key="sponsor.id"
+            class="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+          >
+            <div class="p-6">
+              <!-- Header with Logo and Basic Info -->
+              <div class="flex items-start space-x-4 mb-4">
+                <!-- Logo -->
+                <div class="flex-shrink-0">
+                  <img
+                    v-if="sponsor.logo_url"
+                    :src="sponsor.logo_url"
+                    :alt="`${sponsor.name} logo`"
+                    class="w-16 h-16 object-contain rounded-lg border border-gray-200"
                   />
-                  <span class="ml-2 text-sm text-gray-500">
-                    Order: {{ sponsor.display_order }}
-                  </span>
+                  <div
+                    v-else
+                    class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200"
+                  >
+                    <i class="pi pi-image text-gray-400 text-xl" />
+                  </div>
+                </div>
+
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-lg font-semibold text-gray-900 truncate">
+                    {{ sponsor.name }}
+                  </h3>
+                  <p
+                    v-if="sponsor.website_url"
+                    class="text-sm text-blue-600 hover:text-blue-800 truncate"
+                  >
+                    <a :href="sponsor.website_url" target="_blank" class="flex items-center">
+                      <i class="pi pi-external-link mr-1" />
+                      {{ sponsor.website_url.replace(/^https?:\/\//, '') }}
+                    </a>
+                  </p>
+                  <div class="flex items-center mt-2">
+                    <Badge
+                      :value="sponsor.is_active ? 'Active' : 'Inactive'"
+                      :severity="sponsor.is_active ? 'success' : 'secondary'"
+                    />
+                    <span class="ml-2 text-sm text-gray-500">
+                      Order: {{ sponsor.display_order }}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Sponsorship Amount (Admin Only) -->
-            <div v-if="sponsor.sponsorship_amount && sponsor.sponsorship_amount > 0" class="mb-4">
-              <span class="text-sm text-gray-500">Sponsorship Amount: </span>
-              <span class="text-sm font-medium text-green-600">
-                ${{ sponsor.sponsorship_amount.toLocaleString() }}
-              </span>
-            </div>
-
-            <!-- Actions -->
-            <div class="flex justify-between items-center pt-4 border-t border-gray-200">
-              <div class="text-xs text-gray-500">
-                {{ formatDate(sponsor.created_at) }}
+              <!-- Sponsorship Amount (Admin Only) -->
+              <div v-if="sponsor.sponsorship_amount && sponsor.sponsorship_amount > 0" class="mb-4">
+                <span class="text-sm text-gray-500">Sponsorship Amount: </span>
+                <span class="text-sm font-medium text-green-600">
+                  ${{ sponsor.sponsorship_amount.toLocaleString() }}
+                </span>
               </div>
-              <div class="flex space-x-2">
-                <Button
-                  v-tooltip.top="'Edit'"
-                  icon="pi pi-pencil"
-                  size="small"
-                  severity="secondary"
-                  text
-                  @click="editSponsor(sponsor)"
-                />
-                <Button
-                  v-tooltip.top="'Delete'"
-                  icon="pi pi-trash"
-                  size="small"
-                  severity="danger"
-                  text
-                  @click="confirmDelete(sponsor)"
-                />
+
+              <!-- Actions -->
+              <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+                <div class="text-xs text-gray-500">
+                  {{ formatDate(sponsor.created_at) }}
+                </div>
+                <div class="flex space-x-2">
+                  <Button
+                    v-tooltip.top="'Edit'"
+                    icon="pi pi-pencil"
+                    size="small"
+                    severity="secondary"
+                    text
+                    @click="editSponsor(sponsor)"
+                  />
+                  <Button
+                    v-tooltip.top="'Delete'"
+                    icon="pi pi-trash"
+                    size="small"
+                    severity="danger"
+                    text
+                    @click="confirmDelete(sponsor)"
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-        </div>
 
         <!-- Empty State -->
         <div v-else class="text-center py-16">
-          <i class="pi pi-building text-gray-400 text-6xl mb-4"/>
+          <i class="pi pi-building text-gray-400 text-6xl mb-4" />
           <h3 class="text-lg font-medium text-gray-900 mb-2">No sponsors yet</h3>
           <p class="text-gray-600 mb-6">Get started by adding your first sponsor.</p>
-          <Button
-            class="btn-primary"
-            @click="navigateTo('/admin/sponsors/add')"
-          >
-            <i class="pi pi-plus mr-2"/>
+          <Button class="btn-primary" @click="navigateTo('/admin/sponsors/add')">
+            <i class="pi pi-plus mr-2" />
             Add First Sponsor
           </Button>
         </div>
@@ -203,11 +206,7 @@
           <!-- Status -->
           <div class="field col-span-2">
             <div class="flex items-center">
-              <Checkbox
-                id="is_active"
-                v-model="selectedSponsor.is_active"
-                binary
-              />
+              <Checkbox id="is_active" v-model="selectedSponsor.is_active" binary />
               <label for="is_active" class="ml-2 text-sm font-medium text-gray-700">
                 Active (visible on public pages)
               </label>
@@ -216,19 +215,17 @@
 
           <!-- Logo Upload -->
           <div class="field col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Logo
-            </label>
-            
+            <label class="block text-sm font-medium text-gray-700 mb-2"> Logo </label>
+
             <!-- Current Logo -->
             <div v-if="selectedSponsor.logo_url" class="mb-3">
               <img
                 :src="selectedSponsor.logo_url"
                 :alt="`${selectedSponsor.name} logo`"
                 class="h-20 object-contain rounded-lg border border-gray-200"
-              >
+              />
             </div>
-            
+
             <!-- Upload New Logo -->
             <FileUpload
               mode="basic"
@@ -246,17 +243,8 @@
         </div>
 
         <div class="flex justify-end space-x-3 mt-6 pt-4 border-t border-gray-200">
-          <Button
-            label="Cancel"
-            severity="secondary"
-            @click="editDialogVisible = false"
-          />
-          <Button
-            type="submit"
-            label="Update Sponsor"
-            :loading="updating"
-            class="btn-primary"
-          />
+          <Button label="Cancel" severity="secondary" @click="editDialogVisible = false" />
+          <Button type="submit" label="Update Sponsor" :loading="updating" class="btn-primary" />
         </div>
       </form>
     </Dialog>
