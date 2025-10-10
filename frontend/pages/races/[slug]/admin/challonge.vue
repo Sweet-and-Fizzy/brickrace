@@ -522,15 +522,18 @@ const startChallongeTournament = async () => {
     // Generate brackets from Challonge tournament structure
     console.log('Generating brackets from Challonge tournament structure...')
     try {
+      // Wait a moment for Challonge to generate matches
+      await new Promise(resolve => setTimeout(resolve, 2000))
+
       const bracketResult = await $fetch(`/api/challonge/tournaments/${tournament.value.id}/generate-brackets`, {
         method: 'POST'
       })
-      
+
       console.log(`Generated ${bracketResult.summary.brackets_generated} brackets`)
       notifications.success(`Tournament started! Generated ${bracketResult.summary.brackets_generated} brackets from Challonge structure.`)
     } catch (bracketError) {
       console.error('Failed to generate brackets:', bracketError)
-      notifications.warn('Tournament started but bracket generation failed. Please try manual sync.')
+      notifications.warning('Tournament started but bracket generation failed', 'Please try the "Regenerate Brackets" button below.')
     }
     
     // Refresh tournament status
