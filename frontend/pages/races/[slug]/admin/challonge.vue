@@ -663,7 +663,8 @@ const regenerateBrackets = async () => {
     
   } catch (error) {
     console.error('Bracket regeneration failed:', error)
-    notifications.error('Failed to regenerate brackets from Challonge')
+    const errorMessage = error?.data?.error || error?.data?.message || error?.message || 'Unknown error'
+    notifications.error('Failed to regenerate brackets', errorMessage)
   } finally {
     syncLoading.value = false
   }
