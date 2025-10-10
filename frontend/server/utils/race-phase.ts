@@ -510,30 +510,132 @@ export async function getCurrentHeat(
     }
 
     if (!typedCurrentBracket) {
-      // No current bracket found - trigger Challonge reconciliation first
-      console.log('❌ No current bracket found, triggering Challonge reconciliation...')
-
+      // If there are no incomplete brackets remaining, don't spam Challonge syncs; finalize and exit
       try {
-        // Get tournament and trigger reconciliation
-        const { data: tournament } = await client
-          .from('challonge_tournaments')
-          .select('id')
+        const { count: incompleteCount } = await client
+          .from('brackets')
+          .select('id', { count: 'exact', head: true })
           .eq('race_id', raceId)
-          .eq('status', 'active')
-          .single()
+          .is('winner_racer_id', null)
+          .or('is_forfeit.is.null,is_forfeit.eq.false')
 
-        if (tournament) {
-          const { reconcileBracketsFromChallonge } = await import('./bracket-generator')
-          await reconcileBracketsFromChallonge(client, raceId, tournament.id)
-          console.log('✅ Challonge reconciliation completed, retrying...')
+        if ((incompleteCount ?? 0) === 0) {
+          console.log('🧹 No incomplete brackets remain; skipping Challonge sync.')
+          // Best effort auto-finalize; ignore failures
+          try {
+            await autoFinalizeChallongeTournament(client, raceId)
+          } catch {
+            // no-op
+            void 0
+          }
+        } else {
+          // There appear to be pending brackets but none selected (edge case) – attempt a single reconcile without recursion
+          console.log(
+            '❌ No current bracket found, attempting a single Challonge reconciliation...'
+          )
+          try {
+            const { data: tournament } = await client
+              .from('challonge_tournaments')
+              .select('id')
+              .eq('race_id', raceId)
+              .eq('status', 'active')
+              .single()
 
-          // Retry getting current bracket after reconciliation
-          return getCurrentHeat(client, raceId, phase)
+            if (tournament) {
+              const { reconcileBracketsFromChallonge } = await import('./bracket-generator')
+              await reconcileBracketsFromChallonge(client, raceId, tournament.id)
+              console.log('✅ Challonge reconciliation completed')
+
+              // Inline re-check for a current bracket (no recursive retry)
+              const { data: reconciledBracket } = await client
+                .from('brackets')
+                .select(
+                  `
+                  *,
+                  track1_racer:racers!track1_racer_id(
+                    id,
+                    name,
+                    racer_number,
+                    image_url
+                  ),
+                  track2_racer:racers!track2_racer_id(
+                    id,
+                    name,
+                    racer_number,
+                    image_url
+                  )
+                `
+                )
+                .eq('race_id', raceId)
+                .is('winner_racer_id', null)
+                .or('is_forfeit.is.null,is_forfeit.eq.false')
+                .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
+                .order('challonge_round', { ascending: true })
+                .order('match_number', { ascending: true })
+                .limit(1)
+                .single()
+
+              if (reconciledBracket) {
+                // Build and return the current bracket after successful reconcile
+                const newBracket = reconciledBracket as BracketRecord
+                const allBrackets = await client
+                  .from('brackets')
+                  .select('id')
+                  .eq('race_id', raceId)
+                  .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
+                  .order('challonge_round', { ascending: true })
+                  .order('match_number', { ascending: true })
+
+                const bracketIndex =
+                  allBrackets?.data?.findIndex((b) => b.id === newBracket.id) ?? 0
+                const heatNumber = bracketIndex + 1
+
+                return {
+                  heat_number: heatNumber,
+                  type: 'bracket',
+                  bracket_id: newBracket.id,
+                  bracket_group: newBracket.bracket_group,
+                  round_number: newBracket.round_number,
+                  match_number: newBracket.match_number,
+                  challonge_match_id: newBracket.challonge_match_id,
+                  challonge_round: newBracket.challonge_round,
+                  // Multi-round metadata
+                  match_format: newBracket.match_format,
+                  total_rounds: newBracket.total_rounds,
+                  current_round: newBracket.current_round,
+                  rounds_won_track1: newBracket.rounds_won_track1,
+                  rounds_won_track2: newBracket.rounds_won_track2,
+                  is_completed: newBracket.is_completed,
+                  racers: [
+                    {
+                      track_number: 1,
+                      racer_id: newBracket.track1_racer_id,
+                      racer_name: newBracket.track1_racer?.name,
+                      racer_number: newBracket.track1_racer?.racer_number,
+                      racer_image_url: newBracket.track1_racer?.image_url,
+                      time: newBracket.track1_time
+                    },
+                    {
+                      track_number: 2,
+                      racer_id: newBracket.track2_racer_id,
+                      racer_name: newBracket.track2_racer?.name,
+                      racer_number: newBracket.track2_racer?.racer_number,
+                      racer_image_url: newBracket.track2_racer?.image_url,
+                      time: newBracket.track2_time
+                    }
+                  ].filter((r) => r.racer_id)
+                }
+              }
+            }
+          } catch (reconcileError) {
+            console.error('Failed to reconcile from Challonge:', reconcileError)
+            // Continue with fallback logic
+          }
         }
-      } catch (reconcileError) {
-        console.error('Failed to reconcile from Challonge:', reconcileError)
-        // Continue with fallback logic
+      } catch (err) {
+        console.error('Error while checking remaining brackets:', err)
       }
+
       // No current bracket found - check if there are any scheduled qualifiers we should show instead
       const { data: scheduledQualifiers, error: qualError } = await client
         .from('qualifiers')
@@ -579,7 +681,7 @@ export async function getCurrentHeat(
         }
       }
 
-      console.log('❌ No scheduled qualifiers, trying Challonge sync...')
+      console.log('❌ No scheduled qualifiers, trying a one-time Challonge sync...')
 
       try {
         await autoSyncNewChallongeMatches(client, raceId)
