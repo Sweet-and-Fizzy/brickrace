@@ -200,6 +200,13 @@ async function handleBestOf3BracketTimes(
   }
 
   // Update the round with the new times
+  // If the round was already completed, reset completion status so it can be re-evaluated
+  if (roundData.completed_at) {
+    updates.completed_at = null
+    updates.winner_racer_id = null
+    updates.winner_track = null
+  }
+
   const { error: updateError } = await client
     .from('bracket_rounds')
     .update(updates)
@@ -213,6 +220,7 @@ async function handleBestOf3BracketTimes(
   const updatedRound = { ...roundData, ...updates }
 
   // Decide round outcome with null semantics (win by non-null, tie if both null)
+  // Always re-evaluate since we reset completed_at above if it was already completed
   if (!updatedRound.completed_at) {
     await completeBestOf3Round(client, updatedRound)
 
