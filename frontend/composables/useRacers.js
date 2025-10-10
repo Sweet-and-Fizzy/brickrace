@@ -416,10 +416,43 @@ export const useRacers = () => {
           .from('brackets')
           .select(
             `
-            *,
-            races!inner(name),
+            id,
+            created_at,
+            race_id,
+            track1_racer_id,
+            track2_racer_id,
+            track1_time,
+            track2_time,
+            bracket_type,
+            bracket_group,
+            round_number,
+            is_forfeit,
+            forfeit_reason,
+            winner_track,
+            winner_racer_id,
+            match_number,
+            match_format,
+            rounds_won_track1,
+            rounds_won_track2,
+            is_completed,
+            challonge_match_id,
+            races(name),
             track1_racer:track1_racer_id(name),
-            track2_racer:track2_racer_id(name)
+            track2_racer:track2_racer_id(name),
+            bracket_rounds(
+              id,
+              round_number,
+              racer1_id,
+              racer2_id,
+              racer1_track,
+              racer2_track,
+              racer1_time,
+              racer2_time,
+              winner_racer_id,
+              winner_track,
+              is_forfeit,
+              forfeit_reason
+            )
           `
           )
           .or(`track1_racer_id.eq.${racerId},track2_racer_id.eq.${racerId}`)
@@ -668,6 +701,17 @@ export const useRacers = () => {
     return racers.value.filter((racer) => racer.user_id === authStore.userId)
   })
 
+  // Preview withdrawal impact before withdrawing
+  const previewWithdrawalImpact = async (racerId, raceId) => {
+    try {
+      const response = await $fetch(`/api/racers/${racerId}/withdrawal-preview?race_id=${raceId}`)
+      return response
+    } catch (err) {
+      console.error('Error previewing withdrawal impact:', err)
+      throw err
+    }
+  }
+
   // Withdraw racer from specific race
   const withdrawRacerFromRace = async (racerId, raceId, reason = null) => {
     try {
@@ -802,6 +846,7 @@ export const useRacers = () => {
     getVoteCounts,
 
     // Race-specific withdrawal methods
+    previewWithdrawalImpact,
     withdrawRacerFromRace,
     reinstateRacerToRace,
     getRaceWithdrawals,

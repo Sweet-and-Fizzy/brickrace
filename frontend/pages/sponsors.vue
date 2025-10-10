@@ -7,7 +7,8 @@
           <h1 class="text-4xl md:text-5xl font-bold mb-6 text-black">Our Amazing Sponsors</h1>
           <p class="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto">
             The Great Holyoke Brick Race is made possible by the generous support of our sponsors.
-            Their commitment to our community and creative endeavors helps us continue this beloved tradition.
+            Their commitment to our community and creative endeavors helps us continue this beloved
+            tradition.
           </p>
         </div>
       </div>
@@ -23,10 +24,10 @@
             class="bg-white shadow-sm border-2 border-black overflow-hidden animate-pulse"
           >
             <div class="flex flex-col h-full">
-              <div class="w-full h-48 p-4 bg-gray-200"/>
+              <div class="w-full h-48 p-4 bg-gray-200" />
               <div class="bg-black p-3">
-                <div class="h-4 bg-gray-600 w-3/4 mx-auto mb-2"/>
-                <div class="h-3 bg-gray-500 w-1/2 mx-auto"/>
+                <div class="h-4 bg-gray-600 w-3/4 mx-auto mb-2" />
+                <div class="h-3 bg-gray-500 w-1/2 mx-auto" />
               </div>
             </div>
           </div>
@@ -51,12 +52,9 @@
                       :src="sponsor.logo_url"
                       :alt="`${sponsor.name} logo`"
                       class="w-full h-full object-contain"
-                    >
-                    <div
-                      v-else
-                      class="w-full h-full bg-gray-100 flex items-center justify-center"
-                    >
-                      <i class="pi pi-building text-gray-400 text-4xl"/>
+                    />
+                    <div v-else class="w-full h-full bg-gray-100 flex items-center justify-center">
+                      <i class="pi pi-building text-gray-400 text-4xl" />
                     </div>
                   </div>
 
@@ -72,7 +70,7 @@
                       rel="noopener noreferrer"
                       class="text-brand-gold hover:text-white transition-colors inline-flex items-center text-sm"
                     >
-                      <i class="pi pi-external-link mr-2"/>
+                      <i class="pi pi-external-link mr-2" />
                       Visit Website
                     </a>
                   </div>
@@ -100,12 +98,9 @@
                       :src="sponsor.logo_url"
                       :alt="`${sponsor.name} logo`"
                       class="w-full h-full object-contain"
-                    >
-                    <div
-                      v-else
-                      class="w-full h-full bg-gray-100 flex items-center justify-center"
-                    >
-                      <i class="pi pi-building text-gray-400 text-3xl"/>
+                    />
+                    <div v-else class="w-full h-full bg-gray-100 flex items-center justify-center">
+                      <i class="pi pi-building text-gray-400 text-3xl" />
                     </div>
                   </div>
 
@@ -121,7 +116,7 @@
                       rel="noopener noreferrer"
                       class="text-sm text-brand-gold hover:text-white transition-colors inline-flex items-center"
                     >
-                      <i class="pi pi-external-link mr-1 text-xs"/>
+                      <i class="pi pi-external-link mr-1 text-xs" />
                       Visit Website
                     </a>
                   </div>
@@ -129,12 +124,18 @@
               </div>
 
               <!-- Become a Sponsor Card -->
-              <div class="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 border-2 border-brand-blue overflow-hidden">
+              <div
+                class="bg-white shadow-sm hover:shadow-md transition-shadow duration-200 border-2 border-brand-blue overflow-hidden"
+              >
                 <div class="flex flex-col h-full">
                   <!-- Icon and Description -->
-                  <div class="w-full h-48 p-4 flex flex-col items-center justify-center bg-white text-center">
-                    <div class="bg-brand-blue rounded-full w-20 h-20 flex items-center justify-center mb-3">
-                      <i class="pi pi-heart text-3xl text-white"/>
+                  <div
+                    class="w-full h-48 p-4 flex flex-col items-center justify-center bg-white text-center"
+                  >
+                    <div
+                      class="bg-brand-blue rounded-full w-20 h-20 flex items-center justify-center mb-3"
+                    >
+                      <i class="pi pi-heart text-3xl text-white" />
                     </div>
                     <p class="text-sm text-gray-600">Support creativity and community spirit!</p>
                   </div>
@@ -146,7 +147,7 @@
                       href="mailto:thegreatholyokebrickrace@gmail.com?subject=Sponsorship Opportunities"
                       class="text-sm text-brand-gold hover:text-white transition-colors inline-flex items-center"
                     >
-                      <i class="pi pi-envelope mr-1 text-xs"/>
+                      <i class="pi pi-envelope mr-1 text-xs" />
                       Contact Us
                     </a>
                   </div>
@@ -158,21 +159,19 @@
 
         <!-- Empty State -->
         <div v-else class="text-center py-16">
-          <i class="pi pi-building text-gray-400 text-6xl mb-4"/>
+          <i class="pi pi-building text-gray-400 text-6xl mb-4" />
           <h3 class="text-lg font-medium text-gray-900 mb-2">No sponsors yet</h3>
           <p class="text-gray-600 mb-6">
             We're always looking for amazing sponsors to support our community event.
           </p>
           <div class="space-y-4">
-            <p class="text-gray-600">
-              Interested in sponsoring The Great Holyoke Brick Race?
-            </p>
+            <p class="text-gray-600">Interested in sponsoring The Great Holyoke Brick Race?</p>
             <Button
               tag="a"
               href="mailto:thegreatholyokebrickrace@gmail.com?subject=Sponsorship Inquiry&body=Hi! I am interested in learning more about sponsorship opportunities for The Great Holyoke Brick Race."
               class="btn-primary"
             >
-              <i class="pi pi-envelope mr-2"/>
+              <i class="pi pi-envelope mr-2" />
               Contact Us About Sponsorship
             </Button>
           </div>
@@ -190,14 +189,14 @@ const { sponsors, loading } = sponsorsStore
 
 // Split sponsors by sponsorship level (if we want to feature higher-tier sponsors)
 const premiumSponsors = computed(() => {
-  return (sponsors.value || []).filter(sponsor => 
-    sponsor.sponsorship_amount && sponsor.sponsorship_amount >= 1000
+  return (sponsors.value || []).filter(
+    (sponsor) => sponsor.sponsorship_amount && sponsor.sponsorship_amount >= 1000
   )
 })
 
 const regularSponsors = computed(() => {
-  return (sponsors.value || []).filter(sponsor => 
-    !sponsor.sponsorship_amount || sponsor.sponsorship_amount < 1000
+  return (sponsors.value || []).filter(
+    (sponsor) => !sponsor.sponsorship_amount || sponsor.sponsorship_amount < 1000
   )
 })
 
@@ -212,7 +211,8 @@ useHead({
   meta: [
     {
       name: 'description',
-      content: 'Meet the amazing sponsors who support The Great Holyoke Brick Race and help make our community event possible.'
+      content:
+        'Meet the amazing sponsors who support The Great Holyoke Brick Race and help make our community event possible.'
     },
     {
       property: 'og:title',
@@ -220,7 +220,8 @@ useHead({
     },
     {
       property: 'og:description',
-      content: 'Meet the amazing sponsors who support The Great Holyoke Brick Race and help make our community event possible.'
+      content:
+        'Meet the amazing sponsors who support The Great Holyoke Brick Race and help make our community event possible.'
     }
   ]
 })

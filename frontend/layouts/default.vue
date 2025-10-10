@@ -107,7 +107,7 @@
               src="~/assets/img/brick_race_logo.jpg"
               alt="The Great Holyoke Brick Race Logo"
               class="h-32 w-auto mb-3"
-            >
+            />
             <div
               class="site-name text-3xl font-bold text-black tracking-wider text-center whitespace-nowrap"
             >
@@ -200,16 +200,18 @@
               aria-label="Open navigation menu"
               @click="sidebarVisible = true"
             />
-            
+
             <!-- Navigation Links -->
             <div class="flex items-center space-x-4 text-sm">
-              <NuxtLink to="/races/the-2025-brick-race" class="hover:text-brand-blue">2025 Race</NuxtLink>
+              <NuxtLink to="/races/the-2025-brick-race" class="hover:text-brand-blue"
+                >2025 Race</NuxtLink
+              >
               <NuxtLink to="/racers" class="hover:text-brand-blue">Racers</NuxtLink>
               <NuxtLink to="/photos" class="hover:text-brand-blue">Photos</NuxtLink>
               <NuxtLink to="/faq" class="hover:text-brand-blue">FAQ</NuxtLink>
               <NuxtLink to="/sponsors" class="hover:text-brand-blue">Sponsors</NuxtLink>
             </div>
-            
+
             <!-- Auth Section -->
             <div class="flex items-center space-x-2">
               <template v-if="authStore.isAuthenticated">
@@ -221,9 +223,9 @@
                   aria-label="User menu"
                   @click="(event) => $refs.tabletUserMenu.toggle(event)"
                 />
-                <Menu 
-                  ref="tabletUserMenu" 
-                  :model="tabletUserMenuItems" 
+                <Menu
+                  ref="tabletUserMenu"
+                  :model="tabletUserMenuItems"
                   :popup="true"
                   :pt="{
                     itemLabel: {
@@ -238,7 +240,7 @@
               </template>
             </div>
           </div>
-          
+
           <!-- Logo and Text Below -->
           <div class="py-4">
             <NuxtLink to="/" class="flex flex-col items-center">
@@ -246,7 +248,7 @@
                 src="~/assets/img/brick_race_logo.jpg"
                 alt="The Great Holyoke Brick Race Logo"
                 class="h-24 w-auto mb-2"
-              >
+              />
               <div class="site-name text-2xl font-bold text-black tracking-wider text-center">
                 the great holyoke brick race
               </div>
@@ -267,17 +269,15 @@
               @click="sidebarVisible = true"
             />
           </div>
-          
+
           <!-- Logo and Text Below -->
           <NuxtLink to="/" class="block text-center pb-4">
             <img
               src="~/assets/img/brick_race_logo.jpg"
               alt="The Great Holyoke Brick Race Logo"
               class="h-20 w-auto mx-auto mb-2"
-            >
-            <div class="site-name text-xl font-bold text-black">
-              the great holyoke brick race
-            </div>
+            />
+            <div class="site-name text-xl font-bold text-black">the great holyoke brick race</div>
           </NuxtLink>
         </div>
       </div>
@@ -317,10 +317,6 @@ const menuItems = computed(() => [
       {
         label: 'The 2025 Brick Race',
         command: () => navigateTo('/races/the-2025-brick-race')
-      },
-      {
-        label: '2025 Test Day',
-        command: () => navigateTo('/races/2025-test-day')
       },
       {
         label: 'Awards',
@@ -491,11 +487,6 @@ const sidebarMenuItems = computed(() => [
     label: 'The 2025 Brick Race',
     icon: 'pi pi-play-circle',
     command: () => navigateTo('/races/the-2025-brick-race')
-  },
-  {
-    label: '2025 Test Day',
-    icon: 'pi pi-calendar',
-    command: () => navigateTo('/races/2025-test-day')
   },
   {
     label: 'Awards',

@@ -15,10 +15,12 @@ export default defineEventHandler(async (event) => {
     // Get tournament with participant count
     const { data: tournament, error: tournamentError } = await client
       .from('challonge_tournaments')
-      .select(`
+      .select(
+        `
         *,
         race:races(*)
-      `)
+      `
+      )
       .eq('id', tournamentId)
       .single()
 
@@ -32,10 +34,13 @@ export default defineEventHandler(async (event) => {
     // Get participant count and details
     const { data: participants, count: participantCount } = await client
       .from('challonge_participants')
-      .select(`
+      .select(
+        `
         *,
         racer:racers(*)
-      `, { count: 'exact' })
+      `,
+        { count: 'exact' }
+      )
       .eq('challonge_tournament_id', tournamentId)
       .order('seed_position', { ascending: true })
 
@@ -54,7 +59,7 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error: any) {
     console.error('Tournament status error:', error)
-    
+
     // Re-throw createError instances
     if (error.statusCode) {
       throw error

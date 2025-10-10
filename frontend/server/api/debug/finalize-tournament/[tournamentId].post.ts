@@ -14,10 +14,10 @@ export default defineEventHandler(async (event) => {
     // Finalize the tournament to generate final rankings
     console.log(`Finalizing tournament ${tournamentId}`)
     const finalizedTournament = await challongeApi.finalizeTournament(tournamentId)
-    
+
     // Get participants with final rankings
     const participants = await challongeApi.getParticipants(tournamentId)
-    
+
     return {
       tournament: finalizedTournament,
       participants,

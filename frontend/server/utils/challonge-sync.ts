@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // Automatic sync utility for internal brackets to Challonge tournaments
 import { challongeApi } from './challonge-client'
+import type { ChallongeApiMatch } from './challonge-client'
+// Note: We accept a loosely-typed Supabase client here to interop with Nuxt's serverSupabaseClient
 
 interface BracketMatch {
   id: string
@@ -41,22 +44,18 @@ export async function syncBracketToChallonge(
   bracketId: string
 ): Promise<void> {
   try {
+    const c: any = client
     console.log(`Starting Challonge sync for bracket ${bracketId}`)
 
-    // Check if this bracket has already been synced
-    const { data: existingSync } = await client
+    // Load previous sync (do not early-return; we will verify remote state instead)
+    const { data: previousSync } = await c
       .from('challonge_match_sync')
-      .select('id, synced_at')
+      .select('id, synced_at, challonge_match_id, winner_participant_id, scores_csv')
       .eq('bracket_id', bracketId)
       .single()
 
-    if (existingSync) {
-      console.log(`Bracket ${bracketId} already synced at ${existingSync.synced_at}`)
-      return
-    }
-
     // Get tournament for this race
-    const { data: tournament } = await client
+    const { data: tournament } = await c
       .from('challonge_tournaments')
       .select('*')
       .eq('race_id', raceId)
@@ -69,23 +68,56 @@ export async function syncBracketToChallonge(
     }
 
     // Get the completed bracket with full details
-    const { data: bracket } = await client
+    const { data: bracket } = await c
       .from('brackets')
-      .select(`
+      .select(
+        `
         *,
         track1_racer:racers!track1_racer_id(id, name, racer_number),
         track2_racer:racers!track2_racer_id(id, name, racer_number)
-      `)
+      `
+      )
       .eq('id', bracketId)
       .single()
 
-    if (!bracket || !bracket.track1_time || !bracket.track2_time) {
-      console.log('Bracket not ready for sync - missing times')
+    if (!bracket) {
+      console.log('Bracket not found')
+      return
+    }
+
+    // Check if bracket is ready for sync based on format
+    let isReadyForSync = false
+    let scoresCsv = ''
+    let winnerRacerId = ''
+
+    if (bracket.match_format === 'best_of_3') {
+      // For best-of-3, check if overall match is complete
+      if (bracket.is_completed && bracket.winner_racer_id) {
+        isReadyForSync = true
+        winnerRacerId = bracket.winner_racer_id
+
+        // Create scores in format "rounds_won_player1-rounds_won_player2"
+        const player1Wins = bracket.rounds_won_track1 || 0
+        const player2Wins = bracket.rounds_won_track2 || 0
+        scoresCsv = `${player1Wins}-${player2Wins}`
+      }
+    } else {
+      // Legacy single race format
+      if (bracket.track1_time && bracket.track2_time) {
+        isReadyForSync = true
+        const isTrack1Winner = bracket.track1_time < bracket.track2_time
+        winnerRacerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
+        scoresCsv = `${bracket.track1_time.toFixed(3)}-${bracket.track2_time.toFixed(3)}`
+      }
+    }
+
+    if (!isReadyForSync) {
+      console.log('Bracket not ready for sync - match not complete')
       return
     }
 
     // Get participant mappings to convert racer IDs to Challonge participant IDs
-    const { data: participants } = await client
+    const { data: participants } = await c
       .from('challonge_participants')
       .select('racer_id, challonge_participant_id')
       .eq('challonge_tournament_id', tournament.id)
@@ -110,9 +142,18 @@ export async function syncBracketToChallonge(
       return
     }
 
-    // Determine winner and loser
-    const isTrack1Winner = bracket.track1_time < bracket.track2_time
-    const winnerRacerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
+    // If we have a previous sync record, check if Challonge already reflects it; if so, skip
+    if (previousSync) {
+      const remoteWinner = matchingMatch.match.winner_id?.toString() || null
+      const expectedWinner = previousSync.winner_participant_id || null
+      // challonge API response doesn't always echo scores_csv; we only compare winner
+      if (remoteWinner === expectedWinner) {
+        console.log(`Challonge already reflects sync for bracket ${bracketId}; skipping update`)
+        return
+      }
+    }
+
+    // Get winner's Challonge participant ID
     const winnerChallongeId = participantMap.get(winnerRacerId)
 
     if (!winnerChallongeId) {
@@ -120,10 +161,7 @@ export async function syncBracketToChallonge(
       return
     }
 
-    // Format scores for Challonge (faster time wins)
-    const scoresCsv = `${bracket.track1_time.toFixed(3)}-${bracket.track2_time.toFixed(3)}`
-
-    // Update the Challonge match
+    // Update the Challonge match (this will also advance winners on Challonge)
     await challongeApi.updateMatch(
       tournament.challonge_tournament_id,
       matchingMatch.match.id.toString(),
@@ -133,23 +171,28 @@ export async function syncBracketToChallonge(
       }
     )
 
-    console.log(`Successfully synced bracket ${bracketId} to Challonge match ${matchingMatch.match.id}`)
+    console.log(
+      `Successfully synced bracket ${bracketId} to Challonge match ${matchingMatch.match.id}`
+    )
     console.log(`Winner: ${winnerChallongeId}, Scores: ${scoresCsv}`)
 
     // Store sync record for tracking
-    await client
-      .from('challonge_match_sync')
-      .upsert({
+    await c.from('challonge_match_sync').upsert(
+      {
         bracket_id: bracketId,
         challonge_tournament_id: tournament.id,
         challonge_match_id: matchingMatch.match.id.toString(),
         synced_at: new Date().toISOString(),
         winner_participant_id: winnerChallongeId,
         scores_csv: scoresCsv
-      }, {
+      },
+      {
         onConflict: 'bracket_id'
-      })
+      }
+    )
 
+    // After reporting the result, refresh upcoming Challonge assignments into internal brackets
+    await refreshUpcomingParticipants(c, tournament.id)
   } catch (error) {
     console.error('Error syncing bracket to Challonge:', error)
     // Don't throw - we don't want to fail the timing operation
@@ -161,48 +204,67 @@ export async function syncBracketToChallonge(
  */
 function findMatchingChallongeMatch(
   bracket: BracketMatch,
-  challongeMatches: any[],
+  challongeMatches: ChallongeApiMatch[],
   participantMap: Map<string, string>
-): any | null {
-  
-  const track1ChallongeId = bracket.track1_racer_id ? participantMap.get(bracket.track1_racer_id) : null
-  const track2ChallongeId = bracket.track2_racer_id ? participantMap.get(bracket.track2_racer_id) : null
+): ChallongeApiMatch | null {
+  const track1ChallongeId = bracket.track1_racer_id
+    ? participantMap.get(bracket.track1_racer_id)
+    : null
+  const track2ChallongeId = bracket.track2_racer_id
+    ? participantMap.get(bracket.track2_racer_id)
+    : null
 
   if (!track1ChallongeId || !track2ChallongeId) {
     return null
   }
+  // Prefer exact challonge_match_id if bracket carries it
+  const preferredId = (bracket as any)?.challonge_match_id
+  if (preferredId) {
+    const exact = challongeMatches.find((m) => m.match.id.toString() === preferredId)
+    if (exact) return exact
+  }
 
-  // Find a match where both participants match (regardless of which side they're on)
-  return challongeMatches.find((match: any) => {
-    const player1 = match.match.player1_id?.toString()
-    const player2 = match.match.player2_id?.toString()
-    
+  // Collect candidate matches where both participants match (side-agnostic)
+  const candidates = challongeMatches.filter((m) => {
+    const player1 = m.match.player1_id?.toString()
+    const player2 = m.match.player2_id?.toString()
     return (
       (player1 === track1ChallongeId && player2 === track2ChallongeId) ||
       (player1 === track2ChallongeId && player2 === track1ChallongeId)
     )
   })
+
+  if (candidates.length === 0) return null
+
+  // Prefer a non-complete match first (for finals/reset scenarios)
+  const open = candidates.find((c) => c.match.state !== 'complete')
+  if (open) return open
+
+  // Otherwise return the most recent by round, then id
+  candidates.sort((a, b) =>
+    a.match.round === b.match.round ? a.match.id - b.match.id : a.match.round - b.match.round
+  )
+  return candidates[candidates.length - 1]
 }
 
 /**
  * Sync all completed brackets for a race to Challonge
  * Useful for bulk sync or recovery scenarios
  */
-export async function syncAllBracketsToChallonge(
-  client: any,
-  raceId: string
-): Promise<void> {
+export async function syncAllBracketsToChallonge(client: any, raceId: string): Promise<void> {
   try {
+    const c: any = client
     console.log(`Starting bulk sync for race ${raceId}`)
 
     // Get all completed brackets for this race
-    const { data: completedBrackets } = await client
+    // Consider a bracket ready if either legacy single (both times present) or best-of-3 completed
+    const { data: completedBrackets } = await c
       .from('brackets')
       .select('id')
       .eq('race_id', raceId)
-      .not('track1_time', 'is', null)
-      .not('track2_time', 'is', null)
-      .not('winner_racer_id', 'is', null)
+      .or(
+        'is_completed.eq.true,and(track1_time.not.is.null,track2_time.not.is.null),winner_racer_id.not.is.null'
+      )
 
     if (!completedBrackets || completedBrackets.length === 0) {
       console.log('No completed brackets found for race')
@@ -213,15 +275,241 @@ export async function syncAllBracketsToChallonge(
 
     // Sync each bracket
     for (const bracket of completedBrackets) {
-      await syncBracketToChallonge(client, raceId, bracket.id)
+      await syncBracketToChallonge(c, raceId, bracket.id)
       // Small delay to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
 
     console.log(`Bulk sync completed for race ${raceId}`)
 
+    // Also refresh upcoming participants based on latest Challonge bracket state
+    const { data: tournament } = await c
+      .from('challonge_tournaments')
+      .select('id')
+      .eq('race_id', raceId)
+      .eq('status', 'active')
+      .single()
+    if (tournament) {
+      await refreshUpcomingParticipants(c, tournament.id)
+    }
   } catch (error) {
     console.error('Error in bulk sync:', error)
     throw error
+  }
+}
+
+/**
+ * Refresh internal brackets' participant slots (track1/track2) from Challonge matches
+ * so that next matches are populated once Challonge advances them.
+ */
+export async function refreshUpcomingParticipants(
+  client: any,
+  tournamentId: string
+): Promise<void> {
+  try {
+    const c: any = client
+    // Load tournament external ID
+    const { data: tournament } = await c
+      .from('challonge_tournaments')
+      .select('id, challonge_tournament_id')
+      .eq('id', tournamentId)
+      .single()
+    if (!tournament) return
+
+    // Fetch all matches and participant mapping
+    const matches = await challongeApi.getMatches(tournament.challonge_tournament_id)
+    const { data: mappings } = await c
+      .from('challonge_participants')
+      .select('challonge_participant_id, racer_id')
+      .eq('challonge_tournament_id', tournamentId)
+
+    const participantToRacer = new Map<string, string>(
+      (mappings || []).map((m: { challonge_participant_id: string | number; racer_id: string }) => [
+        m.challonge_participant_id.toString(),
+        m.racer_id
+      ])
+    )
+
+    // Get withdrawn racers for this race to skip them
+    const { data: withdrawnRacers } = await c
+      .from('race_withdrawals')
+      .select('racer_id')
+      .eq('race_id', tournament.race_id)
+
+    const withdrawnRacerIds = new Set(
+      (withdrawnRacers || []).map((w: { racer_id: string }) => w.racer_id)
+    )
+
+    // Pre-compute Challonge natural order (or suggested_play_order if present)
+    const orderById = new Map<string, number>()
+    matches.forEach((mm: any, idx: number) => {
+      const mid = mm.match.id.toString()
+      const spo = (mm.match as any).suggested_play_order
+      orderById.set(mid, typeof spo === 'number' && spo > 0 ? spo : idx + 1)
+    })
+
+    // For each match, ensure our bracket row has correct racer assignments and match_number
+    for (const m of matches) {
+      const match = m.match
+      const challongeMatchId = match.id.toString()
+
+      // Find internal bracket row by challonge_match_id
+      const { data: bracket } = await c
+        .from('brackets')
+        .select('id, track1_racer_id, track2_racer_id')
+        .eq('challonge_match_id', challongeMatchId)
+        .single()
+
+      if (!bracket) continue
+
+      const track1RacerId = match.player1_id
+        ? participantToRacer.get(match.player1_id.toString()) || null
+        : null
+      const track2RacerId = match.player2_id
+        ? participantToRacer.get(match.player2_id.toString()) || null
+        : null
+
+      // Skip withdrawn racers - don't add them to brackets
+      if (
+        (track1RacerId && withdrawnRacerIds.has(track1RacerId)) ||
+        (track2RacerId && withdrawnRacerIds.has(track2RacerId))
+      ) {
+        console.log(`Skipping bracket update for withdrawn racer in match ${challongeMatchId}`)
+        continue
+      }
+
+      // Build updates: participant slots and match_number if missing/misaligned
+      const updates: any = {}
+      if (
+        (track1RacerId && track1RacerId !== bracket.track1_racer_id) ||
+        (track2RacerId && track2RacerId !== bracket.track2_racer_id)
+      ) {
+        updates.track1_racer_id = track1RacerId
+        updates.track2_racer_id = track2RacerId
+      }
+
+      const desiredOrder = orderById.get(challongeMatchId) || null
+      if (desiredOrder && (!('match_number' in bracket) || bracket.match_number !== desiredOrder)) {
+        updates.match_number = desiredOrder
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await c.from('brackets').update(updates).eq('id', bracket.id)
+      }
+
+      // Ensure best-of-3 bracket rounds exist when both participants are known
+      if (track1RacerId && track2RacerId) {
+        const { data: fullBracket } = await c
+          .from('brackets')
+          .select('id, match_format')
+          .eq('id', bracket.id)
+          .single()
+
+        if (fullBracket && fullBracket.match_format === 'best_of_3') {
+          const { data: existingRounds } = await c
+            .from('bracket_rounds')
+            .select('id')
+            .eq('bracket_id', bracket.id)
+            .limit(1)
+
+          if (!existingRounds || existingRounds.length === 0) {
+            await c.from('bracket_rounds').insert([
+              {
+                bracket_id: bracket.id,
+                round_number: 1,
+                racer1_id: track1RacerId,
+                racer2_id: track2RacerId,
+                racer1_track: 1,
+                racer2_track: 2
+              },
+              {
+                bracket_id: bracket.id,
+                round_number: 2,
+                racer1_id: track1RacerId,
+                racer2_id: track2RacerId,
+                racer1_track: 2,
+                racer2_track: 1
+              },
+              {
+                bracket_id: bracket.id,
+                round_number: 3,
+                racer1_id: track1RacerId,
+                racer2_id: track2RacerId,
+                racer1_track: 1,
+                racer2_track: 2
+              }
+            ])
+          } else {
+            // Update existing rounds to ensure racer IDs match current bracket participants
+            await c
+              .from('bracket_rounds')
+              .update({ racer1_id: track1RacerId, racer2_id: track2RacerId })
+              .eq('bracket_id', bracket.id)
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.error('Error refreshing upcoming participants from Challonge:', err)
+    // non-fatal
+  }
+}
+
+/**
+ * Seed internal brackets from Challonge matches for a race.
+ */
+export async function seedBracketsFromChallonge(client: any, raceId: string): Promise<void> {
+  try {
+    const c: any = client
+
+    const { data: tournament } = await c
+      .from('challonge_tournaments')
+      .select('id, challonge_tournament_id, status')
+      .eq('race_id', raceId)
+      .eq('status', 'active')
+      .single()
+
+    if (!tournament) return
+
+    const matches = await challongeApi.getMatches(tournament.challonge_tournament_id)
+
+    const { data: existing } = await c
+      .from('brackets')
+      .select('id, challonge_match_id')
+      .eq('race_id', raceId)
+
+    const existingSet = new Set<string>((existing || []).map((b: any) => b.challonge_match_id))
+
+    const toInsert: any[] = []
+    matches.forEach((m: any, idx: number) => {
+      const match = m.match
+      const challongeMatchId = match.id.toString()
+      if (existingSet.has(challongeMatchId)) return
+
+      const group = match.round < 0 ? 'loser' : 'winner'
+      const roundNumber = Math.abs(match.round)
+      const suggestedOrder = (match as any).suggested_play_order
+      const matchNumber =
+        typeof suggestedOrder === 'number' && suggestedOrder > 0 ? suggestedOrder : idx + 1
+
+      toInsert.push({
+        race_id: raceId,
+        bracket_type: 'double_elimination',
+        bracket_group: group,
+        round_number: roundNumber,
+        match_number: matchNumber,
+        match_format: 'best_of_3',
+        total_rounds: 3,
+        current_round: 1,
+        challonge_match_id: challongeMatchId,
+        challonge_round: match.round
+      })
+    })
+
+    if (toInsert.length > 0) {
+      await c.from('brackets').insert(toInsert)
+    }
+  } catch (err) {
+    console.error('Error seeding brackets from Challonge:', err)
   }
 }

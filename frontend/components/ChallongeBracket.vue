@@ -5,22 +5,18 @@
       <ProgressSpinner />
       <p class="mt-4 text-gray-600">Loading tournament bracket...</p>
     </div>
-    
+
     <!-- Error State -->
     <div v-else-if="error" class="text-center py-12">
       <i class="pi pi-exclamation-triangle text-4xl text-red-500 mb-4" />
       <h3 class="text-xl font-semibold text-red-700 mb-2">Tournament Error</h3>
       <p class="text-red-600 mb-4">{{ error }}</p>
-      <Button 
-        severity="secondary"
-        size="small"
-        @click="refreshBracket"
-      >
+      <Button severity="secondary" size="small" @click="refreshBracket">
         <i class="pi pi-refresh mr-2" />
         Retry
       </Button>
     </div>
-    
+
     <!-- Tournament Display -->
     <div v-else-if="tournament && embedUrl" class="bracket-wrapper">
       <!-- Bracket Header -->
@@ -38,10 +34,10 @@
               </p>
             </div>
           </div>
-          
+
           <div class="flex items-center gap-2">
-            <Button 
-              size="small" 
+            <Button
+              size="small"
               severity="secondary"
               :loading="refreshing"
               class="bg-white/20 border-white/30 text-white hover:bg-white/30"
@@ -50,8 +46,8 @@
               <i class="pi pi-refresh mr-1" />
               <span class="hidden sm:inline">Refresh</span>
             </Button>
-            <Button 
-              size="small" 
+            <Button
+              size="small"
               severity="secondary"
               class="bg-white/20 border-white/30 text-white hover:bg-white/30"
               @click="openFullBracket"
@@ -61,11 +57,13 @@
             </Button>
           </div>
         </div>
-        
+
         <!-- Tournament Stats -->
         <div v-if="tournamentStatus" class="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div class="bg-white/10 rounded-lg p-3">
-            <div class="text-lg font-bold text-white">{{ tournamentStatus.participants?.count || 0 }}</div>
+            <div class="text-lg font-bold text-white">
+              {{ tournamentStatus.participants?.count || 0 }}
+            </div>
             <div class="text-blue-100 text-xs">Participants</div>
           </div>
           <div class="bg-white/10 rounded-lg p-3">
@@ -86,28 +84,28 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Iframe Container -->
       <div class="iframe-container">
-        <iframe 
+        <iframe
           :src="embedUrl"
-          width="100%" 
-          height="600" 
-          frameborder="0" 
-          scrolling="auto" 
+          width="100%"
+          height="600"
+          frameborder="0"
+          scrolling="auto"
           allowtransparency="true"
           class="challonge-iframe"
           :class="{ 'opacity-50': refreshing }"
           @load="onIframeLoad"
         />
-        
+
         <!-- Iframe Loading Overlay -->
         <div v-if="iframeLoading" class="iframe-loading-overlay">
           <ProgressSpinner />
           <p class="mt-2 text-gray-600">Loading bracket...</p>
         </div>
       </div>
-      
+
       <!-- Tournament Footer -->
       <div class="bracket-footer">
         <div class="flex items-center justify-between text-sm">
@@ -120,7 +118,10 @@
               <i class="pi pi-clock" />
               <span>Last updated: {{ formatLastUpdate() }}</span>
             </div>
-            <div v-if="tournament.status === 'active'" class="flex items-center gap-1 text-green-600">
+            <div
+              v-if="tournament.status === 'active'"
+              class="flex items-center gap-1 text-green-600"
+            >
               <i class="pi pi-circle-fill animate-pulse" />
               <span class="font-medium">Live Updates</span>
             </div>
@@ -128,17 +129,17 @@
         </div>
       </div>
     </div>
-    
+
     <!-- No Tournament State -->
-    <div v-else class="text-center py-12 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg">
+    <div
+      v-else
+      class="text-center py-12 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg"
+    >
       <i class="pi pi-trophy text-4xl text-gray-400 mb-4" />
       <h3 class="text-xl font-semibold text-gray-700 mb-2">No Tournament Available</h3>
       <p class="text-gray-600 mb-4">The tournament bracket has not been created yet.</p>
       <div v-if="showAdminLink" class="mt-4">
-        <Button 
-          class="btn-primary"
-          @click="navigateTo(`/races/${raceSlug}/admin/challonge`)"
-        >
+        <Button class="btn-primary" @click="navigateTo(`/races/${raceSlug}/admin/challonge`)">
           <i class="pi pi-plus mr-2" />
           Create Tournament
         </Button>
@@ -197,7 +198,7 @@ let refreshInterval: NodeJS.Timeout | null = null
 // Computed
 const embedUrl = computed(() => {
   if (!tournament.value?.embed_url) return null
-  
+
   // Add custom parameters for better integration
   const params = new URLSearchParams({
     multiplier: '0.9',
@@ -206,7 +207,7 @@ const embedUrl = computed(() => {
     theme: '1',
     show_standings: '1'
   })
-  
+
   return `${tournament.value.embed_url}?${params.toString()}`
 })
 
@@ -214,7 +215,7 @@ const embedUrl = computed(() => {
 const loadTournament = async () => {
   loading.value = true
   error.value = null
-  
+
   try {
     // Get race ID if not provided
     let raceId = props.raceId
@@ -222,10 +223,10 @@ const loadTournament = async () => {
       const { data: raceData } = await $fetch(`/api/races/by-slug/${props.raceSlug}`)
       raceId = (raceData as Race).id
     }
-    
+
     // Get tournament data
     tournament.value = await getTournamentByRace(raceId)
-    
+
     if (tournament.value?.id) {
       // Get tournament status
       tournamentStatus.value = await getTournamentStatus(tournament.value.id)
@@ -246,15 +247,15 @@ const refreshBracket = async () => {
     await loadTournament()
     return
   }
-  
+
   refreshing.value = true
   iframeLoading.value = true
-  
+
   try {
     // Refresh tournament status
     tournamentStatus.value = await getTournamentStatus(tournament.value.id)
     lastUpdate.value = new Date()
-    
+
     // Force iframe reload by updating src
     const iframe = document.querySelector('.challonge-iframe') as HTMLIFrameElement
     if (iframe && iframe.src) {
@@ -315,12 +316,15 @@ onUnmounted(() => {
 })
 
 // Watch for tournament status changes
-watch(() => tournament.value?.status, (newStatus, oldStatus) => {
-  if (newStatus !== oldStatus) {
-    clearAutoRefresh()
-    setupAutoRefresh()
+watch(
+  () => tournament.value?.status,
+  (newStatus, oldStatus) => {
+    if (newStatus !== oldStatus) {
+      clearAutoRefresh()
+      setupAutoRefresh()
+    }
   }
-})
+)
 </script>
 
 <style scoped>
@@ -380,11 +384,11 @@ watch(() => tournament.value?.status, (newStatus, oldStatus) => {
   .bracket-header {
     padding: 1rem;
   }
-  
+
   .bracket-footer {
     padding: 0.75rem 1rem;
   }
-  
+
   .challonge-iframe {
     height: 500px;
   }
@@ -392,7 +396,8 @@ watch(() => tournament.value?.status, (newStatus, oldStatus) => {
 
 /* Animation for live indicator */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

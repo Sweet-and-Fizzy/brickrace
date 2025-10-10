@@ -176,7 +176,7 @@
                   :src="sponsor.logo_url"
                   :alt="`${sponsor.name} logo`"
                   class="w-full h-full object-contain"
-                >
+                />
                 <span v-else class="text-gray-600 text-sm px-2">{{ sponsor.name }}</span>
               </a>
             </div>
@@ -184,7 +184,7 @@
               to="/sponsors"
               class="text-gray-300 hover:text-white transition-colors text-sm inline-flex items-center"
             >
-              <i class="pi pi-external-link mr-2"/>
+              <i class="pi pi-external-link mr-2" />
               View All Sponsors
             </NuxtLink>
           </div>

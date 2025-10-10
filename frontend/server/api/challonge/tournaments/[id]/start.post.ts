@@ -49,12 +49,14 @@ export default defineEventHandler(async (event) => {
     }
 
     // Start tournament on Challonge
-    const challongeTournament = await challongeApi.startTournament(tournament.challonge_tournament_id)
+    const challongeTournament = await challongeApi.startTournament(
+      tournament.challonge_tournament_id
+    )
 
     // Update tournament status in our database
     const { data: updatedTournament, error: updateError } = await client
       .from('challonge_tournaments')
-      .update({ 
+      .update({
         status: 'active',
         updated_at: new Date().toISOString()
       })
@@ -84,7 +86,7 @@ export default defineEventHandler(async (event) => {
       },
       matches: {
         total: matches.length,
-        first_round: matches.filter(m => m.match.round === 1).length
+        first_round: matches.filter((m) => m.match.round === 1).length
       },
       summary: {
         participants: participantCount,
@@ -95,7 +97,7 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error: any) {
     console.error('Tournament start error:', error)
-    
+
     // Handle Challonge-specific errors
     if (error.message?.includes('Challonge API Error')) {
       throw createError({

@@ -4,15 +4,12 @@
       <!-- Page Header -->
       <div class="mb-8">
         <div class="flex items-center gap-3 mb-4">
-          <NuxtLink 
-            :to="`/races/${route.params.slug}`"
-            class="text-gray-500 hover:text-gray-700"
-          >
+          <NuxtLink :to="`/races/${route.params.slug}`" class="text-gray-500 hover:text-gray-700">
             <i class="pi pi-arrow-left text-lg" />
           </NuxtLink>
           <h1 class="text-3xl font-bold text-black">Challonge Tournament Management</h1>
         </div>
-        
+
         <div v-if="race" class="bg-white border-2 border-gray-200 rounded-lg p-4">
           <div class="flex items-center gap-3">
             <i class="pi pi-flag text-brand-blue text-xl" />
@@ -34,11 +31,7 @@
       <div v-else-if="pageError" class="text-center py-12">
         <i class="pi pi-exclamation-triangle text-4xl text-red-500 mb-4" />
         <p class="text-red-600 font-medium">{{ pageError }}</p>
-        <Button 
-          class="mt-4"
-          severity="secondary"
-          @click="initializePage"
-        >
+        <Button class="mt-4" severity="secondary" @click="initializePage">
           <i class="pi pi-refresh mr-2" />
           Retry
         </Button>
@@ -58,7 +51,8 @@
             <div class="space-y-6">
               <p class="text-gray-700">
                 Create a professional tournament bracket on Challonge for your qualified racers.
-                This will provide a beautiful, interactive bracket that spectators can follow in real-time.
+                This will provide a beautiful, interactive bracket that spectators can follow in
+                real-time.
               </p>
 
               <!-- Tournament Readiness Summary -->
@@ -69,17 +63,23 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                   <div class="text-center">
-                    <div class="text-2xl font-bold text-green-600">{{ eligibleRacers.eligible_racers?.length || 0 }}</div>
+                    <div class="text-2xl font-bold text-green-600">
+                      {{ eligibleRacers.eligible_racers?.length || 0 }}
+                    </div>
                     <div class="text-gray-600">Ready for Brackets</div>
                     <div class="text-xs text-gray-500 mt-1">Has qualifying times</div>
                   </div>
                   <div class="text-center">
-                    <div class="text-2xl font-bold text-blue-600">{{ eligibleRacers.summary?.total_checked_in || 0 }}</div>
+                    <div class="text-2xl font-bold text-blue-600">
+                      {{ eligibleRacers.summary?.total_checked_in || 0 }}
+                    </div>
                     <div class="text-gray-600">Checked In</div>
                     <div class="text-xs text-gray-500 mt-1">Present at race</div>
                   </div>
                   <div class="text-center">
-                    <div class="text-2xl font-bold text-amber-600">{{ eligibleRacers.summary?.not_qualified || 0 }}</div>
+                    <div class="text-2xl font-bold text-amber-600">
+                      {{ eligibleRacers.summary?.not_qualified || 0 }}
+                    </div>
                     <div class="text-gray-600">Need Qualifying</div>
                     <div class="text-xs text-gray-500 mt-1">No times recorded yet</div>
                   </div>
@@ -89,28 +89,32 @@
               <!-- Tournament Form -->
               <form class="space-y-4" @submit.prevent="createChallongeTournament">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Tournament Name</label>
-                  <InputText 
-                    v-model="tournamentForm.name" 
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Tournament Name</label
+                  >
+                  <InputText
+                    v-model="tournamentForm.name"
                     class="w-full"
                     placeholder="e.g., The 2025 Brick Race - Elimination Brackets"
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                  <Textarea 
-                    v-model="tournamentForm.description" 
-                    class="w-full" 
+                  <Textarea
+                    v-model="tournamentForm.description"
+                    class="w-full"
                     rows="3"
                     placeholder="Brief description of the tournament"
                   />
                 </div>
 
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Tournament Type</label>
-                  <Select 
+                  <label class="block text-sm font-medium text-gray-700 mb-2"
+                    >Tournament Type</label
+                  >
+                  <Select
                     v-model="tournamentForm.tournament_type"
                     :options="tournamentTypes"
                     option-label="label"
@@ -120,7 +124,7 @@
                 </div>
 
                 <div class="flex justify-end gap-3 pt-4">
-                  <Button 
+                  <Button
                     type="submit"
                     :loading="challongeLoading"
                     :disabled="!canCreateTournament"
@@ -145,8 +149,8 @@
                   <i class="pi pi-trophy text-brand-gold" />
                   Tournament Details
                 </div>
-                <Badge 
-                  :value="tournament.status" 
+                <Badge
+                  :value="tournament.status"
                   :severity="getStatusSeverity(tournament.status)"
                 />
               </div>
@@ -160,7 +164,9 @@
                   </div>
                   <div>
                     <label class="text-sm font-medium text-gray-600">Type</label>
-                    <p class="font-semibold capitalize">{{ tournament.tournament_type.replace('_', ' ') }}</p>
+                    <p class="font-semibold capitalize">
+                      {{ tournament.tournament_type.replace('_', ' ') }}
+                    </p>
                   </div>
                   <div>
                     <label class="text-sm font-medium text-gray-600">Status</label>
@@ -171,12 +177,10 @@
                   <div>
                     <label class="text-sm font-medium text-gray-600">Public URL</label>
                     <div class="flex items-center gap-2">
-                      <code class="text-sm bg-gray-100 px-2 py-1 rounded">challonge.com/{{ tournament.challonge_url }}</code>
-                      <Button 
-                        size="small"
-                        severity="secondary"
-                        @click="openChallongeUrl"
+                      <code class="text-sm bg-gray-100 px-2 py-1 rounded"
+                        >challonge.com/{{ tournament.challonge_url }}</code
                       >
+                      <Button size="small" severity="secondary" @click="openChallongeUrl">
                         <i class="pi pi-external-link" />
                       </Button>
                     </div>
@@ -200,15 +204,21 @@
             </template>
             <template #content>
               <div class="space-y-4">
-                <div v-if="!participantsAdded" class="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <div
+                  v-if="!participantsAdded"
+                  class="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-lg"
+                >
                   <div class="flex items-center gap-3">
                     <i class="pi pi-info-circle text-amber-600" />
                     <div>
                       <p class="font-medium text-amber-800">Ready to add racers to tournament</p>
-                      <p class="text-sm text-amber-700">{{ eligibleRacers?.eligible_racers?.length || 0 }} racers have qualifying times and can be added to the elimination brackets.</p>
+                      <p class="text-sm text-amber-700">
+                        {{ eligibleRacers?.eligible_racers?.length || 0 }} racers have qualifying
+                        times and can be added to the elimination brackets.
+                      </p>
                     </div>
                   </div>
-                  <Button 
+                  <Button
                     :loading="challongeLoading"
                     class="btn-primary"
                     @click="addEligibleRacers"
@@ -223,7 +233,10 @@
                     <i class="pi pi-check-circle text-green-600" />
                     <div>
                       <p class="font-medium text-green-800">Participants Added</p>
-                      <p class="text-sm text-green-700">{{ tournamentStatus?.participants?.count || 0 }} racers have been added to the tournament.</p>
+                      <p class="text-sm text-green-700">
+                        {{ tournamentStatus?.participants?.count || 0 }} racers have been added to
+                        the tournament.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -240,15 +253,19 @@
               </div>
             </template>
             <template #content>
-              <div class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div
+                class="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg"
+              >
                 <div class="flex items-center gap-3">
                   <i class="pi pi-rocket text-green-600" />
                   <div>
                     <p class="font-medium text-green-800">Ready to Start</p>
-                    <p class="text-sm text-green-700">All participants have been added. You can now start the tournament brackets.</p>
+                    <p class="text-sm text-green-700">
+                      All participants have been added. You can now start the tournament brackets.
+                    </p>
                   </div>
                 </div>
-                <Button 
+                <Button
                   :loading="challongeLoading"
                   severity="success"
                   class="font-semibold"
@@ -273,16 +290,15 @@
               <div class="text-center py-6">
                 <i class="pi pi-external-link text-4xl text-brand-blue mb-4" />
                 <h3 class="text-xl font-semibold mb-2">Tournament is Live!</h3>
-                <p class="text-gray-600 mb-6">The tournament brackets are now active and can be viewed by spectators.</p>
+                <p class="text-gray-600 mb-6">
+                  The tournament brackets are now active and can be viewed by spectators.
+                </p>
                 <div class="flex justify-center gap-3">
-                  <Button 
-                    class="btn-primary"
-                    @click="openChallongeUrl"
-                  >
+                  <Button class="btn-primary" @click="openChallongeUrl">
                     <i class="pi pi-external-link mr-2" />
                     View Live Bracket
                   </Button>
-                  <Button 
+                  <Button
                     severity="secondary"
                     @click="navigateTo(`/races/${route.params.slug}/brackets`)"
                   >
@@ -312,10 +328,13 @@
                       <div>
                         <p class="font-medium text-blue-800">Auto-Sync Active</p>
                         <p class="text-sm text-blue-700">
-                          Bracket results are automatically synced to Challonge when timing system records times.
+                          Bracket results are automatically synced to Challonge when timing system
+                          records times.
                           <span v-if="syncStatus">
-                            {{ syncStatus.total_synced || 0 }}/{{ syncStatus.total_completed || 0 }} brackets synced
-                            ({{ syncStatus.sync_coverage || '0%' }})
+                            {{ syncStatus.total_synced || 0 }}/{{
+                              syncStatus.total_completed || 0
+                            }}
+                            brackets synced ({{ syncStatus.sync_coverage || '0%' }})
                           </span>
                         </p>
                       </div>
@@ -334,27 +353,15 @@
 
                 <!-- Manual Sync Controls -->
                 <div class="flex gap-3 flex-wrap">
-                  <Button
-                    :loading="syncLoading"
-                    severity="secondary"
-                    @click="manualSync(false)"
-                  >
+                  <Button :loading="syncLoading" severity="secondary" @click="manualSync(false)">
                     <i class="pi pi-sync mr-2" />
                     Sync Missing Brackets
                   </Button>
-                  <Button
-                    :loading="syncLoading"
-                    severity="warning"
-                    @click="manualSync(true)"
-                  >
+                  <Button :loading="syncLoading" severity="warning" @click="manualSync(true)">
                     <i class="pi pi-replay mr-2" />
                     Force Re-sync All
                   </Button>
-                  <Button
-                    :loading="syncLoading"
-                    severity="danger"
-                    @click="regenerateBrackets"
-                  >
+                  <Button :loading="syncLoading" severity="danger" @click="regenerateBrackets">
                     <i class="pi pi-refresh mr-2" />
                     Regenerate Brackets
                   </Button>
@@ -393,7 +400,15 @@ definePageMeta({
 })
 
 const route = useRoute()
-const { createTournament, addParticipants, startTournament, getTournamentStatus, getEligibleRacers, loading: challongeLoading, error: challongeError } = useChallonge()
+const {
+  createTournament,
+  addParticipants,
+  startTournament,
+  getTournamentStatus,
+  getEligibleRacers,
+  loading: challongeLoading,
+  error: challongeError
+} = useChallonge()
 const notifications = useNotifications()
 
 // Page state
@@ -423,16 +438,19 @@ const tournamentTypes = [
 
 // Computed
 const canCreateTournament = computed(() => {
-  return tournamentForm.value.name.trim() && 
-         eligibleRacers.value?.eligible_racers?.length >= 2
+  return tournamentForm.value.name.trim() && eligibleRacers.value?.eligible_racers?.length >= 2
 })
 
 const getStatusSeverity = (status) => {
   switch (status) {
-    case 'pending': return 'warn'
-    case 'active': return 'success'
-    case 'completed': return 'info'
-    default: return 'secondary'
+    case 'pending':
+      return 'warn'
+    case 'active':
+      return 'success'
+    case 'completed':
+      return 'info'
+    default:
+      return 'secondary'
   }
 }
 
@@ -440,7 +458,7 @@ const getStatusSeverity = (status) => {
 const initializePage = async () => {
   pageLoading.value = true
   pageError.value = null
-  
+
   try {
     // Get race data
     const { data: raceData } = await $fetch(`/api/races/by-slug/${route.params.slug}`)
@@ -457,11 +475,11 @@ const initializePage = async () => {
     try {
       const tournamentData = await $fetch(`/api/challonge/tournaments/by-race/${race.value.id}`)
       tournament.value = tournamentData.data
-      
+
       if (tournament.value) {
         tournamentStatus.value = await getTournamentStatus(tournament.value.id)
         participantsAdded.value = (tournamentStatus.value.participants?.count || 0) > 0
-        
+
         // Load sync status if tournament is active
         if (tournament.value.status === 'active') {
           await refreshSyncStatus()
@@ -485,10 +503,10 @@ const createChallongeTournament = async () => {
   try {
     const result = await createTournament(race.value.id, tournamentForm.value)
     tournament.value = result.tournament
-    
+
     // Refresh tournament status
     await refreshTournamentStatus()
-    
+
     // Show success message
     // Show success message
     notifications.success('Tournament created successfully!')
@@ -503,10 +521,10 @@ const addEligibleRacers = async () => {
   try {
     const result = await addParticipants(tournament.value.id, eligibleRacers.value.eligible_racers)
     participantsAdded.value = true
-    
+
     // Refresh tournament status
     await refreshTournamentStatus()
-    
+
     notifications.success(`Added ${result.summary?.added || 0} participants to tournament`)
   } catch (error) {
     console.error('Add participants error:', error)
@@ -518,24 +536,34 @@ const startChallongeTournament = async () => {
   try {
     const result = await startTournament(tournament.value.id)
     tournament.value = result.tournament
-    
+
     // Generate brackets from Challonge tournament structure
     console.log('Generating brackets from Challonge tournament structure...')
     try {
-      const bracketResult = await $fetch(`/api/challonge/tournaments/${tournament.value.id}/generate-brackets`, {
-        method: 'POST'
-      })
-      
+      // Wait a moment for Challonge to generate matches
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+
+      const bracketResult = await $fetch(
+        `/api/challonge/tournaments/${tournament.value.id}/generate-brackets`,
+        {
+          method: 'POST'
+        }
+      )
+
       console.log(`Generated ${bracketResult.summary.brackets_generated} brackets`)
-      notifications.success(`Tournament started! Generated ${bracketResult.summary.brackets_generated} brackets from Challonge structure.`)
+      notifications.success(
+        `Tournament started! Generated ${bracketResult.summary.brackets_generated} brackets from Challonge structure.`
+      )
     } catch (bracketError) {
       console.error('Failed to generate brackets:', bracketError)
-      notifications.warn('Tournament started but bracket generation failed. Please try manual sync.')
+      notifications.warning(
+        'Tournament started but bracket generation failed',
+        'Please try the "Regenerate Brackets" button below.'
+      )
     }
-    
+
     // Refresh tournament status
     await refreshTournamentStatus()
-    
   } catch (error) {
     console.error('Tournament start error:', error)
     notifications.error(challongeError.value || 'Failed to start tournament')
@@ -546,7 +574,7 @@ const refreshTournamentStatus = async () => {
   if (tournament.value) {
     try {
       tournamentStatus.value = await getTournamentStatus(tournament.value.id)
-      
+
       // Also refresh sync status if tournament is active
       if (tournament.value.status === 'active') {
         await refreshSyncStatus()
@@ -589,15 +617,18 @@ const formatTime = (dateString) => {
 // Sync functions
 const refreshSyncStatus = async () => {
   if (!tournament.value) return
-  
+
   syncLoading.value = true
   try {
-    const response = await $fetch(`/api/challonge/tournaments/${tournament.value.id}/sync-brackets`, {
-      method: 'POST',
-      body: { 
-        force_resync: false
+    const response = await $fetch(
+      `/api/challonge/tournaments/${tournament.value.id}/sync-brackets`,
+      {
+        method: 'POST',
+        body: {
+          force_resync: false
+        }
       }
-    })
+    )
     syncStatus.value = response.summary
     syncStatus.value.sync_records = response.sync_records
   } catch (error) {
@@ -610,23 +641,25 @@ const refreshSyncStatus = async () => {
 
 const manualSync = async (forceResync = false) => {
   if (!tournament.value) return
-  
+
   syncLoading.value = true
   try {
-    const response = await $fetch(`/api/challonge/tournaments/${tournament.value.id}/sync-brackets`, {
-      method: 'POST',
-      body: { 
-        force_resync: forceResync
+    const response = await $fetch(
+      `/api/challonge/tournaments/${tournament.value.id}/sync-brackets`,
+      {
+        method: 'POST',
+        body: {
+          force_resync: forceResync
+        }
       }
-    })
-    
+    )
+
     syncStatus.value = response.summary
     syncStatus.value.sync_records = response.sync_records
-    
+
     const action = forceResync ? 'Re-synced' : 'Synced'
     const count = response.sync_results?.length || 0
     notifications.success(`${action} ${count} bracket(s) to Challonge`)
-    
   } catch (error) {
     console.error('Manual sync failed:', error)
     notifications.error('Failed to sync brackets to Challonge')
@@ -637,30 +670,34 @@ const manualSync = async (forceResync = false) => {
 
 const regenerateBrackets = async () => {
   if (!tournament.value) return
-  
+
   const confirmed = confirm(
     'This will replace all existing brackets with new ones from Challonge tournament structure. ' +
-    'Any recorded times will be lost. Are you sure?'
+      'Any recorded times will be lost. Are you sure?'
   )
-  
+
   if (!confirmed) return
-  
+
   syncLoading.value = true
   try {
-    const response = await $fetch(`/api/challonge/tournaments/${tournament.value.id}/generate-brackets`, {
-      method: 'POST'
-    })
-    
+    const response = await $fetch(
+      `/api/challonge/tournaments/${tournament.value.id}/generate-brackets`,
+      {
+        method: 'POST'
+      }
+    )
+
     notifications.success(
       `Regenerated ${response.summary.brackets_generated} brackets from Challonge structure`
     )
-    
+
     // Refresh sync status
     await refreshSyncStatus()
-    
   } catch (error) {
     console.error('Bracket regeneration failed:', error)
-    notifications.error('Failed to regenerate brackets from Challonge')
+    const errorMessage =
+      error?.data?.error || error?.data?.message || error?.message || 'Unknown error'
+    notifications.error('Failed to regenerate brackets', errorMessage)
   } finally {
     syncLoading.value = false
   }

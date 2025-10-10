@@ -67,7 +67,7 @@
             <i class="pi pi-pencil mr-2 text-gray-600" />
             Edit Race
           </NuxtLink>
-          <hr class="my-2 border-gray-200" >
+          <hr class="my-2 border-gray-200" />
         </template>
 
         <!-- General admin items -->

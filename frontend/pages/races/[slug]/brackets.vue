@@ -55,7 +55,7 @@
 
         <!-- Challonge Tournament Bracket -->
         <div class="mb-8">
-          <ChallongeBracket 
+          <ChallongeBracket
             :race-slug="route.params.slug"
             :race-id="race.id"
             :show-admin-link="authStore.isRaceAdmin"
@@ -79,19 +79,12 @@
                     Manage tournament brackets and view administrative tools.
                   </p>
                   <div class="flex gap-3">
-                    <Button 
+                    <Button
                       class="btn-primary"
                       @click="navigateTo(`/races/${route.params.slug}/admin/challonge`)"
                     >
                       <i class="pi pi-trophy mr-2" />
                       Manage Challonge Tournament
-                    </Button>
-                    <Button 
-                      severity="secondary"
-                      @click="navigateTo(`/races/${route.params.slug}/brackets`)"
-                    >
-                      <i class="pi pi-sitemap mr-2" />
-                      Traditional Brackets
                     </Button>
                   </div>
                 </div>
@@ -501,7 +494,50 @@
                         >
                           Winner R{{ bracket.round_number }}
                         </div>
-                        <h3 class="text-xl font-bold text-black">Match #{{ index + 1 }}</h3>
+                        <h3 class="text-xl font-bold text-black">
+                          Match #{{ bracket.match_number || index + 1 }}
+                        </h3>
+                        <!-- Best of 3 indicator -->
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-semibold"
+                        >
+                          Best of 3
+                        </div>
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold"
+                        >
+                          Round {{ bracket.current_round || 1 }}/{{ bracket.total_rounds || 3 }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Round Progress for Best of 3 -->
+                    <div
+                      v-if="bracket.match_format === 'best_of_3'"
+                      class="mb-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200"
+                    >
+                      <div class="flex items-center justify-between text-sm">
+                        <span class="font-medium text-purple-800">Round Progress:</span>
+                        <div class="flex items-center gap-2">
+                          <span class="text-blue-600 font-semibold">
+                            {{ bracket.track1_racer_name || 'Player 1' }}:
+                            {{ bracket.rounds_won_track1 || 0 }}
+                          </span>
+                          <span class="text-gray-400">-</span>
+                          <span class="text-red-600 font-semibold">
+                            {{ bracket.track2_racer_name || 'Player 2' }}:
+                            {{ bracket.rounds_won_track2 || 0 }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="mt-2 text-xs text-purple-600">
+                        {{
+                          bracket.is_completed
+                            ? 'Match Complete!'
+                            : `Current Round: ${bracket.current_round || 1}`
+                        }}
                       </div>
                     </div>
                     <!-- Bracket Race Content -->
@@ -519,12 +555,12 @@
                           </div>
                           <div v-if="bracket.track1_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track1_racer_name }}
+                              {{ trackRacerName(bracket, 1) || bracket.track1_racer_name }}
                             </div>
                             <div
                               class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track1_racer_number }}
+                              #{{ trackRacerNumber(bracket, 1) || bracket.track1_racer_number }}
                             </div>
                             <div v-if="bracket.track1_time" class="text-lg font-bold text-blue-600">
                               {{ formatTime(bracket.track1_time) }}
@@ -567,12 +603,12 @@
                           </div>
                           <div v-if="bracket.track2_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track2_racer_name }}
+                              {{ trackRacerName(bracket, 2) || bracket.track2_racer_name }}
                             </div>
                             <div
                               class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track2_racer_number }}
+                              #{{ trackRacerNumber(bracket, 2) || bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-red-600">
                               {{ formatTime(bracket.track2_time) }}
@@ -597,18 +633,28 @@
                     </div>
 
                     <!-- Double Withdrawal Resolution -->
-                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                    <div
+                      v-if="
+                        !bracket.is_forfeit &&
+                        !bracket.winner_racer_id &&
+                        isBothRacersWithdrawn(bracket) &&
+                        authStore.isRaceAdmin
+                      "
+                      class="mt-4 text-center"
+                    >
                       <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
                         <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
                           <i class="pi pi-exclamation-triangle text-lg" />
                           <span class="font-bold">DOUBLE WITHDRAWAL</span>
                         </div>
-                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
-                        
+                        <p class="text-sm text-red-600 mb-4">
+                          Both racers have withdrawn. Admin intervention required.
+                        </p>
+
                         <div class="flex flex-col gap-2">
                           <Button
                             label="Mark as Bye (No Advancement)"
-                            severity="secondary" 
+                            severity="secondary"
                             size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
@@ -616,7 +662,7 @@
                           <Button
                             label="Manual Selection..."
                             severity="primary"
-                            size="small" 
+                            size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="showManualSelection(bracket)"
                           />
@@ -637,10 +683,7 @@
                     </div>
 
                     <!-- Winner Display -->
-                    <div
-                      v-else-if="bracket.track1_time && bracket.track2_time"
-                      class="mt-6 text-center"
-                    >
+                    <div v-else-if="bracket.is_completed" class="mt-6 text-center">
                       <div
                         class="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl p-4"
                       >
@@ -650,7 +693,9 @@
                             Winner
                           </p>
                         </div>
-                        <p class="font-bold text-xl text-yellow-900">{{ getWinner(bracket) }}</p>
+                        <p class="font-bold text-xl text-yellow-900">
+                          {{ getWinnerName(bracket) }}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -681,8 +726,49 @@
                           Loser R{{ bracket.round_number }}
                         </div>
                         <h3 class="text-xl font-bold text-black">
-                          Elimination Match #{{ index + 1 }}
+                          Elimination Match #{{ bracket.match_number || index + 1 }}
                         </h3>
+                        <!-- Best of 3 indicator -->
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-100 text-purple-700 px-2 py-1 rounded-lg text-xs font-semibold"
+                        >
+                          Best of 3
+                        </div>
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold"
+                        >
+                          Round {{ bracket.current_round || 1 }}/{{ bracket.total_rounds || 3 }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Round Progress for Best of 3 -->
+                    <div
+                      v-if="bracket.match_format === 'best_of_3'"
+                      class="mb-4 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200"
+                    >
+                      <div class="flex items-center justify-between text-sm">
+                        <span class="font-medium text-purple-800">Round Progress:</span>
+                        <div class="flex items-center gap-2">
+                          <span class="text-blue-600 font-semibold">
+                            {{ bracket.track1_racer_name || 'Player 1' }}:
+                            {{ bracket.rounds_won_track1 || 0 }}
+                          </span>
+                          <span class="text-gray-400">-</span>
+                          <span class="text-red-600 font-semibold">
+                            {{ bracket.track2_racer_name || 'Player 2' }}:
+                            {{ bracket.rounds_won_track2 || 0 }}
+                          </span>
+                        </div>
+                      </div>
+                      <div class="mt-2 text-xs text-purple-600">
+                        {{
+                          bracket.is_completed
+                            ? 'Match Complete!'
+                            : `Current Round: ${bracket.current_round || 1}`
+                        }}
                       </div>
                     </div>
                     <!-- Similar bracket content but for loser bracket -->
@@ -700,12 +786,12 @@
                           </div>
                           <div v-if="bracket.track1_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track1_racer_name }}
+                              {{ trackRacerName(bracket, 1) || bracket.track1_racer_name }}
                             </div>
                             <div
                               class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track1_racer_number }}
+                              #{{ trackRacerNumber(bracket, 1) || bracket.track1_racer_number }}
                             </div>
                             <div v-if="bracket.track1_time" class="text-lg font-bold text-blue-600">
                               {{ formatTime(bracket.track1_time) }}
@@ -748,12 +834,12 @@
                           </div>
                           <div v-if="bracket.track2_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track2_racer_name }}
+                              {{ trackRacerName(bracket, 2) || bracket.track2_racer_name }}
                             </div>
                             <div
                               class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track2_racer_number }}
+                              #{{ trackRacerNumber(bracket, 2) || bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-red-600">
                               {{ formatTime(bracket.track2_time) }}
@@ -778,18 +864,28 @@
                     </div>
 
                     <!-- Double Withdrawal Resolution -->
-                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                    <div
+                      v-if="
+                        !bracket.is_forfeit &&
+                        !bracket.winner_racer_id &&
+                        isBothRacersWithdrawn(bracket) &&
+                        authStore.isRaceAdmin
+                      "
+                      class="mt-4 text-center"
+                    >
                       <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
                         <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
                           <i class="pi pi-exclamation-triangle text-lg" />
                           <span class="font-bold">DOUBLE WITHDRAWAL</span>
                         </div>
-                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
-                        
+                        <p class="text-sm text-red-600 mb-4">
+                          Both racers have withdrawn. Admin intervention required.
+                        </p>
+
                         <div class="flex flex-col gap-2">
                           <Button
                             label="Mark as Bye (No Advancement)"
-                            severity="secondary" 
+                            severity="secondary"
                             size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
@@ -797,7 +893,7 @@
                           <Button
                             label="Manual Selection..."
                             severity="primary"
-                            size="small" 
+                            size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="showManualSelection(bracket)"
                           />
@@ -818,10 +914,7 @@
                     </div>
 
                     <!-- Winner Display (Survivor) -->
-                    <div
-                      v-else-if="bracket.track1_time && bracket.track2_time"
-                      class="mt-6 text-center"
-                    >
+                    <div v-else-if="bracket.is_completed" class="mt-6 text-center">
                       <div
                         class="bg-gradient-to-r from-orange-100 to-red-100 border-2 border-orange-300 rounded-xl p-4"
                       >
@@ -831,7 +924,9 @@
                             Survivor
                           </p>
                         </div>
-                        <p class="font-bold text-xl text-orange-900">{{ getWinner(bracket) }}</p>
+                        <p class="font-bold text-xl text-orange-900">
+                          {{ getWinnerName(bracket) }}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -862,6 +957,12 @@
                           FINAL
                         </div>
                         <h3 class="text-xl font-bold text-black">Championship Match</h3>
+                        <div
+                          v-if="bracket.match_format === 'best_of_3'"
+                          class="bg-purple-600 text-white px-2 py-1 rounded-full text-xs font-bold"
+                        >
+                          Round {{ bracket.current_round || 1 }}/{{ bracket.total_rounds || 3 }}
+                        </div>
                       </div>
                     </div>
                     <!-- Championship bracket content -->
@@ -879,12 +980,12 @@
                           </div>
                           <div v-if="bracket.track1_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track1_racer_name }}
+                              {{ trackRacerName(bracket, 1) || bracket.track1_racer_name }}
                             </div>
                             <div
                               class="bg-purple-50 text-purple-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track1_racer_number }}
+                              #{{ trackRacerNumber(bracket, 1) || bracket.track1_racer_number }}
                             </div>
                             <div
                               v-if="bracket.track1_time"
@@ -932,12 +1033,12 @@
                           </div>
                           <div v-if="bracket.track2_racer_name">
                             <div class="font-bold text-xl text-black mb-1">
-                              {{ bracket.track2_racer_name }}
+                              {{ trackRacerName(bracket, 2) || bracket.track2_racer_name }}
                             </div>
                             <div
                               class="bg-pink-50 text-pink-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                             >
-                              #{{ bracket.track2_racer_number }}
+                              #{{ trackRacerNumber(bracket, 2) || bracket.track2_racer_number }}
                             </div>
                             <div v-if="bracket.track2_time" class="text-lg font-bold text-pink-600">
                               {{ formatTime(bracket.track2_time) }}
@@ -962,18 +1063,28 @@
                     </div>
 
                     <!-- Double Withdrawal Resolution -->
-                    <div v-if="!bracket.is_forfeit && !bracket.winner_racer_id && isBothRacersWithdrawn(bracket) && authStore.isRaceAdmin" class="mt-4 text-center">
+                    <div
+                      v-if="
+                        !bracket.is_forfeit &&
+                        !bracket.winner_racer_id &&
+                        isBothRacersWithdrawn(bracket) &&
+                        authStore.isRaceAdmin
+                      "
+                      class="mt-4 text-center"
+                    >
                       <div class="bg-red-100 border-2 border-red-300 rounded-lg p-4">
                         <div class="flex items-center justify-center gap-2 text-red-700 mb-3">
                           <i class="pi pi-exclamation-triangle text-lg" />
                           <span class="font-bold">DOUBLE WITHDRAWAL</span>
                         </div>
-                        <p class="text-sm text-red-600 mb-4">Both racers have withdrawn. Admin intervention required.</p>
-                        
+                        <p class="text-sm text-red-600 mb-4">
+                          Both racers have withdrawn. Admin intervention required.
+                        </p>
+
                         <div class="flex flex-col gap-2">
                           <Button
                             label="Mark as Bye (No Advancement)"
-                            severity="secondary" 
+                            severity="secondary"
                             size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="resolveDoubleWithdrawal(bracket, 'advance_bye')"
@@ -981,7 +1092,7 @@
                           <Button
                             label="Manual Selection..."
                             severity="primary"
-                            size="small" 
+                            size="small"
                             :loading="resolvingDoubleWithdrawal === bracket.id"
                             @click="showManualSelection(bracket)"
                           />
@@ -1002,10 +1113,7 @@
                     </div>
 
                     <!-- Tournament Champion -->
-                    <div
-                      v-else-if="bracket.track1_time && bracket.track2_time"
-                      class="mt-6 text-center"
-                    >
+                    <div v-else-if="bracket.is_completed" class="mt-6 text-center">
                       <div
                         class="bg-gradient-to-r from-yellow-100 to-purple-100 border-2 border-yellow-300 rounded-xl p-6"
                       >
@@ -1016,7 +1124,9 @@
                           </p>
                           <i class="pi pi-star-fill text-yellow-600 text-2xl" />
                         </div>
-                        <p class="font-bold text-2xl text-purple-900">{{ getWinner(bracket) }}</p>
+                        <p class="font-bold text-2xl text-purple-900">
+                          {{ getWinnerName(bracket) }}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1062,7 +1172,13 @@
                               v-if="bracket.bracket_group"
                               class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 rounded-full text-sm font-bold capitalize"
                             >
-                              {{ bracket.bracket_group === 'winner' ? 'Winner Bracket' : bracket.bracket_group === 'loser' ? 'Loser Bracket' : 'Finals' }}
+                              {{
+                                bracket.bracket_group === 'winner'
+                                  ? 'Winner Bracket'
+                                  : bracket.bracket_group === 'loser'
+                                    ? 'Loser Bracket'
+                                    : 'Finals'
+                              }}
                             </div>
                             <div
                               v-if="bracket.round_number"
@@ -1070,8 +1186,19 @@
                             >
                               Round {{ bracket.round_number }}
                             </div>
+                            <!-- Per-match round for best-of-3 -->
+                            <div
+                              v-if="bracket.match_format === 'best_of_3'"
+                              class="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold"
+                            >
+                              Match Round {{ bracket.current_round || 1 }}/{{
+                                bracket.total_rounds || 3
+                              }}
+                            </div>
                           </div>
-                          <h3 class="text-xl font-bold text-black">Bracket #{{ index + 1 }}</h3>
+                          <h3 class="text-xl font-bold text-black">
+                            Match #{{ bracket.match_number || index + 1 }}
+                          </h3>
                         </div>
                         <Button
                           v-tooltip.top="'Delete Bracket'"
@@ -1100,86 +1227,18 @@
                             </div>
                             <div v-if="bracket.track1_racer_name">
                               <RacerLink
-                                :racer-id="bracket.track1_racer_id"
-                                :racer-name="bracket.track1_racer_name"
+                                :racer-id="trackRacerId(bracket, 1) || bracket.track1_racer_id"
+                                :racer-name="
+                                  trackRacerName(bracket, 1) || bracket.track1_racer_name
+                                "
                                 class="font-bold text-xl text-black hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
                               />
                               <div
                                 class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                               >
-                                #{{ bracket.track1_racer_number }}
+                                #{{ trackRacerNumber(bracket, 1) || bracket.track1_racer_number }}
                               </div>
-
-                              <!-- Time Display or Input -->
-                              <div
-                                v-if="bracket.track1_time && !editingTime[bracket.id + '_track1']"
-                                class="mt-2 relative"
-                              >
-                                <Button
-                                  v-tooltip.top="'Edit Time'"
-                                  class="absolute -top-2 -right-2"
-                                  severity="primary"
-                                  size="small"
-                                  rounded
-                                  text
-                                  icon="pi pi-pencil"
-                                  @click="editTime(bracket, 1)"
-                                />
-                                <p class="text-lg font-bold text-blue-600">
-                                  {{ formatTime(bracket.track1_time) }}
-                                </p>
-                              </div>
-                              <div
-                                v-else-if="
-                                  bracket.track1_time && editingTime[bracket.id + '_track1']
-                                "
-                                class="mt-2"
-                              >
-                                <div class="flex items-center gap-2 justify-center">
-                                  <InputNumber
-                                    ref="track1EditInput"
-                                    v-model="bracketTimes[bracket.id + '_track1']"
-                                    mode="decimal"
-                                    :min-fraction-digits="0"
-                                    :max-fraction-digits="3"
-                                    :min="0"
-                                    :step="0.001"
-                                    placeholder="0.000"
-                                    class="w-20"
-                                    :input-style="{
-                                      color: '#374151',
-                                      backgroundColor: 'white',
-                                      border: '1px solid #3b82f6',
-                                      borderRadius: '0.375rem',
-                                      padding: '0.25rem 0.5rem',
-                                      textAlign: 'center',
-                                      fontSize: '0.875rem',
-                                      width: '80px',
-                                      maxWidth: '80px',
-                                      boxSizing: 'border-box'
-                                    }"
-                                    @keyup.enter="updateTime(bracket, 1)"
-                                  />
-                                  <Button
-                                    :disabled="
-                                      !bracketTimes[bracket.id + '_track1'] ||
-                                      processing === `${bracket.id}_track1_edit`
-                                    "
-                                    :loading="processing === `${bracket.id}_track1_edit`"
-                                    severity="success"
-                                    size="small"
-                                    icon="pi pi-check"
-                                    @click="updateTime(bracket, 1)"
-                                  />
-                                  <Button
-                                    severity="secondary"
-                                    size="small"
-                                    icon="pi pi-times"
-                                    @click="cancelEdit(bracket, 1)"
-                                  />
-                                </div>
-                              </div>
-                              <div v-else class="mt-3">
+                              <div class="mt-3">
                                 <div class="bg-blue-50 rounded-lg p-3">
                                   <div class="flex items-center gap-2 justify-center">
                                     <InputNumber
@@ -1191,6 +1250,7 @@
                                       :step="0.001"
                                       placeholder="0.000"
                                       class="w-24"
+                                      :disabled="bracket.is_completed || bracket.is_forfeit"
                                       :input-style="{
                                         color: '#374151',
                                         backgroundColor: 'white',
@@ -1209,7 +1269,9 @@
                                     <Button
                                       :disabled="
                                         !bracketTimes[bracket.id + '_track1'] ||
-                                        processing === `${bracket.id}_track1`
+                                        processing === `${bracket.id}_track1` ||
+                                        bracket.is_completed ||
+                                        bracket.is_forfeit
                                       "
                                       :loading="processing === `${bracket.id}_track1`"
                                       severity="primary"
@@ -1230,15 +1292,6 @@
                           </div>
                         </div>
 
-                        <!-- VS Divider -->
-                        <div class="flex items-center justify-center flex-shrink-0">
-                          <div
-                            class="bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200"
-                          >
-                            <span class="font-bold text-lg">VS</span>
-                          </div>
-                        </div>
-
                         <!-- Track 2 -->
                         <div
                           class="flex-1 bg-white rounded-xl p-5 border-2 border-red-200 shadow-md hover:shadow-lg transition-shadow duration-200"
@@ -1252,86 +1305,18 @@
                             </div>
                             <div v-if="bracket.track2_racer_name">
                               <RacerLink
-                                :racer-id="bracket.track2_racer_id"
-                                :racer-name="bracket.track2_racer_name"
+                                :racer-id="trackRacerId(bracket, 2) || bracket.track2_racer_id"
+                                :racer-name="
+                                  trackRacerName(bracket, 2) || bracket.track2_racer_name
+                                "
                                 class="font-bold text-xl text-black hover:text-blue-600 hover:underline transition-colors duration-200 mb-1 block"
                               />
                               <div
                                 class="bg-red-50 text-red-700 px-2 py-1 rounded-lg text-sm font-semibold mb-3 inline-block"
                               >
-                                #{{ bracket.track2_racer_number }}
+                                #{{ trackRacerNumber(bracket, 2) || bracket.track2_racer_number }}
                               </div>
-
-                              <!-- Time Display or Input -->
-                              <div
-                                v-if="bracket.track2_time && !editingTime[bracket.id + '_track2']"
-                                class="mt-2 relative"
-                              >
-                                <Button
-                                  v-tooltip.top="'Edit Time'"
-                                  class="absolute -top-2 -right-2"
-                                  severity="danger"
-                                  size="small"
-                                  rounded
-                                  text
-                                  icon="pi pi-pencil"
-                                  @click="editTime(bracket, 2)"
-                                />
-                                <p class="text-lg font-bold text-red-600">
-                                  {{ formatTime(bracket.track2_time) }}
-                                </p>
-                              </div>
-                              <div
-                                v-else-if="
-                                  bracket.track2_time && editingTime[bracket.id + '_track2']
-                                "
-                                class="mt-2"
-                              >
-                                <div class="flex items-center gap-2 justify-center">
-                                  <InputNumber
-                                    ref="track2EditInput"
-                                    v-model="bracketTimes[bracket.id + '_track2']"
-                                    mode="decimal"
-                                    :min-fraction-digits="0"
-                                    :max-fraction-digits="3"
-                                    :min="0"
-                                    :step="0.001"
-                                    placeholder="0.000"
-                                    class="w-20"
-                                    :input-style="{
-                                      color: '#374151',
-                                      backgroundColor: 'white',
-                                      border: '1px solid #ef4444',
-                                      borderRadius: '0.375rem',
-                                      padding: '0.25rem 0.5rem',
-                                      textAlign: 'center',
-                                      fontSize: '0.875rem',
-                                      width: '80px',
-                                      maxWidth: '80px',
-                                      boxSizing: 'border-box'
-                                    }"
-                                    @keyup.enter="updateTime(bracket, 2)"
-                                  />
-                                  <Button
-                                    :disabled="
-                                      !bracketTimes[bracket.id + '_track2'] ||
-                                      processing === `${bracket.id}_track2_edit`
-                                    "
-                                    :loading="processing === `${bracket.id}_track2_edit`"
-                                    severity="danger"
-                                    size="small"
-                                    icon="pi pi-check"
-                                    @click="updateTime(bracket, 2)"
-                                  />
-                                  <Button
-                                    severity="secondary"
-                                    size="small"
-                                    icon="pi pi-times"
-                                    @click="cancelEdit(bracket, 2)"
-                                  />
-                                </div>
-                              </div>
-                              <div v-else class="mt-3">
+                              <div class="mt-3">
                                 <div class="bg-red-50 rounded-lg p-3">
                                   <div class="flex items-center gap-2 justify-center">
                                     <InputNumber
@@ -1343,6 +1328,7 @@
                                       :step="0.001"
                                       placeholder="0.000"
                                       class="w-24"
+                                      :disabled="bracket.is_completed || bracket.is_forfeit"
                                       :input-style="{
                                         color: '#374151',
                                         backgroundColor: 'white',
@@ -1361,7 +1347,9 @@
                                     <Button
                                       :disabled="
                                         !bracketTimes[bracket.id + '_track2'] ||
-                                        processing === `${bracket.id}_track2`
+                                        processing === `${bracket.id}_track2` ||
+                                        bracket.is_completed ||
+                                        bracket.is_forfeit
                                       "
                                       :loading="processing === `${bracket.id}_track2`"
                                       severity="danger"
@@ -1381,25 +1369,22 @@
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      <!-- Winner Display -->
-                      <div
-                        v-if="bracket.track1_time && bracket.track2_time"
-                        class="mt-6 text-center"
-                      >
-                        <div
-                          class="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl p-4 relative shadow-lg"
-                        >
-                          <div class="flex items-center justify-center gap-2 mb-2">
-                            <i class="pi pi-trophy text-yellow-600 text-lg" />
-                            <p class="text-sm font-bold text-yellow-800 uppercase tracking-wide">
-                              Winner
+                        <!-- Winner Display -->
+                        <div v-if="bracket.is_completed" class="mt-6 text-center">
+                          <div
+                            class="bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl p-4 relative shadow-lg"
+                          >
+                            <div class="flex items-center justify-center gap-2 mb-2">
+                              <i class="pi pi-trophy text-yellow-600 text-lg" />
+                              <p class="text-sm font-bold text-yellow-800 uppercase tracking-wide">
+                                Winner
+                              </p>
+                            </div>
+                            <p class="font-bold text-xl text-yellow-900">
+                              {{ getWinnerName(bracket) }}
                             </p>
                           </div>
-                          <p class="font-bold text-xl text-yellow-900">
-                            {{ getWinner(bracket) }}
-                          </p>
                         </div>
                       </div>
                     </div>
@@ -1530,7 +1515,9 @@ const {
   generateBrackets: generateBracketsComposable,
   getEligibleRacers,
   forfeitRacer,
-  clearBrackets
+  clearBrackets,
+  recordTime: recordTimeComposable,
+  getCurrentRound
 } = useBrackets()
 
 // Reactive data
@@ -1538,7 +1525,7 @@ const race = ref(null)
 const raceBrackets = computed(() => {
   const brackets = race.value ? getBracketsForRace(race.value.id) : []
   // Map the bracket data to include flattened racer names
-  return brackets.map(b => ({
+  return brackets.map((b) => ({
     ...b,
     track1_racer_name: b.track1_racer?.name || null,
     track1_racer_number: b.track1_racer?.racer_number || null,
@@ -1556,12 +1543,58 @@ const generatingBrackets = ref(false)
 const generatingNextRound = ref(false)
 const clearingBrackets = ref(false)
 const bracketTimes = ref({})
-const editingTime = ref({})
 const eligibleRacers = ref([])
 const checkedInCount = ref(0)
 const withdrawnCount = ref(0)
 const withdrawnRacers = ref(new Set())
 const resolvingDoubleWithdrawal = ref(null) // Track which bracket is being resolved
+
+// Current round data per bracket (for best-of-3 track flipping)
+const currentRounds = ref({})
+
+// Load and cache the current round info for a bracket
+const loadCurrentRound = async (bracket) => {
+  try {
+    if (!bracket || bracket.match_format !== 'best_of_3') return
+    const data = await getCurrentRound(bracket.id)
+    if (data) {
+      currentRounds.value = { ...currentRounds.value, [bracket.id]: data }
+    }
+  } catch (e) {
+    console.warn('Failed to load current round for bracket', bracket?.id, e?.message || e)
+  }
+}
+
+// Helper to resolve which racer is on a given track for the current round
+const getTrackDisplay = (bracket, track) => {
+  const base = (racerNum) =>
+    racerNum === 1
+      ? {
+          id: bracket?.track1_racer_id,
+          name: bracket?.track1_racer_name,
+          number: bracket?.track1_racer_number
+        }
+      : {
+          id: bracket?.track2_racer_id,
+          name: bracket?.track2_racer_name,
+          number: bracket?.track2_racer_number
+        }
+
+  if (bracket?.match_format === 'best_of_3') {
+    const cr = currentRounds.value[bracket.id]
+    if (cr) {
+      // racer1_id always maps to bracket.track1_racer_*, racer2_id to track2
+      if (cr.racer1_track === track) return base(1)
+      if (cr.racer2_track === track) return base(2)
+    }
+  }
+  // Fallback to static assignment
+  return track === 1 ? base(1) : base(2)
+}
+
+const trackRacerName = (bracket, track) => getTrackDisplay(bracket, track)?.name || null
+const trackRacerNumber = (bracket, track) => getTrackDisplay(bracket, track)?.number || null
+const trackRacerId = (bracket, track) => getTrackDisplay(bracket, track)?.id || null
 
 // Breadcrumb navigation
 const breadcrumbItems = computed(() => [
@@ -1616,13 +1649,13 @@ const generateBracketsMessage = computed(() => {
 })
 
 const completedBrackets = computed(() => {
-  return raceBrackets.value.filter((b) => b.track1_time && b.track2_time).length
+  return raceBrackets.value.filter((b) => b.is_completed).length
 })
 
 const completedBracketsByType = computed(() => {
   const byType = { double_elimination: 0 }
   raceBrackets.value.forEach((b) => {
-    if (b.track1_time && b.track2_time && b.bracket_type) {
+    if (b.is_completed && b.bracket_type) {
       byType[b.bracket_type] = (byType[b.bracket_type] || 0) + 1
     }
   })
@@ -1702,7 +1735,7 @@ const buildTournamentTree = (brackets, bracketType) => {
     track1_time: bracket.track1_time,
     track2_name: bracket.track2_racer_name,
     track2_time: bracket.track2_time,
-    winner: getWinner(bracket) !== 'TBD' ? getWinner(bracket) : null
+    winner: bracket.is_completed ? getWinnerName(bracket) : null
   }))
 
   const typeNode = {
@@ -1776,48 +1809,38 @@ const canGenerateNextRound = computed(() => {
 // })
 
 const winners = computed(() => {
-  // Get all completed brackets by type
-  const completedBrackets = raceBrackets.value.filter(
-    (b) => b.track1_time && b.track2_time && b.track1_time !== b.track2_time
+  // Completed brackets with a winner
+  const completed = raceBrackets.value.filter(
+    (b) => b.is_completed && b.winner_racer_id && b.bracket_type
   )
 
-  // Group by bracket type and find the most recent round for each type
+  // Group by type
   const bracketsByType = { double_elimination: [] }
-  completedBrackets.forEach((bracket) => {
-    if (bracket.bracket_type) {
-      if (!bracketsByType[bracket.bracket_type]) {
-        bracketsByType[bracket.bracket_type] = []
-      }
-      bracketsByType[bracket.bracket_type].push(bracket)
+  completed.forEach((bracket) => {
+    if (!bracketsByType[bracket.bracket_type]) {
+      bracketsByType[bracket.bracket_type] = []
     }
+    bracketsByType[bracket.bracket_type].push(bracket)
   })
 
   const currentRoundWinners = []
 
-  // For each bracket type, find the current round winners
   Object.keys(bracketsByType).forEach((bracketType) => {
     const typeBrackets = bracketsByType[bracketType]
     if (typeBrackets.length === 0) return
-
-    // Sort brackets by creation time to identify rounds
     const sortedBrackets = typeBrackets.sort(
       (a, b) => new Date(a.created_at) - new Date(b.created_at)
     )
 
-    // Find brackets that don't have their racers as winners in later brackets
     const activeWinners = []
-
     sortedBrackets.forEach((bracket) => {
-      const isTrack1Winner = bracket.track1_time < bracket.track2_time
-
+      const isTrack1Winner = bracket.winner_track === 1
       const winnerId = isTrack1Winner ? bracket.track1_racer_id : bracket.track2_racer_id
       const winnerName = isTrack1Winner ? bracket.track1_racer_name : bracket.track2_racer_name
       const winnerNumber = isTrack1Winner
         ? bracket.track1_racer_number
         : bracket.track2_racer_number
-      const winningTime = isTrack1Winner ? bracket.track1_time : bracket.track2_time
 
-      // Check if this winner appears in any later bracket (meaning they advanced)
       const appearsInLaterBracket = sortedBrackets.some((laterBracket) => {
         return (
           new Date(laterBracket.created_at) > new Date(bracket.created_at) &&
@@ -1825,13 +1848,12 @@ const winners = computed(() => {
         )
       })
 
-      // If winner doesn't appear in later brackets, they're a current round winner
       if (!appearsInLaterBracket) {
         activeWinners.push({
           racer_id: winnerId,
           racer_name: winnerName,
           racer_number: winnerNumber,
-          winning_time: winningTime,
+          winning_time: null,
           bracket_id: bracket.id,
           bracket_type: bracketType
         })
@@ -1841,12 +1863,17 @@ const winners = computed(() => {
     currentRoundWinners.push(...activeWinners)
   })
 
-  return currentRoundWinners.sort((a, b) => a.winning_time - b.winning_time)
+  return currentRoundWinners
 })
 
 const tiedBrackets = computed(() => {
+  // With best-of-3, ties are resolved by rounds; ignore tie detection for multi-round
   return raceBrackets.value.filter(
-    (b) => b.track1_time && b.track2_time && b.track1_time === b.track2_time
+    (b) =>
+      b.match_format !== 'best_of_3' &&
+      b.track1_time &&
+      b.track2_time &&
+      b.track1_time === b.track2_time
   )
 })
 
@@ -1975,7 +2002,9 @@ const getTournamentPlacings = (bracketType) => {
 
     // Best time among semi-final losers gets third place
     if (semiFinalLosers.length > 0) {
-      thirdPlace = semiFinalLosers.reduce((best, current) => (current.time < best.time ? current : best))
+      thirdPlace = semiFinalLosers.reduce((best, current) =>
+        current.time < best.time ? current : best
+      )
     }
   }
 
@@ -1988,17 +2017,9 @@ const formatTime = (time) => {
   return `${Number.parseFloat(time).toFixed(3)}s`
 }
 
-const getWinner = (bracket) => {
-  if (!bracket.track1_time || !bracket.track2_time) return 'TBD'
-
-  // Handle ties
-  if (bracket.track1_time === bracket.track2_time) {
-    return `TIE: ${bracket.track1_racer_name} & ${bracket.track2_racer_name}`
-  }
-
-  return bracket.track1_time < bracket.track2_time
-    ? bracket.track1_racer_name
-    : bracket.track2_racer_name
+const getWinnerName = (bracket) => {
+  if (!bracket || !bracket.is_completed || !bracket.winner_track) return 'TBD'
+  return bracket.winner_track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
 }
 
 // Load eligible racers count for display
@@ -2026,7 +2047,7 @@ const loadEligibleRacers = async () => {
 
     checkedInCount.value = checkedIn || 0
     withdrawnCount.value = withdrawn || 0
-    withdrawnRacers.value = new Set((withdrawnData || []).map(w => w.racer_id))
+    withdrawnRacers.value = new Set((withdrawnData || []).map((w) => w.racer_id))
   } catch (err) {
     console.error('Error loading eligible racers:', err)
   }
@@ -2095,71 +2116,7 @@ const initializeData = async () => {
   }
 }
 
-// Generate brackets using fastest vs slowest pairing
-const generateBrackets = async () => {
-  if (!canGenerateBrackets.value) return
-
-  generatingBrackets.value = true
-
-  try {
-    // Take only the specified number of top qualifiers
-    const racersToUse = [...qualifiedRacers.value].slice(0, initialRacerCount.value)
-    const newBrackets = []
-
-    // Pair fastest with slowest
-    while (racersToUse.length >= 2) {
-      const fastest = racersToUse.shift() // First element (fastest)
-      const slowest = racersToUse.pop() // Last element (slowest)
-
-      newBrackets.push({
-        race_id: race.value.id,
-        track1_racer_id: fastest.racer_id,
-        track2_racer_id: slowest.racer_id,
-        bracket_type: selectedBracketType.value
-      })
-    }
-
-    // Insert all brackets
-    const { data: insertedBrackets, error: insertError } = await supabase
-      .from('brackets')
-      .insert(newBrackets).select(`
-        *,
-        track1_racer:racers!track1_racer_id(name, racer_number),
-        track2_racer:racers!track2_racer_id(name, racer_number)
-      `)
-
-    if (insertError) throw insertError
-
-    // Update local state
-    const formattedBrackets = (insertedBrackets || []).map((b) => ({
-      ...b,
-      track1_racer_name: b.track1_racer?.name || 'TBD',
-      track1_racer_number: b.track1_racer?.racer_number,
-      track2_racer_name: b.track2_racer?.name || 'TBD',
-      track2_racer_number: b.track2_racer?.racer_number
-    }))
-
-    brackets.value = [...brackets.value, ...formattedBrackets]
-
-    toast.add({
-      severity: 'success',
-      summary: 'Brackets Generated',
-      detail: `Created ${newBrackets.length} new bracket races`,
-      life: 3000
-    })
-  } catch (err) {
-    // Keep essential error logging for production debugging
-    console.error('Error generating brackets:', err)
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: err.message || 'Failed to generate brackets',
-      life: 5000
-    })
-  } finally {
-    generatingBrackets.value = false
-  }
-}
+// Removed legacy generateBrackets (single-round) in favor of double elimination generator
 
 // Generate next round from winners - simplified using composable logic
 const generateNextRound = async () => {
@@ -2286,7 +2243,7 @@ const deleteBracket = async (bracketId) => {
   }
 }
 
-// Record bracket race time
+// Record bracket round time via composable (best-of-3 aware)
 const recordTime = async (bracket, track) => {
   const timeKey = `${bracket.id}_track${track}`
   const timeValue = bracketTimes.value[bracket.id + `_track${track}`]
@@ -2296,26 +2253,16 @@ const recordTime = async (bracket, track) => {
   processing.value = timeKey
 
   try {
-    const updateField = track === 1 ? 'track1_time' : 'track2_time'
-
-    const { error: updateError } = await supabase
-      .from('brackets')
-      .update({ [updateField]: timeValue })
-      .eq('id', bracket.id)
-
-    if (updateError) throw updateError
-
-    // Update local state
-    const bracketIndex = brackets.value.findIndex((b) => b.id === bracket.id)
-    if (bracketIndex !== -1) {
-      brackets.value[bracketIndex][updateField] = timeValue
-    }
+    const ok = await recordTimeComposable(bracket.id, track, timeValue)
+    if (!ok) throw new Error('Failed to record time')
 
     // Clear the input
     const inputKey = bracket.id + `_track${track}`
     bracketTimes.value[inputKey] = undefined
 
-    const racerName = track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
+    const racerName =
+      trackRacerName(bracket, track) ||
+      (track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name)
 
     toast.add({
       severity: 'success',
@@ -2338,89 +2285,18 @@ const recordTime = async (bracket, track) => {
 }
 
 // Edit time functionality
-const editTime = (bracket, track) => {
-  const editKey = `${bracket.id}_track${track}`
-  editingTime.value[editKey] = true
-
-  // Pre-populate the input with current time
-  const currentTime = track === 1 ? bracket.track1_time : bracket.track2_time
-  bracketTimes.value[bracket.id + `_track${track}`] = currentTime
-
-  // Focus handled automatically by Vue
-}
-
-const updateTime = async (bracket, track) => {
-  const timeValue = bracketTimes.value[bracket.id + `_track${track}`]
-
-  if (!timeValue || timeValue <= 0) return
-
-  processing.value = `${bracket.id}_track${track}_edit`
-
-  try {
-    const updateField = track === 1 ? 'track1_time' : 'track2_time'
-
-    const { error: updateError } = await supabase
-      .from('brackets')
-      .update({ [updateField]: timeValue })
-      .eq('id', bracket.id)
-
-    if (updateError) throw updateError
-
-    // Update local state
-    const bracketIndex = brackets.value.findIndex((b) => b.id === bracket.id)
-    if (bracketIndex !== -1) {
-      brackets.value[bracketIndex][updateField] = timeValue
-    }
-
-    // Clear editing state
-    const editKey = `${bracket.id}_track${track}`
-    const inputKey = bracket.id + `_track${track}`
-    editingTime.value[editKey] = undefined
-    bracketTimes.value[inputKey] = undefined
-
-    const racerName = track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
-
-    toast.add({
-      severity: 'success',
-      summary: 'Time Updated',
-      detail: `${formatTime(timeValue)} updated for ${racerName}`,
-      life: 3000
-    })
-  } catch (err) {
-    // Keep essential error logging for production debugging
-    console.error('Error updating time:', err)
-    toast.add({
-      severity: 'error',
-      summary: 'Error',
-      detail: err.message || 'Failed to update time',
-      life: 5000
-    })
-  } finally {
-    processing.value = null
-  }
-}
-
-const cancelEdit = (bracket, track) => {
-  const editKey = `${bracket.id}_track${track}`
-  const inputKey = bracket.id + `_track${track}`
-  editingTime.value[editKey] = undefined
-  bracketTimes.value[inputKey] = undefined
-}
+// Removed edit/update time helpers in favor of per-round recording
 
 // Check if both racers in a bracket are withdrawn
 const isBothRacersWithdrawn = (bracket) => {
   if (!bracket.track1_racer_id || !bracket.track2_racer_id) return false
-  return withdrawnRacers.value.has(bracket.track1_racer_id) && 
-         withdrawnRacers.value.has(bracket.track2_racer_id)
+  return (
+    withdrawnRacers.value.has(bracket.track1_racer_id) &&
+    withdrawnRacers.value.has(bracket.track2_racer_id)
+  )
 }
 
-// Get previous round losers who could advance
-const getPreviousRoundLosers = (bracket) => {
-  // Find brackets from previous round that fed into this bracket
-  // This would need more complex logic based on bracket relationships
-  // For now, return empty array - would need parent bracket tracking
-  return []
-}
+// Removed unused getPreviousRoundLosers helper
 
 // Show manual selection dialog for double withdrawal
 const showManualSelection = (bracket) => {
@@ -2436,10 +2312,10 @@ const showManualSelection = (bracket) => {
 const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = null, reason = '') => {
   try {
     resolvingDoubleWithdrawal.value = bracket.id
-    
+
     // For now, we'll implement a simple forfeit-based resolution
     // In a full implementation, this would call database functions to properly restructure
-    
+
     if (action === 'admin_choice' && replacementRacerId) {
       // Update bracket to advance the chosen racer
       const { error } = await supabase
@@ -2451,9 +2327,9 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
           forfeit_reason: `Double withdrawal resolved: ${reason || 'Admin selection'}`
         })
         .eq('id', bracket.id)
-      
+
       if (error) throw error
-      
+
       toast.add({
         severity: 'success',
         summary: 'Resolution Complete',
@@ -2469,9 +2345,9 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
           is_forfeit: true // Mark as resolved to prevent showing double withdrawal warning
         })
         .eq('id', bracket.id)
-      
+
       if (error) throw error
-      
+
       toast.add({
         severity: 'info',
         summary: 'Marked as Bye',
@@ -2479,10 +2355,9 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
         life: 3000
       })
     }
-    
+
     // Refresh brackets
     await initializeBrackets()
-    
   } catch (err) {
     console.error('Error resolving double withdrawal:', err)
     toast.add({
@@ -2497,8 +2372,16 @@ const resolveDoubleWithdrawal = async (bracket, action, replacementRacerId = nul
 }
 
 // Handle forfeit with confirmation
-const handleForfeit = (bracket, track) => {
-  const racerName = track === 1 ? bracket.track1_racer_name : bracket.track2_racer_name
+const handleForfeit = (bracket, displayTrack) => {
+  // Map display track (which can flip each round in best-of-3) to the bracket's original track
+  // Determine the racer currently shown on this display track
+  const forfeitingRacerId = trackRacerId(bracket, displayTrack)
+  // Resolve to bracket-level track: 1 if matches track1_racer_id, else 2
+  const bracketTrack = forfeitingRacerId && forfeitingRacerId === bracket.track1_racer_id ? 1 : 2
+
+  const racerName =
+    trackRacerName(bracket, displayTrack) ||
+    (bracketTrack === 1 ? bracket.track1_racer_name : bracket.track2_racer_name)
 
   confirm.require({
     message: `Are you sure ${racerName} wants to forfeit this race?`,
@@ -2509,11 +2392,11 @@ const handleForfeit = (bracket, track) => {
     acceptLabel: 'Forfeit',
     accept: async () => {
       try {
-        await forfeitRacer(bracket.id, track, `${racerName} forfeited`)
+        await forfeitRacer(bracket.id, bracketTrack, `${racerName} forfeited`)
         toast.add({
           severity: 'info',
           summary: 'Forfeit Recorded',
-          detail: `${racerName} has forfeited the race`,
+          detail: `${racerName} has forfeited the match`,
           life: 3000
         })
       } catch (err) {
@@ -2544,6 +2427,7 @@ const confirmClearBrackets = () => {
       try {
         await clearBrackets(race.value.id)
         await loadEligibleRacers() // Refresh counts
+        currentRounds.value = {}
       } finally {
         clearingBrackets.value = false
       }
@@ -2555,7 +2439,28 @@ const confirmClearBrackets = () => {
 onMounted(async () => {
   await authStore.initAuth()
   await initializeData()
+  // Preload current round for best-of-3 brackets
+  for (const b of raceBrackets.value) {
+    if (b.match_format === 'best_of_3') {
+      loadCurrentRound(b)
+    }
+  }
 })
+
+// Keep current round data fresh when brackets change
+watch(
+  () =>
+    raceBrackets.value.map((b) => ({ id: b.id, cur: b.current_round, completed: b.is_completed })),
+  async (list) => {
+    for (const item of list) {
+      const bracket = raceBrackets.value.find((b) => b.id === item.id)
+      if (bracket && bracket.match_format === 'best_of_3') {
+        await loadCurrentRound(bracket)
+      }
+    }
+  },
+  { deep: true }
+)
 
 // Page head
 useHead({

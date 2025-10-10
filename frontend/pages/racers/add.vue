@@ -8,7 +8,7 @@
             src="~/assets/img/brickracer.jpg"
             alt="Brick Racer"
             class="w-full sm:w-64 h-48 object-contain mx-auto"
-          >
+          />
         </div>
         <div class="flex-1 text-center sm:text-left">
           <h1 class="text-3xl sm:text-4xl font-bold text-black mb-4">Add New Racer</h1>
@@ -42,7 +42,9 @@
             </div>
 
             <!-- Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start">
+            <div
+              class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start"
+            >
               <Button
                 type="submit"
                 :loading="loading"
@@ -53,7 +55,9 @@
               />
 
               <NuxtLink to="/racers" class="w-full sm:w-auto">
-                <Button type="button" class="btn-secondary w-full sm:w-auto"><span>Cancel</span></Button>
+                <Button type="button" class="btn-secondary w-full sm:w-auto"
+                  ><span>Cancel</span></Button
+                >
               </NuxtLink>
             </div>
           </form>

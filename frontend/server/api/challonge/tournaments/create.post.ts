@@ -44,7 +44,9 @@ export default defineEventHandler(async (event) => {
     }
 
     // Generate unique tournament URL
-    const tournamentUrl = challongeUtils.generateTournamentUrl(race.name.toLowerCase().replace(/\s+/g, '-'))
+    const tournamentUrl = challongeUtils.generateTournamentUrl(
+      race.name.toLowerCase().replace(/\s+/g, '-')
+    )
 
     // Create tournament on Challonge
     console.log('Creating Challonge tournament with params:', {
@@ -61,7 +63,7 @@ export default defineEventHandler(async (event) => {
         holdThirdPlaceMatch: body.tournament_type === 'single_elimination' ? true : false
       }
     })
-    
+
     const challongeTournament = await challongeApi.createTournament({
       tournament: {
         name: body.name,
@@ -83,7 +85,7 @@ export default defineEventHandler(async (event) => {
     // Save tournament data to our database
     // Convert tournament type back to underscore format for database constraint
     const dbTournamentType = (body.tournament_type || 'double elimination').replace(' ', '_')
-    
+
     const { data: localTournament, error: insertError } = await client
       .from('challonge_tournaments')
       .insert({
@@ -119,7 +121,7 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error: any) {
     console.error('Tournament creation error:', error)
-    
+
     // Handle Challonge-specific errors
     if (error.message?.includes('Challonge API Error')) {
       throw createError({

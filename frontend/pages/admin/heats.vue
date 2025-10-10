@@ -147,7 +147,6 @@
         </div>
       </div>
 
-
       <!-- Error Display -->
       <div v-if="error" class="bg-red-50/20 p-4 rounded-lg mb-6">
         <p class="text-red-800">{{ error }}</p>
@@ -170,7 +169,7 @@
                   :src="currentHeat.racers[0].racer_image_url"
                   :alt="currentHeat.racers[0].racer_name"
                   class="w-12 h-12 rounded-full object-cover"
-                >
+                />
                 <div>
                   <p class="font-medium">{{ currentHeat.racers[0].racer_name }}</p>
                   <p class="text-sm text-gray-600">
@@ -184,7 +183,7 @@
                 step="0.01"
                 placeholder="Time (seconds)"
                 class="w-full px-3 py-2 border rounded-md"
-              >
+              />
             </div>
           </div>
 
@@ -198,7 +197,7 @@
                   :src="currentHeat.racers[1].racer_image_url"
                   :alt="currentHeat.racers[1].racer_name"
                   class="w-12 h-12 rounded-full object-cover"
-                >
+                />
                 <div>
                   <p class="font-medium">{{ currentHeat.racers[1].racer_name }}</p>
                   <p class="text-sm text-gray-600">
@@ -212,7 +211,7 @@
                 step="0.01"
                 placeholder="Time (seconds)"
                 class="w-full px-3 py-2 border rounded-md"
-              >
+              />
             </div>
           </div>
         </div>
@@ -273,7 +272,7 @@
                   :src="racer.racer_image_url"
                   :alt="racer.racer_name"
                   class="w-8 h-8 rounded-full object-cover"
-                >
+                />
                 <div>
                   <p class="text-sm font-medium">{{ racer.racer_name }}</p>
                   <p class="text-xs text-gray-600">#{{ racer.racer_number }}</p>
@@ -295,39 +294,45 @@
       <!-- Danger Zone - Reset Options -->
       <div v-if="currentRace" class="mt-8 p-4 border-2 border-red-500 rounded-lg bg-red-50">
         <h3 class="text-lg font-bold text-red-700 mb-3">
-          <i class="pi pi-exclamation-triangle mr-2"/>
+          <i class="pi pi-exclamation-triangle mr-2" />
           Danger Zone - Reset Options
         </h3>
-        
+
         <div class="space-y-4">
           <!-- Clear Scheduled Heats -->
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <p class="font-medium text-gray-900">Clear Scheduled Heats</p>
-              <p class="text-sm text-gray-600">Remove all upcoming scheduled heats (keeps completed ones)</p>
+              <p class="text-sm text-gray-600">
+                Remove all upcoming scheduled heats (keeps completed ones)
+              </p>
             </div>
-            <button 
+            <button
               :disabled="loading"
-              @click="confirmClearScheduledHeats"
               class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:opacity-50 whitespace-nowrap"
+              @click="confirmClearScheduledHeats"
             >
-              <i class="pi pi-trash mr-2"/>
+              <i class="pi pi-trash mr-2" />
               Clear Scheduled
             </button>
           </div>
 
           <!-- Reset Everything -->
-          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-red-300">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-3 border-t border-red-300"
+          >
             <div>
               <p class="font-medium text-gray-900">Reset All Qualifiers</p>
-              <p class="text-sm text-gray-600">Delete ALL qualifier data and start fresh (cannot be undone)</p>
+              <p class="text-sm text-gray-600">
+                Delete ALL qualifier data and start fresh (cannot be undone)
+              </p>
             </div>
-            <button 
+            <button
               :disabled="loading"
-              @click="confirmResetAllQualifiers"
               class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 whitespace-nowrap"
+              @click="confirmResetAllQualifiers"
             >
-              <i class="pi pi-exclamation-circle mr-2"/>
+              <i class="pi pi-exclamation-circle mr-2" />
               Reset Everything
             </button>
           </div>
@@ -381,7 +386,7 @@
                     :src="option.image_url"
                     :alt="option.name"
                     class="w-8 h-8 rounded-full object-cover"
-                  >
+                  />
                   <div
                     v-else
                     class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center"
@@ -416,7 +421,7 @@
                     :src="option.image_url"
                     :alt="option.name"
                     class="w-8 h-8 rounded-full object-cover"
-                  >
+                  />
                   <div
                     v-else
                     class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center"
@@ -593,13 +598,21 @@ const fetchAvailableRacers = async () => {
 
 // Reset Methods
 const confirmClearScheduledHeats = () => {
-  if (confirm('Are you sure you want to clear all scheduled heats? This will remove all upcoming heats but keep completed ones.')) {
+  if (
+    confirm(
+      'Are you sure you want to clear all scheduled heats? This will remove all upcoming heats but keep completed ones.'
+    )
+  ) {
     clearScheduledHeats()
   }
 }
 
 const confirmResetAllQualifiers = () => {
-  if (confirm('⚠️ WARNING: This will DELETE ALL qualifier data including completed heats and times!\n\nThis action cannot be undone. Are you absolutely sure?')) {
+  if (
+    confirm(
+      '⚠️ WARNING: This will DELETE ALL qualifier data including completed heats and times!\n\nThis action cannot be undone. Are you absolutely sure?'
+    )
+  ) {
     if (confirm('Please confirm once more: Delete ALL qualifier data for this race?')) {
       resetAllQualifiers()
     }
@@ -608,13 +621,16 @@ const confirmResetAllQualifiers = () => {
 
 const clearScheduledHeats = async () => {
   if (!currentRace.value) return
-  
+
   try {
     loading.value = true
-    const { data } = await $fetch(`/api/admin/races/${currentRace.value.id}/clear-scheduled-heats`, {
-      method: 'POST'
-    })
-    
+    const { data } = await $fetch(
+      `/api/admin/races/${currentRace.value.id}/clear-scheduled-heats`,
+      {
+        method: 'POST'
+      }
+    )
+
     showSuccess('Scheduled heats cleared successfully')
     // Refresh the heats data
     await heats.fetchCurrentRaceData()
@@ -629,13 +645,13 @@ const clearScheduledHeats = async () => {
 
 const resetAllQualifiers = async () => {
   if (!currentRace.value) return
-  
+
   try {
     loading.value = true
     const { data } = await $fetch(`/api/admin/races/${currentRace.value.id}/reset-qualifiers`, {
       method: 'POST'
     })
-    
+
     showSuccess('All qualifier data has been reset')
     // Refresh everything
     await heats.fetchCurrentRaceData()

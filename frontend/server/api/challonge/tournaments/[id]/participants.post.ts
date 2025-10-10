@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
       .select('racer_id')
       .eq('challonge_tournament_id', tournamentId)
 
-    const existingRacerIds = new Set(existingParticipants?.map(p => p.racer_id) || [])
+    const existingRacerIds = new Set(existingParticipants?.map((p) => p.racer_id) || [])
     const newRacers = body.racers.filter((racer: any) => !existingRacerIds.has(racer.racer_id))
 
     if (newRacers.length === 0) {
@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
     // Add participants to Challonge
     console.log('Adding participants to Challonge tournament:', tournament.challonge_tournament_id)
     console.log('Participants to add:', participants)
-    
+
     const challongeParticipants = await challongeApi.bulkAddParticipants(
       tournament.challonge_tournament_id,
       participants
@@ -82,8 +82,7 @@ export default defineEventHandler(async (event) => {
 
     const { data: localParticipants, error: insertError } = await client
       .from('challonge_participants')
-      .insert(participantMappings as Omit<ChallongeParticipant, 'id' | 'created_at'>[])
-      .select(`
+      .insert(participantMappings as Omit<ChallongeParticipant, 'id' | 'created_at'>[]).select(`
         *,
         racer:racers(*)
       `)
@@ -110,7 +109,7 @@ export default defineEventHandler(async (event) => {
         total: totalParticipants || 0,
         challonge_tournament_id: tournament.challonge_tournament_id
       },
-      challonge_participants: challongeParticipants.map(cp => ({
+      challonge_participants: challongeParticipants.map((cp) => ({
         id: cp.participant.id,
         name: cp.participant.name,
         seed: cp.participant.seed
@@ -118,7 +117,7 @@ export default defineEventHandler(async (event) => {
     }
   } catch (error: any) {
     console.error('Participant addition error:', error)
-    
+
     // Handle Challonge-specific errors
     if (error.message?.includes('Challonge API Error')) {
       throw createError({

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Define types for function parameters to avoid 'any' types
@@ -23,6 +24,13 @@ interface BracketRecord {
   bracket_group?: string
   round_number?: number
   match_number?: number
+  // Added fields for multi-round support
+  match_format?: 'single' | 'best_of_3'
+  total_rounds?: number
+  current_round?: number
+  rounds_won_track1?: number
+  rounds_won_track2?: number
+  is_completed?: boolean
   track1_racer_id?: string
   track2_racer_id?: string
   winner_racer_id?: string
@@ -44,69 +52,18 @@ interface BracketRecord {
   }
 }
 
-interface NextHeatRecord {
-  heat_number: number
-  track_number: number
-  racer_id: string
-  racer_name: string
-  racer_number: number
-  racer_image_url?: string
-  scheduled_order: number
-}
+// (removed) NextHeatRecord unused
 
 export type RacePhase = 'qualifying' | 'brackets' | 'complete' | 'not_started'
 
 /**
  * Automatically finalize Challonge tournament when race is complete
  */
-async function autoFinalizeChallongeTournament(client: SupabaseClient<any>, raceId: string): Promise<void> {
+async function autoFinalizeChallongeTournament(
+  client: SupabaseClient<any>,
+  raceId: string
+): Promise<void> {
   try {
-    console.log('🏁 Auto-finalizing Challonge tournament...')
-    
-    // Get the tournament for this race
-    const { data: tournament } = await client
-      .from('challonge_tournaments')
-      .select('challonge_tournament_id, status')
-      .eq('race_id', raceId)
-      .eq('status', 'active')
-      .single()
-    
-    if (!tournament) {
-      console.log('No active Challonge tournament found for auto-finalization')
-      return
-    }
-    
-    // Import the Challonge API client
-    const { challongeApi } = await import('./challonge-client')
-    
-    // Check if tournament is already finalized by getting participants
-    const participants = await challongeApi.getParticipants(tournament.challonge_tournament_id)
-    const hasRankings = participants.some(p => p.participant.final_rank !== null)
-    
-    if (hasRankings) {
-      console.log('✅ Tournament already finalized')
-      return
-    }
-    
-    // Finalize the tournament
-    await challongeApi.finalizeTournament(tournament.challonge_tournament_id)
-    
-    console.log(`✅ Auto-finalized tournament ${tournament.challonge_tournament_id}`)
-    
-  } catch (error) {
-    console.error('❌ Auto-finalization failed:', error)
-    throw error
-  }
-}
-
-/**
- * Automatically sync new matches from Challonge if needed
- * This is called when no current bracket is found locally
- */
-async function autoSyncNewChallongeMatches(client: SupabaseClient<any>, raceId: string): Promise<void> {
-  try {
-    console.log('🔄 Auto-syncing new matches from Challonge...')
-    
     // Get the tournament for this race
     const { data: tournament } = await client
       .from('challonge_tournaments')
@@ -114,20 +71,187 @@ async function autoSyncNewChallongeMatches(client: SupabaseClient<any>, raceId: 
       .eq('race_id', raceId)
       .eq('status', 'active')
       .single()
-    
+
+    if (!tournament) {
+      return
+    }
+
+    // Import the Challonge API client
+    const { challongeApi } = await import('./challonge-client')
+
+    // Check if tournament is already finalized by getting participants
+    const participants = await challongeApi.getParticipants(tournament.challonge_tournament_id)
+    const hasRankings = participants.some((p) => p.participant.final_rank !== null)
+
+    if (hasRankings) {
+      // Still save rankings even if already finalized (in case we missed it before)
+      await saveFinalRankings(client, tournament.id, tournament.challonge_tournament_id)
+
+      // Update tournament status to finalized in our database
+      await client
+        .from('challonge_tournaments')
+        .update({ status: 'finalized' })
+        .eq('id', tournament.id)
+
+      // Assign bracket placement awards to top 3
+      await assignBracketPlacementAwards(client, raceId, tournament.id)
+
+      return
+    }
+
+    // Finalize the tournament
+    await challongeApi.finalizeTournament(tournament.challonge_tournament_id)
+
+    // Save final rankings to our database
+    await saveFinalRankings(client, tournament.id, tournament.challonge_tournament_id)
+
+    // Update tournament status to finalized
+    await client
+      .from('challonge_tournaments')
+      .update({ status: 'finalized' })
+      .eq('id', tournament.id)
+
+    // Assign bracket placement awards to top 3
+    await assignBracketPlacementAwards(client, raceId, tournament.id)
+  } catch (error) {
+    console.error('Error auto-finalizing tournament:', error)
+    throw error
+  }
+}
+
+/**
+ * Assign bracket placement awards to top 3 finishers
+ */
+async function assignBracketPlacementAwards(
+  client: SupabaseClient<any>,
+  raceId: string,
+  tournamentId: string
+): Promise<void> {
+  try {
+    // Get award definitions for 1st, 2nd, 3rd place
+    const { data: awardDefs } = await client
+      .from('award_definitions')
+      .select('id, name')
+      .in('name', ['1st Place - Bracket Champion', '2nd Place - Runner-Up', '3rd Place'])
+
+    if (!awardDefs || awardDefs.length === 0) {
+      return
+    }
+
+    // Create a map of rank to award definition
+    const awardMap = new Map<number, string>()
+    for (const award of awardDefs) {
+      if (award.name.startsWith('1st')) awardMap.set(1, award.id)
+      else if (award.name.startsWith('2nd')) awardMap.set(2, award.id)
+      else if (award.name.startsWith('3rd')) awardMap.set(3, award.id)
+    }
+
+    // Get top 3 finishers from challonge_participants
+    const { data: topFinishers } = await client
+      .from('challonge_participants')
+      .select('racer_id, final_rank')
+      .eq('challonge_tournament_id', tournamentId)
+      .in('final_rank', [1, 2, 3])
+      .order('final_rank', { ascending: true })
+
+    if (!topFinishers || topFinishers.length === 0) {
+      return
+    }
+
+    // Create award_winners records (upsert to avoid duplicates)
+    const awardWinners = topFinishers
+      .filter((f) => f.final_rank && awardMap.has(f.final_rank))
+      .map((f) => ({
+        race_id: raceId,
+        racer_id: f.racer_id,
+        award_definition_id: awardMap.get(f.final_rank)!
+      }))
+
+    if (awardWinners.length > 0) {
+      // Delete existing bracket placement awards for this race first
+      const awardDefIds = Array.from(awardMap.values())
+      await client
+        .from('awards')
+        .delete()
+        .eq('race_id', raceId)
+        .in('award_definition_id', awardDefIds)
+
+      // Insert new awards
+      await client.from('awards').insert(awardWinners)
+    }
+  } catch (error) {
+    console.error('Error assigning bracket placement awards:', error)
+    // Don't throw - this is best-effort
+  }
+}
+
+/**
+ * Save final rankings from Challonge to our database
+ */
+async function saveFinalRankings(
+  client: SupabaseClient<any>,
+  tournamentId: string,
+  challongeTournamentId: string
+): Promise<void> {
+  try {
+    const { challongeApi } = await import('./challonge-client')
+
+    // Get participants with final rankings from Challonge
+    const participants = await challongeApi.getParticipants(challongeTournamentId)
+
+    // Update each participant's final_rank in our database
+    for (const challongeParticipant of participants) {
+      const participantData = challongeParticipant.participant
+
+      if (participantData.final_rank !== null) {
+        await client
+          .from('challonge_participants')
+          .update({ final_rank: participantData.final_rank })
+          .eq('challonge_tournament_id', tournamentId)
+          .eq('challonge_participant_id', String(participantData.id))
+
+        console.log(
+          `Saved final_rank ${participantData.final_rank} for participant ${participantData.id}`
+        )
+      }
+    }
+  } catch (error) {
+    console.error('Error saving final rankings:', error)
+    // Don't throw - this is best-effort
+  }
+}
+
+/**
+ * Automatically sync new matches from Challonge if needed
+ * This is called when no current bracket is found locally
+ */
+async function autoSyncNewChallongeMatches(
+  client: SupabaseClient<any>,
+  raceId: string
+): Promise<void> {
+  try {
+    console.log('🔄 Auto-syncing new matches from Challonge...')
+
+    // Get the tournament for this race
+    const { data: tournament } = await client
+      .from('challonge_tournaments')
+      .select('id, challonge_tournament_id, status')
+      .eq('race_id', raceId)
+      .eq('status', 'active')
+      .single()
+
     if (!tournament) {
       console.log('No active Challonge tournament found for this race')
       return
     }
-    
+
     // Import the bracket generator function
     const { generateBracketsFromChallonge } = await import('./bracket-generator')
-    
+
     // Regenerate brackets from current Challonge state
     const result = await generateBracketsFromChallonge(client, raceId, tournament.id)
-    
+
     console.log(`✅ Auto-sync complete: ${result.bracketsGenerated} brackets generated`)
-    
   } catch (error) {
     console.error('❌ Auto-sync failed:', error)
     throw error
@@ -138,7 +262,7 @@ async function autoSyncNewChallongeMatches(client: SupabaseClient<any>, raceId: 
  * Determines the current phase of a race based on the state of qualifiers and brackets
  */
 export async function getRacePhase(
-  client: SupabaseClient<any, "public", any>,
+  client: SupabaseClient<any, 'public', any>,
   raceId: string
 ): Promise<RacePhase> {
   try {
@@ -170,24 +294,32 @@ export async function getRacePhase(
           .single()
 
         if (tournament) {
-          console.log(`🎾 Found Challonge tournament ${tournament.challonge_tournament_id} for race ${raceId}`)
+          console.log(
+            `🎾 Found Challonge tournament ${tournament.challonge_tournament_id} for race ${raceId}`
+          )
           const { challongeApi } = await import('./challonge-client')
-          const participants = await challongeApi.getParticipants(tournament.challonge_tournament_id)
-          const hasRankings = participants.some(p => p.participant.final_rank !== null)
-          
+          const participants = await challongeApi.getParticipants(
+            tournament.challonge_tournament_id
+          )
+          const hasRankings = participants.some((p) => p.participant.final_rank !== null)
+
           if (hasRankings) {
             console.log(`✅ Challonge tournament has final rankings - returning 'complete'`)
             return 'complete'
           } else {
-            console.log(`🏁 Challonge tournament exists but no final rankings - returning 'brackets'`)
+            console.log(
+              `🏁 Challonge tournament exists but no final rankings - returning 'brackets'`
+            )
             return 'brackets'
           }
         }
       } catch (error: any) {
         console.log('No Challonge tournament found:', error?.message || error)
       }
-      
-      console.log(`❌ No qualifiers, brackets, or Challonge tournament found - returning 'not_started'`)
+
+      console.log(
+        `❌ No qualifiers, brackets, or Challonge tournament found - returning 'not_started'`
+      )
       return 'not_started'
     }
 
@@ -204,23 +336,23 @@ export async function getRacePhase(
 
         if (tournament) {
           const { challongeApi } = await import('./challonge-client')
-          const participants = await challongeApi.getParticipants(tournament.challonge_tournament_id)
-          const hasRankings = participants.some(p => p.participant.final_rank !== null)
-          
+          const participants = await challongeApi.getParticipants(
+            tournament.challonge_tournament_id
+          )
+          const hasRankings = participants.some((p) => p.participant.final_rank !== null)
+
           if (hasRankings) {
             console.log(`✅ Challonge tournament has final rankings - returning 'complete'`)
             return 'complete'
           }
         }
-      } catch (error) {
-        console.log('Could not check Challonge status, falling back to local bracket check')
+      } catch (err) {
+        console.log('Could not check Challonge status, falling back to local bracket check:', err)
       }
-      
+
       // Fallback: Check for any incomplete brackets (no winner assigned)
-      const incompleteBrackets = brackets.filter(
-        b => b.winner_racer_id === null
-      )
-      
+      const incompleteBrackets = brackets.filter((b) => b.winner_racer_id === null)
+
       // If no incomplete brackets remain, the tournament is complete
       if (incompleteBrackets.length === 0) {
         // Auto-finalize the Challonge tournament if not already done
@@ -230,10 +362,10 @@ export async function getRacePhase(
           console.error('Failed to auto-finalize tournament:', error)
           // Continue even if finalization fails
         }
-        
+
         return 'complete'
       }
-      
+
       return 'brackets'
     }
 
@@ -268,12 +400,11 @@ export async function getCurrentHeat(
   raceId: string,
   phase: RacePhase
 ) {
-  
   // If tournament is complete, return null (no current heat)
   if (phase === 'complete') {
     return null
   }
-  
+
   if (phase === 'qualifying') {
     // Get current qualifier heat (in_progress first, then scheduled)
     const { data: currentHeat } = await client
@@ -347,7 +478,7 @@ export async function getCurrentHeat(
       }
     }
   } else if (phase === 'brackets') {
-    // Get current bracket (first one without both times, ordered by Challonge play order)
+    // Get current bracket (first one without winner, ordered by Challonge play order)
     const { data: currentBracket } = await client
       .from('brackets')
       .select(
@@ -368,16 +499,263 @@ export async function getCurrentHeat(
       `
       )
       .eq('race_id', raceId)
-      .is('winner_racer_id', null) // Only get brackets without a winner (incomplete)
+      .is('winner_racer_id', null) // No winner assigned
+      .or('is_forfeit.is.null,is_forfeit.eq.false') // Not forfeited
       .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
       .limit(1)
       .single()
 
+    console.log(
+      '🎯 Current bracket found:',
+      currentBracket
+        ? {
+            id: currentBracket.id,
+            match_number: currentBracket.match_number,
+            winner_racer_id: currentBracket.winner_racer_id,
+            is_forfeit: currentBracket.is_forfeit,
+            track1_racer_id: currentBracket.track1_racer_id,
+            track2_racer_id: currentBracket.track2_racer_id
+          }
+        : 'None'
+    )
+
     const typedCurrentBracket = currentBracket as BracketRecord | null
 
+    if (typedCurrentBracket) {
+      // Check if this bracket needs to be auto-completed as a bye
+      // This can happen when upstream matches are forfeited but Challonge sync hasn't completed yet
+      let needsByeCompletion =
+        !typedCurrentBracket.winner_racer_id &&
+        ((typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id) ||
+          (!typedCurrentBracket.track1_racer_id && typedCurrentBracket.track2_racer_id))
+
+      // Also check if either racer has been withdrawn from the tournament
+      if (
+        !needsByeCompletion &&
+        !typedCurrentBracket.winner_racer_id &&
+        typedCurrentBracket.track1_racer_id &&
+        typedCurrentBracket.track2_racer_id
+      ) {
+        const { data: withdrawals } = await client
+          .from('race_withdrawals')
+          .select('racer_id')
+          .eq('race_id', raceId)
+          .in('racer_id', [
+            typedCurrentBracket.track1_racer_id,
+            typedCurrentBracket.track2_racer_id
+          ])
+
+        const withdrawnRacerIds = withdrawals?.map((w) => w.racer_id) || []
+
+        if (withdrawnRacerIds.length === 1) {
+          // One racer withdrawn - the other gets a bye
+          needsByeCompletion = true
+          console.log(
+            `🚪 One racer withdrawn from match ${typedCurrentBracket.match_number}, awarding bye to remaining racer`
+          )
+        } else if (withdrawnRacerIds.length === 2) {
+          // Both racers withdrawn - match should be forfeited
+          console.log(
+            `🚫 Both racers withdrawn from match ${typedCurrentBracket.match_number}, forfeiting match`
+          )
+          await client
+            .from('brackets')
+            .update({
+              is_forfeit: true,
+              is_completed: true
+            })
+            .eq('id', typedCurrentBracket.id)
+
+          // Recursively get the next bracket after forfeiting
+          return getCurrentHeat(client, raceId, phase)
+        }
+      }
+
+      if (needsByeCompletion) {
+        console.log(
+          `🏃 Auto-completing bye bracket ${typedCurrentBracket.id} (match ${typedCurrentBracket.match_number})`
+        )
+
+        // Determine winner based on who is still in the tournament
+        let winnerId, winnerTrack
+
+        if (typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id) {
+          // Track 1 has racer, track 2 empty
+          winnerId = typedCurrentBracket.track1_racer_id
+          winnerTrack = 1
+        } else if (!typedCurrentBracket.track1_racer_id && typedCurrentBracket.track2_racer_id) {
+          // Track 2 has racer, track 1 empty
+          winnerId = typedCurrentBracket.track2_racer_id
+          winnerTrack = 2
+        } else {
+          // Both tracks have racers, but one is withdrawn - check withdrawals
+          const { data: withdrawals } = await client
+            .from('race_withdrawals')
+            .select('racer_id')
+            .eq('race_id', raceId)
+            .in('racer_id', [
+              typedCurrentBracket.track1_racer_id,
+              typedCurrentBracket.track2_racer_id
+            ])
+
+          const withdrawnRacerIds = withdrawals?.map((w) => w.racer_id) || []
+
+          if (withdrawnRacerIds.includes(typedCurrentBracket.track1_racer_id)) {
+            // Track 1 racer withdrawn, track 2 wins
+            winnerId = typedCurrentBracket.track2_racer_id
+            winnerTrack = 2
+          } else {
+            // Track 2 racer withdrawn, track 1 wins
+            winnerId = typedCurrentBracket.track1_racer_id
+            winnerTrack = 1
+          }
+        }
+
+        await client
+          .from('brackets')
+          .update({
+            winner_track: winnerTrack,
+            winner_racer_id: winnerId,
+            is_completed: true,
+            rounds_won_track1: winnerTrack === 1 ? 2 : 0,
+            rounds_won_track2: winnerTrack === 2 ? 2 : 0
+          })
+          .eq('id', typedCurrentBracket.id)
+
+        // Recursively get the next bracket after auto-completing this bye
+        return getCurrentHeat(client, raceId, phase)
+      }
+    }
+
     if (!typedCurrentBracket) {
+      // If there are no incomplete brackets remaining, don't spam Challonge syncs; finalize and exit
+      try {
+        const { count: incompleteCount } = await client
+          .from('brackets')
+          .select('id', { count: 'exact', head: true })
+          .eq('race_id', raceId)
+          .is('winner_racer_id', null)
+          .or('is_forfeit.is.null,is_forfeit.eq.false')
+
+        if ((incompleteCount ?? 0) === 0) {
+          console.log('🧹 No incomplete brackets remain; skipping Challonge sync.')
+          // Best effort auto-finalize; ignore failures
+          try {
+            await autoFinalizeChallongeTournament(client, raceId)
+          } catch {
+            // no-op
+            void 0
+          }
+        } else {
+          // There appear to be pending brackets but none selected (edge case) – attempt a single reconcile without recursion
+          console.log(
+            '❌ No current bracket found, attempting a single Challonge reconciliation...'
+          )
+          try {
+            const { data: tournament } = await client
+              .from('challonge_tournaments')
+              .select('id')
+              .eq('race_id', raceId)
+              .eq('status', 'active')
+              .single()
+
+            if (tournament) {
+              const { reconcileBracketsFromChallonge } = await import('./bracket-generator')
+              await reconcileBracketsFromChallonge(client, raceId, tournament.id)
+              console.log('✅ Challonge reconciliation completed')
+
+              // Inline re-check for a current bracket (no recursive retry)
+              const { data: reconciledBracket } = await client
+                .from('brackets')
+                .select(
+                  `
+                  *,
+                  track1_racer:racers!track1_racer_id(
+                    id,
+                    name,
+                    racer_number,
+                    image_url
+                  ),
+                  track2_racer:racers!track2_racer_id(
+                    id,
+                    name,
+                    racer_number,
+                    image_url
+                  )
+                `
+                )
+                .eq('race_id', raceId)
+                .is('winner_racer_id', null)
+                .or('is_forfeit.is.null,is_forfeit.eq.false')
+                .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
+                .order('challonge_round', { ascending: true })
+                .order('match_number', { ascending: true })
+                .limit(1)
+                .single()
+
+              if (reconciledBracket) {
+                // Build and return the current bracket after successful reconcile
+                const newBracket = reconciledBracket as BracketRecord
+                const allBrackets = await client
+                  .from('brackets')
+                  .select('id')
+                  .eq('race_id', raceId)
+                  .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
+                  .order('challonge_round', { ascending: true })
+                  .order('match_number', { ascending: true })
+
+                const bracketIndex =
+                  allBrackets?.data?.findIndex((b) => b.id === newBracket.id) ?? 0
+                const heatNumber = bracketIndex + 1
+
+                return {
+                  heat_number: heatNumber,
+                  type: 'bracket',
+                  bracket_id: newBracket.id,
+                  bracket_group: newBracket.bracket_group,
+                  round_number: newBracket.round_number,
+                  match_number: newBracket.match_number,
+                  challonge_match_id: newBracket.challonge_match_id,
+                  challonge_round: newBracket.challonge_round,
+                  // Multi-round metadata
+                  match_format: newBracket.match_format,
+                  total_rounds: newBracket.total_rounds,
+                  current_round: newBracket.current_round,
+                  rounds_won_track1: newBracket.rounds_won_track1,
+                  rounds_won_track2: newBracket.rounds_won_track2,
+                  is_completed: newBracket.is_completed,
+                  racers: [
+                    {
+                      track_number: 1,
+                      racer_id: newBracket.track1_racer_id,
+                      racer_name: newBracket.track1_racer?.name,
+                      racer_number: newBracket.track1_racer?.racer_number,
+                      racer_image_url: newBracket.track1_racer?.image_url,
+                      time: newBracket.track1_time
+                    },
+                    {
+                      track_number: 2,
+                      racer_id: newBracket.track2_racer_id,
+                      racer_name: newBracket.track2_racer?.name,
+                      racer_number: newBracket.track2_racer?.racer_number,
+                      racer_image_url: newBracket.track2_racer?.image_url,
+                      time: newBracket.track2_time
+                    }
+                  ].filter((r) => r.racer_id)
+                }
+              }
+            }
+          } catch (reconcileError) {
+            console.error('Failed to reconcile from Challonge:', reconcileError)
+            // Continue with fallback logic
+          }
+        }
+      } catch (err) {
+        console.error('Error while checking remaining brackets:', err)
+      }
+
       // No current bracket found - check if there are any scheduled qualifiers we should show instead
       const { data: scheduledQualifiers, error: qualError } = await client
         .from('qualifiers')
@@ -423,11 +801,11 @@ export async function getCurrentHeat(
         }
       }
 
-      console.log('❌ No scheduled qualifiers, trying Challonge sync...')
+      console.log('❌ No scheduled qualifiers, trying a one-time Challonge sync...')
 
       try {
         await autoSyncNewChallongeMatches(client, raceId)
-        
+
         // Try getting current bracket again after sync
         const { data: retryBracket } = await client
           .from('brackets')
@@ -450,33 +828,43 @@ export async function getCurrentHeat(
           )
           .eq('race_id', raceId)
           .is('winner_racer_id', null)
+          .or('is_forfeit.is.null,is_forfeit.eq.false')
           .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
           .order('challonge_round', { ascending: true })
           .order('match_number', { ascending: true })
           .limit(1)
           .single()
-        
+
         if (retryBracket) {
           console.log('Found new bracket after Challonge sync')
           // Set typedCurrentBracket to the new bracket and continue normal processing
           const newBracket = retryBracket as BracketRecord
-          
-          if (newBracket.track1_racer_id && !newBracket.track2_racer_id && !newBracket.winner_racer_id) {
-            // Auto-complete the bye
+
+          if (
+            !newBracket.winner_racer_id &&
+            ((newBracket.track1_racer_id && !newBracket.track2_racer_id) ||
+              (!newBracket.track1_racer_id && newBracket.track2_racer_id))
+          ) {
+            // Auto-complete bye (mark completed with 2-0 win for Bo3)
+            const winnerTrack = newBracket.track1_racer_id ? 1 : 2
+            const winnerId = newBracket.track1_racer_id || newBracket.track2_racer_id
             await client
               .from('brackets')
               .update({
-                winner_track: 1,
-                winner_racer_id: newBracket.track1_racer_id
+                winner_track: winnerTrack,
+                winner_racer_id: winnerId,
+                is_completed: true,
+                rounds_won_track1: winnerTrack === 1 ? 2 : 0,
+                rounds_won_track2: winnerTrack === 2 ? 2 : 0
               })
               .eq('id', newBracket.id)
-            
+
             console.log(`Auto-completed bye for bracket ${newBracket.id}`)
-            
+
             // Recursively get the next bracket after auto-completing this bye
             return getCurrentHeat(client, raceId, phase)
           }
-          
+
           // Process the new bracket normally
           const allBrackets = await client
             .from('brackets')
@@ -485,10 +873,10 @@ export async function getCurrentHeat(
             .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
             .order('challonge_round', { ascending: true })
             .order('match_number', { ascending: true })
-          
-          const bracketIndex = allBrackets?.data?.findIndex(b => b.id === newBracket.id) ?? 0
+
+          const bracketIndex = allBrackets?.data?.findIndex((b) => b.id === newBracket.id) ?? 0
           const heatNumber = bracketIndex + 1
-          
+
           return {
             heat_number: heatNumber,
             type: 'bracket',
@@ -498,6 +886,13 @@ export async function getCurrentHeat(
             match_number: newBracket.match_number,
             challonge_match_id: newBracket.challonge_match_id,
             challonge_round: newBracket.challonge_round,
+            // Multi-round metadata
+            match_format: newBracket.match_format,
+            total_rounds: newBracket.total_rounds,
+            current_round: newBracket.current_round,
+            rounds_won_track1: newBracket.rounds_won_track1,
+            rounds_won_track2: newBracket.rounds_won_track2,
+            is_completed: newBracket.is_completed,
             racers: [
               {
                 track_number: 1,
@@ -515,11 +910,11 @@ export async function getCurrentHeat(
                 racer_image_url: newBracket.track2_racer?.image_url,
                 time: newBracket.track2_time
               }
-            ].filter(r => r.racer_id)
+            ].filter((r) => r.racer_id)
           }
         }
-      } catch (error) {
-        console.error('Auto-sync failed:', error)
+      } catch (err) {
+        console.error('Auto-sync failed:', err)
         // Continue with normal flow even if sync fails
       }
     }
@@ -528,10 +923,10 @@ export async function getCurrentHeat(
       // Check if this bracket has no racers assigned - if so, try auto-sync
       if (!typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id) {
         console.log('Current bracket has no racers assigned, checking for new Challonge matches...')
-        
+
         try {
           await autoSyncNewChallongeMatches(client, raceId)
-          
+
           // Recursively try again after sync
           return getCurrentHeat(client, raceId, phase)
         } catch (error) {
@@ -541,18 +936,27 @@ export async function getCurrentHeat(
       }
 
       // Check if this is a bye match (only one racer) and auto-complete if needed
-      if (typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id && !typedCurrentBracket.winner_racer_id) {
-        // Auto-complete the bye
+      if (
+        !typedCurrentBracket.winner_racer_id &&
+        ((typedCurrentBracket.track1_racer_id && !typedCurrentBracket.track2_racer_id) ||
+          (!typedCurrentBracket.track1_racer_id && typedCurrentBracket.track2_racer_id))
+      ) {
+        // Auto-complete bye (mark completed with 2-0 win for Bo3)
+        const winnerTrack = typedCurrentBracket.track1_racer_id ? 1 : 2
+        const winnerId = typedCurrentBracket.track1_racer_id || typedCurrentBracket.track2_racer_id
         await client
           .from('brackets')
           .update({
-            winner_track: 1,
-            winner_racer_id: typedCurrentBracket.track1_racer_id
+            winner_track: winnerTrack,
+            winner_racer_id: winnerId,
+            is_completed: true,
+            rounds_won_track1: winnerTrack === 1 ? 2 : 0,
+            rounds_won_track2: winnerTrack === 2 ? 2 : 0
           })
           .eq('id', typedCurrentBracket.id)
-        
+
         console.log(`Auto-completed bye for bracket ${typedCurrentBracket.id}`)
-        
+
         // Recursively get the next bracket after auto-completing this bye
         return getCurrentHeat(client, raceId, phase)
       }
@@ -565,8 +969,8 @@ export async function getCurrentHeat(
         .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
         .order('challonge_round', { ascending: true })
         .order('match_number', { ascending: true })
-      
-      const bracketIndex = allBrackets?.findIndex(b => b.id === typedCurrentBracket.id) ?? 0
+
+      const bracketIndex = allBrackets?.findIndex((b) => b.id === typedCurrentBracket.id) ?? 0
       const heatNumber = bracketIndex + 1 // Sequential numbering starting from 1
 
       return {
@@ -578,6 +982,13 @@ export async function getCurrentHeat(
         match_number: typedCurrentBracket.match_number,
         challonge_match_id: typedCurrentBracket.challonge_match_id,
         challonge_round: typedCurrentBracket.challonge_round,
+        // Multi-round metadata
+        match_format: typedCurrentBracket.match_format,
+        total_rounds: typedCurrentBracket.total_rounds,
+        current_round: typedCurrentBracket.current_round,
+        rounds_won_track1: typedCurrentBracket.rounds_won_track1,
+        rounds_won_track2: typedCurrentBracket.rounds_won_track2,
+        is_completed: typedCurrentBracket.is_completed,
         racers: [
           {
             track_number: 1,
@@ -595,7 +1006,7 @@ export async function getCurrentHeat(
             racer_image_url: typedCurrentBracket.track2_racer?.image_url,
             time: typedCurrentBracket.track2_time
           }
-        ].filter(r => r.racer_id) // Filter out null racers (byes)
+        ].filter((r) => r.racer_id) // Filter out null racers (byes)
       }
     }
   }
@@ -616,7 +1027,8 @@ export async function getUpcomingHeats(
     // Get upcoming qualifiers directly (more reliable than RPC)
     const { data: upcomingQualifiers } = await client
       .from('qualifiers')
-      .select(`
+      .select(
+        `
         *,
         racer:racers(
           id,
@@ -624,7 +1036,8 @@ export async function getUpcomingHeats(
           racer_number,
           image_url
         )
-      `)
+      `
+      )
       .eq('race_id', raceId)
       .in('status', ['scheduled', 'in_progress'])
       .order('heat_number', { ascending: true })
@@ -636,7 +1049,20 @@ export async function getUpcomingHeats(
       const currentHeatNumber = currentHeat?.heat_number
 
       // Group by heat number
-      const grouped: Record<number, any> = {}
+      const grouped: Record<
+        number,
+        {
+          heat_number: number
+          type: 'qualifier'
+          racers: Array<{
+            track_number: number
+            racer_id: string
+            racer_name?: string
+            racer_number?: number
+            racer_image_url?: string
+          }>
+        }
+      > = {}
       upcomingQualifiers.forEach((q) => {
         if (!grouped[q.heat_number]) {
           grouped[q.heat_number] = {
@@ -657,7 +1083,7 @@ export async function getUpcomingHeats(
       const heatsArray = Object.values(grouped)
         .sort((a, b) => a.heat_number - b.heat_number)
         // Filter out current heat
-        .filter(heat => heat.heat_number !== currentHeatNumber)
+        .filter((heat) => heat.heat_number !== currentHeatNumber)
 
       // Return the next heats
       return heatsArray.slice(0, count)
@@ -684,7 +1110,8 @@ export async function getUpcomingHeats(
       `
       )
       .eq('race_id', raceId)
-      .is('winner_racer_id', null) // Only get brackets without a winner (incomplete)
+      .is('winner_racer_id', null)
+      .or('is_forfeit.is.null,is_forfeit.eq.false')
       .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
@@ -692,8 +1119,18 @@ export async function getUpcomingHeats(
 
     if (upcomingBrackets && upcomingBrackets.length > 1) {
       // Skip the first one (that's the current bracket)
-      const nextBrackets = upcomingBrackets.slice(1)
-      
+      // Skip bye brackets (single participant, no winner yet) so we don't queue them
+      const nextBrackets = upcomingBrackets
+        .slice(1)
+        .filter(
+          (b) =>
+            !(
+              !b.winner_racer_id &&
+              ((b.track1_racer_id && !b.track2_racer_id) ||
+                (!b.track1_racer_id && b.track2_racer_id))
+            )
+        )
+
       // Get all brackets for numbering (using Challonge ordering)
       const { data: allBrackets } = await client
         .from('brackets')
@@ -704,9 +1141,9 @@ export async function getUpcomingHeats(
         .order('match_number', { ascending: true })
 
       return nextBrackets.map((bracket, index) => {
-        const bracketIndex = allBrackets?.findIndex(b => b.id === bracket.id) ?? 0
+        const bracketIndex = allBrackets?.findIndex((b) => b.id === bracket.id) ?? 0
         const heatNumber = bracketIndex + 1 // Sequential numbering starting from 1
-        
+
         return {
           heat_number: heatNumber,
           type: 'bracket',
@@ -732,7 +1169,7 @@ export async function getUpcomingHeats(
               racer_number: bracket.track2_racer?.racer_number,
               racer_image_url: bracket.track2_racer?.image_url
             }
-          ].filter(r => r.racer_id) // Filter out null racers
+          ].filter((r) => r.racer_id) // Filter out null racers
         }
       })
     }

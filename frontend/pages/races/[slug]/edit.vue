@@ -130,7 +130,7 @@
                   accept="image/*"
                   class="hidden"
                   @change="handleImageUpload"
-                >
+                />
 
                 <!-- Custom upload button -->
                 <Button
@@ -158,16 +158,26 @@
                   alt="Race preview"
                   class="max-w-xs rounded-lg shadow-md"
                   @error="form.image_url = ''"
-                >
+                />
               </div>
 
               <!-- Submit Button -->
-              <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start">
-                <Button type="submit" :loading="loading" severity="primary" class="w-full sm:w-auto">
+              <div
+                class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start"
+              >
+                <Button
+                  type="submit"
+                  :loading="loading"
+                  severity="primary"
+                  class="w-full sm:w-auto"
+                >
                   <i class="pi pi-save mr-2" />
                   Save Changes
                 </Button>
-                <NuxtLink :to="`/races/${race?.slug || $route.params.slug}`" class="w-full sm:w-auto">
+                <NuxtLink
+                  :to="`/races/${race?.slug || $route.params.slug}`"
+                  class="w-full sm:w-auto"
+                >
                   <Button
                     type="button"
                     severity="secondary"

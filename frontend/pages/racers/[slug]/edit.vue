@@ -132,7 +132,7 @@
                         :src="previewImage || form.image_url"
                         :alt="previewImage ? 'Photo preview' : 'Current main photo'"
                         class="max-w-xs max-h-48 mx-auto rounded-lg shadow-md object-cover"
-                      >
+                      />
                     </div>
 
                     <!-- Preview Action Buttons -->
@@ -210,7 +210,9 @@
               </div>
 
               <!-- Action Buttons -->
-              <div class="flex flex-col-reverse sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start">
+              <div
+                class="flex flex-col-reverse sm:flex-row gap-4 pt-6 border-t border-gray-200 sm:justify-start"
+              >
                 <NuxtLink :to="`/racers/${racer.slug}`" class="w-full sm:w-auto">
                   <Button type="button" class="btn-secondary w-full sm:w-auto">
                     <span>Cancel</span>

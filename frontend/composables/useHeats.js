@@ -13,20 +13,26 @@ export const useHeats = () => {
   const recentlyCompletedHeat = useState('heats-recently-completed', () => null)
   const displayDelayTimer = useState('heats-display-timer', () => null)
   const showCompletedHeatResults = useState('heats-show-completed', () => false)
-  
+  // Track last completed heat we displayed to prevent repeated re-triggers
+  const lastCompletedKey = useState('heats-last-completed-key', () => null)
+
   // Debounce timer for data fetching to prevent excessive API calls
   const debounceTimer = useState('heats-debounce-timer', () => null)
 
+  // Lightweight polling fallback (in case realtime misses events)
+  const pollingTimer = useState('heats-polling-timer', () => null)
+  const POLLING_INTERVAL_MS = 2000
+
   // Configuration for how long to show completed results (in milliseconds)
   const COMPLETED_HEAT_DISPLAY_DURATION = 15000 // 15 seconds
-  
+
   // Debounced version of fetchCurrentRaceData to prevent API call spam
   const debouncedFetchCurrentRaceData = async (delay = 500) => {
     // Clear existing timer
     if (debounceTimer.value) {
       clearTimeout(debounceTimer.value)
     }
-    
+
     // Set new timer
     debounceTimer.value = setTimeout(async () => {
       await fetchCurrentRaceData()
@@ -59,6 +65,14 @@ export const useHeats = () => {
     }, COMPLETED_HEAT_DISPLAY_DURATION)
   }
 
+  // Helper to build a stable key for a heat (per race)
+  const getHeatKey = (heat) => {
+    if (!heat) return null
+    const raceId = (currentRace.value && currentRace.value.id) || 'unknown'
+    if (heat.type === 'bracket' && heat.bracket_id) return `r${raceId}:br:${heat.bracket_id}`
+    return `r${raceId}:q:${heat.heat_number}`
+  }
+
   // Helper function to detect if a heat was just completed
   const detectHeatCompletion = (previousHeat, newHeat, newUpcomingHeats) => {
     // If we had a current heat before, but now we don't, and there are upcoming heats
@@ -73,9 +87,13 @@ export const useHeats = () => {
     }
 
     // For brackets, also check if bracket_id changed (more precise than heat_number)
-    if (previousHeat && newHeat && 
-        previousHeat.type === 'bracket' && newHeat.type === 'bracket' &&
-        previousHeat.bracket_id !== newHeat.bracket_id) {
+    if (
+      previousHeat &&
+      newHeat &&
+      previousHeat.type === 'bracket' &&
+      newHeat.type === 'bracket' &&
+      previousHeat.bracket_id !== newHeat.bracket_id
+    ) {
       return previousHeat
     }
 
@@ -83,7 +101,11 @@ export const useHeats = () => {
   }
 
   // Fetch completed heat results with times (handles both qualifiers and brackets)
-  const fetchCompletedHeatResults = async (heatNumber, heatType = 'qualifier', bracketId = null) => {
+  const fetchCompletedHeatResults = async (
+    heatNumber,
+    heatType = 'qualifier',
+    bracketId = null
+  ) => {
     if (!currentRace.value) return null
 
     try {
@@ -91,7 +113,8 @@ export const useHeats = () => {
         // Get the completed bracket data with racer information
         let query = supabase
           .from('brackets')
-          .select(`
+          .select(
+            `
             *,
             track1_racer:racers!track1_racer_id(
               id,
@@ -105,7 +128,8 @@ export const useHeats = () => {
               racer_number,
               image_url
             )
-          `)
+          `
+          )
           .eq('race_id', currentRace.value.id)
           .not('track1_time', 'is', null)
           .not('track2_time', 'is', null)
@@ -132,6 +156,13 @@ export const useHeats = () => {
             bracket_group: completedBracket.bracket_group,
             round_number: completedBracket.round_number,
             match_number: completedBracket.match_number,
+            // Multi-round metadata for best-of-3 display
+            match_format: completedBracket.match_format,
+            total_rounds: completedBracket.total_rounds,
+            current_round: completedBracket.current_round,
+            rounds_won_track1: completedBracket.rounds_won_track1,
+            rounds_won_track2: completedBracket.rounds_won_track2,
+            is_completed: completedBracket.is_completed,
             winner_racer_id: completedBracket.winner_racer_id,
             racers: [
               {
@@ -152,7 +183,7 @@ export const useHeats = () => {
                 time: completedBracket.track2_time,
                 is_winner: completedBracket.winner_track === 2
               }
-            ].filter(r => r.racer_id) // Filter out null racers
+            ].filter((r) => r.racer_id) // Filter out null racers
           }
         }
 
@@ -228,20 +259,25 @@ export const useHeats = () => {
       const justCompletedHeat = detectHeatCompletion(previousHeat, newHeat, newUpcomingHeats)
 
       if (justCompletedHeat) {
-        // Fetch the completed heat results before starting the display
-        try {
-          console.log('useHeats: justCompletedHeat data:', justCompletedHeat)
-          const completedHeatWithResults = await fetchCompletedHeatResults(
-            justCompletedHeat.heat_number,
-            justCompletedHeat.type || 'qualifier',
-            justCompletedHeat.bracket_id // Pass bracket_id for precise lookup
-          )
-          if (completedHeatWithResults) {
-            startCompletedHeatDisplay(completedHeatWithResults)
+        // Only trigger once per completed heat key to avoid extending the display window
+        const completedKey = getHeatKey(justCompletedHeat)
+        if (completedKey && lastCompletedKey.value !== completedKey) {
+          // Fetch the completed heat results before starting the display
+          try {
+            console.log('useHeats: justCompletedHeat data:', justCompletedHeat)
+            const completedHeatWithResults = await fetchCompletedHeatResults(
+              justCompletedHeat.heat_number,
+              justCompletedHeat.type || 'qualifier',
+              justCompletedHeat.bracket_id // Pass bracket_id for precise lookup
+            )
+            if (completedHeatWithResults) {
+              startCompletedHeatDisplay(completedHeatWithResults)
+              lastCompletedKey.value = completedKey
+            }
+          } catch (err) {
+            console.error('Error fetching completed heat results:', err)
+            // Continue with normal operation even if we can't fetch completed results
           }
-        } catch (err) {
-          console.error('Error fetching completed heat results:', err)
-          // Continue with normal operation even if we can't fetch completed results
         }
       }
 
@@ -411,12 +447,51 @@ export const useHeats = () => {
           filter: `race_id=eq.${currentRace.value.id}`
         },
         async (payload) => {
-          // Only refresh if this affects the current heat or upcoming heats
-          if (payload.eventType === 'UPDATE' && payload.new?.status === 'completed') {
-            // A qualifier was completed - this might change current/upcoming heats
-            await debouncedFetchCurrentRaceData()
+          const oldRow = payload.old || {}
+          const newRow = payload.new || {}
+
+          // Guard: only react to rows from our race id (extra safety)
+          if (newRow.race_id !== currentRace.value.id) return
+
+          // Refresh logic matrix:
+          // - INSERT of scheduled/in_progress heats can change current/upcoming
+          // - UPDATE to the current heat (time or status) should live-refresh hero
+          // - UPDATE when status becomes completed should also refresh (existing behavior)
+          if (payload.eventType === 'INSERT') {
+            if (['scheduled', 'in_progress'].includes(newRow.status)) {
+              await debouncedFetchCurrentRaceData(400)
+            }
+            return
           }
-          // Skip refreshing for other qualifier changes (like status changes during heat)
+
+          if (payload.eventType === 'UPDATE') {
+            // If this qualifier just completed, refresh (kept from previous behavior)
+            if (newRow.status === 'completed' && oldRow.status !== 'completed') {
+              await debouncedFetchCurrentRaceData(150)
+              return
+            }
+
+            // Live updates during in-progress heat: if this row belongs to the current heat,
+            // and time or status changed, refresh the hero with a light debounce
+            const isCurrentQualifierHeat =
+              currentHeat.value?.type === 'qualifier' &&
+              Number(currentHeat.value?.heat_number) === Number(newRow.heat_number)
+
+            const timeChanged = oldRow.time !== newRow.time
+            const statusChanged = oldRow.status !== newRow.status
+
+            if (isCurrentQualifierHeat && (timeChanged || statusChanged)) {
+              await debouncedFetchCurrentRaceData(150)
+              return
+            }
+
+            // Fallback: if heat_number changed (rare), refresh upcoming list
+            if (oldRow.heat_number !== newRow.heat_number) {
+              await debouncedFetchCurrentRaceData(400)
+              return
+            }
+          }
+          // For DELETE or other changes, no-op
         }
       )
       .subscribe()
@@ -438,30 +513,88 @@ export const useHeats = () => {
             // New brackets generated - current heat might have changed
             console.log('🔄 New brackets generated, refreshing current heat')
             await debouncedFetchCurrentRaceData()
-          } else if (payload.eventType === 'UPDATE' && payload.new?.winner_racer_id && !payload.old?.winner_racer_id) {
-            // Bracket completed (winner determined) - capture results immediately
-            console.log('🏁 Bracket completed, capturing results before next heat loads')
-            
-            try {
-              // Fetch the completed bracket results immediately
-              const completedBracketWithResults = await fetchCompletedHeatResults(
-                null, // Don't need heat number for bracket ID lookup
-                'bracket',
-                payload.new.id // Use the bracket ID from the update event
-              )
-              
-              if (completedBracketWithResults) {
-                console.log('Successfully captured completed bracket results:', completedBracketWithResults)
-                startCompletedHeatDisplay(completedBracketWithResults)
+          } else if (payload.eventType === 'UPDATE') {
+            const oldRow = payload.old || {}
+            const newRow = payload.new || {}
+
+            // Case 1: Bracket completed (winner determined) - existing behavior
+            if (newRow?.winner_racer_id && !oldRow?.winner_racer_id) {
+              console.log('🏁 Bracket completed, capturing results before next heat loads')
+              try {
+                // Guard against repeated triggers for the same bracket completion
+                const completedKey = getHeatKey({
+                  type: 'bracket',
+                  bracket_id: newRow.id,
+                  heat_number: null
+                })
+                if (!completedKey || lastCompletedKey.value === completedKey) {
+                  // Already displayed this completion; skip
+                } else {
+                  const completedBracketWithResults = await fetchCompletedHeatResults(
+                    null,
+                    'bracket',
+                    newRow.id
+                  )
+                  if (completedBracketWithResults) {
+                    console.log(
+                      'Successfully captured completed bracket results:',
+                      completedBracketWithResults
+                    )
+                    startCompletedHeatDisplay(completedBracketWithResults)
+                    lastCompletedKey.value = completedKey
+                  }
+                }
+              } catch (err) {
+                console.error('Error capturing completed bracket results:', err)
               }
-            } catch (err) {
-              console.error('Error capturing completed bracket results:', err)
+              // Allow bracket regeneration to happen then refresh
+              await debouncedFetchCurrentRaceData(2000)
+              return
             }
-            
-            // Also refresh current heat data (with delay to let bracket regeneration finish)
-            await debouncedFetchCurrentRaceData(2000) // 2 second delay for bracket regeneration
+
+            // Case 2: Live update when best-of-3 round or score changes on current bracket
+            const fieldsThatAffectDisplay = [
+              'current_round',
+              'rounds_won_track1',
+              'rounds_won_track2',
+              'is_completed'
+            ]
+            const changed = fieldsThatAffectDisplay.some((f) => oldRow?.[f] !== newRow?.[f])
+            const affectsCurrent =
+              currentHeat.value?.type === 'bracket' && currentHeat.value?.bracket_id === newRow.id
+
+            if (changed && affectsCurrent) {
+              console.log('🎯 Bracket round/score changed for current match — refreshing heat')
+              await debouncedFetchCurrentRaceData(250)
+            }
           }
           // Skip refreshing for time updates without winner determination
+        }
+      )
+      .subscribe()
+
+    // Channel for per-round updates (ensures UI refresh even if bracket updates are delayed)
+    const bracketRoundsChannel = supabase
+      .channel(`bracket_rounds-${currentRace.value.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'bracket_rounds'
+        },
+        async (payload) => {
+          const brId = (payload.new || payload.old || {}).bracket_id
+          // Only refresh if this round belongs to the current bracket heat
+          if (
+            brId &&
+            currentHeat.value?.type === 'bracket' &&
+            currentHeat.value?.bracket_id === brId
+          ) {
+            const action = payload.eventType === 'INSERT' ? 'inserted' : 'updated'
+            console.log(`🟡 Bracket round ${action} — refreshing current heat display`)
+            await debouncedFetchCurrentRaceData(250)
+          }
         }
       )
       .subscribe()
@@ -471,6 +604,7 @@ export const useHeats = () => {
       onUnmounted(() => {
         qualifiersChannel.unsubscribe()
         bracketsChannel.unsubscribe()
+        bracketRoundsChannel.unsubscribe()
       })
     }
   }
@@ -481,6 +615,16 @@ export const useHeats = () => {
     await fetchCurrentRaceData()
     if (currentRace.value) {
       setupRealtimeSubscription()
+      // Start a lightweight polling fallback to ensure UI stays fresh
+      if (pollingTimer.value) clearInterval(pollingTimer.value)
+      pollingTimer.value = setInterval(async () => {
+        // Skip polling if we're in the middle of showing completed results to avoid flicker
+        if (showCompletedHeatResults.value) return
+        // Only poll when there is an active race context
+        if (currentRace.value) {
+          await debouncedFetchCurrentRaceData(0)
+        }
+      }, POLLING_INTERVAL_MS)
     }
   }
 
@@ -493,6 +637,11 @@ export const useHeats = () => {
   if (import.meta.client) {
     onUnmounted(() => {
       cleanup()
+      // Clear polling interval if set
+      if (pollingTimer.value) {
+        clearInterval(pollingTimer.value)
+        pollingTimer.value = null
+      }
     })
   }
 

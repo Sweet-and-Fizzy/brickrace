@@ -60,9 +60,8 @@ export const useSponsors = () => {
       is_active: sponsorData.is_active ?? true,
       display_order: sponsorData.display_order || 0
     }
-    
-    const { data, error } = await (supabase
-      .from('sponsors') as any)
+
+    const { data, error } = await (supabase.from('sponsors') as any)
       .insert(insertData)
       .select()
       .single()
@@ -89,9 +88,8 @@ export const useSponsors = () => {
       display_order: updates.display_order,
       updated_at: new Date().toISOString()
     }
-    
-    const { data, error } = await (supabase
-      .from('sponsors') as any)
+
+    const { data, error } = await (supabase.from('sponsors') as any)
       .update(updateData)
       .eq('id', id)
       .select()
@@ -110,10 +108,7 @@ export const useSponsors = () => {
 
   // Delete a sponsor
   const deleteSponsor = async (id: string): Promise<void> => {
-    const { error } = await supabase
-      .from('sponsors')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('sponsors').delete().eq('id', id)
 
     if (error) {
       console.error('Error deleting sponsor:', error)
@@ -130,21 +125,17 @@ export const useSponsors = () => {
     const fileName = `${sponsorId || Date.now()}.${fileExt}`
     const filePath = `sponsor-logos/${fileName}`
 
-    const { data, error } = await supabase.storage
-      .from('general-photos')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
+    const { data, error } = await supabase.storage.from('general-photos').upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    })
 
     if (error) {
       console.error('Error uploading sponsor logo:', error)
       throw error
     }
 
-    const { data: publicUrlData } = supabase.storage
-      .from('general-photos')
-      .getPublicUrl(data.path)
+    const { data: publicUrlData } = supabase.storage.from('general-photos').getPublicUrl(data.path)
 
     return publicUrlData.publicUrl
   }

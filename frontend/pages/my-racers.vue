@@ -56,7 +56,7 @@
                               :src="getCurrentImage(racer)"
                               :alt="racer.name?.replace(/[\r\n\t]/g, ' ').trim() || ''"
                               class="w-full h-48 object-cover transition-all duration-300 ease-in-out"
-                            >
+                            />
                           </div>
 
                           <!-- Glass Effect Navigation Arrows -->

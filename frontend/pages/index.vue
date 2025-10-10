@@ -25,8 +25,8 @@
         <!-- Call to Action Button -->
         <div class="text-center mb-8">
           <NuxtLink to="/racers/add">
-            <Button 
-              label="Register Your Racer" 
+            <Button
+              label="Register Your Racer"
               class="btn-primary text-lg px-8 py-3"
               size="large"
             />
@@ -58,7 +58,10 @@
                     <p class="text-lg font-bold">CHECK-IN: 11:00 AM</p>
                     <p class="text-lg font-bold">RACE: NOON</p>
                     <p class="mt-4">
-                      All racers should <NuxtLink to="/racers/add" class="text-blue-600 hover:text-blue-800 underline">register online</NuxtLink>.
+                      All racers should
+                      <NuxtLink to="/racers/add" class="text-blue-600 hover:text-blue-800 underline"
+                        >register online</NuxtLink
+                      >.
                     </p>
                   </div>
                 </div>
@@ -130,7 +133,8 @@
             </div>
             <h3 class="font-bold text-lg mb-2">Food</h3>
             <p class="text-gray-600 text-sm">
-              Enjoy delicious options from Batch, Holyoke Hummus, The Grill, Comfort Bagel, and Wake the Dead Donuts
+              Enjoy delicious options from Batch, Holyoke Hummus, The Grill, Comfort Bagel, and Wake
+              the Dead Donuts
             </p>
           </div>
 
@@ -160,7 +164,7 @@
                     src="~/assets/img/go.png"
                     alt="Test Drive"
                     class="w-full h-full object-contain"
-                  >
+                  />
                 </div>
                 <div class="flex-1">
                   <h3 class="text-xl font-bold text-black mb-2">Test drive the track</h3>
@@ -182,7 +186,7 @@
                     src="~/assets/img/car-cartoon.png"
                     alt="Explore Holyoke"
                     class="w-full h-full object-contain"
-                  >
+                  />
                 </div>
                 <div class="flex-1">
                   <h3 class="text-xl font-bold text-black mb-2">More to do around town</h3>
@@ -299,7 +303,7 @@
                       src="~/assets/img/brickrace_art.jpg"
                       alt="The Great Holyoke Brick Race Artwork"
                       class="w-full h-48 object-cover rounded-lg"
-                    >
+                    />
                   </div>
                 </div>
 
@@ -342,7 +346,7 @@
                       src="~/assets/img/building_brickracer.jpg"
                       alt="Building a Brick Racer"
                       class="w-full h-48 object-cover rounded-lg"
-                    >
+                    />
                   </div>
                 </div>
 
@@ -421,7 +425,7 @@
             :alt="item.alt"
             class="max-w-full max-h-full object-contain"
             style="max-height: 90vh"
-          >
+          />
         </div>
       </template>
     </Galleria>

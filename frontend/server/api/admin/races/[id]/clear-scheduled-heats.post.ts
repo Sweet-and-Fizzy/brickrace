@@ -1,5 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
-import { serverSupabaseUser } from '#supabase/server'
+import { serverSupabaseClient, serverSupabaseUser } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   // Check for admin auth
@@ -31,7 +30,6 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-
     // Delete all scheduled heats for this race
     const { error: deleteError, count } = await client
       .from('qualifiers')

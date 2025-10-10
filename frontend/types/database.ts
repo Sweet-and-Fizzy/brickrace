@@ -126,6 +126,32 @@ export interface Bracket {
   challonge_match_id?: string
   challonge_round?: number
   challonge_suggested_play_order?: number
+  // New fields for multi-round matches
+  match_format?: 'single' | 'best_of_3'
+  rounds_won_track1?: number
+  rounds_won_track2?: number
+  current_round?: number
+  total_rounds?: number
+  is_completed?: boolean
+  created_at: string
+  updated_at?: string
+}
+
+export interface BracketRound {
+  id: string
+  bracket_id: string
+  round_number: number
+  racer1_id: string
+  racer2_id: string
+  racer1_track: number
+  racer2_track: number
+  racer1_time?: number
+  racer2_time?: number
+  winner_racer_id?: string
+  winner_track?: number
+  is_forfeit?: boolean
+  forfeit_reason?: string
+  completed_at?: string
   created_at: string
   updated_at?: string
 }

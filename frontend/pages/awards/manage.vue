@@ -150,7 +150,7 @@
                   :src="definition.image_url"
                   :alt="definition.name"
                   class="w-full aspect-square object-cover"
-                >
+                />
                 <div
                   v-else
                   class="w-full aspect-square bg-gray-200 flex items-center justify-center"
@@ -259,7 +259,7 @@
                   :src="definitionForm.image_url"
                   alt="Award preview"
                   class="w-16 h-16 object-cover rounded border border-gray-300"
-                >
+                />
                 <Button
                   label="Remove Image"
                   icon="pi pi-times"
