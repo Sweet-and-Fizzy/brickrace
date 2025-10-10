@@ -100,9 +100,10 @@ export const useChallonge = () => {
       const { data: raceData } = await $fetch(`/api/races/by-slug/${raceSlug}`)
       const race = raceData as Race
 
-      // Use existing composables to get checkins and qualifiers
+      // Use existing composables to get checkins, qualifiers, and withdrawals
       const checkinsComposable = useCheckins()
       const qualifiersComposable = useQualifiers(race.id)
+      const racersComposable = useRacers()
 
       // Initialize and fetch data
       await checkinsComposable.initialize(race.id)
@@ -111,29 +112,35 @@ export const useChallonge = () => {
       // Get checked-in racers
       const checkedInRacers = checkinsComposable.getCheckinsForRace(race.id)
 
+      // Get withdrawn racers for this race
+      const withdrawnRacers = await racersComposable.getRaceWithdrawals(race.id)
+      const withdrawnRacerIds = new Set(withdrawnRacers.map((w: any) => w.racer_id))
+
       // Get qualifiers data
       const qualifiers = qualifiersComposable.qualifiers
 
-      // Process racers with their best qualifying times
-      const racersWithTimes = (checkedInRacers as CheckinWithRacer[]).map((checkin) => {
-        const racerQualifiers = (qualifiers.value as Qualifier[]).filter(
-          (q: Qualifier) => q.racer_id === checkin.racer_id
-        )
-        const bestTime =
-          racerQualifiers.length > 0
-            ? Math.min(...racerQualifiers.map((q: Qualifier) => q.time))
-            : null
+      // Process racers with their best qualifying times, excluding withdrawn racers
+      const racersWithTimes = (checkedInRacers as CheckinWithRacer[])
+        .filter((checkin) => !withdrawnRacerIds.has(checkin.racer_id)) // Exclude withdrawn racers
+        .map((checkin) => {
+          const racerQualifiers = (qualifiers.value as Qualifier[]).filter(
+            (q: Qualifier) => q.racer_id === checkin.racer_id
+          )
+          const bestTime =
+            racerQualifiers.length > 0
+              ? Math.min(...racerQualifiers.map((q: Qualifier) => q.time))
+              : null
 
-        return {
-          racer_id: checkin.racer_id,
-          racer_number: checkin.racer.racer_number,
-          name: checkin.racer.name,
-          user_id: checkin.racer.user_id || checkin.racer_id, // fallback
-          image_url: checkin.racer.image_url,
-          best_time: bestTime,
-          qualified: bestTime !== null
-        }
-      })
+          return {
+            racer_id: checkin.racer_id,
+            racer_number: checkin.racer.racer_number,
+            name: checkin.racer.name,
+            user_id: checkin.racer.user_id || checkin.racer_id, // fallback
+            image_url: checkin.racer.image_url,
+            best_time: bestTime,
+            qualified: bestTime !== null
+          }
+        })
 
       // Filter to only qualified racers and sort by best time
       const qualifiedRacers = racersWithTimes
@@ -148,9 +155,10 @@ export const useChallonge = () => {
         },
         eligible_racers: qualifiedRacers,
         summary: {
-          total_checked_in: checkedInRacers.length,
+          total_checked_in: checkedInRacers.length - withdrawnRacerIds.size,
           qualified: qualifiedRacers.length,
-          not_qualified: checkedInRacers.length - qualifiedRacers.length
+          not_qualified: checkedInRacers.length - withdrawnRacerIds.size - qualifiedRacers.length,
+          withdrawn: withdrawnRacerIds.size
         },
         tournament_exists: false, // Will be checked separately in the page
         existing_tournament: null
