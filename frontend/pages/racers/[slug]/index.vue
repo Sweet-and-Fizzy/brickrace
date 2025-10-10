@@ -54,30 +54,16 @@
               <template #content>
                 <!-- Main Image Display -->
                 <div
-                  class="relative w-full h-64 md:h-96 cursor-pointer group"
+                  class="relative w-full h-64 md:h-96 cursor-pointer"
                   @click="openRacerGallery(0)"
                 >
                   <Image
                     :src="allRacerPhotos[0]?.url"
                     :alt="racer.name"
-                    image-class="w-full h-64 md:h-96 object-cover group-hover:scale-105 transition-transform duration-300"
+                    image-class="w-full h-64 md:h-96 object-cover"
                     class="w-full h-64 md:h-96"
                     :preview="false"
                   />
-
-                  <!-- Hover Overlay -->
-                  <div
-                    class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center"
-                  >
-                    <div
-                      class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center"
-                    >
-                      <i class="pi pi-search-plus text-3xl mb-2" />
-                      <p class="text-sm font-medium">
-                        View Gallery ({{ allRacerPhotos.length }} photos)
-                      </p>
-                    </div>
-                  </div>
 
                   <!-- Name Tag Badge -->
                   <div
@@ -112,20 +98,20 @@
                     <div
                       v-for="(photo, index) in allRacerPhotos.slice(1, 6)"
                       :key="index + 1"
-                      class="flex-shrink-0 cursor-pointer group"
+                      class="flex-shrink-0 cursor-pointer"
                       @click="openRacerGallery(index + 1)"
                     >
                       <Image
                         :src="photo.url"
                         :alt="`${racer.name} photo ${index + 2}`"
-                        image-class="w-16 h-16 object-cover rounded border-2 border-transparent group-hover:border-blue-400 transition-colors"
+                        image-class="w-16 h-16 object-cover rounded border-2 border-gray-300"
                         class="w-16 h-16"
                         :preview="false"
                       />
                     </div>
                     <div
                       v-if="allRacerPhotos.length > 6"
-                      class="flex-shrink-0 w-16 h-16 bg-gray-200 rounded border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-blue-400 transition-colors"
+                      class="flex-shrink-0 w-16 h-16 bg-gray-200 rounded border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer"
                       @click="openRacerGallery(6)"
                     >
                       <span class="text-xs font-medium text-gray-600"
