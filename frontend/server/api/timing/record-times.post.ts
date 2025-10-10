@@ -175,7 +175,13 @@ async function handleBestOf3BracketTimes(
   }
 
   // Update round times based on track assignments
-  const updates: Partial<{ racer1_time: number | null; racer2_time: number | null }> = {}
+  const updates: Partial<{
+    racer1_time: number | null
+    racer2_time: number | null
+    completed_at: string | null
+    winner_racer_id: string | null
+    winner_track: number | null
+  }> = {}
 
   if (track1_time !== undefined) {
     // Find which racer is assigned to track 1 in this round
