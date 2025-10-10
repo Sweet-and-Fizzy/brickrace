@@ -21,6 +21,7 @@ import {
   syncBracketByChallongeMatchId,
   reconcileBracketsFromChallonge
 } from '~/server/utils/bracket-generator'
+import { challongeApi } from '~/server/utils/challonge-client'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Bracket as BracketRow } from '~/types/database'
 
@@ -174,7 +175,7 @@ async function handleBestOf3BracketTimes(
   }
 
   // Update round times based on track assignments
-  const updates: Partial<{ racer1_time: number; racer2_time: number }> = {}
+  const updates: Partial<{ racer1_time: number | null; racer2_time: number | null }> = {}
 
   if (track1_time !== undefined) {
     // Find which racer is assigned to track 1 in this round
@@ -211,18 +212,64 @@ async function handleBestOf3BracketTimes(
   // Get updated round data
   const updatedRound = { ...roundData, ...updates }
 
-  // Check if both times are recorded for this round
-  if (
-    updatedRound.racer1_time != null &&
-    updatedRound.racer2_time != null &&
-    !updatedRound.completed_at
-  ) {
+  // Decide round outcome with null semantics (win by non-null, tie if both null)
+  if (!updatedRound.completed_at) {
     await completeBestOf3Round(client, updatedRound)
 
-    // After completing a round, check if match is now decided (2 wins)
+    // After completing a round, compute wins now to avoid relying on async triggers
+    try {
+      const { data: participants } = await client
+        .from('brackets')
+        .select(
+          'track1_racer_id, track2_racer_id, is_completed, rounds_won_track1, rounds_won_track2'
+        )
+        .eq('id', bracket.id)
+        .single()
+      const { data: roundsAll } = await client
+        .from('bracket_rounds')
+        .select('winner_racer_id, completed_at')
+        .eq('bracket_id', bracket.id)
+
+      if (participants && Array.isArray(roundsAll)) {
+        const t1 = participants.track1_racer_id
+        const t2 = participants.track2_racer_id
+        let w1 = 0
+        let w2 = 0
+        for (const r of roundsAll) {
+          if (!r.completed_at || !r.winner_racer_id) continue
+          if (t1 && r.winner_racer_id === t1) w1++
+          if (t2 && r.winner_racer_id === t2) w2++
+        }
+        const decided = w1 >= 2 || w2 >= 2
+        // Persist if changed or not marked yet
+        if (decided && !participants.is_completed) {
+          await client
+            .from('brackets')
+            .update({
+              rounds_won_track1: w1,
+              rounds_won_track2: w2,
+              is_completed: true,
+              winner_racer_id: w1 >= 2 ? t1 : t2
+            })
+            .eq('id', bracket.id)
+        } else if (!decided) {
+          // Update visible wins even if not completed yet (useful if trigger lagging)
+          await client
+            .from('brackets')
+            .update({ rounds_won_track1: w1, rounds_won_track2: w2 })
+            .eq('id', bracket.id)
+        }
+      }
+    } catch (calcErr) {
+      console.warn('Failed to compute/persist best-of-3 wins immediately:', calcErr)
+    }
+
+    // Now check if match is decided (2 wins)
     const { data: updatedBracket } = await client
       .from('brackets')
-      .select('id, rounds_won_track1, rounds_won_track2, is_completed, challonge_match_id')
+      .select(
+        'id, rounds_won_track1, rounds_won_track2, is_completed, challonge_match_id, track1_racer_id, track2_racer_id'
+      )
       .eq('id', bracket.id)
       .single()
 
@@ -251,6 +298,28 @@ async function handleBestOf3BracketTimes(
         }
       }
     } else {
+      // Special case: after round 3, if neither racer has any wins, auto-withdraw both
+      try {
+        const { data: rounds } = await client
+          .from('bracket_rounds')
+          .select('round_number, winner_racer_id, completed_at')
+          .eq('bracket_id', bracket.id)
+          .order('round_number')
+
+        const allThreeCompleted =
+          Array.isArray(rounds) && rounds.filter((r) => r.completed_at).length >= 3
+        const anyWins = Array.isArray(rounds) && rounds.some((r) => r.winner_racer_id)
+
+        if (allThreeCompleted && !anyWins) {
+          await handleDoubleNoPointsWithdrawal(client, raceId, {
+            bracket_id: bracket.id,
+            racer1_id: updatedBracket?.track1_racer_id || null,
+            racer2_id: updatedBracket?.track2_racer_id || null
+          })
+        }
+      } catch (e) {
+        console.error('Failed double-no-points withdrawal check:', e)
+      }
       // Not decided yet; advance bracket.current_round to the next incomplete round
       await advanceBestOf3ToNextRound(client, bracket.id)
     }
@@ -332,14 +401,25 @@ async function completeBestOf3Round(
     racer2_id: string
     racer1_track: 1 | 2
     racer2_track: 1 | 2
-    racer1_time: number | string
-    racer2_time: number | string
+    racer1_time: number | string | null
+    racer2_time: number | string | null
   }
 ) {
-  // Determine winner of this round by racer slot (not physical track)
-  const t1 = Number(roundData.racer1_time)
-  const t2 = Number(roundData.racer2_time)
-  const winnerIsRacer1 = t1 < t2
+  // Determine winner with null semantics: non-null wins; both null => tie
+  const hasT1 = roundData.racer1_time !== null && roundData.racer1_time !== undefined
+  const hasT2 = roundData.racer2_time !== null && roundData.racer2_time !== undefined
+  let winnerIsRacer1: boolean | null = null
+  if (hasT1 && hasT2) {
+    const t1 = Number(roundData.racer1_time)
+    const t2 = Number(roundData.racer2_time)
+    winnerIsRacer1 = t1 < t2
+  } else if (hasT1 && !hasT2) {
+    winnerIsRacer1 = true
+  } else if (!hasT1 && hasT2) {
+    winnerIsRacer1 = false
+  } else {
+    winnerIsRacer1 = null // tie
+  }
 
   // Fetch current bracket participants to avoid relying on possibly-null round racer ids
   const { data: br, error: brErr } = await client
@@ -369,27 +449,48 @@ async function completeBestOf3Round(
     console.warn('Unable to backfill round participant ids (non-fatal):', e)
   }
 
-  // Winner racer id comes from the round slot winner; winnerTrack is the physical track for logging only
-  const winnerRacerId = winnerIsRacer1
-    ? roundData.racer1_id || br?.track1_racer_id
-    : roundData.racer2_id || br?.track2_racer_id
-  const winnerTrack: 1 | 2 = winnerIsRacer1 ? roundData.racer1_track : roundData.racer2_track
+  let roundUpdateError: unknown = null
+  if (winnerIsRacer1 === null) {
+    // Tie: mark round completed without winner
+    const res = await client
+      .from('bracket_rounds')
+      .update({ completed_at: new Date().toISOString() })
+      .eq('id', roundData.id)
+    roundUpdateError = res.error
+  } else {
+    // Winner racer id comes from the round slot winner; winnerTrack is the physical track for logging only
+    const winnerRacerId = winnerIsRacer1
+      ? roundData.racer1_id || br?.track1_racer_id
+      : roundData.racer2_id || br?.track2_racer_id
+    const winnerTrack: 1 | 2 = winnerIsRacer1 ? roundData.racer1_track : roundData.racer2_track
 
-  // Update round with winner and completion time
-  const { error: roundUpdateError } = await client
-    .from('bracket_rounds')
-    .update({
-      winner_racer_id: winnerRacerId,
-      winner_track: winnerTrack,
-      completed_at: new Date().toISOString()
-    })
-    .eq('id', roundData.id)
+    // Update round with winner and completion time
+    const res = await client
+      .from('bracket_rounds')
+      .update({
+        winner_racer_id: winnerRacerId,
+        winner_track: winnerTrack,
+        completed_at: new Date().toISOString()
+      })
+      .eq('id', roundData.id)
+    roundUpdateError = res.error
+  }
 
   if (roundUpdateError) {
     throw roundUpdateError
   }
 
-  console.log(`🎯 Round ${roundData.round_number} completed: Winner = ${winnerRacerId}`)
+  console.log(
+    `🎯 Round ${roundData.round_number} completed: ${
+      winnerIsRacer1 === null
+        ? 'Tie (no winner)'
+        : `Winner = ${
+            winnerIsRacer1
+              ? roundData.racer1_id || br?.track1_racer_id
+              : roundData.racer2_id || br?.track2_racer_id
+          }`
+    }`
+  )
 
   // The database trigger will automatically update the bracket's win counts and determine overall winner
 }
@@ -417,6 +518,113 @@ async function advanceBestOf3ToNextRound(client: SupabaseClient, bracketId: stri
   }
 }
 
+// When both racers fail to score any points after 3 rounds, withdraw both from tournament
+async function handleDoubleNoPointsWithdrawal(
+  client: SupabaseClient,
+  raceId: string,
+  params: { bracket_id: string; racer1_id: string | null; racer2_id: string | null }
+): Promise<void> {
+  try {
+    const r1 = params.racer1_id
+    const r2 = params.racer2_id
+    if (!r1 && !r2) return
+
+    console.warn(
+      `Double no-points detected on bracket ${params.bracket_id}. Withdrawing racer(s):`,
+      [r1, r2].filter(Boolean)
+    )
+
+    const reason = 'Both racers failed to score in best-of-3 match'
+
+    // Upsert withdrawal records (without withdrawn_by since timing API is system)
+    const rows = [r1, r2]
+      .filter((id): id is string => Boolean(id))
+      .map((id) => ({ race_id: raceId, racer_id: id, reason }))
+    if (rows.length > 0) {
+      await client.from('race_withdrawals').upsert(rows)
+    }
+
+    // Delete participants from Challonge to keep bracket in sync
+    try {
+      const { data: tournament } = await client
+        .from('challonge_tournaments')
+        .select('id, challonge_tournament_id')
+        .eq('race_id', raceId)
+        .eq('status', 'active')
+        .single()
+
+      if (tournament) {
+        const { data: participantMap } = await client
+          .from('challonge_participants')
+          .select('racer_id, challonge_participant_id')
+          .eq('challonge_tournament_id', tournament.id)
+          .in(
+            'racer_id',
+            rows.map((r) => r.racer_id)
+          )
+
+        for (const rec of participantMap || []) {
+          try {
+            await challongeApi.deleteParticipant(
+              tournament.challonge_tournament_id,
+              rec.challonge_participant_id
+            )
+          } catch (delErr) {
+            console.error('Failed to delete participant from Challonge:', delErr)
+          }
+        }
+      }
+    } catch (chErr) {
+      console.error('Challonge participant cleanup error:', chErr)
+    }
+
+    // Invoke DB routine to forfeit all remaining matches for each racer
+    for (const id of [r1, r2]) {
+      if (!id) continue
+      try {
+        await client.rpc('handle_racer_withdrawal', {
+          target_race_id: raceId,
+          target_racer_id: id
+        })
+      } catch (wErr) {
+        console.error('handle_racer_withdrawal error:', wErr)
+      }
+    }
+
+    // Mark current bracket as forfeited with no winner
+    try {
+      await client
+        .from('brackets')
+        .update({
+          is_forfeit: true,
+          forfeit_reason: reason,
+          is_completed: true,
+          winner_racer_id: null
+        })
+        .eq('id', params.bracket_id)
+    } catch (bErr) {
+      console.error('Failed to mark bracket as forfeited:', bErr)
+    }
+
+    // Reconcile from Challonge to update downstream matches/participants
+    try {
+      const { data: tournament } = await client
+        .from('challonge_tournaments')
+        .select('id')
+        .eq('race_id', raceId)
+        .eq('status', 'active')
+        .single()
+      if (tournament) {
+        await reconcileBracketsFromChallonge(client, raceId, tournament.id)
+      }
+    } catch (recErr) {
+      console.error('Reconcile after double withdrawal failed:', recErr)
+    }
+  } catch (err) {
+    console.error('Double no-points withdrawal failed:', err)
+  }
+}
+
 export default defineEventHandler(async (event) => {
   // Validate API key
   await requireTimingAuth(event)
@@ -433,10 +641,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (!track1_time && !track2_time) {
+  // Allow null to be explicitly provided; only reject when both values are truly undefined
+  if (typeof track1_time === 'undefined' && typeof track2_time === 'undefined') {
     throw createError({
       statusCode: 400,
-      statusMessage: 'At least one of track1_time or track2_time is required'
+      statusMessage: 'Provide track1_time and/or track2_time (numbers or nulls).'
     })
   }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 // Define types for function parameters to avoid 'any' types
@@ -51,15 +52,7 @@ interface BracketRecord {
   }
 }
 
-interface NextHeatRecord {
-  heat_number: number
-  track_number: number
-  racer_id: string
-  racer_name: string
-  racer_number: number
-  racer_image_url?: string
-  scheduled_order: number
-}
+// (removed) NextHeatRecord unused
 
 export type RacePhase = 'qualifying' | 'brackets' | 'complete' | 'not_started'
 
@@ -233,8 +226,8 @@ export async function getRacePhase(
             return 'complete'
           }
         }
-      } catch (error) {
-        console.log('Could not check Challonge status, falling back to local bracket check')
+      } catch (err) {
+        console.log('Could not check Challonge status, falling back to local bracket check:', err)
       }
 
       // Fallback: Check for any incomplete brackets (no winner assigned)
@@ -386,7 +379,9 @@ export async function getCurrentHeat(
       `
       )
       .eq('race_id', raceId)
-      .is('winner_racer_id', null) // Only get brackets without a winner (incomplete)
+      .is('winner_racer_id', null) // Incomplete by winner
+      .eq('is_completed', false) // Not marked complete (covers forfeit-completed)
+      .or('is_forfeit.is.null,is_forfeit.eq.false') // Not forfeited
       .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
@@ -468,6 +463,8 @@ export async function getCurrentHeat(
           )
           .eq('race_id', raceId)
           .is('winner_racer_id', null)
+          .eq('is_completed', false)
+          .or('is_forfeit.is.null,is_forfeit.eq.false')
           .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
           .order('challonge_round', { ascending: true })
           .order('match_number', { ascending: true })
@@ -547,8 +544,8 @@ export async function getCurrentHeat(
             ].filter((r) => r.racer_id)
           }
         }
-      } catch (error) {
-        console.error('Auto-sync failed:', error)
+      } catch (err) {
+        console.error('Auto-sync failed:', err)
         // Continue with normal flow even if sync fails
       }
     }
@@ -678,7 +675,20 @@ export async function getUpcomingHeats(
       const currentHeatNumber = currentHeat?.heat_number
 
       // Group by heat number
-      const grouped: Record<number, any> = {}
+      const grouped: Record<
+        number,
+        {
+          heat_number: number
+          type: 'qualifier'
+          racers: Array<{
+            track_number: number
+            racer_id: string
+            racer_name?: string
+            racer_number?: number
+            racer_image_url?: string
+          }>
+        }
+      > = {}
       upcomingQualifiers.forEach((q) => {
         if (!grouped[q.heat_number]) {
           grouped[q.heat_number] = {
@@ -726,7 +736,9 @@ export async function getUpcomingHeats(
       `
       )
       .eq('race_id', raceId)
-      .is('winner_racer_id', null) // Only get brackets without a winner (incomplete)
+      .is('winner_racer_id', null)
+      .eq('is_completed', false)
+      .or('is_forfeit.is.null,is_forfeit.eq.false')
       .order('challonge_suggested_play_order', { ascending: true, nullsFirst: false })
       .order('challonge_round', { ascending: true })
       .order('match_number', { ascending: true })
