@@ -26,7 +26,7 @@
               <div class="text-right">
                 <div class="text-gray-600 text-sm font-medium">Total Awards</div>
                 <div class="text-3xl font-bold text-black">
-                  {{ voteableAwards.length + filteredAssignedAwards.length }}
+                  {{ voteableAwards.length + bracketAwards.length + otherAssignedAwards.length }}
                 </div>
               </div>
             </div>
@@ -274,12 +274,114 @@
           </div>
         </div>
 
-        <!-- Current Winners / Assigned Awards -->
-        <div v-if="filteredAssignedAwards.length">
-          <h2 class="text-3xl font-bold text-black mb-8">Award Winners</h2>
+        <!-- Bracket Placement Awards -->
+        <div v-if="bracketAwards.length" class="mb-12">
+          <div class="mb-8">
+            <h2 class="text-3xl font-bold text-black mb-2">Tournament Winners</h2>
+            <p class="text-gray-600">
+              These awards are based on final tournament bracket standings, not community voting.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card
+              v-for="award in bracketAwards"
+              :key="award.id"
+              class="border-2 overflow-hidden"
+              :class="{
+                'border-yellow-500 bg-gradient-to-br from-yellow-50 to-yellow-100':
+                  award.award_definition?.name?.startsWith('1st'),
+                'border-gray-400 bg-gradient-to-br from-gray-50 to-gray-100':
+                  award.award_definition?.name?.startsWith('2nd'),
+                'border-amber-600 bg-gradient-to-br from-amber-50 to-orange-100':
+                  award.award_definition?.name?.startsWith('3rd')
+              }"
+              style="
+                box-shadow:
+                  0 4px 12px rgba(0, 0, 0, 0.15),
+                  inset 2px 2px 4px rgba(255, 255, 255, 0.4);
+              "
+            >
+              <template #header>
+                <div class="p-6 text-center">
+                  <!-- Award Image or Medal Icon -->
+                  <div v-if="award.award_definition?.image_url" class="flex justify-center mb-3">
+                    <img
+                      :src="award.award_definition.image_url"
+                      :alt="award.award_definition.name"
+                      class="w-32 h-32 object-contain"
+                    />
+                  </div>
+                  <div v-else class="text-6xl mb-3">
+                    <span v-if="award.award_definition?.name?.startsWith('1st')">🏆</span>
+                    <span v-else-if="award.award_definition?.name?.startsWith('2nd')">🥈</span>
+                    <span v-else-if="award.award_definition?.name?.startsWith('3rd')">🥉</span>
+                  </div>
+
+                  <!-- Award Name -->
+                  <h3 class="font-bold text-xl mb-4 text-black">
+                    {{ award.award_definition?.name }}
+                  </h3>
+                </div>
+              </template>
+
+              <template #content>
+                <div class="px-6 pb-6">
+                  <!-- Racer Image -->
+                  <div class="flex justify-center mb-4">
+                    <img
+                      v-if="award.racer?.image_url"
+                      :src="award.racer.image_url"
+                      :alt="award.racer.name"
+                      class="w-24 h-24 object-cover rounded-lg border-2"
+                      :class="{
+                        'border-yellow-600': award.award_definition?.name?.startsWith('1st'),
+                        'border-gray-500': award.award_definition?.name?.startsWith('2nd'),
+                        'border-amber-700': award.award_definition?.name?.startsWith('3rd')
+                      }"
+                    />
+                    <div
+                      v-else
+                      class="w-24 h-24 bg-gray-200 rounded-lg border-2 border-gray-400 flex items-center justify-center"
+                    >
+                      <i class="pi pi-car text-3xl text-gray-400" />
+                    </div>
+                  </div>
+
+                  <!-- Winner Info -->
+                  <div class="text-center">
+                    <RacerLink
+                      :racer-id="award.racer?.id"
+                      :racer-slug="award.racer?.slug"
+                      class="font-bold text-xl text-black hover:text-brand-blue hover:underline transition-colors duration-200 block mb-2"
+                    >
+                      {{ award.racer?.name }}
+                    </RacerLink>
+                    <div
+                      class="inline-block px-3 py-1 rounded-full text-sm font-semibold"
+                      :class="{
+                        'bg-yellow-600/20 text-yellow-900':
+                          award.award_definition?.name?.startsWith('1st'),
+                        'bg-gray-500/20 text-gray-800':
+                          award.award_definition?.name?.startsWith('2nd'),
+                        'bg-amber-700/20 text-amber-900':
+                          award.award_definition?.name?.startsWith('3rd')
+                      }"
+                    >
+                      Racer #{{ award.racer?.racer_number }}
+                    </div>
+                  </div>
+                </div>
+              </template>
+            </Card>
+          </div>
+        </div>
+
+        <!-- Current Winners / Other Assigned Awards -->
+        <div v-if="otherAssignedAwards.length">
+          <h2 class="text-3xl font-bold text-black mb-8">Other Award Winners</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <Card
-              v-for="award in filteredAssignedAwards"
+              v-for="award in otherAssignedAwards"
               :key="award.id"
               class="border-2 border-brand-gold bg-white hover:shadow-2xl transition-all duration-300 overflow-hidden"
               style="
@@ -504,6 +606,7 @@ const activeRace = ref(null)
 const selectedRace = computed(() => activeRace.value?.id)
 const submittingVotes = ref({})
 const votes = ref({})
+const loading = ref(false)
 
 // Get racers who are checked in for the active race
 const racers = computed(() => {
@@ -578,6 +681,37 @@ const filteredAssignedAwards = computed(() => {
   })
 })
 
+// Separate bracket placement awards from other assigned awards
+const bracketAwards = computed(() => {
+  return filteredAssignedAwards.value
+    .filter(
+      (award) =>
+        award.award_definition?.name?.includes('1st Place - Bracket Champion') ||
+        award.award_definition?.name?.includes('2nd Place - Runner-Up') ||
+        award.award_definition?.name?.includes('3rd Place')
+    )
+    .sort((a, b) => {
+      // Sort order: 1st, 2nd, 3rd
+      const getOrder = (name) => {
+        if (name?.includes('1st')) return 1
+        if (name?.includes('2nd')) return 2
+        if (name?.includes('3rd')) return 3
+        return 4
+      }
+      return getOrder(a.award_definition?.name) - getOrder(b.award_definition?.name)
+    })
+})
+
+// Other assigned awards (excluding bracket placements)
+const otherAssignedAwards = computed(() => {
+  return filteredAssignedAwards.value.filter(
+    (award) =>
+      !award.award_definition?.name?.includes('1st Place - Bracket Champion') &&
+      !award.award_definition?.name?.includes('2nd Place - Runner-Up') &&
+      !award.award_definition?.name?.includes('3rd Place')
+  )
+})
+
 // Handle vote submission
 const handleVoteSubmission = async (awardDefinitionId) => {
   const racerId = votes.value[awardDefinitionId]
@@ -617,6 +751,7 @@ const handleVoteSubmission = async (awardDefinitionId) => {
 
 // Fetch active race
 const fetchActiveRace = async () => {
+  loading.value = true
   try {
     const supabase = useSupabaseClient()
     const { data, error } = await supabase
@@ -635,6 +770,8 @@ const fetchActiveRace = async () => {
     }
   } catch (error) {
     console.error('Error fetching active race:', error)
+  } finally {
+    loading.value = false
   }
 }
 
