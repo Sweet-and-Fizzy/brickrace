@@ -240,6 +240,7 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth'
+import { resizeImage, getResizeOptions } from '~/utils/imageResizer'
 
 definePageMeta({
   middleware: 'auth'
@@ -486,14 +487,18 @@ const savePreviewedPhoto = async () => {
       throw new Error('File name not found')
     }
 
-    const fileExt = fileName.split('.').pop()
+    // Resize image before upload to avoid size limits
+    const resizeOptions = getResizeOptions(actualFile)
+    const resizedFile = await resizeImage(actualFile, resizeOptions)
+
+    const fileExt = 'jpg' // Always use jpg after resize
     const newFileName = `racer-${racer.value.id}-main-${Date.now()}.${fileExt}`
     const filePath = `racers/${authStore.userId}/${newFileName}`
 
-    // Upload file to Supabase Storage
+    // Upload resized file to Supabase Storage
     const { error: uploadError } = await supabase.storage
       .from('race-images')
-      .upload(filePath, actualFile)
+      .upload(filePath, resizedFile)
 
     if (uploadError) throw uploadError
 
