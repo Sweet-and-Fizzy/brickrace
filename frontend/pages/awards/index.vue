@@ -553,7 +553,7 @@
                     <Column header="Votes" class="text-right">
                       <template #body="{ data }">
                         <Badge
-                          :value="`${data.vote_count} votes`"
+                          :value="data.vote_count"
                           class="font-bold bg-brand-blue text-white"
                         />
                       </template>
